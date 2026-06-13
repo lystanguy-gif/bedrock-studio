@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Play, Pause, Mic, MicOff, Search, Loader2, ExternalLink, AlertTriangle,
   HelpCircle, XCircle, CheckCircle2, Video, VideoOff, ImagePlus, X,
-  MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag
+  MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag, BookOpen, ChevronDown
 } from "lucide-react";
+import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -116,6 +117,11 @@ function Live({ cfg, onBack }) {
   const [comments, setComments] = useState([]);
   const [draft, setDraft] = useState("");
   const [cError, setCError] = useState("");
+  const [kbHits, setKbHits] = useState([]);
+  const [kbReady, setKbReady] = useState(false);
+  const [kbOpen, setKbOpen] = useState({});
+
+  const kbRef = useRef(null), kbSeenRef = useRef(new Set());
 
   const recRef = useRef(null), wantRef = useRef(false), busyRef = useRef(false);
   const lastLenRef = useRef(0), floorRef = useRef(null), joinedRef = useRef("");
@@ -124,6 +130,21 @@ function Live({ cfg, onBack }) {
   useEffect(() => { floorRef.current = floor; }, [floor]);
   useEffect(() => { busyRef.current = analyzing; }, [analyzing]);
   useEffect(() => { joinedRef.current = segments.map((s) => s.text).join(" "); }, [segments]);
+
+  // Base documentaire locale : chargée une fois.
+  useEffect(() => { loadKnowledgeBase().then((kb) => { kbRef.current = kb; setKbReady(true); }).catch(() => {}); }, []);
+  // À chaque évolution de la transcription, on repère les fiches dont un mot-clé
+  // est prononcé, et on ajoute les nouvelles en haut de la liste.
+  useEffect(() => {
+    if (!kbRef.current) return;
+    const found = scanForFiches(kbRef.current, joinedRef.current);
+    const fresh = found.filter(({ fiche }) => !kbSeenRef.current.has(fiche.id));
+    if (!fresh.length) return;
+    const side = floorRef.current ?? 0;
+    const stamp = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    fresh.forEach(({ fiche }) => kbSeenRef.current.add(fiche.id));
+    setKbHits((p) => [...fresh.map(({ fiche, matched }) => ({ fiche, matched, side, stamp })), ...p].slice(0, 40));
+  }, [segments, kbReady]);
 
   useEffect(() => {
     if (!clockRunning || floor === null) return;
@@ -135,7 +156,7 @@ function Live({ cfg, onBack }) {
   const cede = () => { stopMic(); setClockRunning(false); setPending(other(floor)); setRequest(null); };
   const accept = () => { stopMic(); setFloor(pending); setPending(null); setRequest(null); setClockRunning(true); };
   const askFloor = (i) => setRequest(i);
-  const reset = () => { stopMic(); setFloor(null); setClockRunning(false); setPending(null); setRequest(null); setRemaining([cfg.minutes * 60, cfg.minutes * 60]); };
+  const reset = () => { stopMic(); setFloor(null); setClockRunning(false); setPending(null); setRequest(null); setRemaining([cfg.minutes * 60, cfg.minutes * 60]); kbSeenRef.current = new Set(); setKbHits([]); };
 
   const analyze = useCallback(async (raw, withWeb = true) => {
     const chunk = (raw || "").trim().slice(-2000);
@@ -353,7 +374,27 @@ Rien à vérifier -> []. sources peut être vide.`;
             </button>
           </div>
           <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: 180, minHeight: 80 }}>
-            {suggestions.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les points à vérifier et leurs sources apparaissent ici.</div>}
+            {suggestions.length === 0 && kbHits.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les fiches et les points à vérifier apparaissent ici quand un terme connu est prononcé.</div>}
+            {kbHits.map(({ fiche, side, stamp }) => { const open = !!kbOpen[fiche.id]; const toggle = () => setKbOpen((o) => ({ ...o, [fiche.id]: !o[fiche.id] })); return (
+              <div key={fiche.id} style={{ background: C.panel2, border: "1px solid " + C.line, borderLeft: "3px solid " + C.greyblue, borderRadius: 12, padding: 10 }}>
+                <div onClick={toggle} className="flex items-center justify-between cursor-pointer" style={{ gap: 8 }}>
+                  <Badge color={C.greyblue}><BookOpen size={11} /> Fiche</Badge>
+                  <span className="inline-flex items-center gap-1" style={{ color: "#6f6b63", fontSize: 11 }}><span style={{ width: 7, height: 7, borderRadius: 2, background: CAMP[side] }} />{stamp}<ChevronDown size={13} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }} /></span>
+                </div>
+                <div onClick={toggle} className="cursor-pointer" style={{ fontSize: 14, fontWeight: 600, marginTop: 4 }}>{fiche.titre}</div>
+                {open && (
+                  <div style={{ marginTop: 6 }}>
+                    {fiche.resume && <div style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{fiche.resume}</div>}
+                    {fiche.reexplication && <div style={{ fontSize: 12, color: C.mute, marginTop: 6, lineHeight: 1.5 }}>{fiche.reexplication}</div>}
+                    {Array.isArray(fiche.pointsCles) && fiche.pointsCles.length > 0 && (
+                      <ul style={{ margin: "6px 0 0", paddingLeft: 16, fontSize: 12, color: C.text, lineHeight: 1.6 }}>
+                        {fiche.pointsCles.map((pt, k) => <li key={k}>{pt}</li>)}
+                      </ul>
+                    )}
+                    {fiche.dossierLabel && <div className="inline-flex items-center gap-1" style={{ fontSize: 12, color: C.gold, marginTop: 6 }}><BookOpen size={11} /> {fiche.dossierLabel}</div>}
+                  </div>
+                )}
+              </div>); })}
             {suggestions.map((it) => it.error
               ? <div key={it.id} style={{ border: "1px solid " + C.red, borderRadius: 12, padding: 10, fontSize: 12, color: "#e0b3ac" }}>{it.note}</div>
               : (() => { const st = STATUS[it.statut], Ic = st.Icon; return (
