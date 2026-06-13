@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Play, Pause, Mic, MicOff, Search, Loader2, ExternalLink, AlertTriangle,
   HelpCircle, XCircle, CheckCircle2, Video, VideoOff, ImagePlus, X,
-  MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag, BookOpen, ChevronDown
+  MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag, BookOpen, ChevronDown,
+  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
+import { supabase, isSupabaseConfigured } from "./lib/supabaseClient.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -32,26 +34,175 @@ const cardStyle = { background: C.panel, border: "1px solid " + C.line, borderRa
 const fieldStyle = { background: C.field, border: "1px solid " + C.line, color: C.text, borderRadius: 14 };
 
 export default function App() {
+  const [session, setSession] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [view, setView] = useState("home"); // home | auth | debate
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) { setAuthReady(true); return; }
+    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setAuthReady(true); });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  return (
+    <Shell>
+      {view === "auth" ? (
+        <AuthScreen onBack={() => setView("home")} onDone={() => setView("home")} />
+      ) : view === "debate" ? (
+        <DebateApp onHome={() => setView("home")} />
+      ) : (
+        <Home
+          session={session}
+          authReady={authReady}
+          onCreate={() => setView(session ? "debate" : "auth")}
+          onSignIn={() => setView("auth")}
+        />
+      )}
+    </Shell>
+  );
+}
+
+// Le flux de débat existant (configuration + direct), inchangé visuellement.
+function DebateApp({ onHome }) {
   const [phase, setPhase] = useState("setup");
   const [cfg, setCfg] = useState({
     panel: "Le contrechamp", topic: "L'État doit-il encadrer les prix de l'énergie ?",
     camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true,
   });
+  return phase === "setup"
+    ? <Setup cfg={cfg} setCfg={setCfg} onStart={() => setPhase("live")} onHome={onHome} />
+    : <Live cfg={cfg} onBack={() => setPhase("setup")} />;
+}
+
+// Pseudo affichable d'une session (métadonnée "pseudo" sinon début de l'email).
+function pseudoOf(session) {
+  if (!session?.user) return null;
+  return session.user.user_metadata?.pseudo || (session.user.email || "").split("@")[0] || "Compte";
+}
+
+/* ----------------------------- ACCUEIL ----------------------------- */
+function Home({ session, authReady, onCreate, onSignIn }) {
+  const pseudo = pseudoOf(session);
+  const accountRight = !authReady ? null : (session ? (
+    <div className="flex items-center gap-2">
+      <span style={{ color: C.mute, fontSize: 13 }}>Bonjour, <strong style={{ color: C.text }}>{pseudo}</strong></span>
+      <button onClick={() => supabase.auth.signOut()} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12 }}><LogOut size={13} /> Déconnexion</button>
+    </div>
+  ) : (
+    <button onClick={onSignIn} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 12 }}><LogIn size={13} /> Se connecter</button>
+  ));
   return (
-    <Shell>
-      {phase === "setup"
-        ? <Setup cfg={cfg} setCfg={setCfg} onStart={() => setPhase("live")} />
-        : <Live cfg={cfg} onBack={() => setPhase("setup")} />}
-    </Shell>
+    <>
+      <Header right={accountRight} />
+      <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
+        <Kicker>Régie de débat</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(40px,8vw,76px)", lineHeight: 0.92, margin: "10px 0 14px", fontWeight: 700 }}>Le contrechamp</h1>
+        <p style={{ color: C.mute, maxWidth: 720, lineHeight: 1.6, marginBottom: 36 }}>
+          Deux camps, face à face. Le champ et le contrechamp. Pour regarder, c'est libre. Pour participer ou héberger, un compte suffit.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <button onClick={onCreate} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: "pointer" }}>
+            Créer un débat <ArrowRight size={16} />
+          </button>
+          <button disabled className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.pill, color: "#6f6b63", border: "1px solid " + C.line, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: "default" }}>
+            Rejoindre un débat · bientôt
+          </button>
+        </div>
+        {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Créer un débat nécessite un compte (gratuit, rapide).</p>}
+        {!isSupabaseConfigured && <p style={{ color: C.gold, fontSize: 12, marginTop: 16 }}>⚠️ Connexion à la base non configurée sur ce site (variables d'environnement manquantes).</p>}
+      </div>
+      <Footer />
+    </>
+  );
+}
+
+/* ----------------------------- COMPTES ----------------------------- */
+function traduireErreur(msg) {
+  const m = (msg || "").toLowerCase();
+  if (m.includes("invalid login")) return "Email ou mot de passe incorrect.";
+  if (m.includes("email not confirmed")) return "Email pas encore confirmé. Vérifie ta boîte mail.";
+  if (m.includes("already registered") || m.includes("already been registered")) return "Un compte existe déjà avec cet email.";
+  if (m.includes("password should be")) return "Mot de passe trop court (6 caractères minimum).";
+  if (m.includes("is invalid")) return "Cette adresse email semble invalide.";
+  return msg || "Une erreur est survenue.";
+}
+
+function AuthScreen({ onBack, onDone }) {
+  const [mode, setMode] = useState("signup"); // signup | signin
+  const [pseudo, setPseudo] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+
+  async function submit() {
+    setError(""); setInfo("");
+    if (!isSupabaseConfigured) { setError("La connexion n'est pas configurée sur ce site."); return; }
+    if (!email.trim() || !password) { setError("Email et mot de passe requis."); return; }
+    if (mode === "signup" && !pseudo.trim()) { setError("Choisis un pseudo."); return; }
+    setBusy(true);
+    try {
+      if (mode === "signup") {
+        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { pseudo: pseudo.trim() } } });
+        if (error) setError(traduireErreur(error.message));
+        else if (!data.session) { setInfo("Compte créé ! Vérifie ta boîte mail pour confirmer, puis connecte-toi."); setMode("signin"); }
+        else onDone();
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) setError(traduireErreur(error.message));
+        else onDone();
+      }
+    } finally { setBusy(false); }
+  }
+
+  const back = <button onClick={onBack} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  return (
+    <>
+      <Header right={back} />
+      <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
+        <Kicker>Ton compte</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 24px", fontWeight: 700 }}>
+          {mode === "signup" ? "Créer un compte" : "Se connecter"}
+        </h1>
+
+        <div style={{ ...cardStyle, padding: 24, maxWidth: 460 }}>
+          <div className="flex gap-2" style={{ marginBottom: 20 }}>
+            <Toggle on={mode === "signup"} onClick={() => { setMode("signup"); setError(""); }} icon={<UserPlus size={14} />} label="Créer un compte" />
+            <Toggle on={mode === "signin"} onClick={() => { setMode("signin"); setError(""); }} icon={<LogIn size={14} />} label="Se connecter" />
+          </div>
+
+          {mode === "signup" && (<>
+            <Label>Pseudo</Label>
+            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} placeholder="Ton nom affiché" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 16 }} />
+          </>)}
+          <Label>Email</Label>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="toi@email.fr" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 16 }} />
+          <Label>Mot de passe</Label>
+          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder="6 caractères minimum" onKeyDown={(e) => e.key === "Enter" && submit()} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
+
+          {error && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{error}</div>}
+          {info && <div style={{ color: C.green, fontSize: 13, marginBottom: 12 }}>{info}</div>}
+
+          <button onClick={submit} disabled={busy} className="inline-flex items-center justify-center gap-2 uppercase w-full" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 13, cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1 }}>
+            {busy ? <Spinner size={15} className="spin" /> : (mode === "signup" ? <UserPlus size={15} /> : <LogIn size={15} />)}
+            {mode === "signup" ? "Créer mon compte" : "Me connecter"}
+          </button>
+        </div>
+        <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Pour regarder un débat, aucun compte n'est nécessaire. Le compte sert à écrire, participer et héberger.</p>
+      </div>
+      <Footer />
+    </>
   );
 }
 
 /* ----------------------------- SETUP ----------------------------- */
-function Setup({ cfg, setCfg, onStart }) {
+function Setup({ cfg, setCfg, onStart, onHome }) {
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
   return (
     <>
-      <Header right={null} />
+      <Header right={onHome ? <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button> : null} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
         <Kicker>Régie de débat</Kicker>
         <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(40px,8vw,76px)", lineHeight: 0.92, margin: "10px 0 14px", fontWeight: 700 }}>
