@@ -1,0 +1,14 @@
+# Configuration de déploiement Netlify pour Le Contrechamp.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# L'appli est une "single page app" : toutes les routes renvoient vers index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
