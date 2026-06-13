@@ -239,7 +239,9 @@ Rien à vérifier -> []. sources peut être vide.`;
   useEffect(() => () => { wantRef.current = false; try { recRef.current && recRef.current.stop(); } catch (e) {} camStreamRef.current && camStreamRef.current.getTracks().forEach((t) => t.stop()); }, []);
 
   function addImages(i, files) {
-    const urls = Array.from(files).filter((f) => f.type.startsWith("image/")).map((f) => URL.createObjectURL(f));
+    // Sur iPhone, le "type" du fichier est souvent vide : on accepte alors le
+    // fichier quand même (le champ est déjà limité aux images via accept).
+    const urls = Array.from(files).filter((f) => !f.type || f.type.startsWith("image/")).map((f) => URL.createObjectURL(f));
     setImages((im) => im.map((arr, k) => k === i ? [...arr, ...urls] : arr));
   }
   function postComment() {
@@ -249,67 +251,10 @@ Rien à vérifier -> []. sources peut être vide.`;
     setCError(""); setComments((c) => [{ id: Date.now(), txt: v, t: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) }, ...c]); setDraft("");
   }
 
-  const Camp = ({ i }) => {
-    const has = i === floor, isPending = pending === i, started = floor !== null;
-    return (
-      <div className="flex flex-col gap-2.5" style={{ background: has ? C.panel2 : C.panel, border: "1px solid " + (has ? C.gold : C.line), borderRadius: 18, padding: 14, boxShadow: has ? "0 16px 44px -26px " + C.gold : "none", transition: "border-color .15s,box-shadow .15s" }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <span style={{ width: 10, height: 10, borderRadius: 3, background: CAMP[i] }} />
-            <span className="truncate uppercase" style={{ fontFamily: SERIF, fontSize: 16, letterSpacing: "0.06em" }}>{cfg.camps[i]}</span>
-          </div>
-          {has && <Badge color={C.gold}>{clockRunning ? "parole" : "pause"}</Badge>}
-          {request === i && !has && <Badge color={C.gold}><Hand size={10} /> demande</Badge>}
-        </div>
-
-        <div className="overflow-hidden flex items-center justify-center" style={{ background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
-          {camOwner === i ? <video ref={(el) => { vidRefs[i].current = el; if (el && camStreamRef.current && el.srcObject !== camStreamRef.current) el.srcObject = camStreamRef.current; }} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
-        </div>
-
-        <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
-
-        {!started ? (
-          <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>en attente du lancement</div>
-        ) : has ? (
-          <div className="flex gap-2">
-            <button onClick={() => micOn ? stopMic() : startMic()} className={micOn ? "" : "pill"} style={micOn ? pillSolid(C.red) : pillBase()}>
-              {micOn ? <><MicOff size={13} /> Couper le micro</> : <><Mic size={13} /> Activer le micro</>}
-            </button>
-            <button onClick={cede} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> Céder</button>
-          </div>
-        ) : isPending ? (
-          <button onClick={accept} className="pulse" style={pillSolid(C.gold, C.bg)}><Hand size={13} /> Prendre la parole</button>
-        ) : (
-          <button onClick={() => askFloor(i)} disabled={request === i} className={request === i ? "" : "pill"} style={{ ...pillBase(), color: request === i ? "#6f6b63" : C.mute, cursor: request === i ? "default" : "pointer" }}>
-            <Hand size={12} /> {request === i ? "demande envoyée" : "Demander la parole"}
-          </button>
-        )}
-
-        <div className="flex gap-2">
-          <button onClick={() => toggleCam(i)} className={camOwner === i ? "" : "pill"} style={camOwner === i ? pillSolid(CAMP[i]) : pillBase()}>
-            {camOwner === i ? <Video size={12} /> : <VideoOff size={12} />} Caméra
-          </button>
-          <label className="pill inline-flex items-center justify-center gap-1.5 cursor-pointer" style={{ ...pillBase(), flex: 1 }}>
-            <ImagePlus size={12} /> Image
-            <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => { addImages(i, e.target.files); e.target.value = ""; }} />
-          </label>
-        </div>
-
-        {images[i].length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {images[i].map((u, k) => (
-              <div key={k} className="relative">
-                <img src={u} alt="" onClick={() => setLightbox(u)} className="object-cover cursor-pointer" style={{ width: 76, height: 76, borderRadius: 10, border: "1px solid " + C.line }} />
-                <button onClick={() => setImages((im) => im.map((arr, kk) => kk === i ? arr.filter((_, j) => j !== k) : arr))} className="absolute" style={{ top: -6, right: -6, borderRadius: 999, background: C.bg, border: "1px solid " + C.line, padding: 1, cursor: "pointer" }}>
-                  <X size={11} color={C.mute} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
+  // Le composant Camp est défini au niveau module (voir plus bas), pour ne
+  // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
+  // l'état nécessaire en props.
+  const campProps = { floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages };
 
   const bannerStatus = floor === null ? "Le modérateur lance le débat"
     : clockRunning ? "au temps de parole"
@@ -345,8 +290,8 @@ Rien à vérifier -> []. sources peut être vide.`;
       </div>
 
       <div className="mx-auto grid grid-cols-2 gap-3" style={{ maxWidth: 1180, padding: "14px 18px 0" }}>
-        <Camp i={0} />
-        <Camp i={1} />
+        <Camp i={0} {...campProps} />
+        <Camp i={1} {...campProps} />
       </div>
 
       {micError && <div className="mx-auto" style={{ maxWidth: 1180, padding: "14px 18px 0" }}><div style={{ background: "#1f1413", border: "1px solid " + C.red, borderRadius: 12, padding: 10, fontSize: 12, color: "#e0b3ac" }}>{micError}</div></div>}
@@ -447,6 +392,71 @@ Rien à vérifier -> []. sources peut être vide.`;
         </div>
       )}
     </>
+  );
+}
+
+/* --------------------------- CAMP (stable) --------------------------- */
+// Défini au niveau module pour conserver son identité entre les rendus :
+// ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
+function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages }) {
+  const has = i === floor, isPending = pending === i, started = floor !== null;
+  return (
+    <div className="flex flex-col gap-2.5" style={{ background: has ? C.panel2 : C.panel, border: "1px solid " + (has ? C.gold : C.line), borderRadius: 18, padding: 14, boxShadow: has ? "0 16px 44px -26px " + C.gold : "none", transition: "border-color .15s,box-shadow .15s" }}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          <span style={{ width: 10, height: 10, borderRadius: 3, background: CAMP[i] }} />
+          <span className="truncate uppercase" style={{ fontFamily: SERIF, fontSize: 16, letterSpacing: "0.06em" }}>{cfg.camps[i]}</span>
+        </div>
+        {has && <Badge color={C.gold}>{clockRunning ? "parole" : "pause"}</Badge>}
+        {request === i && !has && <Badge color={C.gold}><Hand size={10} /> demande</Badge>}
+      </div>
+
+      <div className="overflow-hidden flex items-center justify-center" style={{ background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
+        {camOwner === i ? <video ref={(el) => { vidRefs[i].current = el; if (el && camStreamRef.current && el.srcObject !== camStreamRef.current) el.srcObject = camStreamRef.current; }} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
+      </div>
+
+      <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
+
+      {!started ? (
+        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>en attente du lancement</div>
+      ) : has ? (
+        <div className="flex gap-2">
+          <button onClick={() => micOn ? stopMic() : startMic()} className={micOn ? "" : "pill"} style={micOn ? pillSolid(C.red) : pillBase()}>
+            {micOn ? <><MicOff size={13} /> Couper le micro</> : <><Mic size={13} /> Activer le micro</>}
+          </button>
+          <button onClick={cede} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> Céder</button>
+        </div>
+      ) : isPending ? (
+        <button onClick={accept} className="pulse" style={pillSolid(C.gold, C.bg)}><Hand size={13} /> Prendre la parole</button>
+      ) : (
+        <button onClick={() => askFloor(i)} disabled={request === i} className={request === i ? "" : "pill"} style={{ ...pillBase(), color: request === i ? "#6f6b63" : C.mute, cursor: request === i ? "default" : "pointer" }}>
+          <Hand size={12} /> {request === i ? "demande envoyée" : "Demander la parole"}
+        </button>
+      )}
+
+      <div className="flex gap-2">
+        <button onClick={() => toggleCam(i)} className={camOwner === i ? "" : "pill"} style={camOwner === i ? pillSolid(CAMP[i]) : pillBase()}>
+          {camOwner === i ? <Video size={12} /> : <VideoOff size={12} />} Caméra
+        </button>
+        <label className="pill inline-flex items-center justify-center gap-1.5 cursor-pointer" style={{ ...pillBase(), flex: 1 }}>
+          <ImagePlus size={12} /> Image
+          <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => { addImages(i, e.target.files); e.target.value = ""; }} />
+        </label>
+      </div>
+
+      {images[i].length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {images[i].map((u, k) => (
+            <div key={k} className="relative">
+              <img src={u} alt="" onClick={() => setLightbox(u)} className="object-cover cursor-pointer" style={{ width: 76, height: 76, borderRadius: 10, border: "1px solid " + C.line }} />
+              <button onClick={() => setImages((im) => im.map((arr, kk) => kk === i ? arr.filter((_, j) => j !== k) : arr))} className="absolute" style={{ top: -6, right: -6, borderRadius: 999, background: C.bg, border: "1px solid " + C.line, padding: 1, cursor: "pointer" }}>
+                <X size={11} color={C.mute} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
