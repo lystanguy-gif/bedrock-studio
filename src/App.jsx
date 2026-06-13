@@ -242,7 +242,7 @@ Rien à vérifier -> []. sources peut être vide.`;
         </div>
 
         <div className="overflow-hidden flex items-center justify-center" style={{ background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
-          {camOwner === i ? <video ref={vidRefs[i]} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
+          {camOwner === i ? <video ref={(el) => { vidRefs[i].current = el; if (el && camStreamRef.current && el.srcObject !== camStreamRef.current) el.srcObject = camStreamRef.current; }} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
         </div>
 
         <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
