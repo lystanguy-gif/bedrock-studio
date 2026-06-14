@@ -16,6 +16,7 @@ const C = {
   field: "#0c0e12",
 };
 const CAMP = [C.red, C.blue];
+const MAX_ROOM = 15; // Capacité d'un débat (limite "maison", vidéo gratuite).
 const STATUS = {
   correct:           { label: "Plausible",        color: C.green,     Icon: CheckCircle2 },
   a_nuancer:         { label: "À nuancer",         color: C.gold,      Icon: AlertTriangle },
@@ -503,6 +504,7 @@ function Live({ lobby, session, onHome }) {
   const [request, setRequest] = useState(null);
   const [remaining, setRemaining] = useState(panel.remaining && panel.remaining.length === 2 ? panel.remaining : [cfg.minutes * 60, cfg.minutes * 60]);
   const [spectators, setSpectators] = useState(1);
+  const [roomRank, setRoomRank] = useState(1);
   const [copied, setCopied] = useState(false);
   const [micOn, setMicOn] = useState(false);
   const [segments, setSegments] = useState([]);
@@ -527,6 +529,7 @@ function Live({ lobby, session, onHome }) {
   const lastLenRef = useRef(0), floorRef = useRef(null), joinedRef = useRef("");
   const camStreamRef = useRef(null), vidRefs = [useRef(null), useRef(null)];
   const remainingRef = useRef(remaining), seenMsgRef = useRef(new Set());
+  const presenceKeyRef = useRef("p" + Math.random().toString(36).slice(2));
 
   useEffect(() => { floorRef.current = floor; }, [floor]);
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
@@ -574,9 +577,15 @@ function Live({ lobby, session, onHome }) {
       })
       .subscribe();
 
-    const pres = supabase.channel("presence-" + panel.id, { config: { presence: { key: pseudo || "anon" } } })
+    const pres = supabase.channel("presence-" + panel.id, { config: { presence: { key: presenceKeyRef.current } } })
       .on("presence", { event: "sync" }, () => {
-        setSpectators(Object.keys(pres.presenceState()).length || 1);
+        const state = pres.presenceState();
+        const keys = Object.keys(state);
+        setSpectators(keys.length || 1);
+        // Rang d'arrivée du client courant (pour ne bloquer que les places au-delà de la limite).
+        const order = keys.map((k) => ({ k, at: (state[k][0] && state[k][0].at) || 0 })).sort((a, b) => a.at - b.at);
+        const rank = order.findIndex((x) => x.k === presenceKeyRef.current) + 1;
+        setRoomRank(rank || keys.length);
       })
       .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, at: Date.now() }); });
 
@@ -750,6 +759,21 @@ Rien à vérifier -> []. sources peut être vide.`;
     </div>
   );
 
+  if (!isHost && roomRank > MAX_ROOM) {
+    return (
+      <>
+        <Header right={<button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>} />
+        <div className="mx-auto" style={{ maxWidth: 720, padding: "80px 18px 60px", textAlign: "center" }}>
+          <Kicker>Salon complet</Kicker>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(24px,4vw,36px)", margin: "12px 0 10px" }}>Ce débat est complet ({MAX_ROOM} places)</h2>
+          <p style={{ color: C.mute, fontSize: 14, lineHeight: 1.6, maxWidth: 520, margin: "0 auto" }}>Pour garder une qualité fluide et gratuite, chaque débat est limité à {MAX_ROOM} personnes pour l'instant. Réessaie un peu plus tard, ou rejoins un autre débat.</p>
+          <button onClick={onHome} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 24, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "12px 24px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><ArrowLeft size={14} /> Retour à l'accueil</button>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header right={headerRight} />
@@ -846,7 +870,7 @@ Rien à vérifier -> []. sources peut être vide.`;
           <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
             <MessageSquare size={14} color={C.gold} />
             <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 13, letterSpacing: "0.08em" }}>Spectateurs</span>
-            <span className="inline-flex items-center gap-1" style={{ color: C.gold, fontSize: 12 }}><Users size={12} /> {spectators}</span>
+            <span className="inline-flex items-center gap-1" style={{ color: C.gold, fontSize: 12 }}><Users size={12} /> {spectators} / {MAX_ROOM}</span>
             <span style={{ color: "#6f6b63", fontSize: 12 }}>· {cfg.visibility === "public" ? "public · " : "privé · "}{cfg.comments ? "commentaires ouverts" : "commentaires bloqués"}</span>
           </div>
           {cfg.comments ? (
