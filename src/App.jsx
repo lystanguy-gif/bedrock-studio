@@ -368,10 +368,11 @@ function Live({ lobby, session, onHome }) {
     pushPanelState(panel.id, { floor, clock_running: clockRunning, remaining });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [floor, clockRunning]);
-  // Hôte : pousse régulièrement le temps restant pendant que le chrono tourne.
+  // Hôte : pousse régulièrement l'état complet pendant que le chrono tourne
+  // (auto-resynchronisation : un spectateur qui vient de rejoindre se cale en ~2 s).
   useEffect(() => {
     if (!isHost || !clockRunning) return;
-    const id = setInterval(() => pushPanelState(panel.id, { remaining: remainingRef.current }), 2000);
+    const id = setInterval(() => pushPanelState(panel.id, { floor: floorRef.current, clock_running: true, remaining: remainingRef.current }), 2000);
     return () => clearInterval(id);
   }, [isHost, clockRunning, panel.id]);
 
@@ -409,7 +410,19 @@ function Live({ lobby, session, onHome }) {
       })
       .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, at: Date.now() }); });
 
-    return () => { supabase.removeChannel(ch); supabase.removeChannel(pres); };
+    // Spectateur : rattrapage de l'état 3,5 s après l'abonnement (au cas où un
+    // changement aurait eu lieu pendant le démarrage de l'écoute temps réel).
+    const resync = setTimeout(() => {
+      if (isHost) return;
+      supabase.from("panels").select("floor,clock_running,remaining").eq("id", panel.id).maybeSingle().then(({ data }) => {
+        if (!data) return;
+        setFloor(data.floor ?? null);
+        setClockRunning(!!data.clock_running);
+        if (Array.isArray(data.remaining) && data.remaining.length === 2) setRemaining(data.remaining);
+      });
+    }, 3500);
+
+    return () => { clearTimeout(resync); supabase.removeChannel(ch); supabase.removeChannel(pres); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel.id]);
   useEffect(() => { busyRef.current = analyzing; }, [analyzing]);
