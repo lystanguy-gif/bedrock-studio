@@ -1009,6 +1009,16 @@ function Live({ lobby, session, onHome }) {
   // Puis-je parler dans le camp i ? (débatteur de ce camp avec la parole, ou hôte si le camp est vide)
   const canSpeakCamp = (i) => (mySeat === i || (iAmController && (seats[String(i)] || []).length === 0));
 
+  // Transcription automatique : dès que j'ai la parole (débatteur du camp actif,
+  // ou hôte d'un camp vide), le micro de transcription se lance seul ; il s'arrête
+  // quand je n'ai plus la parole. (Indépendant du micro de la caméra/voix.)
+  const iSpeakNow = floor !== null && canSpeakCamp(floor);
+  useEffect(() => {
+    if (iSpeakNow && !wantRef.current) startMic();
+    else if (!iSpeakNow && wantRef.current) stopMic();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [iSpeakNow]);
+
   // Cycle de vie : le débat reste ouvert tant qu'il y a quelqu'un « en haut »
   // (l'hôte OU au moins un débatteur présent). Sinon, fermeture après un court délai.
   const hostPresent = presentIds.has(panel.owner_id);
