@@ -451,38 +451,41 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
 }
 
 /* ----------------------------- MENTIONS LÉGALES ----------------------------- */
+const LEGAL_FR = [
+  ["But du site", "Le Contrechamp est un espace de débat structuré où deux camps s'opposent avec un temps de parole, une transcription, des fiches de repère et un espace de commentaires. Son objectif est de favoriser l'échange argumenté et la confrontation honnête des idées, pas de désigner une vérité officielle."],
+  ["Sur quoi nous nous appuyons", "Les fiches documentaires et les repères affichés pendant un débat sont des aides à la compréhension. Ils s'appuient sur des notions et des faits largement établis, mais ils peuvent contenir des simplifications, des imprécisions ou des erreurs, et ne remplacent pas une recherche approfondie ni une source primaire."],
+  ["Ce à quoi nous ne nous engageons pas", "Nous ne garantissons ni l'exactitude, ni l'exhaustivité, ni la neutralité parfaite des contenus. Nous ne garantissons pas non plus la disponibilité continue du service. Les opinions exprimées par les participants n'engagent qu'eux, jamais l'éditeur du site."],
+  ["Comptes & contenus des utilisateurs", "Pour regarder un débat, aucun compte n'est nécessaire. Pour écrire, participer ou héberger, un compte est requis : c'est une condition d'identification et de responsabilité. Chacun est responsable de ce qu'il publie. Un filtre de mots, des outils de modération et le signalement visent à limiter les abus ; les contenus illégaux ou contraires aux règles peuvent être retirés et les comptes concernés suspendus."],
+  ["Données personnelles", "Nous collectons le strict nécessaire au fonctionnement : email, pseudo et les contenus que tu publies. Ces données servent à faire fonctionner les comptes et les débats. Tu peux modifier ton pseudo et ton mot de passe depuis tes paramètres. (Avant une ouverture large au public, une politique de confidentialité complète sera ajoutée.)"],
+  ["Hébergement & technique", "Le site est hébergé via des prestataires tiers (déploiement et base de données). Le débat « en direct » repose sur une synchronisation entre les appareils des participants."],
+  ["Avertissement", "Ce texte est original et propre au Contrechamp : il n'est la copie d'aucune mention légale existante. Il est informatif et amené à évoluer. Avant une mise en ligne publique à grande échelle, il devra être complété par des mentions légales et des conditions d'utilisation conformes à la réglementation applicable (identité de l'éditeur, RGPD, etc.)."],
+];
+const LEGAL_EN = [
+  ["Purpose of the site", "Le Contrechamp is a space for structured debate where two camps face off with speaking time, a transcript, reference sheets and a comment area. Its goal is to encourage reasoned exchange and the honest confrontation of ideas, not to declare an official truth."],
+  ["What we rely on", "The fact sheets and references shown during a debate are aids to understanding. They draw on widely established notions and facts, but may contain simplifications, inaccuracies or errors, and don't replace in-depth research or a primary source."],
+  ["What we don't guarantee", "We guarantee neither the accuracy, completeness, nor perfect neutrality of the content. Nor do we guarantee continuous availability of the service. Opinions expressed by participants are their own, never the site publisher's."],
+  ["Accounts & user content", "To watch a debate, no account is needed. To write, take part or host, an account is required: it's a condition of identification and responsibility. Everyone is responsible for what they publish. A word filter, moderation tools and reporting aim to limit abuse; illegal or rule-breaking content may be removed and the accounts involved suspended."],
+  ["Personal data", "We collect only what's necessary to operate: email, username and the content you publish. This data is used to run accounts and debates. You can change your username and password from your settings. (Before a wide public release, a full privacy policy will be added.)"],
+  ["Hosting & technical", "The site is hosted via third-party providers (deployment and database). The live debate relies on synchronization between participants' devices."],
+  ["Disclaimer", "This text is original and specific to Le Contrechamp: it copies no existing legal notice. It is informational and will evolve. Before a large-scale public launch, it must be completed with legal notices and terms of use compliant with applicable regulations (publisher identity, GDPR, etc.)."],
+];
 function Legal({ onBack }) {
-  const back = <button onClick={onBack} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Retour</button>;
-  const H = ({ children }) => <h2 className="uppercase" style={{ fontFamily: SERIF, fontSize: 15, letterSpacing: "0.06em", color: C.gold, marginTop: 26, marginBottom: 8 }}>{children}</h2>;
-  const P = ({ children }) => <p style={{ color: C.text, fontSize: 14, lineHeight: 1.65, marginBottom: 8 }}>{children}</p>;
+  const { t, lang } = useLang();
+  const back = <button onClick={onBack} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Retour")}</button>;
+  const sections = lang === "en" ? LEGAL_EN : LEGAL_FR;
   return (
     <>
       <Header right={back} />
       <div className="mx-auto" style={{ maxWidth: 760, padding: "48px 18px 60px" }}>
         <Kicker>Le Contrechamp</Kicker>
-        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(30px,5vw,48px)", lineHeight: 1, margin: "10px 0 6px", fontWeight: 700 }}>Mentions légales & conditions</h1>
-        <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 8 }}>Document d'information, rédigé en langage clair. Il n'a pas valeur de conseil juridique.</p>
-
-        <H>But du site</H>
-        <P>Le Contrechamp est un espace de <strong>débat structuré</strong> où deux camps s'opposent avec un temps de parole, une transcription, des fiches de repère et un espace de commentaires. Son objectif est de <strong>favoriser l'échange argumenté</strong> et la confrontation honnête des idées, pas de désigner une vérité officielle.</P>
-
-        <H>Sur quoi nous nous appuyons</H>
-        <P>Les <strong>fiches documentaires</strong> et les repères affichés pendant un débat sont des <strong>aides à la compréhension</strong>. Ils s'appuient sur des notions et des faits largement établis, mais ils peuvent contenir des <strong>simplifications, des imprécisions ou des erreurs</strong>, et ne remplacent pas une recherche approfondie ni une source primaire.</P>
-
-        <H>Ce à quoi nous ne nous engageons pas</H>
-        <P>Nous ne garantissons ni l'<strong>exactitude</strong>, ni l'<strong>exhaustivité</strong>, ni la <strong>neutralité parfaite</strong> des contenus. Nous ne garantissons pas non plus la <strong>disponibilité continue</strong> du service. Les opinions exprimées par les participants n'engagent qu'eux, jamais l'éditeur du site.</P>
-
-        <H>Comptes & contenus des utilisateurs</H>
-        <P>Pour regarder un débat, aucun compte n'est nécessaire. Pour <strong>écrire, participer ou héberger</strong>, un compte est requis : c'est une condition d'<strong>identification et de responsabilité</strong>. Chacun est responsable de ce qu'il publie. Un <strong>filtre de mots</strong>, des outils de <strong>modération</strong> et le <strong>signalement</strong> visent à limiter les abus ; les contenus illégaux ou contraires aux règles peuvent être retirés et les comptes concernés suspendus.</P>
-
-        <H>Données personnelles</H>
-        <P>Nous collectons le strict nécessaire au fonctionnement : <strong>email, pseudo</strong> et les contenus que tu publies. Ces données servent à faire fonctionner les comptes et les débats. Tu peux modifier ton pseudo et ton mot de passe depuis tes paramètres. (Avant une ouverture large au public, une politique de confidentialité complète sera ajoutée.)</P>
-
-        <H>Hébergement & technique</H>
-        <P>Le site est hébergé via des prestataires tiers (déploiement et base de données). Le débat « en direct » repose sur une synchronisation entre les appareils des participants.</P>
-
-        <H>Avertissement</H>
-        <P>Ce texte est <strong>original</strong> et propre au Contrechamp : il n'est la copie d'aucune mention légale existante. Il est <strong>informatif</strong> et amené à évoluer. Avant une mise en ligne publique à grande échelle, il devra être complété par des mentions légales et des conditions d'utilisation conformes à la réglementation applicable (identité de l'éditeur, RGPD, etc.).</P>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(30px,5vw,48px)", lineHeight: 1, margin: "10px 0 6px", fontWeight: 700 }}>{t("Mentions légales & conditions")}</h1>
+        <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 8 }}>{t("Document d'information, rédigé en langage clair. Il n'a pas valeur de conseil juridique.")}</p>
+        {sections.map(([h, p]) => (
+          <div key={h}>
+            <h2 className="uppercase" style={{ fontFamily: SERIF, fontSize: 15, letterSpacing: "0.06em", color: C.gold, marginTop: 26, marginBottom: 8 }}>{h}</h2>
+            <p style={{ color: C.text, fontSize: 14, lineHeight: 1.65, marginBottom: 8 }}>{p}</p>
+          </div>
+        ))}
       </div>
       <Footer />
     </>
@@ -929,6 +932,7 @@ function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
 
 /* ----------------------------- LIVE ----------------------------- */
 function Live({ lobby, session, onHome }) {
+  const { t } = useLang();
   const { panel, isHost, pseudo } = lobby;
   const cfg = {
     panel: "Le contrechamp",
@@ -1401,25 +1405,25 @@ Rien à vérifier -> []. sources peut être vide.`;
   // l'état nécessaire en props.
   const campProps = { floor, clockRunning, remaining, cfg, publishing, pubCamp, videosByCamp, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController: iAmController, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
 
-  const bannerStatus = floor === null ? "Le modérateur lance le débat"
-    : clockRunning ? "au temps de parole"
-    : pending !== null ? "parole cédée — " + cfg.camps[pending] + " doit accepter"
-    : "en pause";
+  const bannerStatus = floor === null ? t("Le modérateur lance le débat")
+    : clockRunning ? t("au temps de parole")
+    : pending !== null ? t("parole cédée — en attente d'acceptation")
+    : t("en pause");
 
   function copyCode() { try { navigator.clipboard.writeText(panel.code); } catch (e) {} setCopied(true); setTimeout(() => setCopied(false), 1500); }
 
   const headerRight = (
     <div className="flex items-center gap-2">
-      <button onClick={copyCode} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 13 }} title="Copier le code de salle">
+      <button onClick={copyCode} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 13 }} title={t("Copier le code de salle")}>
         <span style={{ fontFamily: SERIF, letterSpacing: "0.18em", color: C.gold }}>{panel.code}</span>
-        {copied ? <span style={{ fontSize: 11, color: C.green }}>copié</span> : <Copy size={13} />}
+        {copied ? <span style={{ fontSize: 11, color: C.green }}>{t("copié")}</span> : <Copy size={13} />}
       </button>
       {iAmController && (floor === null
-        ? <button onClick={launch} className="inline-flex items-center gap-1.5 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 16px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><Flag size={13} /> Lancer</button>
-        : <button onClick={() => setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13 }}>{clockRunning ? <><Pause size={13} /> Pause</> : <><Play size={13} /> Reprendre</>}</button>)}
-      {iAmController && phase === "live" && floor !== null && <button onClick={openVote} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13, color: C.gold }} title="Clore le débat et lancer le vote"><CheckCircle2 size={13} /> Clore</button>}
-      {iAmController && <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title="Réinitialiser"><RotateCcw size={13} /></button>}
-      <button onClick={onHome} className="pill" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}>Quitter</button>
+        ? <button onClick={launch} className="inline-flex items-center gap-1.5 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 16px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><Flag size={13} /> {t("Lancer")}</button>
+        : <button onClick={() => setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13 }}>{clockRunning ? <><Pause size={13} /> {t("Pause")}</> : <><Play size={13} /> {t("Reprendre")}</>}</button>)}
+      {iAmController && phase === "live" && floor !== null && <button onClick={openVote} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13, color: C.gold }} title={t("Clore le débat et lancer le vote")}><CheckCircle2 size={13} /> {t("Clore")}</button>}
+      {iAmController && <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title={t("Réinitialiser")}><RotateCcw size={13} /></button>}
+      <button onClick={onHome} className="pill" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}>{t("Quitter")}</button>
     </div>
   );
 
@@ -1429,12 +1433,12 @@ Rien à vérifier -> []. sources peut être vide.`;
     <div className="mx-auto" style={{ maxWidth: 1180, padding: "14px 18px 0" }}>
       <div style={{ ...cardStyle, padding: 18, borderColor: C.gold }}>
         {phase === "voting" ? (<>
-          <Kicker>Le verdict du public</Kicker>
-          <h3 style={{ fontFamily: SERIF, fontSize: 20, margin: "6px 0 12px" }}>Qui a remporté ce débat ?</h3>
+          <Kicker>{t("Le verdict du public")}</Kicker>
+          <h3 style={{ fontFamily: SERIF, fontSize: 20, margin: "6px 0 12px" }}>{t("Qui a remporté ce débat ?")}</h3>
           {!session ? (
-            <p style={{ color: C.mute, fontSize: 13 }}>Connecte-toi pour voter. (Regarder reste libre.)</p>
+            <p style={{ color: C.mute, fontSize: 13 }}>{t("Connecte-toi pour voter. (Regarder reste libre.)")}</p>
           ) : isDebater ? (
-            <p style={{ color: C.mute, fontSize: 13 }}>Tu débats dans ce panel — c'est au public de voter.</p>
+            <p style={{ color: C.mute, fontSize: 13 }}>{t("Tu débats dans ce panel — c'est au public de voter.")}</p>
           ) : (
             <div className="flex flex-col sm:flex-row gap-3">
               {[0, 1].map((i) => (
@@ -1447,26 +1451,26 @@ Rien à vérifier -> []. sources peut être vide.`;
           <div style={{ marginTop: 14 }}>
             {[0, 1].map((i) => (
               <div key={i} style={{ marginBottom: 8 }}>
-                <div className="flex justify-between" style={{ fontSize: 12, color: C.mute, marginBottom: 4 }}><span>{cfg.camps[i]}</span><span>{tallyNow.counts[i]} voix</span></div>
+                <div className="flex justify-between" style={{ fontSize: 12, color: C.mute, marginBottom: 4 }}><span>{cfg.camps[i]}</span><span>{tallyNow.counts[i]} {t("voix")}</span></div>
                 <div style={{ height: 8, borderRadius: 6, background: C.field, overflow: "hidden" }}><div style={{ width: barFor(i) + "%", height: "100%", background: CAMP[i], transition: "width .3s" }} /></div>
               </div>
             ))}
-            <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 6 }}>{totalVotes} vote{totalVotes > 1 ? "s" : ""} · validé à partir de {MIN_VOTERS} votes</p>
+            <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 6 }}>{totalVotes} {totalVotes > 1 ? t("votes") : t("vote")} · {t("validé à partir de")} {MIN_VOTERS} {t("votes")}</p>
           </div>
-          {iAmController && <button onClick={closeVote} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 12, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><CheckCircle2 size={14} /> Clôturer le vote & révéler</button>}
+          {iAmController && <button onClick={closeVote} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 12, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><CheckCircle2 size={14} /> {t("Clôturer le vote & révéler")}</button>}
         </>) : (() => {
           const r = result || {};
           const validated = r.winner != null && r.voters >= MIN_VOTERS;
           return (<>
-            <Kicker>Résultat</Kicker>
+            <Kicker>{t("Résultat")}</Kicker>
             {r.winner == null
-              ? <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "6px 0 6px" }}>Égalité — pas de vainqueur</h3>
-              : <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "6px 0 6px" }}>Vainqueur : <span style={{ color: CAMP[r.winner] }}>{(r.camps && r.camps[r.winner]) || cfg.camps[r.winner]}</span></h3>}
-            <p style={{ color: C.mute, fontSize: 13 }}>{r.voters || 0} votant{(r.voters || 0) > 1 ? "s" : ""}{r.winner != null ? " · " + r.sharePct + "% des voix" : ""} · {r.audience || 0} présent{(r.audience || 0) > 1 ? "s" : ""}</p>
-            {!validated && <p style={{ color: C.gold, fontSize: 13, marginTop: 8 }}>Débat non validé : il faut au moins {MIN_VOTERS} votes et un vainqueur net pour décerner des trophées.</p>}
+              ? <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "6px 0 6px" }}>{t("Égalité — pas de vainqueur")}</h3>
+              : <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "6px 0 6px" }}>{t("Vainqueur :")} <span style={{ color: CAMP[r.winner] }}>{(r.camps && r.camps[r.winner]) || cfg.camps[r.winner]}</span></h3>}
+            <p style={{ color: C.mute, fontSize: 13 }}>{r.voters || 0} {(r.voters || 0) > 1 ? t("votants") : t("votant")}{r.winner != null ? " · " + r.sharePct + "% " + t("des voix") : ""} · {r.audience || 0} {(r.audience || 0) > 1 ? t("présents") : t("présent")}</p>
+            {!validated && <p style={{ color: C.gold, fontSize: 13, marginTop: 8 }}>{t("Débat non validé : il faut au moins")} {MIN_VOTERS} {t("votes et un vainqueur net pour décerner des trophées.")}</p>}
             {awarded.length > 0 && <TrophyUnlock ids={awarded} />}
-            {validated && mySeat != null && mySeat === r.winner && awarded.length === 0 && <p style={{ color: C.green, fontSize: 13, marginTop: 8 }}>Victoire enregistrée ! (Pas de nouveau trophée cette fois.)</p>}
-            {iAmController && <button onClick={backToLive} className="pill inline-flex items-center gap-2" style={{ marginTop: 12, padding: "9px 16px", fontSize: 12 }}><RotateCcw size={13} /> Revenir au direct</button>}
+            {validated && mySeat != null && mySeat === r.winner && awarded.length === 0 && <p style={{ color: C.green, fontSize: 13, marginTop: 8 }}>{t("Victoire enregistrée ! (Pas de nouveau trophée cette fois.)")}</p>}
+            {iAmController && <button onClick={backToLive} className="pill inline-flex items-center gap-2" style={{ marginTop: 12, padding: "9px 16px", fontSize: 12 }}><RotateCcw size={13} /> {t("Revenir au direct")}</button>}
           </>);
         })()}
       </div>
@@ -1476,12 +1480,12 @@ Rien à vérifier -> []. sources peut être vide.`;
   if (!iAmController && mySeat == null && roomRank > MAX_ROOM) {
     return (
       <>
-        <Header right={<button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>} />
+        <Header right={<button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Accueil")}</button>} />
         <div className="mx-auto" style={{ maxWidth: 720, padding: "80px 18px 60px", textAlign: "center" }}>
-          <Kicker>Salon complet</Kicker>
-          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(24px,4vw,36px)", margin: "12px 0 10px" }}>Ce débat est complet ({MAX_ROOM} places)</h2>
-          <p style={{ color: C.mute, fontSize: 14, lineHeight: 1.6, maxWidth: 520, margin: "0 auto" }}>Pour garder une qualité fluide et gratuite, chaque débat est limité à {MAX_ROOM} personnes pour l'instant. Réessaie un peu plus tard, ou rejoins un autre débat.</p>
-          <button onClick={onHome} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 24, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "12px 24px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><ArrowLeft size={14} /> Retour à l'accueil</button>
+          <Kicker>{t("Salon complet")}</Kicker>
+          <h2 style={{ fontFamily: SERIF, fontSize: "clamp(24px,4vw,36px)", margin: "12px 0 10px" }}>{t("Ce débat est complet")} ({MAX_ROOM} {t("places")})</h2>
+          <p style={{ color: C.mute, fontSize: 14, lineHeight: 1.6, maxWidth: 520, margin: "0 auto" }}>{t("Pour garder une qualité fluide et gratuite, chaque débat est limité pour l'instant. Réessaie plus tard, ou rejoins un autre débat.")}</p>
+          <button onClick={onHome} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 24, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "12px 24px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><ArrowLeft size={14} /> {t("Retour à l'accueil")}</button>
         </div>
         <Footer />
       </>
@@ -1492,7 +1496,7 @@ Rien à vérifier -> []. sources peut être vide.`;
     <>
       <Header right={headerRight} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "22px 18px 0" }}>
-        <Kicker>{cfg.panel} · {cfg.visibility === "public" ? "public" : "privé"}</Kicker>
+        <Kicker>{cfg.panel} · {cfg.visibility === "public" ? t("public") : t("privé")}</Kicker>
         <h2 style={{ fontFamily: SERIF, fontSize: "clamp(22px,3.4vw,32px)", lineHeight: 1.05, margin: "6px 0 18px" }}>{cfg.topic}</h2>
 
         <div className="flex items-center justify-between" style={{ background: C.panel2, border: "1px solid " + (floor !== null ? C.gold : C.line), borderRadius: 18, padding: "16px 22px" }}>
@@ -1513,13 +1517,13 @@ Rien à vérifier -> []. sources peut être vide.`;
         <Camp i={1} {...campProps} />
       </div>
 
-      {micError && <div className="mx-auto" style={{ maxWidth: 1180, padding: "14px 18px 0" }}><div style={{ background: "#1f1413", border: "1px solid " + C.red, borderRadius: 12, padding: 10, fontSize: 12, color: "#e0b3ac" }}>{micError}</div></div>}
+      {micError && <div className="mx-auto" style={{ maxWidth: 1180, padding: "14px 18px 0" }}><div style={{ background: "#1f1413", border: "1px solid " + C.red, borderRadius: 12, padding: 10, fontSize: 12, color: "#e0b3ac" }}>{t(micError)}</div></div>}
 
       <div className="mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ maxWidth: 1180, padding: "14px 18px 0" }}>
         <div style={{ ...cardStyle, padding: 16, display: "flex", flexDirection: "column" }}>
-          <Kicker>Retranscription complète</Kicker>
+          <Kicker>{t("Retranscription complète")}</Kicker>
           <div className="overflow-y-auto flex flex-col gap-2" style={{ maxHeight: 230, minHeight: 120, marginTop: 10, fontSize: 14, lineHeight: 1.6 }}>
-            {segments.length === 0 && <span style={{ color: "#6f6b63" }}>Tout ce qui est dit s'écrit ici, repérable par camp, et reste relisible.</span>}
+            {segments.length === 0 && <span style={{ color: "#6f6b63" }}>{t("Tout ce qui est dit s'écrit ici, repérable par camp, et reste relisible.")}</span>}
             {segments.map((s, k) => (
               <div key={k}>
                 <span className="uppercase" style={{ fontFamily: SERIF, color: CAMP[s.side], letterSpacing: "0.05em", fontSize: 12 }}>{cfg.camps[s.side]} · </span>
@@ -1532,17 +1536,17 @@ Rien à vérifier -> []. sources peut être vide.`;
 
         <div style={{ ...cardStyle, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
           <div className="flex items-center justify-between">
-            <Kicker>Vérifications</Kicker>
+            <Kicker>{t("Vérifications")}</Kicker>
             <button onClick={() => analyze(joinedRef.current, true)} disabled={analyzing} className="inline-flex items-center gap-1.5 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "6px 14px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 11, opacity: analyzing ? 0.6 : 1, cursor: analyzing ? "default" : "pointer" }}>
-              {analyzing ? <Loader2 size={12} className="spin" /> : <Search size={12} />} Vérifier
+              {analyzing ? <Loader2 size={12} className="spin" /> : <Search size={12} />} {t("Vérifier")}
             </button>
           </div>
           <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: 180, minHeight: 80 }}>
-            {suggestions.length === 0 && kbHits.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les fiches et les points à vérifier apparaissent ici quand un terme connu est prononcé.</div>}
+            {suggestions.length === 0 && kbHits.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>{t("Les fiches et les points à vérifier apparaissent ici quand un terme connu est prononcé.")}</div>}
             {kbHits.map(({ fiche, side, stamp }) => { const open = !!kbOpen[fiche.id]; const toggle = () => setKbOpen((o) => ({ ...o, [fiche.id]: !o[fiche.id] })); return (
               <div key={fiche.id} style={{ background: C.panel2, border: "1px solid " + C.line, borderLeft: "3px solid " + C.greyblue, borderRadius: 12, padding: 10 }}>
                 <div onClick={toggle} className="flex items-center justify-between cursor-pointer" style={{ gap: 8 }}>
-                  <Badge color={C.greyblue}><BookOpen size={11} /> Fiche</Badge>
+                  <Badge color={C.greyblue}><BookOpen size={11} /> {t("Fiche")}</Badge>
                   <span className="inline-flex items-center gap-1" style={{ color: "#6f6b63", fontSize: 11 }}><span style={{ width: 7, height: 7, borderRadius: 2, background: CAMP[side] }} />{stamp}<ChevronDown size={13} style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }} /></span>
                 </div>
                 <div onClick={toggle} className="cursor-pointer" style={{ fontSize: 14, fontWeight: 600, marginTop: 4 }}>{fiche.titre}</div>
@@ -1564,7 +1568,7 @@ Rien à vérifier -> []. sources peut être vide.`;
               : (() => { const st = STATUS[it.statut], Ic = st.Icon; return (
                 <div key={it.id} style={{ background: C.panel2, border: "1px solid " + C.line, borderLeft: "3px solid " + st.color, borderRadius: 12, padding: 10 }}>
                   <div className="flex items-center justify-between" style={{ marginBottom: 4, gap: 8 }}>
-                    <Badge color={st.color}><Ic size={11} /> {st.label}</Badge>
+                    <Badge color={st.color}><Ic size={11} /> {t(st.label)}</Badge>
                     <span className="inline-flex items-center gap-1" style={{ color: "#6f6b63", fontSize: 11 }}><span style={{ width: 7, height: 7, borderRadius: 2, background: CAMP[it.side] }} />{it.stamp}</span>
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 600 }}>{it.claim}</div>
@@ -1574,7 +1578,7 @@ Rien à vérifier -> []. sources peut être vide.`;
           </div>
           {floor !== null && canSpeakCamp(floor) && (
             <div className="flex items-end gap-2">
-              <textarea value={manual} onChange={(e) => setManual(e.target.value)} rows={2} placeholder="Saisie manuelle (ou phrase de l'adversaire)…" className="flex-1" style={{ ...fieldStyle, padding: "8px 12px", fontSize: 14, resize: "none" }} />
+              <textarea value={manual} onChange={(e) => setManual(e.target.value)} rows={2} placeholder={t("Saisie manuelle (ou phrase de l'adversaire)…")} className="flex-1" style={{ ...fieldStyle, padding: "8px 12px", fontSize: 14, resize: "none" }} />
               <button onClick={() => { if (manual.trim()) { appendSpeech(manual.trim()); analyze(manual, true); setManual(""); } }} className="pill inline-flex items-center" style={{ padding: "9px 13px" }}><Send size={14} /></button>
             </div>
           )}
@@ -1585,31 +1589,31 @@ Rien à vérifier -> []. sources peut être vide.`;
         <div style={{ ...cardStyle, padding: 18 }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <Kicker>Sur le plateau</Kicker>
+              <Kicker>{t("Sur le plateau")}</Kicker>
               <div className="flex flex-col gap-2" style={{ marginTop: 10 }}>
-                {onStage.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Personne sur les sièges pour l'instant.</div>}
+                {onStage.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>{t("Personne sur les sièges pour l'instant.")}</div>}
                 {onStage.map(({ id, camp }) => { const pr = debaters[id]; return (
                   <button key={id} onClick={() => setViewedProfile(id)} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
                     <span style={{ width: 28, height: 28, borderRadius: "50%", overflow: "hidden", border: "1px solid " + CAMP[camp], flexShrink: 0 }}>
                       {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
                     </span>
-                    <span style={{ fontSize: 13, color: C.text }}>{(pr && pr.pseudo) || "Débatteur"}</span>
+                    <span style={{ fontSize: 13, color: C.text }}>{(pr && pr.pseudo) || t("Débatteur")}</span>
                     <span style={{ width: 8, height: 8, borderRadius: 2, background: CAMP[camp] }} />
                   </button>
                 ); })}
               </div>
             </div>
             <div>
-              <Kicker>Top commentateurs</Kicker>
+              <Kicker>{t("Top commentateurs")}</Kicker>
               <div className="flex flex-col gap-2" style={{ marginTop: 10 }}>
-                {topCommenters.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les plus actifs du chat apparaîtront ici.</div>}
+                {topCommenters.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>{t("Les plus actifs du chat apparaîtront ici.")}</div>}
                 {topCommenters.map((c, k) => { const pr = commenterProfiles[c.id]; return (
                   <button key={c.id} onClick={() => setViewedProfile(c.id)} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
                     <span style={{ color: C.gold, fontSize: 12, fontFamily: SERIF, width: 14 }}>{k + 1}</span>
                     <span style={{ width: 28, height: 28, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, flexShrink: 0 }}>
                       {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
                     </span>
-                    <span style={{ fontSize: 13, color: C.text, flex: 1 }}>{(pr && pr.pseudo) || c.author || "Membre"}</span>
+                    <span style={{ fontSize: 13, color: C.text, flex: 1 }}>{(pr && pr.pseudo) || c.author || t("Membre")}</span>
                     <span style={{ fontSize: 11, color: "#6f6b63" }}>{c.n} msg</span>
                   </button>
                 ); })}
@@ -1623,23 +1627,23 @@ Rien à vérifier -> []. sources peut être vide.`;
         <div style={{ ...cardStyle, padding: 18 }}>
           <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
             <MessageSquare size={14} color={C.gold} />
-            <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 13, letterSpacing: "0.08em" }}>Spectateurs</span>
+            <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 13, letterSpacing: "0.08em" }}>{t("Spectateurs")}</span>
             <span className="inline-flex items-center gap-1" style={{ color: C.gold, fontSize: 12 }}><Users size={12} /> {spectators} / {MAX_ROOM}</span>
-            <span style={{ color: "#6f6b63", fontSize: 12 }}>· {cfg.visibility === "public" ? "public · " : "privé · "}{cfg.comments ? "commentaires ouverts" : "commentaires bloqués"}</span>
+            <span style={{ color: "#6f6b63", fontSize: 12 }}>· {cfg.visibility === "public" ? t("public") + " · " : t("privé") + " · "}{cfg.comments ? t("commentaires ouverts") : t("commentaires bloqués")}</span>
           </div>
           {cfg.comments ? (
             <>
               <div className="flex gap-2" style={{ marginBottom: 8 }}>
-                <input value={draft} onChange={(e) => { setDraft(e.target.value); setCError(""); }} onKeyDown={(e) => e.key === "Enter" && postComment()} placeholder="Écrire un commentaire…" className="flex-1" style={{ ...fieldStyle, padding: "9px 13px", fontSize: 14 }} />
+                <input value={draft} onChange={(e) => { setDraft(e.target.value); setCError(""); }} onKeyDown={(e) => e.key === "Enter" && postComment()} placeholder={t("Écrire un commentaire…")} className="flex-1" style={{ ...fieldStyle, padding: "9px 13px", fontSize: 14 }} />
                 <button onClick={postComment} className="pill inline-flex items-center" style={{ padding: "9px 13px" }}><Send size={14} /></button>
               </div>
-              {cError && <div style={{ color: C.red, fontSize: 12, marginBottom: 8 }}>{cError}</div>}
+              {cError && <div style={{ color: C.red, fontSize: 12, marginBottom: 8 }}>{t(cError)}</div>}
               <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: 120 }}>
-                {comments.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires s'afficheront ici, en direct. Les mots interdits sont refusés.</div>}
+                {comments.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>{t("Les commentaires s'afficheront ici, en direct. Les mots interdits sont refusés.")}</div>}
                 {comments.map((c) => (<div key={c.id} className="flex gap-2" style={{ fontSize: 14 }}><span style={{ color: "#6f6b63" }}>{c.t}</span>{c.author && <span onClick={() => c.author_id && setViewedProfile(c.author_id)} style={{ color: C.gold, fontWeight: 600, cursor: c.author_id ? "pointer" : "default" }}>{c.author}</span>}<span>{c.txt}</span></div>))}
               </div>
             </>
-          ) : <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires sont désactivés pour ce panel.</div>}
+          ) : <div style={{ color: "#6f6b63", fontSize: 12 }}>{t("Les commentaires sont désactivés pour ce panel.")}</div>}
         </div>
       </div>
 
@@ -1674,6 +1678,7 @@ function VideoTile({ stream, muted, mirror }) {
 // Défini au niveau module pour conserver son identité entre les rendus :
 // ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
 function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, videosByCamp, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
+  const { t } = useLang();
   const has = i === floor, started = floor !== null;
   const occ = (seats && seats[String(i)]) || [];
   const canSpeak = canSpeakCamp(i);
@@ -1689,7 +1694,7 @@ function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, vid
           <span style={{ width: 10, height: 10, borderRadius: 3, background: CAMP[i] }} />
           <span className="truncate uppercase" style={{ fontFamily: SERIF, fontSize: 16, letterSpacing: "0.06em" }}>{cfg.camps[i]}</span>
         </div>
-        {has && <Badge color={C.gold}>{clockRunning ? "parole" : "pause"}</Badge>}
+        {has && <Badge color={C.gold}>{clockRunning ? t("parole") : t("pause")}</Badge>}
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -1702,14 +1707,14 @@ function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, vid
                 <span onClick={() => onViewProfile(uid)} style={{ width: 26, height: 26, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, cursor: "pointer", flexShrink: 0 }}>
                   {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
                 </span>
-                <span onClick={() => onViewProfile(uid)} style={{ fontSize: 12, color: C.text, cursor: "pointer" }}>{(pr && pr.pseudo) || "Débatteur"}</span>
-                {me && <button onClick={leaveSeat} title="Quitter le siège" style={{ background: "none", border: "none", cursor: "pointer", color: C.mute, display: "flex" }}><X size={13} /></button>}
+                <span onClick={() => onViewProfile(uid)} style={{ fontSize: 12, color: C.text, cursor: "pointer" }}>{(pr && pr.pseudo) || t("Débatteur")}</span>
+                {me && <button onClick={leaveSeat} title={t("Quitter le siège")} style={{ background: "none", border: "none", cursor: "pointer", color: C.mute, display: "flex" }}><X size={13} /></button>}
               </div>
             );
           }
           return (
             <button key={s} onClick={canClaim ? () => claimSeat(i) : undefined} disabled={!canClaim} style={{ ...pillBase(), flex: "0 0 auto", color: canClaim ? CAMP[i] : "#4a5060", cursor: canClaim ? "pointer" : "default", borderStyle: "dashed" }}>
-              {canClaim ? "+ Monter" : "place libre"}
+              {canClaim ? t("+ Monter") : t("place libre")}
             </button>
           );
         })}
@@ -1718,7 +1723,7 @@ function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, vid
       <div className="flex gap-2">
         {videos.length === 0 ? (
           <div className="overflow-hidden flex items-center justify-center" style={{ flex: 1, background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
-            <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>
+            <span style={{ color: "#6f6b63", fontSize: 12 }}>{t("caméra éteinte")}</span>
           </div>
         ) : videos.map((v) => (
           <div key={v.key} className="overflow-hidden flex items-center justify-center" style={{ flex: 1, background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
@@ -1730,24 +1735,24 @@ function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, vid
       <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
 
       {!started ? (
-        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>en attente du lancement</div>
+        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{t("en attente du lancement")}</div>
       ) : has && canSpeak ? (
         <button onClick={() => micOn ? stopMic() : startMic()} className={micOn ? "" : "pill"} style={micOn ? pillSolid(C.red) : pillBase()}>
-          {micOn ? <><MicOff size={13} /> Couper le micro</> : <><Mic size={13} /> Activer le micro</>}
+          {micOn ? <><MicOff size={13} /> {t("Couper le micro")}</> : <><Mic size={13} /> {t("Activer le micro")}</>}
         </button>
       ) : isController && !has ? (
-        <button onClick={() => giveFloor(i)} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> Donner la parole</button>
+        <button onClick={() => giveFloor(i)} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> {t("Donner la parole")}</button>
       ) : (
-        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{has ? (clockRunning ? "au temps de parole" : "en pause") : "à l'écoute"}</div>
+        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{has ? (clockRunning ? t("au temps de parole") : t("en pause")) : t("à l'écoute")}</div>
       )}
 
       {canSpeak && (
         <div className="flex gap-2">
           <button onClick={() => toggleCam(i)} className={iPublishHere ? "" : "pill"} style={iPublishHere ? pillSolid(CAMP[i]) : pillBase()}>
-            {iPublishHere ? <Video size={12} /> : <VideoOff size={12} />} {iPublishHere ? "Caméra + voix" : "Caméra"}
+            {iPublishHere ? <Video size={12} /> : <VideoOff size={12} />} {iPublishHere ? t("Caméra + voix") : t("Caméra")}
           </button>
           <label className="pill inline-flex items-center justify-center gap-1.5 cursor-pointer" style={{ ...pillBase(), flex: 1 }}>
-            <ImagePlus size={12} /> Image
+            <ImagePlus size={12} /> {t("Image")}
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => { addImages(i, e.target.files); e.target.value = ""; }} />
           </label>
         </div>
@@ -1813,17 +1818,18 @@ function TrophyBadge({ palier = "Bronze", size = 64, locked = false }) {
 
 // Annonce des trophées débloqués à la fin d'un débat (badges + noms).
 function TrophyUnlock({ ids }) {
+  const { t } = useLang();
   const [all, setAll] = useState([]);
   useEffect(() => { fetch("/trophees.json").then((r) => r.json()).then(setAll).catch(() => {}); }, []);
-  const got = all.filter((t) => ids.includes(t.id));
+  const got = all.filter((tr) => ids.includes(tr.id));
   return (
     <div style={{ marginTop: 12 }}>
-      <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.12em", marginBottom: 8 }}>{ids.length} trophée{ids.length > 1 ? "s" : ""} débloqué{ids.length > 1 ? "s" : ""} !</div>
+      <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.12em", marginBottom: 8 }}>{ids.length} {ids.length > 1 ? t("trophées débloqués !") : t("trophée débloqué !")}</div>
       <div className="flex flex-wrap gap-3">
-        {got.map((t) => (
-          <div key={t.id} className="text-center" style={{ width: 96 }}>
-            <div style={{ height: 66 }}><TrophyBadge palier={t.palier} size={64} /></div>
-            <div style={{ fontSize: 12, marginTop: 4 }}>{t.nom}</div>
+        {got.map((tr) => (
+          <div key={tr.id} className="text-center" style={{ width: 96 }}>
+            <div style={{ height: 66 }}><TrophyBadge palier={tr.palier} size={64} /></div>
+            <div style={{ fontSize: 12, marginTop: 4 }}>{tr.nom}</div>
           </div>
         ))}
       </div>

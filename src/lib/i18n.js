@@ -176,6 +176,111 @@ export const EN = {
 
   // — Pied de page —
   "Le contrechamp — régie de débat · maquette": "Le Contrechamp — debate control room · prototype",
+
+  // — Débat en direct —
+  "Le modérateur lance le débat": "The moderator starts the debate",
+  "au temps de parole": "speaking",
+  "parole cédée — en attente d'acceptation": "floor yielded — awaiting acceptance",
+  "en pause": "paused",
+  "Copier le code de salle": "Copy room code",
+  "copié": "copied",
+  "Lancer": "Start",
+  "Pause": "Pause",
+  "Reprendre": "Resume",
+  "Clore": "Close",
+  "Clore le débat et lancer le vote": "Close the debate and start the vote",
+  "Quitter": "Leave",
+  "Le verdict du public": "The public's verdict",
+  "Qui a remporté ce débat ?": "Who won this debate?",
+  "Connecte-toi pour voter. (Regarder reste libre.)": "Sign in to vote. (Watching stays free.)",
+  "Tu débats dans ce panel — c'est au public de voter.": "You're debating in this panel — it's up to the audience to vote.",
+  "voix": "votes", "vote": "vote", "votes": "votes",
+  "validé à partir de": "validated from",
+  "Clôturer le vote & révéler": "Close the vote & reveal",
+  "Résultat": "Result",
+  "Égalité — pas de vainqueur": "Tie — no winner",
+  "Vainqueur :": "Winner:",
+  "votant": "voter", "votants": "voters", "des voix": "of the votes",
+  "présent": "present", "présents": "present",
+  "Débat non validé : il faut au moins": "Debate not validated: you need at least",
+  "votes et un vainqueur net pour décerner des trophées.": "votes and a clear winner to award trophies.",
+  "Victoire enregistrée ! (Pas de nouveau trophée cette fois.)": "Win recorded! (No new trophy this time.)",
+  "Revenir au direct": "Back to live",
+  "Salon complet": "Room full",
+  "Ce débat est complet": "This debate is full",
+  "places": "seats",
+  "Pour garder une qualité fluide et gratuite, chaque débat est limité pour l'instant. Réessaie plus tard, ou rejoins un autre débat.":
+    "To keep it smooth and free, each debate is limited for now. Try again later, or join another debate.",
+  "Retour à l'accueil": "Back to home",
+  "public": "public", "privé": "private",
+  "Retranscription complète": "Full transcript",
+  "Tout ce qui est dit s'écrit ici, repérable par camp, et reste relisible.":
+    "Everything said is written here, marked by side, and stays readable.",
+  "Vérifications": "Fact-checks",
+  "Vérifier": "Check",
+  "Les fiches et les points à vérifier apparaissent ici quand un terme connu est prononcé.":
+    "Fact sheets and points to check appear here when a known term is spoken.",
+  "Fiche": "Sheet",
+  "Saisie manuelle (ou phrase de l'adversaire)…": "Manual entry (or the opponent's sentence)…",
+  "Sur le plateau": "On stage",
+  "Personne sur les sièges pour l'instant.": "No one on the seats yet.",
+  "Débatteur": "Debater",
+  "Top commentateurs": "Top commenters",
+  "Les plus actifs du chat apparaîtront ici.": "The most active in chat will appear here.",
+  "Spectateurs": "Viewers",
+  "commentaires ouverts": "comments open",
+  "commentaires bloqués": "comments off",
+  "Écrire un commentaire…": "Write a comment…",
+  "Les commentaires s'afficheront ici, en direct. Les mots interdits sont refusés.":
+    "Comments appear here, live. Banned words are rejected.",
+  "Les commentaires sont désactivés pour ce panel.": "Comments are disabled for this panel.",
+  "Connecte-toi pour commenter.": "Sign in to comment.",
+  "Commentaire bloqué : langage interdit.": "Comment blocked: banned language.",
+
+  // — Camp (vignette) —
+  "parole": "speaking", "pause": "paused",
+  "Quitter le siège": "Leave the seat",
+  "+ Monter": "+ Take a seat",
+  "place libre": "free seat",
+  "caméra éteinte": "camera off",
+  "en attente du lancement": "waiting for the start",
+  "Couper le micro": "Mute the mic",
+  "Activer le micro": "Turn on the mic",
+  "Donner la parole": "Give the floor",
+  "à l'écoute": "listening",
+  "Caméra + voix": "Camera + voice",
+  "Caméra": "Camera",
+  "Image": "Image",
+
+  // — Verdicts de fact-checking —
+  "Plausible": "Plausible",
+  "À nuancer": "Needs nuance",
+  "À vérifier": "To verify",
+  "Douteux": "Doubtful",
+  "Probablement faux": "Likely false",
+
+  // — Trophées débloqués —
+  "trophée débloqué !": "trophy unlocked!",
+  "trophées débloqués !": "trophies unlocked!",
+
+  // — Erreurs caméra / micro / vérification —
+  "Accès caméra/micro refusé. Clique sur l'icône caméra (ou le cadenas) dans la barre d'adresse pour autoriser, puis réessaie.":
+    "Camera/mic access denied. Click the camera icon (or padlock) in the address bar to allow, then try again.",
+  "Aucune caméra ou micro détecté sur cet appareil.": "No camera or microphone detected on this device.",
+  "Caméra/micro déjà utilisés par une autre application. Ferme-la et réessaie.":
+    "Camera/mic already in use by another app. Close it and try again.",
+  "Impossible d'accéder à la caméra/au micro. Vérifie les autorisations du navigateur, puis réessaie.":
+    "Couldn't access the camera/mic. Check your browser permissions, then try again.",
+  "Reconnaissance vocale non gérée ici. Utilise Chrome, ou la saisie en bas.":
+    "Speech recognition isn't supported here. Use Chrome, or type below.",
+  "Micro bloqué dans l'aperçu intégré. Ouvre la maquette dans son onglet, ou saisis en bas.":
+    "Mic blocked in the embedded preview. Open the app in its own tab, or type below.",
+  "Vérification indisponible là, réessaie dans un instant.": "Fact-check unavailable right now, try again shortly.",
+
+  // — Mentions légales —
+  "Retour": "Back",
+  "Document d'information, rédigé en langage clair. Il n'a pas valeur de conseil juridique.":
+    "Information document, written in plain language. It is not legal advice.",
 }
 
 // Renvoie la traduction de `s` pour la langue donnée (fr par défaut).
