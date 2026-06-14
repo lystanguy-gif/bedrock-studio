@@ -798,6 +798,7 @@ function Live({ lobby, session, onHome }) {
   const [result, setResult] = useState(null); // { winner, counts, voters, sharePct, audience, ... }
   const [awarded, setAwarded] = useState([]); // trophées que JE viens de débloquer
   const awardedRef = useRef(false);
+  const [commenterProfiles, setCommenterProfiles] = useState({}); // profils des meilleurs commentateurs
   const [kbHits, setKbHits] = useState([]);
   const [kbReady, setKbReady] = useState(false);
   const [kbOpen, setKbOpen] = useState({});
@@ -1200,6 +1201,19 @@ Rien à vérifier -> []. sources peut être vide.`;
     if (camp === 0 || camp === 1) videosByCamp[camp].push({ key, stream, me: false });
   });
 
+  // Top commentateurs de ce débat (par nombre de commentaires).
+  const commentCounts = {};
+  comments.forEach((c) => { if (c.author_id) { const e = commentCounts[c.author_id] || (commentCounts[c.author_id] = { id: c.author_id, author: c.author, n: 0 }); e.n++; } });
+  const topCommenters = Object.values(commentCounts).sort((a, b) => b.n - a.n).slice(0, 5);
+  const topIds = topCommenters.map((c) => c.id).join(",");
+  useEffect(() => {
+    const ids = topIds ? topIds.split(",") : [];
+    if (!ids.length) { setCommenterProfiles({}); return; }
+    getProfiles(ids).then(({ profiles }) => setCommenterProfiles(profiles || {}));
+  }, [topIds]);
+  // Débatteurs sur le plateau (sièges occupés, avec leur camp).
+  const onStage = [...seats["0"].map((id) => ({ id, camp: 0 })), ...seats["1"].map((id) => ({ id, camp: 1 }))];
+
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
   // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
   // l'état nécessaire en props.
@@ -1382,6 +1396,44 @@ Rien à vérifier -> []. sources peut être vide.`;
               <button onClick={() => { if (manual.trim()) { appendSpeech(manual.trim()); analyze(manual, true); setManual(""); } }} className="pill inline-flex items-center" style={{ padding: "9px 13px" }}><Send size={14} /></button>
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="mx-auto" style={{ maxWidth: 1180, padding: "14px 18px 0" }}>
+        <div style={{ ...cardStyle, padding: 18 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <Kicker>Sur le plateau</Kicker>
+              <div className="flex flex-col gap-2" style={{ marginTop: 10 }}>
+                {onStage.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Personne sur les sièges pour l'instant.</div>}
+                {onStage.map(({ id, camp }) => { const pr = debaters[id]; return (
+                  <button key={id} onClick={() => setViewedProfile(id)} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
+                    <span style={{ width: 28, height: 28, borderRadius: "50%", overflow: "hidden", border: "1px solid " + CAMP[camp], flexShrink: 0 }}>
+                      {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
+                    </span>
+                    <span style={{ fontSize: 13, color: C.text }}>{(pr && pr.pseudo) || "Débatteur"}</span>
+                    <span style={{ width: 8, height: 8, borderRadius: 2, background: CAMP[camp] }} />
+                  </button>
+                ); })}
+              </div>
+            </div>
+            <div>
+              <Kicker>Top commentateurs</Kicker>
+              <div className="flex flex-col gap-2" style={{ marginTop: 10 }}>
+                {topCommenters.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les plus actifs du chat apparaîtront ici.</div>}
+                {topCommenters.map((c, k) => { const pr = commenterProfiles[c.id]; return (
+                  <button key={c.id} onClick={() => setViewedProfile(c.id)} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, textAlign: "left" }}>
+                    <span style={{ color: C.gold, fontSize: 12, fontFamily: SERIF, width: 14 }}>{k + 1}</span>
+                    <span style={{ width: 28, height: 28, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, flexShrink: 0 }}>
+                      {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
+                    </span>
+                    <span style={{ fontSize: 13, color: C.text, flex: 1 }}>{(pr && pr.pseudo) || c.author || "Membre"}</span>
+                    <span style={{ fontSize: 11, color: "#6f6b63" }}>{c.n} msg</span>
+                  </button>
+                ); })}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
