@@ -3,10 +3,10 @@ import {
   Play, Pause, Mic, MicOff, Search, Loader2, ExternalLink, AlertTriangle,
   HelpCircle, XCircle, CheckCircle2, Video, VideoOff, ImagePlus, X,
   MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag, BookOpen, ChevronDown,
-  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner, Users, Copy
+  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner, Users, Copy, Crown
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
-import { supabase, isSupabaseConfigured } from "./lib/supabaseClient.js";
+import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
 import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages } from "./lib/lobby.js";
 
 const C = {
@@ -104,8 +104,10 @@ function pseudoOf(session) {
 /* ----------------------------- ACCUEIL ----------------------------- */
 function Home({ session, authReady, onCreate, onJoin, onSignIn }) {
   const pseudo = pseudoOf(session);
+  const admin = isAdminEmail(session?.user?.email);
   const accountRight = !authReady ? null : (session ? (
     <div className="flex items-center gap-2">
+      {admin && <span className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, border: "1px solid " + C.gold, color: C.gold, fontSize: 10, letterSpacing: "0.08em", padding: "3px 9px", fontWeight: 700 }}><Crown size={11} /> Admin</span>}
       <span style={{ color: C.mute, fontSize: 13 }}>Bonjour, <strong style={{ color: C.text }}>{pseudo}</strong></span>
       <button onClick={() => supabase.auth.signOut()} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12 }}><LogOut size={13} /> Déconnexion</button>
     </div>
