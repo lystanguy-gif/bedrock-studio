@@ -12,24 +12,30 @@ export function genCode(n = 5) {
 // Crée un panel et renvoie sa ligne. Réessaie si le code est déjà pris.
 export async function createPanel(cfg, ownerId) {
   const minutes = Number(cfg.minutes) || 5
+  const maxPerCamp = cfg.maxPerCamp === 2 ? 2 : 1
   for (let attempt = 0; attempt < 6; attempt++) {
     const code = genCode()
-    const { data, error } = await supabase.from('panels').insert({
-      code,
-      topic: cfg.topic,
-      camps: cfg.camps,
-      minutes,
-      visibility: cfg.visibility,
-      comments_allowed: cfg.comments,
-      owner_id: ownerId,
-      floor: null,
-      clock_running: false,
-      remaining: [minutes * 60, minutes * 60],
-    }).select().single()
+    const base = {
+      code, topic: cfg.topic, camps: cfg.camps, minutes,
+      visibility: cfg.visibility, comments_allowed: cfg.comments, owner_id: ownerId,
+      floor: null, clock_running: false, remaining: [minutes * 60, minutes * 60],
+    }
+    let { data, error } = await supabase.from('panels')
+      .insert({ ...base, seats: { '0': [], '1': [] }, max_per_camp: maxPerCamp }).select().single()
+    // Si les colonnes sièges n'existent pas encore (migration non faite), on insère sans.
+    if (error && /seats|max_per_camp/.test(error.message || '')) {
+      ;({ data, error } = await supabase.from('panels').insert(base).select().single())
+    }
     if (!error) return { panel: data }
     if (error.code !== '23505') return { error: error.message } // 23505 = code déjà utilisé
   }
   return { error: 'Impossible de générer un code unique, réessaie.' }
+}
+
+// Met à jour l'occupation des sièges (camp -> liste d'identifiants de débatteurs).
+export async function setSeats(panelId, seats) {
+  const { error } = await supabase.from('panels').update({ seats }).eq('id', panelId)
+  return { error: error?.message }
 }
 
 export async function getPanelByCode(code) {

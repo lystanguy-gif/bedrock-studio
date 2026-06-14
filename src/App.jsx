@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -32,6 +32,7 @@ const other = (i) => (i === 0 ? 1 : 0);
 const hhmm = (iso) => { try { return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); } catch { return ""; } };
 const hhmmDate = (iso) => { try { return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }); } catch { return ""; } };
 const mergeSegments = (list) => { const out = []; for (const s of list) { if (out.length && out[out.length - 1].side === s.side) out[out.length - 1].text = (out[out.length - 1].text + " " + s.text).trim(); else out.push({ side: s.side, text: s.text }); } return out; };
+const normSeats = (s) => ({ "0": (s && (s["0"] || s[0])) || [], "1": (s && (s["1"] || s[1])) || [] });
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = "Inter, Arial, system-ui, sans-serif";
 
@@ -105,7 +106,7 @@ export default function App() {
 function CreateFlow({ session, onHome, onLaunched }) {
   const [cfg, setCfg] = useState({
     panel: "Le contrechamp", topic: "L'État doit-il encadrer les prix de l'énergie ?",
-    camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true,
+    camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true, maxPerCamp: 1,
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -647,6 +648,12 @@ function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
           <Label>Temps de parole par camp (minutes)</Label>
           <input type="number" min={1} max={60} value={cfg.minutes} onChange={(e) => set("minutes", Math.max(1, Math.min(60, Number(e.target.value) || 1)))} style={{ ...fieldStyle, padding: "10px 14px", width: 120, marginBottom: 22 }} />
 
+          <Label>Format</Label>
+          <div className="flex gap-3" style={{ marginBottom: 22 }}>
+            <Toggle on={cfg.maxPerCamp === 1} onClick={() => set("maxPerCamp", 1)} icon={<span style={{ fontFamily: SERIF }}>1v1</span>} label="Un contre un" />
+            <Toggle on={cfg.maxPerCamp === 2} onClick={() => set("maxPerCamp", 2)} icon={<span style={{ fontFamily: SERIF }}>2v2</span>} label="Deux contre deux" />
+          </div>
+
           <Label>Visibilité</Label>
           <div className="flex gap-3" style={{ marginBottom: 16 }}>
             <Toggle on={cfg.visibility === "prive"} onClick={() => set("visibility", "prive")} icon={<Lock size={14} />} label="Privé — sur invitation" />
@@ -678,7 +685,12 @@ function Live({ lobby, session, onHome }) {
     minutes: panel.minutes || 5,
     visibility: panel.visibility || "prive",
     comments: panel.comments_allowed !== false,
+    maxPerCamp: panel.max_per_camp === 2 ? 2 : 1,
   };
+  const [seats, setSeats] = useState(() => normSeats(panel.seats));
+  const [debaters, setDebaters] = useState({});
+  const myUserId = session?.user?.id || null;
+  const mySeat = (myUserId && seats["0"].includes(myUserId)) ? 0 : (myUserId && seats["1"].includes(myUserId)) ? 1 : null;
   const [floor, setFloor] = useState(panel.floor ?? null);
   const [clockRunning, setClockRunning] = useState(!!panel.clock_running);
   const [pending, setPending] = useState(null);
@@ -740,13 +752,14 @@ function Live({ lobby, session, onHome }) {
         if (m.kind === "transcript") segInit.push({ side: m.side ?? 0, text: m.content });
         else if (m.kind === "comment") comInit.unshift({ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) });
       });
-      if (!isHost && segInit.length) setSegments(mergeSegments(segInit));
+      if (segInit.length) setSegments(mergeSegments(segInit));
       if (comInit.length) setComments(comInit);
     });
 
     const ch = supabase.channel("panel-" + panel.id)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "panels", filter: "id=eq." + panel.id }, ({ new: row }) => {
-        if (isHost) return; // l'hôte fait autorité, il n'applique pas ses propres échos
+        if (row.seats) setSeats(normSeats(row.seats)); // sièges synchronisés pour tout le monde
+        if (isHost) return; // l'hôte fait autorité pour parole/chrono
         setFloor(row.floor ?? null);
         setClockRunning(!!row.clock_running);
         if (Array.isArray(row.remaining) && row.remaining.length === 2) setRemaining(row.remaining);
@@ -754,7 +767,7 @@ function Live({ lobby, session, onHome }) {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "panel_id=eq." + panel.id }, ({ new: m }) => {
         if (seenMsgRef.current.has(m.id)) return;
         seenMsgRef.current.add(m.id);
-        if (m.kind === "transcript") { if (!isHost) appendSegment(m.side ?? 0, m.content); }
+        if (m.kind === "transcript") appendSegment(m.side ?? 0, m.content);
         else if (m.kind === "comment") setComments((c) => [{ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) }, ...c]);
       })
       .subscribe();
@@ -816,6 +829,40 @@ function Live({ lobby, session, onHome }) {
   const askFloor = (i) => setRequest(i);
   const reset = () => { stopMic(); setFloor(null); setClockRunning(false); setPending(null); setRequest(null); setRemaining([cfg.minutes * 60, cfg.minutes * 60]); kbSeenRef.current = new Set(); setKbHits([]); };
 
+  // --- Sièges (débatteurs) ---
+  const seatsRef = useRef(seats);
+  useEffect(() => { seatsRef.current = seats; }, [seats]);
+  // Profils (avatar/pseudo) des débatteurs assis.
+  useEffect(() => {
+    const ids = [...seats["0"], ...seats["1"]];
+    if (!ids.length) { setDebaters({}); return; }
+    getProfiles(ids).then(({ profiles }) => setDebaters(profiles || {}));
+  }, [seats]);
+  // Libère mon siège en quittant le débat.
+  useEffect(() => () => {
+    if (!myUserId) return;
+    const s = seatsRef.current;
+    if (s["0"].includes(myUserId) || s["1"].includes(myUserId)) {
+      pushSeats(panel.id, { "0": s["0"].filter((x) => x !== myUserId), "1": s["1"].filter((x) => x !== myUserId) });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const giveFloor = (i) => { setFloor(i); setClockRunning(true); };
+  async function claimSeat(i) {
+    if (!myUserId) return;
+    const next = { "0": seats["0"].filter((x) => x !== myUserId), "1": seats["1"].filter((x) => x !== myUserId) };
+    if (next[String(i)].length >= cfg.maxPerCamp) return;
+    next[String(i)] = [...next[String(i)], myUserId];
+    setSeats(next); await pushSeats(panel.id, next);
+  }
+  async function leaveSeat() {
+    if (!myUserId || mySeat == null) return;
+    const next = { "0": seats["0"].filter((x) => x !== myUserId), "1": seats["1"].filter((x) => x !== myUserId) };
+    setSeats(next); await pushSeats(panel.id, next);
+  }
+  // Puis-je parler dans le camp i ? (débatteur de ce camp avec la parole, ou hôte si le camp est vide)
+  const canSpeakCamp = (i) => (mySeat === i || (isHost && (seats[String(i)] || []).length === 0));
+
   const analyze = useCallback(async (raw, withWeb = true) => {
     const chunk = (raw || "").trim().slice(-2000);
     if (chunk.length < 10 || busyRef.current) return;
@@ -868,8 +915,9 @@ Rien à vérifier -> []. sources peut être vide.`;
   }
   function appendSpeech(txt) {
     const side = floorRef.current ?? 0;
-    appendSegment(side, txt);
-    if (isHost) postMessage(panel.id, { kind: "transcript", side, author: pseudo, content: txt.trim() });
+    // La transcription passe par la base : ainsi tous les participants la voient,
+    // quel que soit le débatteur qui parle (et chacun l'applique en la recevant).
+    postMessage(panel.id, { kind: "transcript", side, author: pseudo, author_id: myUserId, content: txt.trim() });
   }
   function startMic() {
     if (floor === null) return;
@@ -918,7 +966,7 @@ Rien à vérifier -> []. sources peut être vide.`;
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
   // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
   // l'état nécessaire en props.
-  const campProps = { floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages, interactive: isHost };
+  const campProps = { floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isHost, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
 
   const bannerStatus = floor === null ? "Le modérateur lance le débat"
     : clockRunning ? "au temps de parole"
@@ -1038,7 +1086,7 @@ Rien à vérifier -> []. sources peut être vide.`;
                   {it.sources && it.sources.map((s, k) => (<a key={k} href={s.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 truncate" style={{ fontSize: 12, color: C.gold, marginTop: 4 }}><ExternalLink size={11} /> {s.titre || s.url}</a>))}
                 </div>); })())}
           </div>
-          {isHost && (
+          {floor !== null && canSpeakCamp(floor) && (
             <div className="flex items-end gap-2">
               <textarea value={manual} onChange={(e) => setManual(e.target.value)} rows={2} placeholder="Saisie manuelle (ou phrase de l'adversaire)…" className="flex-1" style={{ ...fieldStyle, padding: "8px 12px", fontSize: 14, resize: "none" }} />
               <button onClick={() => { if (manual.trim()) { appendSpeech(manual.trim()); analyze(manual, true); setManual(""); } }} className="pill inline-flex items-center" style={{ padding: "9px 13px" }}><Send size={14} /></button>
@@ -1087,8 +1135,12 @@ Rien à vérifier -> []. sources peut être vide.`;
 /* --------------------------- CAMP (stable) --------------------------- */
 // Défini au niveau module pour conserver son identité entre les rendus :
 // ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
-function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages, interactive = true }) {
-  const has = i === floor, isPending = pending === i, started = floor !== null;
+function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isHost, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
+  const has = i === floor, started = floor !== null;
+  const occ = (seats && seats[String(i)]) || [];
+  const canSpeak = canSpeakCamp(i);
+  const max = cfg.maxPerCamp || 1;
+  const canClaim = loggedIn && mySeat == null && occ.length < max;
   return (
     <div className="flex flex-col gap-2.5" style={{ background: has ? C.panel2 : C.panel, border: "1px solid " + (has ? C.gold : C.line), borderRadius: 18, padding: 14, boxShadow: has ? "0 16px 44px -26px " + C.gold : "none", transition: "border-color .15s,box-shadow .15s" }}>
       <div className="flex items-center justify-between">
@@ -1097,7 +1149,29 @@ function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs
           <span className="truncate uppercase" style={{ fontFamily: SERIF, fontSize: 16, letterSpacing: "0.06em" }}>{cfg.camps[i]}</span>
         </div>
         {has && <Badge color={C.gold}>{clockRunning ? "parole" : "pause"}</Badge>}
-        {request === i && !has && <Badge color={C.gold}><Hand size={10} /> demande</Badge>}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: max }).map((_, s) => {
+          const uid = occ[s];
+          if (uid) {
+            const pr = debaters[uid]; const me = uid === myUserId;
+            return (
+              <div key={s} className="inline-flex items-center gap-2" style={{ background: C.pill, border: "1px solid " + (me ? C.gold : C.line), borderRadius: 999, padding: "3px 10px 3px 3px" }}>
+                <span onClick={() => onViewProfile(uid)} style={{ width: 26, height: 26, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, cursor: "pointer", flexShrink: 0 }}>
+                  {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
+                </span>
+                <span onClick={() => onViewProfile(uid)} style={{ fontSize: 12, color: C.text, cursor: "pointer" }}>{(pr && pr.pseudo) || "Débatteur"}</span>
+                {me && <button onClick={leaveSeat} title="Quitter le siège" style={{ background: "none", border: "none", cursor: "pointer", color: C.mute, display: "flex" }}><X size={13} /></button>}
+              </div>
+            );
+          }
+          return (
+            <button key={s} onClick={canClaim ? () => claimSeat(i) : undefined} disabled={!canClaim} style={{ ...pillBase(), flex: "0 0 auto", color: canClaim ? CAMP[i] : "#4a5060", cursor: canClaim ? "pointer" : "default", borderStyle: "dashed" }}>
+              {canClaim ? "+ Monter" : "place libre"}
+            </button>
+          );
+        })}
       </div>
 
       <div className="overflow-hidden flex items-center justify-center" style={{ background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
@@ -1106,26 +1180,19 @@ function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs
 
       <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
 
-      {!interactive ? (
-        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{!started ? "en attente du lancement" : has ? (clockRunning ? "au temps de parole" : "en pause") : "à l'écoute"}</div>
-      ) : !started ? (
+      {!started ? (
         <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>en attente du lancement</div>
-      ) : has ? (
-        <div className="flex gap-2">
-          <button onClick={() => micOn ? stopMic() : startMic()} className={micOn ? "" : "pill"} style={micOn ? pillSolid(C.red) : pillBase()}>
-            {micOn ? <><MicOff size={13} /> Couper le micro</> : <><Mic size={13} /> Activer le micro</>}
-          </button>
-          <button onClick={cede} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> Céder</button>
-        </div>
-      ) : isPending ? (
-        <button onClick={accept} className="pulse" style={pillSolid(C.gold, C.bg)}><Hand size={13} /> Prendre la parole</button>
-      ) : (
-        <button onClick={() => askFloor(i)} disabled={request === i} className={request === i ? "" : "pill"} style={{ ...pillBase(), color: request === i ? "#6f6b63" : C.mute, cursor: request === i ? "default" : "pointer" }}>
-          <Hand size={12} /> {request === i ? "demande envoyée" : "Demander la parole"}
+      ) : has && canSpeak ? (
+        <button onClick={() => micOn ? stopMic() : startMic()} className={micOn ? "" : "pill"} style={micOn ? pillSolid(C.red) : pillBase()}>
+          {micOn ? <><MicOff size={13} /> Couper le micro</> : <><Mic size={13} /> Activer le micro</>}
         </button>
+      ) : isHost && !has ? (
+        <button onClick={() => giveFloor(i)} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> Donner la parole</button>
+      ) : (
+        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{has ? (clockRunning ? "au temps de parole" : "en pause") : "à l'écoute"}</div>
       )}
 
-      {interactive && (
+      {canSpeak && (
         <div className="flex gap-2">
           <button onClick={() => toggleCam(i)} className={camOwner === i ? "" : "pill"} style={camOwner === i ? pillSolid(CAMP[i]) : pillBase()}>
             {camOwner === i ? <Video size={12} /> : <VideoOff size={12} />} Caméra
