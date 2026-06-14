@@ -951,6 +951,7 @@ function renderItemEditor() {
           <button class="px-btn" id="tool-fill" onclick="setTool('fill')">🪣 Remplir</button>
           <button class="px-btn" id="tool-erase" onclick="setTool('erase')">◻ Gomme</button>
           <button class="px-btn" onclick="clearPx()">🗑 Effacer tout</button>
+          <button class="px-btn" onclick="importItemImage()">🖼 Importer une image</button>
           <button class="px-btn" onclick="loadDaguePreset()">⚔ Dague Courbée</button>
         </div>
         <div class="palette-row" id="px-palette"></div>
@@ -1076,6 +1077,33 @@ function addCustomColor() {
   const col=document.getElementById('custom-color').value;
   if(!palette.includes(col)) palette.push(col);
   currentColor=col; renderPalette();
+}
+
+function importItemImage() {
+  if(!currentItem) return;
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=()=>{
+    const f=inp.files[0]; if(!f) return;
+    const img=new Image();
+    img.onload=()=>{
+      const gs=currentItem.gridSize;
+      const cv=document.createElement('canvas'); cv.width=gs; cv.height=gs;
+      const ctx=cv.getContext('2d');
+      // cadre l'image (carré centré) puis réduit à la grille
+      const side=Math.min(img.width,img.height), sx=(img.width-side)/2, sy=(img.height-side)/2;
+      ctx.imageSmoothingEnabled=true;
+      ctx.drawImage(img, sx,sy,side,side, 0,0,gs,gs);
+      const d=ctx.getImageData(0,0,gs,gs).data;
+      for(let y=0;y<gs;y++)for(let x=0;x<gs;x++){
+        const i=(y*gs+x)*4, a=d[i+3];
+        currentItem.pixels[y][x] = a<100 ? null : '#'+[d[i],d[i+1],d[i+2]].map(v=>v.toString(16).padStart(2,'0')).join('');
+      }
+      redrawPx(); updateItemPreview(); toast('✓ Image importée dans la grille');
+    };
+    img.onerror=()=>toast('⚠ Image illisible');
+    img.src=URL.createObjectURL(f);
+  };
+  inp.click();
 }
 
 function loadDaguePreset() {
@@ -1763,26 +1791,30 @@ const CR_PRESETS = {
     bone('tail','body', [0,16,7],  [cube([-1,13,7],[2,2,6],'#8a5a3a')], [-35,0,0],'tail')
   ]},
   spider:{emoji:'🕷️',label:'Araignée',build:()=>{
-    const legs=[]; const ys=[1,0,-1,-2]; // 4 paires
-    ys.forEach((zoff,i)=>{
-      legs.push(bone('legL'+i,'body',[3,5,zoff*3],[cube([3,4,zoff*3-1],[10,2,2],'#2d2230')],[0,0,-(15+i*8)],i%2?'legL':'legFL'));
-      legs.push(bone('legR'+i,'body',[-3,5,zoff*3],[cube([-13,4,zoff*3-1],[10,2,2],'#2d2230')],[0,0,(15+i*8)],i%2?'legR':'legFR'));
+    const legs=[]; const zs=[-4,-1.5,1.5,4]; const fans=[26,9,-9,-26];
+    zs.forEach((z,i)=>{
+      legs.push(bone('legL'+i,'body',[4,6,z],[cube([3,5,z-1],[12,2,2],'#241a2c')],[0,fans[i],-58], i<2?'legFL':'legL'));
+      legs.push(bone('legR'+i,'body',[-4,6,z],[cube([-15,5,z-1],[12,2,2],'#241a2c')],[0,-fans[i],58], i<2?'legFR':'legR'));
     });
     return [
-      bone('body', null, [0,5,0], [cube([-5,2,-1],[10,6,8],'#352a3a')], [0,0,0],'body'),
-      bone('head','body',[0,5,-1],[cube([-4,2,-7],[8,6,6],'#2d2230'), cube([-2,6,-8],[2,2,1],'#c0392b'), cube([1,6,-8],[2,2,1],'#c0392b')],[0,0,0],'head'),
+      bone('body', null, [0,6,3], [cube([-5,3,0],[10,8,10],'#3a2e44')], [0,0,0],'body'),
+      bone('head','body',[0,6,0],[cube([-4,4,-7],[8,6,7],'#2a2032'), cube([-3,8,-7],[2,2,2],'#c0392b'), cube([1,8,-7],[2,2,2],'#c0392b'), cube([-2,5,-9],[1,1,2],'#1a1422'), cube([1,5,-9],[1,1,2],'#1a1422')],[0,0,0],'head'),
       ...legs
     ];
   }},
   dragon:{emoji:'🐲',label:'Dragon (ailes)',build:()=>[
-    bone('body', null, [0,16,0], [cube([-5,12,-8],[10,10,18],'#7a2230')], [0,0,0],'body'),
-    bone('neck','body',[0,22,-8],[cube([-3,20,-14],[6,7,7],'#8a2a38')],[ -20,0,0],'head'),
-    bone('head','neck',[0,27,-13],[cube([-4,24,-20],[8,7,8],'#7a2230'), cube([-3,31,-18],[2,3,2],'#5a1822'), cube([2,31,-18],[2,3,2],'#5a1822')],[0,0,0],'head'),
-    bone('wingL','body',[5,21,-2],[cube([5,20,-3],[18,2,12],'#9a3040')],[0,0,-8],'wingL'),
-    bone('wingR','body',[-5,21,-2],[cube([-23,20,-3],[18,2,12],'#9a3040')],[0,0,8],'wingR'),
-    bone('legL','body',[4,12,4],[cube([2,0,2],[4,12,4],'#5a1822')],[0,0,0],'legL'),
-    bone('legR','body',[-4,12,4],[cube([-6,0,2],[4,12,4],'#5a1822')],[0,0,0],'legR'),
-    bone('tail','body',[0,17,10],[cube([-3,14,10],[6,6,16],'#7a2230')],[10,0,0],'tail')
+    bone('body', null, [0,17,0], [cube([-5,13,-6],[10,11,16],'#7a2230')], [0,0,0],'body'),
+    bone('neck','body',[0,23,-6],[cube([-3,20,-13],[6,8,8],'#8a2a38')],[-28,0,0],'head'),
+    bone('head','neck',[0,30,-12],[cube([-4,27,-21],[8,8,10],'#7a2230'), cube([-3,25,-23],[6,3,3],'#6a1e28'), cube([-4,35,-17],[2,4,3],'#5a1822'), cube([2,35,-17],[2,4,3],'#5a1822')],[0,0,0],null),
+    bone('wingL','body',[4,23,-1],[cube([4,22,-6],[22,2,15],'#9a3040')],[0,0,-6],'wingL'),
+    bone('wingR','body',[-4,23,-1],[cube([-26,22,-6],[22,2,15],'#9a3040')],[0,0,6],'wingR'),
+    bone('legFL','body',[5,13,-3],[cube([3,0,-5],[4,13,4],'#5a1822')],[0,0,0],'legFL'),
+    bone('legFR','body',[-5,13,-3],[cube([-7,0,-5],[4,13,4],'#5a1822')],[0,0,0],'legFR'),
+    bone('legBL','body',[6,13,6],[cube([3,0,4],[5,13,5],'#5a1822')],[0,0,0],'legBL'),
+    bone('legBR','body',[-6,13,6],[cube([-8,0,4],[5,13,5],'#5a1822')],[0,0,0],'legBR'),
+    bone('tail1','body',[0,18,10],[cube([-3,15,10],[6,6,10],'#7a2230')],[6,0,0],'tail'),
+    bone('tail2','tail1',[0,18,20],[cube([-2,15,20],[4,4,10],'#6a1e28')],[6,0,0],null),
+    bone('tail3','tail2',[0,17,30],[cube([-1,15,30],[2,3,9],'#5a1822')],[6,0,0],null)
   ]},
   bird:{emoji:'🐦',label:'Oiseau',build:()=>[
     bone('body', null, [0,8,0], [cube([-3,5,-4],[6,7,9],'#e0a040')], [0,0,0],'body'),
@@ -1801,12 +1833,13 @@ const CR_PRESETS = {
     bone('legL','body',[4,14,0],[cube([1,0,-3],[6,14,6],'#5e554e')],[0,0,0],'legL'),
     bone('legR','body',[-4,14,0],[cube([-7,0,-3],[6,14,6],'#5e554e')],[0,0,0],'legR')
   ]},
-  snake:{emoji:'🐍',label:'Serpent',build:()=>[
-    bone('body', null, [0,3,-6], [cube([-3,0,-9],[6,5,8],'#2e7a3a')], [0,0,0],'head'),
-    bone('seg1','body',[0,3,-1],[cube([-2,0,-1],[4,4,8],'#3a8a46')], [0,0,0],'body'),
-    bone('seg2','seg1',[0,3,7],[cube([-2,0,7],[4,4,8],'#2e7a3a')], [0,8,0],'tail'),
-    bone('head_d','body',[0,3,-9],[cube([-2,4,-10],[1,1,1],'#c0392b'), cube([1,4,-10],[1,1,1],'#c0392b')],[0,0,0],null)
-  ]},
+  snake:{emoji:'🐍',label:'Serpent',build:()=>{
+    const segDefs=[{z:-8,w:6,h:5,col:'#3a8a46'},{z:-2,w:6,h:5,col:'#2e7a3a'},{z:4,w:5,h:4,col:'#3a8a46'},{z:10,w:4,h:4,col:'#2e7a3a'},{z:16,w:3,h:3,col:'#256632'}];
+    const bones=[ bone('head',null,[0,3,-10],[cube([-3,0,-16],[6,5,8],'#2e7a3a'), cube([-2,5,-15],[2,1,2],'#c0392b'), cube([1,5,-15],[2,1,2],'#c0392b'), cube([-1,1,-17],[2,2,1],'#1f5228')],[0,0,0],'head') ];
+    let prev='head';
+    segDefs.forEach((s,i)=>{ const n='seg'+i; bones.push(bone(n, prev, [0,3,s.z], [cube([-s.w/2,0,s.z],[s.w,s.h,6],s.col)], [0,0,0], i===segDefs.length-1?'tail':(i===2?'body':null))); prev=n; });
+    return bones;
+  }},
   blob:{emoji:'🫧',label:'Blob / Slime',build:()=>[
     bone('body', null, [0,4,0], [cube([-5,0,-5],[10,8,10],'#27ae60'), cube([-3,8,-3],[6,2,6],'#27ae60')], [0,0,0],'body'),
     bone('eyes','body',[0,5,-5],[cube([-3,4,-6],[2,2,1],'#ffffff'), cube([1,4,-6],[2,2,1],'#ffffff')], [0,0,0],'head')
@@ -2473,6 +2506,7 @@ function renderPaintProps(c){
     <button class="px-btn" id="pt-fill" onclick="setPaintTool('fill')">🪣 Remplir</button>
     <button class="px-btn" id="pt-erase" onclick="setPaintTool('erase')">◻ Gomme</button>
     <button class="px-btn" id="pt-pick" onclick="setPaintTool('pick')">💧 Pipette</button>
+    <button class="px-btn" onclick="importPaintImage()">🖼 Image</button>
     <button class="px-btn" onclick="paintClearCube()">🗑 Tout effacer</button>
   </div>`;
   h+=`<div class="cr-pal" id="paint-pal"></div>`;
@@ -2515,6 +2549,17 @@ function floodCube(cu,c,r,target,rep){
   while(st.length){ const [x,y]=st.pop(); if(x<0||x>=fw||y<0||y>=fh) continue; if((cu.tex[y][x]||null)!==(target||null)) continue; cu.tex[y][x]=rep; st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]); }
 }
 function paintClearCube(){ const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube]; const {fw,fh}=crDims(cu); cu.tex=Array.from({length:fh},()=>Array(fw).fill(null)); cu._tw=fw; cu._th=fh; redrawPaint(); rebuildCreatureMesh(); }
+function importPaintImage(){
+  const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube]; ensureCubeTex(cu);
+  const {fw,fh}=crDims(cu);
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=()=>{ const f=inp.files[0]; if(!f) return; const img=new Image();
+    img.onload=()=>{ const cv=document.createElement('canvas'); cv.width=fw; cv.height=fh; const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=true; ctx.drawImage(img,0,0,fw,fh); const d=ctx.getImageData(0,0,fw,fh).data;
+      for(let r=0;r<fh;r++)for(let c=0;c<fw;c++){ const i=(r*fw+c)*4; cu.tex[r][c]= d[i+3]<100? null : '#'+[d[i],d[i+1],d[i+2]].map(v=>v.toString(16).padStart(2,'0')).join(''); }
+      redrawPaint(); rebuildCreatureMesh(); toast('✓ Image appliquée sur la boîte'); };
+    img.src=URL.createObjectURL(f); };
+  inp.click();
+}
 function redrawPaint(){
   const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube]; ensureCubeTex(cu);
   const {fw,fh,W,H,D}=crDims(cu); const s=crPaintScale;
