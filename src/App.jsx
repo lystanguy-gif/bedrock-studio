@@ -11,7 +11,7 @@ import { evaluateWin, applyLoss, tally, THEMES, MIN_VOTERS } from "./lib/trophie
 import { COUNTRIES } from "./lib/places.js";
 import { translate } from "./lib/i18n.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies, sendFriendRequest, acceptFriendRequest, removeFriendship, getFriendship, listFriendships } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies, sendFriendRequest, acceptFriendRequest, removeFriendship, getFriendship, listFriendships, searchProfiles } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -757,6 +757,26 @@ function FriendsSection({ meId, onOpen }) {
   const accept = async (r) => { await acceptFriendRequest(r.id); load(); };
   const remove = async (r) => { await removeFriendship(r.id); load(); };
 
+  // Recherche de membres par pseudo (avec une petite temporisation).
+  const [q, setQ] = useState("");
+  const [results, setResults] = useState(null);
+  const [sent, setSent] = useState({}); // id -> demande envoyée depuis la recherche
+  const timer = useRef(null);
+  useEffect(() => {
+    clearTimeout(timer.current);
+    const query = q.trim();
+    if (query.length < 2) { setResults(null); return; }
+    timer.current = setTimeout(async () => {
+      const { profiles } = await searchProfiles(query, meId);
+      setResults(profiles || []);
+    }, 300);
+    return () => clearTimeout(timer.current);
+  }, [q, meId]);
+  const addFromSearch = async (oid) => {
+    const { error } = await sendFriendRequest(meId, oid);
+    if (!error) { setSent((s) => ({ ...s, [oid]: true })); load(); }
+  };
+
   const incoming = (rows || []).filter((r) => r.status === "pending" && r.addressee_id === meId);
   const outgoing = (rows || []).filter((r) => r.status === "pending" && r.requester_id === meId);
   const friends = (rows || []).filter((r) => r.status === "accepted");
@@ -781,6 +801,31 @@ function FriendsSection({ meId, onOpen }) {
       ) : rows === null ? (
         <p style={{ color: "#6f6b63", fontSize: 12 }}>{t("Chargement…")}</p>
       ) : (<>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("Rechercher un membre par pseudo…")} className="w-full" style={{ ...fieldStyle, padding: "9px 13px", marginBottom: 8, fontSize: 14 }} />
+        {results !== null && (
+          <div style={{ marginBottom: 10 }}>
+            {results.length === 0 ? (
+              <p style={{ color: "#6f6b63", fontSize: 12 }}>{t("Aucun membre trouvé.")}</p>
+            ) : results.map((p) => {
+              const link = (rows || []).find((r) => otherOf(r) === p.id);
+              const isFriend = link && link.status === "accepted";
+              const isPending = (link && link.status === "pending") || sent[p.id];
+              return (
+                <div key={p.id} className="flex items-center gap-2" style={{ padding: "6px 0" }}>
+                  <button onClick={() => onOpen(p.id)} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, flex: 1, textAlign: "left" }}>
+                    <span style={{ width: 30, height: 30, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, flexShrink: 0 }}>
+                      {p.avatar ? <img src={"/avatars/" + p.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
+                    </span>
+                    <span style={{ fontSize: 14, color: C.text }}>{p.pseudo || t("Membre")}</span>
+                  </button>
+                  {isFriend ? <span style={{ color: C.green, fontSize: 12, fontWeight: 600 }}>{t("Amis")}</span>
+                    : isPending ? <span style={{ color: C.mute, fontSize: 12 }}>{t("En attente")}</span>
+                    : <button onClick={() => addFromSearch(p.id)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "6px 12px", fontWeight: 700, fontSize: 11, cursor: "pointer" }}><UserPlus size={12} /> {t("Ajouter")}</button>}
+                </div>
+              );
+            })}
+          </div>
+        )}
         {incoming.length > 0 && (
           <div style={{ marginBottom: 8 }}>
             <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>{t("Demandes reçues")}</div>

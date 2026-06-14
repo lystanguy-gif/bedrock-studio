@@ -134,6 +134,16 @@ export async function listFriendships(meId) {
   return { rows: data || [] }
 }
 
+// Recherche de membres par pseudo (pour trouver des amis à ajouter).
+export async function searchProfiles(query, excludeId, limit = 12) {
+  const q = (query || '').trim().replace(/[%_\\]/g, '\\$&') // échappe les jokers SQL
+  if (q.length < 2) return { profiles: [] }
+  const { data, error } = await supabase.from('profiles')
+    .select('id, pseudo, avatar').ilike('pseudo', `%${q}%`).limit(limit)
+  if (error) return { profiles: [], error: error.message }
+  return { profiles: (data || []).filter((p) => p.id !== excludeId) }
+}
+
 // Liste les débats publics (pour L'Agora), les plus récents d'abord.
 export async function listPublicPanels(limit = 24) {
   const { data, error } = await supabase.from('panels').select('*')

@@ -169,6 +169,10 @@ export const EN = {
   "Aucun ami pour l'instant. Ouvre le profil d'un membre et clique « Ajouter en ami ».":
     "No friends yet. Open a member's profile and click “Add friend”.",
   "Demandes envoyées": "Requests sent",
+  "Rechercher un membre par pseudo…": "Search a member by username…",
+  "Aucun membre trouvé.": "No member found.",
+  "En attente": "Pending",
+  "Ajouter": "Add",
 
   // — Pied de page —
   "Le contrechamp — régie de débat · maquette": "Le Contrechamp — debate control room · prototype",
