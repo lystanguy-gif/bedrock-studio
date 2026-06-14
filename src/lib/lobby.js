@@ -101,6 +101,39 @@ export async function getProfiles(ids) {
   return { profiles: map }
 }
 
+// --- Amis (demande + acceptation) ---
+const noFriendsTable = (e) => e && /friendships/.test(e.message || '') && /exist|relation|schema cache/.test(e.message || '')
+export async function sendFriendRequest(meId, otherId) {
+  const { error } = await supabase.from('friendships').insert({ requester_id: meId, addressee_id: otherId })
+  if (noFriendsTable(error)) return { error: 'no-table' }
+  return { error: error?.message }
+}
+export async function acceptFriendRequest(rowId) {
+  const { error } = await supabase.from('friendships').update({ status: 'accepted' }).eq('id', rowId)
+  return { error: error?.message }
+}
+export async function removeFriendship(rowId) {
+  const { error } = await supabase.from('friendships').delete().eq('id', rowId)
+  return { error: error?.message }
+}
+// Lien d'amitié (dans un sens ou l'autre) entre moi et un autre membre, s'il existe.
+export async function getFriendship(meId, otherId) {
+  const { data, error } = await supabase.from('friendships').select('*')
+    .or(`and(requester_id.eq.${meId},addressee_id.eq.${otherId}),and(requester_id.eq.${otherId},addressee_id.eq.${meId})`)
+    .maybeSingle()
+  if (noFriendsTable(error)) return { row: null, error: 'no-table' }
+  if (error) return { row: null, error: error.message }
+  return { row: data }
+}
+// Tous mes liens (demandes reçues/envoyées + amis confirmés).
+export async function listFriendships(meId) {
+  const { data, error } = await supabase.from('friendships').select('*')
+    .or(`requester_id.eq.${meId},addressee_id.eq.${meId}`)
+  if (noFriendsTable(error)) return { rows: [], error: 'no-table' }
+  if (error) return { rows: [], error: error.message }
+  return { rows: data || [] }
+}
+
 // Liste les débats publics (pour L'Agora), les plus récents d'abord.
 export async function listPublicPanels(limit = 24) {
   const { data, error } = await supabase.from('panels').select('*')

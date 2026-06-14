@@ -10,7 +10,7 @@ import { MeshRTC } from "./lib/rtc.js";
 import { evaluateWin, applyLoss, tally, THEMES, MIN_VOTERS } from "./lib/trophies.js";
 import { COUNTRIES } from "./lib/places.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies, sendFriendRequest, acceptFriendRequest, removeFriendship, getFriendship, listFriendships } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -86,7 +86,7 @@ export default function App() {
       ) : view === "trophies" && session ? (
         <TrophyGallery session={session} onHome={goHome} />
       ) : view === "agora" ? (
-        <Agora onHome={goHome} onOpenPanel={openPanel} />
+        <Agora session={session} onHome={goHome} onOpenPanel={openPanel} />
       ) : view === "legal" ? (
         <Legal onBack={() => setView("home")} />
       ) : (
@@ -317,6 +317,7 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
   const [hashtags, setHashtags] = useState([]);
   const [hSearch, setHSearch] = useState("");
   const [showProfile, setShowProfile] = useState(false);
+  const [viewedFriend, setViewedFriend] = useState(null);
 
   useEffect(() => { fetch("/avatars.json").then((r) => r.json()).then(setAvatars).catch(() => {}); }, []);
   useEffect(() => { fetch("/hashtags.json").then((r) => r.json()).then(setHashtags).catch(() => {}); }, []);
@@ -420,7 +421,10 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
           <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>Mes trophées</span>
           <ArrowRight size={16} color={C.gold} />
         </button>
+
+        <FriendsSection meId={session.user.id} onOpen={setViewedFriend} />
         {showProfile && <ProfileModal id={session.user.id} onClose={() => setShowProfile(false)} />}
+        {viewedFriend && <ProfileModal id={viewedFriend} meId={session.user.id} onClose={() => setViewedFriend(null)} />}
         <p style={{ marginTop: 6 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
       </div>
       <Footer />
@@ -521,7 +525,7 @@ function TrophyGallery({ session, onHome }) {
 }
 
 /* ----------------------------- L'AGORA ----------------------------- */
-function Agora({ onHome, onOpenPanel }) {
+function Agora({ session, onHome, onOpenPanel }) {
   const [publics, setPublics] = useState(null);
   const [creators, setCreators] = useState({});
   const [viewedProfile, setViewedProfile] = useState(null);
@@ -608,24 +612,66 @@ function Agora({ onHome, onOpenPanel }) {
           </div>
         )}
       </div>
-      {viewedProfile && <ProfileModal id={viewedProfile} onClose={() => setViewedProfile(null)} />}
+      {viewedProfile && <ProfileModal id={viewedProfile} meId={session?.user?.id} onClose={() => setViewedProfile(null)} />}
       <Footer />
     </>
   );
 }
 
 /* ----------------------------- FICHE PROFIL ----------------------------- */
-function ProfileModal({ id, onClose }) {
+function ProfileModal({ id, onClose, meId }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hashtags, setHashtags] = useState([]);
   const [trophs, setTrophs] = useState([]);
+  const [friend, setFriend] = useState(undefined); // undefined=chargement, null=aucun, sinon la ligne
+  const [friendMsg, setFriendMsg] = useState("");
+  const canFriend = meId && id && meId !== id;
   useEffect(() => { getProfile(id).then(({ profile }) => { setProfile(profile); setLoading(false); }); }, [id]);
   useEffect(() => { fetch("/hashtags.json").then((r) => r.json()).then(setHashtags).catch(() => {}); }, []);
   useEffect(() => { fetch("/trophees.json").then((r) => r.json()).then(setTrophs).catch(() => {}); }, []);
+  useEffect(() => {
+    if (!canFriend) { setFriend(null); return; }
+    getFriendship(meId, id).then(({ row, error }) => setFriend(error === 'no-table' ? 'no-table' : (row || null)));
+  }, [meId, id, canFriend]);
   const labelOf = (tag) => hashtags.find((h) => h.tag === tag)?.libelle || tag;
   const earnedIds = Array.isArray(profile?.trophies) ? profile.trophies.map((e) => e.id) : [];
   const earnedTrophs = trophs.filter((t) => earnedIds.includes(t.id));
+
+  async function askFriend() {
+    setFriendMsg("");
+    const { error } = await sendFriendRequest(meId, id);
+    if (error === 'no-table') { setFriendMsg("Amis : bientôt disponible (petite mise à jour de la base à faire)."); return; }
+    if (error) { setFriendMsg("Impossible d'envoyer la demande."); return; }
+    const { row } = await getFriendship(meId, id); setFriend(row || null);
+  }
+  async function acceptFriend() { if (friend?.id) { await acceptFriendRequest(friend.id); const { row } = await getFriendship(meId, id); setFriend(row || null); } }
+  async function dropFriend() { if (friend?.id) { await removeFriendship(friend.id); setFriend(null); } }
+
+  const friendButton = !canFriend ? null : friend === undefined ? null : (
+    <div style={{ marginTop: 14 }}>
+      {friend === 'no-table' || friend === null ? (
+        <button onClick={askFriend} className="inline-flex items-center gap-2 uppercase w-full justify-center" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 18px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 12, cursor: "pointer" }}><UserPlus size={14} /> Ajouter en ami</button>
+      ) : friend.status === 'accepted' ? (
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5" style={{ color: C.green, fontSize: 13, fontWeight: 600 }}><Check size={14} /> Amis</span>
+          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12, marginLeft: "auto" }}>Retirer</button>
+        </div>
+      ) : friend.addressee_id === meId ? (
+        <div className="flex items-center gap-2">
+          <span style={{ color: C.mute, fontSize: 13 }}>T'a envoyé une demande</span>
+          <button onClick={acceptFriend} className="inline-flex items-center gap-1.5 uppercase" style={{ marginLeft: "auto", borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" }}><Check size={13} /> Accepter</button>
+          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12 }}>Refuser</button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <span style={{ color: C.mute, fontSize: 13 }}>Demande envoyée</span>
+          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12, marginLeft: "auto" }}>Annuler</button>
+        </div>
+      )}
+      {friendMsg && <div style={{ color: C.gold, fontSize: 12, marginTop: 8 }}>{friendMsg}</div>}
+    </div>
+  );
   return (
     <div onClick={onClose} className="fixed inset-0 flex items-center justify-center" style={{ background: "rgba(2,3,4,0.9)", zIndex: 60, padding: 24, cursor: "pointer" }}>
       <div onClick={(e) => e.stopPropagation()} style={{ ...cardStyle, padding: 26, maxWidth: 420, width: "100%" }}>
@@ -664,9 +710,77 @@ function ProfileModal({ id, onClose }) {
               </div>
             )}
           </div>
+          {friendButton}
         </>)}
         <button onClick={onClose} className="pill w-full" style={{ marginTop: 18, padding: "9px 18px", fontSize: 12 }}>Fermer</button>
       </div>
+    </div>
+  );
+}
+
+/* ----------------------------- MES AMIS ----------------------------- */
+function FriendsSection({ meId, onOpen }) {
+  const [rows, setRows] = useState(null);
+  const [profiles, setProfiles] = useState({});
+  const [noTable, setNoTable] = useState(false);
+  const otherOf = (r) => (r.requester_id === meId ? r.addressee_id : r.requester_id);
+  const load = async () => {
+    const { rows, error } = await listFriendships(meId);
+    if (error === "no-table") { setNoTable(true); setRows([]); return; }
+    setRows(rows);
+    const { profiles } = await getProfiles(rows.map(otherOf));
+    setProfiles(profiles || {});
+  };
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [meId]);
+  const accept = async (r) => { await acceptFriendRequest(r.id); load(); };
+  const remove = async (r) => { await removeFriendship(r.id); load(); };
+
+  const incoming = (rows || []).filter((r) => r.status === "pending" && r.addressee_id === meId);
+  const outgoing = (rows || []).filter((r) => r.status === "pending" && r.requester_id === meId);
+  const friends = (rows || []).filter((r) => r.status === "accepted");
+
+  const Person = ({ oid, right }) => { const pr = profiles[oid]; return (
+    <div className="flex items-center gap-2" style={{ padding: "6px 0" }}>
+      <button onClick={() => onOpen(oid)} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", padding: 0, flex: 1, textAlign: "left" }}>
+        <span style={{ width: 30, height: 30, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, flexShrink: 0 }}>
+          {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
+        </span>
+        <span style={{ fontSize: 14, color: C.text }}>{(pr && pr.pseudo) || "Membre"}</span>
+      </button>
+      {right}
+    </div>
+  ); };
+
+  return (
+    <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
+      <Label>Mes amis {friends.length > 0 ? "(" + friends.length + ")" : ""}</Label>
+      {noTable ? (
+        <p style={{ color: "#6f6b63", fontSize: 12 }}>Bientôt disponible (une petite mise à jour de la base est nécessaire).</p>
+      ) : rows === null ? (
+        <p style={{ color: "#6f6b63", fontSize: 12 }}>Chargement…</p>
+      ) : (<>
+        {incoming.length > 0 && (
+          <div style={{ marginBottom: 8 }}>
+            <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>Demandes reçues</div>
+            {incoming.map((r) => <Person key={r.id} oid={otherOf(r)} right={
+              <span className="flex gap-2">
+                <button onClick={() => accept(r)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "6px 12px", fontWeight: 700, fontSize: 11, cursor: "pointer" }}><Check size={12} /> Accepter</button>
+                <button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>Refuser</button>
+              </span>
+            } />)}
+          </div>
+        )}
+        {friends.length === 0 && incoming.length === 0 && outgoing.length === 0 && (
+          <p style={{ color: "#6f6b63", fontSize: 12 }}>Aucun ami pour l'instant. Ouvre le profil d'un membre et clique « Ajouter en ami ».</p>
+        )}
+        {friends.map((r) => <Person key={r.id} oid={otherOf(r)} right={<button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>Retirer</button>} />)}
+        {outgoing.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <div className="uppercase" style={{ color: "#6f6b63", fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>Demandes envoyées</div>
+            {outgoing.map((r) => <Person key={r.id} oid={otherOf(r)} right={<button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>Annuler</button>} />)}
+          </div>
+        )}
+      </>)}
     </div>
   );
 }
@@ -1469,7 +1583,7 @@ Rien à vérifier -> []. sources peut être vide.`;
           <img src={lightbox} alt="" style={{ maxWidth: "90%", maxHeight: "90%", borderRadius: 12 }} />
         </div>
       )}
-      {viewedProfile && <ProfileModal id={viewedProfile} onClose={() => setViewedProfile(null)} />}
+      {viewedProfile && <ProfileModal id={viewedProfile} meId={myUserId} onClose={() => setViewedProfile(null)} />}
     </>
   );
 }
