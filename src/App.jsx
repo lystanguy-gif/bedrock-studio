@@ -30,6 +30,7 @@ const BANNED = ["connard","conard","connasse","pute","salope","encule","enculé"
 const fmt = (s) => (s < 0 ? "-" : "") + String(Math.floor(Math.abs(s) / 60)).padStart(2, "0") + ":" + String(Math.abs(s) % 60).padStart(2, "0");
 const other = (i) => (i === 0 ? 1 : 0);
 const hhmm = (iso) => { try { return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); } catch { return ""; } };
+const hhmmDate = (iso) => { try { return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }); } catch { return ""; } };
 const mergeSegments = (list) => { const out = []; for (const s of list) { if (out.length && out[out.length - 1].side === s.side) out[out.length - 1].text = (out[out.length - 1].text + " " + s.text).trim(); else out.push({ side: s.side, text: s.text }); } return out; };
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = "Inter, Arial, system-ui, sans-serif";
@@ -70,7 +71,11 @@ export default function App() {
       ) : view === "live" && lobby ? (
         <Live lobby={lobby} session={session} onHome={goHome} />
       ) : view === "settings" && session ? (
-        <Settings session={session} onHome={goHome} onLegal={() => setView("legal")} />
+        <Settings session={session} onHome={goHome} onLegal={() => setView("legal")} onTrophies={() => setView("trophies")} />
+      ) : view === "trophies" && session ? (
+        <TrophyGallery session={session} onHome={goHome} />
+      ) : view === "agora" ? (
+        <Agora onHome={goHome} onOpenPanel={openPanel} />
       ) : view === "legal" ? (
         <Legal onBack={() => setView("home")} />
       ) : (
@@ -82,7 +87,7 @@ export default function App() {
           onSignIn={() => setView("auth")}
           onSettings={() => setView("settings")}
           onLegal={() => setView("legal")}
-          onOpenPanel={openPanel}
+          onAgora={() => setView("agora")}
         />
       )}
     </Shell>
@@ -115,12 +120,10 @@ function pseudoOf(session) {
 }
 
 /* ----------------------------- ACCUEIL ----------------------------- */
-function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLegal, onOpenPanel }) {
+function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLegal, onAgora }) {
   const pseudo = pseudoOf(session);
   const admin = isAdminEmail(session?.user?.email);
   const avatar = session?.user?.user_metadata?.avatar;
-  const [publics, setPublics] = useState([]);
-  useEffect(() => { let on = true; listPublicPanels().then(({ panels }) => { if (on) setPublics(panels || []); }); return () => { on = false; }; }, []);
   const accountRight = !authReady ? null : (session ? (
     <div className="flex items-center gap-2">
       {admin && <span className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, border: "1px solid " + C.gold, color: C.gold, fontSize: 10, letterSpacing: "0.08em", padding: "3px 9px", fontWeight: 700 }}><AdminSeal size={13} /> Admin</span>}
@@ -149,35 +152,13 @@ function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLe
           <button onClick={onJoin} className="pill inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13 }}>
             Rejoindre un débat
           </button>
+          <button onClick={onAgora} className="pill inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, color: C.gold }}>
+            L'Agora <ArrowRight size={16} />
+          </button>
         </div>
         {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Créer un débat nécessite un compte (gratuit, rapide).</p>}
         {!isSupabaseConfigured && <p style={{ color: C.gold, fontSize: 12, marginTop: 16 }}>⚠️ Connexion à la base non configurée sur ce site (variables d'environnement manquantes).</p>}
-        <div style={{ marginTop: 44 }}>
-          <Kicker>L'Agora · débats publics</Kicker>
-          {publics.length === 0 ? (
-            <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 10 }}>Aucun débat public en ce moment. Crée le premier en choisissant « Public » à l'ouverture du débat.</p>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ marginTop: 12 }}>
-              {publics.map((p) => {
-                const camps = (p.camps && p.camps.length >= 2) ? p.camps : ["Pour", "Contre"];
-                return (
-                  <button key={p.id} onClick={() => onOpenPanel(p)} className="text-left" style={{ ...cardStyle, padding: 16, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}>
-                    <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || "Débat"}</div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2" style={{ fontSize: 13 }}>
-                        <span style={{ color: CAMP[0] }}>●</span> {camps[0]}
-                        <span style={{ color: C.mute }}>vs</span>
-                        <span style={{ color: CAMP[1] }}>●</span> {camps[1]}
-                      </div>
-                      <span className="inline-flex items-center gap-1 uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.08em" }}>Rejoindre <ArrowRight size={13} /></span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-        <p style={{ marginTop: 28 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
+        <p style={{ marginTop: 36 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
       </div>
       <Footer />
     </>
@@ -312,7 +293,7 @@ function JoinScreen({ session, onHome, onJoined }) {
 }
 
 /* ----------------------------- MON COMPTE ----------------------------- */
-function Settings({ session, onHome, onLegal }) {
+function Settings({ session, onHome, onLegal, onTrophies }) {
   const meta = session.user.user_metadata || {};
   const [pseudo, setPseudo] = useState(meta.pseudo || pseudoOf(session));
   const [avatar, setAvatar] = useState(meta.avatar || null);
@@ -389,7 +370,11 @@ function Settings({ session, onHome, onLegal }) {
           <button onClick={savePassword} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><KeyRound size={14} /> Mettre à jour le mot de passe</button>
         </div>
 
-        <p style={{ marginTop: 18 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
+        <button onClick={onTrophies} className="w-full inline-flex items-center justify-between" style={{ ...cardStyle, padding: 18, cursor: "pointer", marginBottom: 16 }}>
+          <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>Mes trophées</span>
+          <ArrowRight size={16} color={C.gold} />
+        </button>
+        <p style={{ marginTop: 6 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
       </div>
       <Footer />
     </>
@@ -429,6 +414,101 @@ function Legal({ onBack }) {
 
         <H>Avertissement</H>
         <P>Ce texte est <strong>original</strong> et propre au Contrechamp : il n'est la copie d'aucune mention légale existante. Il est <strong>informatif</strong> et amené à évoluer. Avant une mise en ligne publique à grande échelle, il devra être complété par des mentions légales et des conditions d'utilisation conformes à la réglementation applicable (identité de l'éditeur, RGPD, etc.).</P>
+      </div>
+      <Footer />
+    </>
+  );
+}
+
+/* ----------------------------- TROPHÉES ----------------------------- */
+function TrophyGallery({ session, onHome }) {
+  const [all, setAll] = useState([]);
+  const [sel, setSel] = useState(null);
+  useEffect(() => { fetch("/trophees.json").then((r) => r.json()).then(setAll).catch(() => {}); }, []);
+  const earned = session.user.user_metadata?.trophies || [];
+  const earnedMap = Object.fromEntries(earned.map((e) => [e.id, e.at]));
+  const earnedCount = all.filter((t) => earnedMap[t.id]).length;
+  const firstE = earned.filter((e) => all.some((t) => t.id === e.id)).sort((a, b) => new Date(a.at) - new Date(b.at))[0];
+  const firstT = firstE ? all.find((t) => t.id === firstE.id) : null;
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  return (
+    <>
+      <Header right={back} />
+      <div className="mx-auto" style={{ maxWidth: 1000, padding: "48px 18px 60px" }}>
+        <Kicker>Ma collection</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(30px,5vw,48px)", lineHeight: 1, margin: "10px 0 6px", fontWeight: 700 }}>Trophées</h1>
+        <p style={{ color: C.mute, fontSize: 14, marginBottom: 4 }}><strong style={{ color: C.gold }}>{earnedCount}</strong> / {all.length} débloqués</p>
+        {firstT && <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 8 }}>Premier trophée : « {firstT.nom} » le {hhmmDate(firstE.at)}</p>}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 14, marginTop: 18 }}>
+          {all.map((t) => {
+            const got = !!earnedMap[t.id];
+            return (
+              <button key={t.id} onClick={() => setSel({ t, got, at: earnedMap[t.id] })} className="text-center" style={{ background: "none", border: "none", cursor: "pointer", padding: 8 }}>
+                <div style={{ height: 86 }}><TrophyBadge palier={t.palier} locked={!got} size={84} /></div>
+                <div style={{ fontSize: 12, color: got ? C.text : "#4a5060", marginTop: 4 }}>{got ? t.nom : "???"}</div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {sel && (
+        <div onClick={() => setSel(null)} className="fixed inset-0 flex items-center justify-center" style={{ background: "rgba(2,3,4,0.9)", zIndex: 50, padding: 24, cursor: "pointer" }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ ...cardStyle, padding: 26, maxWidth: 380, textAlign: "center" }}>
+            <div style={{ height: 118 }}><TrophyBadge palier={sel.t.palier} locked={!sel.got} size={110} /></div>
+            {sel.got ? (<>
+              <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.12em", marginTop: 6 }}>{sel.t.categorie} · {sel.t.rarete}</div>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "4px 0 8px" }}>{sel.t.nom}</h3>
+              <p style={{ color: C.text, fontSize: 14, lineHeight: 1.5 }}>{sel.t.condition}</p>
+              {sel.at && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 8 }}>Débloqué le {hhmmDate(sel.at)}</p>}
+            </>) : (<>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "10px 0 6px", color: C.mute }}>Trophée verrouillé</h3>
+              <p style={{ color: "#6f6b63", fontSize: 13, lineHeight: 1.5 }}>Débloque-le en débattant pour révéler son nom et comment l'obtenir.</p>
+            </>)}
+            <button onClick={() => setSel(null)} className="pill" style={{ marginTop: 16, padding: "8px 18px", fontSize: 12 }}>Fermer</button>
+          </div>
+        </div>
+      )}
+      <Footer />
+    </>
+  );
+}
+
+/* ----------------------------- L'AGORA ----------------------------- */
+function Agora({ onHome, onOpenPanel }) {
+  const [publics, setPublics] = useState(null);
+  useEffect(() => { listPublicPanels().then(({ panels }) => setPublics(panels || [])); }, []);
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  return (
+    <>
+      <Header right={back} />
+      <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
+        <Kicker>L'Agora</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 10px", fontWeight: 700 }}>Débats publics</h1>
+        <p style={{ color: C.mute, fontSize: 14, marginBottom: 8 }}>Choisis un débat en cours et rejoins-le. <span style={{ color: "#6f6b63" }}>(Filtres par sujet et par pays, et cartes détaillées à venir.)</span></p>
+        {publics === null ? (
+          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Chargement…</p>
+        ) : publics.length === 0 ? (
+          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Aucun débat public en ce moment. Crée le premier en choisissant « Public » à l'ouverture du débat.</p>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ marginTop: 16 }}>
+            {publics.map((p) => {
+              const camps = (p.camps && p.camps.length >= 2) ? p.camps : ["Pour", "Contre"];
+              return (
+                <button key={p.id} onClick={() => onOpenPanel(p)} className="text-left" style={{ ...cardStyle, padding: 16, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || "Débat"}</div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2" style={{ fontSize: 13 }}>
+                      <span style={{ color: CAMP[0] }}>●</span> {camps[0]}
+                      <span style={{ color: C.mute }}>vs</span>
+                      <span style={{ color: CAMP[1] }}>●</span> {camps[1]}
+                    </div>
+                    <span className="inline-flex items-center gap-1 uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.08em" }}>Rejoindre <ArrowRight size={13} /></span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
       <Footer />
     </>
@@ -977,6 +1057,37 @@ function AdminSeal({ size = 14 }) {
       <defs><linearGradient id="adseal" x1="0" y1="0" x2="0" y2="24" gradientUnits="userSpaceOnUse"><stop stopColor="#e0c184" /><stop offset="1" stopColor="#b08a4a" /></linearGradient></defs>
       <path d="M12 1.6 L20.2 5 V11 C20.2 16.6 16.6 20.2 12 22.4 C7.4 20.2 3.8 16.6 3.8 11 V5 Z" fill="none" stroke="url(#adseal)" strokeWidth="1.6" strokeLinejoin="round" />
       <path d="M12 6.6 l1.5 3.1 3.4.3 -2.6 2.2 .8 3.3 -3.1 -1.8 -3.1 1.8 .8 -3.3 -2.6 -2.2 3.4 -.3 Z" fill="url(#adseal)" />
+    </svg>
+  );
+}
+
+// Couleurs des paliers de trophées.
+const PALIERS = {
+  Bronze: { m1: "#caa06a", m2: "#7d5a32", ring: "#8a6a3b" },
+  Argent: { m1: "#eef1f5", m2: "#9aa1ab", ring: "#aeb4be" },
+  Or: { m1: "#f3d488", m2: "#b08a4a", ring: "#d8b25e" },
+  Vermeil: { m1: "#f0b27a", m2: "#b5572e", ring: "#d98a52" },
+  Pourpre: { m1: "#d68fb8", m2: "#6a2b55", ring: "#b06a9a" },
+  Laurier: { m1: "#f6e08f", m2: "#c8a55a", ring: "#e8c878" },
+};
+// Médaille de trophée (SVG maison). locked = silhouette sombre + point d'interrogation.
+function TrophyBadge({ palier = "Bronze", size = 64, locked = false }) {
+  const gid = useRef("tb" + Math.random().toString(36).slice(2)).current;
+  const p = locked ? { m1: "#262b34", m2: "#14171d", ring: "#2c323d" } : (PALIERS[palier] || PALIERS.Bronze);
+  return (
+    <svg width={size} height={size} viewBox="0 0 120 120" aria-hidden="true">
+      <defs><radialGradient id={gid} cx="40%" cy="35%" r="70%"><stop offset="0" stopColor={p.m1} /><stop offset="1" stopColor={p.m2} /></radialGradient></defs>
+      <path d="M44 96 L40 116 L52 108 L60 116 L60 92 Z" fill={p.m2} />
+      <path d="M76 96 L80 116 L68 108 L60 116 L60 92 Z" fill={p.ring} />
+      <circle cx="60" cy="60" r="40" fill={"url(#" + gid + ")"} stroke={p.ring} strokeWidth="2" />
+      {locked ? (
+        <text x="60" y="72" textAnchor="middle" fontSize="34" fontWeight="700" fill="#4a5060" fontFamily="Georgia, serif">?</text>
+      ) : (<>
+        <rect x="50" y="50" width="20" height="18" rx="2" fill="#0c0e12" fillOpacity=".55" />
+        <rect x="58.5" y="40" width="3" height="14" rx="1.5" fill="#0c0e12" fillOpacity=".55" />
+        <circle cx="60" cy="39" r="4" fill="#0c0e12" fillOpacity=".55" />
+        <ellipse cx="48" cy="46" rx="9" ry="5" fill="#fff" fillOpacity=".22" transform="rotate(-30 48 46)" />
+      </>)}
     </svg>
   );
 }
