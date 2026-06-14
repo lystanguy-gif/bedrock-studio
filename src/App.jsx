@@ -1009,16 +1009,6 @@ function Live({ lobby, session, onHome }) {
   // Puis-je parler dans le camp i ? (débatteur de ce camp avec la parole, ou hôte si le camp est vide)
   const canSpeakCamp = (i) => (mySeat === i || (iAmController && (seats[String(i)] || []).length === 0));
 
-  // Transcription automatique : dès que j'ai la parole (débatteur du camp actif,
-  // ou hôte d'un camp vide), le micro de transcription se lance seul ; il s'arrête
-  // quand je n'ai plus la parole. (Indépendant du micro de la caméra/voix.)
-  const iSpeakNow = floor !== null && canSpeakCamp(floor);
-  useEffect(() => {
-    if (iSpeakNow && !wantRef.current) startMic();
-    else if (!iSpeakNow && wantRef.current) stopMic();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [iSpeakNow]);
-
   // Cycle de vie : le débat reste ouvert tant qu'il y a quelqu'un « en haut »
   // (l'hôte OU au moins un débatteur présent). Sinon, fermeture après un court délai.
   const hostPresent = presentIds.has(panel.owner_id);
@@ -1611,6 +1601,24 @@ function TrophyUnlock({ ids }) {
 function pillBase() { return { flex: 1, borderRadius: 999, background: C.pill, border: "1px solid " + C.line, color: C.text, padding: "8px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }; }
 function pillSolid(bg, fg = "#fff") { return { ...pillBase(), background: bg, color: fg, border: "1px solid " + bg }; }
 
+// Garde-fou : si un composant plante, on affiche un message lisible (et le
+// détail de l'erreur) au lieu d'un écran blanc, avec un bouton pour recharger.
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <div style={{ maxWidth: 620, margin: "60px auto", padding: 24, color: C.text, fontFamily: SANS }}>
+        <h2 style={{ fontFamily: SERIF, fontSize: 24, marginBottom: 8 }}>Oups — un souci d'affichage</h2>
+        <p style={{ color: C.mute, lineHeight: 1.6, marginBottom: 12 }}>Une erreur est survenue. Tes données sont en sécurité. Recharge la page pour continuer.</p>
+        <pre style={{ background: C.field, border: "1px solid " + C.line, borderRadius: 10, padding: 12, fontSize: 12, color: "#e0b3ac", whiteSpace: "pre-wrap", overflowX: "auto" }}>{String(this.state.error && (this.state.error.message || this.state.error))}</pre>
+        <button onClick={() => location.reload()} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 14, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "11px 22px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><RotateCcw size={14} /> Recharger la page</button>
+      </div>
+    );
+  }
+}
+
 function Shell({ children }) {
   return (
     <div className="app-bg" style={{ minHeight: "100vh", color: C.text, fontFamily: SANS, background: "linear-gradient(180deg,#0b0c0f,#060608)" }}>
@@ -1632,7 +1640,7 @@ function Shell({ children }) {
           background:radial-gradient(circle,rgba(150,150,160,.05),transparent 70%);}
         a{text-decoration:none}
       `}</style>
-      <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
+      <div style={{ position: "relative", zIndex: 1 }}><ErrorBoundary>{children}</ErrorBoundary></div>
     </div>
   );
 }
