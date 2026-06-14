@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useContext } from "react";
 import {
   Play, Pause, Mic, MicOff, Search, Loader2, ExternalLink, AlertTriangle,
   HelpCircle, XCircle, CheckCircle2, Video, VideoOff, ImagePlus, X,
@@ -9,6 +9,7 @@ import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { MeshRTC } from "./lib/rtc.js";
 import { evaluateWin, applyLoss, tally, THEMES, MIN_VOTERS } from "./lib/trophies.js";
 import { COUNTRIES } from "./lib/places.js";
+import { translate } from "./lib/i18n.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
 import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies, sendFriendRequest, acceptFriendRequest, removeFriendship, getFriendship, listFriendships } from "./lib/lobby.js";
 
@@ -42,6 +43,16 @@ const SANS = "Inter, Arial, system-ui, sans-serif";
 const cardStyle = { background: C.panel, border: "1px solid " + C.line, borderRadius: 18 };
 const fieldStyle = { background: C.field, border: "1px solid " + C.line, color: C.text, borderRadius: 14 };
 
+// Langue de l'interface (FR/EN), partagée via un contexte React et persistée.
+const LangContext = React.createContext({ lang: "fr", setLang: () => {}, t: (s) => s });
+function LangProvider({ children }) {
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem("cc_lang") || "fr"; } catch { return "fr"; } });
+  useEffect(() => { try { localStorage.setItem("cc_lang", lang); } catch (e) {} }, [lang]);
+  const t = useCallback((s) => translate(lang, s), [lang]);
+  return <LangContext.Provider value={{ lang, setLang, t }}>{children}</LangContext.Provider>;
+}
+function useLang() { return useContext(LangContext); }
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
@@ -71,6 +82,7 @@ export default function App() {
   };
 
   return (
+    <LangProvider>
     <Shell>
       {view === "auth" ? (
         <AuthScreen onBack={() => setView("home")} onDone={() => setView("home")} />
@@ -102,6 +114,7 @@ export default function App() {
         />
       )}
     </Shell>
+    </LangProvider>
   );
 }
 
@@ -132,44 +145,45 @@ function pseudoOf(session) {
 
 /* ----------------------------- ACCUEIL ----------------------------- */
 function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLegal, onAgora }) {
+  const { t } = useLang();
   const pseudo = pseudoOf(session);
   const admin = isAdminEmail(session?.user?.email);
   const avatar = session?.user?.user_metadata?.avatar;
   const accountRight = !authReady ? null : (session ? (
     <div className="flex items-center gap-2">
       {admin && <span className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, border: "1px solid " + C.gold, color: C.gold, fontSize: 10, letterSpacing: "0.08em", padding: "3px 9px", fontWeight: 700 }}><AdminSeal size={13} /> Admin</span>}
-      <button onClick={onSettings} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", color: C.mute, fontSize: 13 }} title="Mon compte">
+      <button onClick={onSettings} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", color: C.mute, fontSize: 13 }} title={t("Mon compte")}>
         {avatar ? <span style={{ width: 26, height: 26, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.gold, display: "inline-block" }}><img src={"/avatars/" + avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /></span> : <SettingsIcon size={14} />}
-        <span>Bonjour, <strong style={{ color: C.text }}>{pseudo}</strong></span>
+        <span>{t("Bonjour,")} <strong style={{ color: C.text }}>{pseudo}</strong></span>
       </button>
-      <button onClick={() => supabase.auth.signOut()} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12 }}><LogOut size={13} /> Déconnexion</button>
+      <button onClick={() => supabase.auth.signOut()} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12 }}><LogOut size={13} /> {t("Déconnexion")}</button>
     </div>
   ) : (
-    <button onClick={onSignIn} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 12 }}><LogIn size={13} /> Se connecter</button>
+    <button onClick={onSignIn} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 12 }}><LogIn size={13} /> {t("Se connecter")}</button>
   ));
   return (
     <>
       <Header right={accountRight} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
-        <Kicker>Régie de débat</Kicker>
+        <Kicker>{t("Régie de débat")}</Kicker>
         <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(40px,8vw,76px)", lineHeight: 0.92, margin: "10px 0 14px", fontWeight: 700 }}>Le contrechamp</h1>
         <p style={{ color: C.mute, maxWidth: 720, lineHeight: 1.6, marginBottom: 36 }}>
-          Deux camps, face à face. Le champ et le contrechamp. Pour regarder, c'est libre. Pour participer ou héberger, un compte suffit.
+          {t("Deux camps, face à face. Le champ et le contrechamp. Pour regarder, c'est libre. Pour participer ou héberger, un compte suffit.")}
         </p>
         <div className="flex flex-wrap gap-3">
           <button onClick={onCreate} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: "pointer" }}>
-            Créer un débat <ArrowRight size={16} />
+            {t("Créer un débat")} <ArrowRight size={16} />
           </button>
           <button onClick={onJoin} className="pill inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13 }}>
-            Rejoindre un débat
+            {t("Rejoindre un débat")}
           </button>
           <button onClick={onAgora} className="pill inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, color: C.gold }}>
-            L'Agora <ArrowRight size={16} />
+            {t("L'Agora")} <ArrowRight size={16} />
           </button>
         </div>
-        {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Créer un débat nécessite un compte (gratuit, rapide).</p>}
-        {!isSupabaseConfigured && <p style={{ color: C.gold, fontSize: 12, marginTop: 16 }}>⚠️ Connexion à la base non configurée sur ce site (variables d'environnement manquantes).</p>}
-        <p style={{ marginTop: 36 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
+        {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>{t("Créer un débat nécessite un compte (gratuit, rapide).")}</p>}
+        {!isSupabaseConfigured && <p style={{ color: C.gold, fontSize: 12, marginTop: 16 }}>{t("⚠️ Connexion à la base non configurée sur ce site (variables d'environnement manquantes).")}</p>}
+        <p style={{ marginTop: 36 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>{t("Mentions légales & conditions")}</button></p>
       </div>
       <Footer />
     </>
@@ -188,6 +202,7 @@ function traduireErreur(msg) {
 }
 
 function AuthScreen({ onBack, onDone }) {
+  const { t } = useLang();
   const [mode, setMode] = useState("signup"); // signup | signin
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
@@ -216,40 +231,40 @@ function AuthScreen({ onBack, onDone }) {
     } finally { setBusy(false); }
   }
 
-  const back = <button onClick={onBack} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  const back = <button onClick={onBack} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Accueil")}</button>;
   return (
     <>
       <Header right={back} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
-        <Kicker>Ton compte</Kicker>
+        <Kicker>{t("Ton compte")}</Kicker>
         <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 24px", fontWeight: 700 }}>
-          {mode === "signup" ? "Créer un compte" : "Se connecter"}
+          {mode === "signup" ? t("Créer un compte") : t("Se connecter")}
         </h1>
 
         <div style={{ ...cardStyle, padding: 24, maxWidth: 460 }}>
           <div className="flex gap-2" style={{ marginBottom: 20 }}>
-            <Toggle on={mode === "signup"} onClick={() => { setMode("signup"); setError(""); }} icon={<UserPlus size={14} />} label="Créer un compte" />
-            <Toggle on={mode === "signin"} onClick={() => { setMode("signin"); setError(""); }} icon={<LogIn size={14} />} label="Se connecter" />
+            <Toggle on={mode === "signup"} onClick={() => { setMode("signup"); setError(""); }} icon={<UserPlus size={14} />} label={t("Créer un compte")} />
+            <Toggle on={mode === "signin"} onClick={() => { setMode("signin"); setError(""); }} icon={<LogIn size={14} />} label={t("Se connecter")} />
           </div>
 
           {mode === "signup" && (<>
-            <Label>Pseudo</Label>
-            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} placeholder="Ton nom affiché" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 16 }} />
+            <Label>{t("Pseudo")}</Label>
+            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} placeholder={t("Ton nom affiché")} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 16 }} />
           </>)}
-          <Label>Email</Label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="toi@email.fr" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 16 }} />
-          <Label>Mot de passe</Label>
-          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder="6 caractères minimum" onKeyDown={(e) => e.key === "Enter" && submit()} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
+          <Label>{t("Email")}</Label>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder={t("toi@email.fr")} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 16 }} />
+          <Label>{t("Mot de passe")}</Label>
+          <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} placeholder={t("6 caractères minimum")} onKeyDown={(e) => e.key === "Enter" && submit()} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
 
-          {error && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{error}</div>}
-          {info && <div style={{ color: C.green, fontSize: 13, marginBottom: 12 }}>{info}</div>}
+          {error && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{t(error)}</div>}
+          {info && <div style={{ color: C.green, fontSize: 13, marginBottom: 12 }}>{t(info)}</div>}
 
           <button onClick={submit} disabled={busy} className="inline-flex items-center justify-center gap-2 uppercase w-full" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 13, cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1 }}>
             {busy ? <Spinner size={15} className="spin" /> : (mode === "signup" ? <UserPlus size={15} /> : <LogIn size={15} />)}
-            {mode === "signup" ? "Créer mon compte" : "Me connecter"}
+            {mode === "signup" ? t("Créer mon compte") : t("Me connecter")}
           </button>
         </div>
-        <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Pour regarder un débat, aucun compte n'est nécessaire. Le compte sert à écrire, participer et héberger.</p>
+        <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>{t("Pour regarder un débat, aucun compte n'est nécessaire. Le compte sert à écrire, participer et héberger.")}</p>
       </div>
       <Footer />
     </>
@@ -258,6 +273,7 @@ function AuthScreen({ onBack, onDone }) {
 
 /* ----------------------------- REJOINDRE ----------------------------- */
 function JoinScreen({ session, onHome, onJoined }) {
+  const { t } = useLang();
   const [code, setCode] = useState("");
   const [pseudo, setPseudo] = useState("");
   const [busy, setBusy] = useState(false);
@@ -277,26 +293,26 @@ function JoinScreen({ session, onHome, onJoined }) {
     onJoined(panel, finalPseudo);
   }
 
-  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Accueil")}</button>;
   return (
     <>
       <Header right={back} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
-        <Kicker>Rejoindre</Kicker>
-        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 24px", fontWeight: 700 }}>Rejoindre un débat</h1>
+        <Kicker>{t("Rejoindre")}</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 24px", fontWeight: 700 }}>{t("Rejoindre un débat")}</h1>
         <div style={{ ...cardStyle, padding: 24, maxWidth: 460 }}>
-          <Label>Code de salle</Label>
+          <Label>{t("Code de salle")}</Label>
           <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="Ex. K7P2M" maxLength={8} onKeyDown={(e) => e.key === "Enter" && join()} className="w-full" style={{ ...fieldStyle, padding: "12px 14px", marginBottom: 18, fontFamily: SERIF, fontSize: 22, letterSpacing: "0.3em", textAlign: "center" }} />
           {!sessionPseudo && (<>
-            <Label>Ton pseudo (pour regarder)</Label>
-            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} placeholder="Spectateur" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
+            <Label>{t("Ton pseudo (pour regarder)")}</Label>
+            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} placeholder={t("Spectateur")} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
           </>)}
-          {err && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{err}</div>}
+          {err && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{t(err)}</div>}
           <button onClick={join} disabled={busy} className="inline-flex items-center justify-center gap-2 uppercase w-full" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 13, cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1 }}>
-            {busy ? <Spinner size={15} className="spin" /> : <ArrowRight size={15} />} Rejoindre
+            {busy ? <Spinner size={15} className="spin" /> : <ArrowRight size={15} />} {t("Rejoindre")}
           </button>
         </div>
-        <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Regarder est libre. Pour commenter, il faut un compte.</p>
+        <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>{t("Regarder est libre. Pour commenter, il faut un compte.")}</p>
       </div>
       <Footer />
     </>
@@ -1811,11 +1827,17 @@ function Shell({ children }) {
   );
 }
 function Header({ right }) {
+  const { lang, setLang } = useLang();
+  const langToggle = (
+    <button onClick={() => setLang(lang === "fr" ? "en" : "fr")} className="pill" title={lang === "fr" ? "Switch to English" : "Passer en français"} style={{ padding: "6px 10px", fontSize: 11, fontWeight: 700, letterSpacing: "0.06em" }}>
+      {lang === "fr" ? "EN" : "FR"}
+    </button>
+  );
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 20, background: "rgba(8,9,11,0.72)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", borderBottom: "1px solid " + C.line }}>
-      <div className="mx-auto flex items-center justify-between" style={{ maxWidth: 1180, padding: "12px 18px" }}>
+      <div className="mx-auto flex items-center justify-between gap-2" style={{ maxWidth: 1180, padding: "12px 18px" }}>
         <span className="uppercase" style={{ fontFamily: SERIF, letterSpacing: "0.2em", fontSize: 15 }}>Le contrechamp</span>
-        {right}
+        <div className="flex items-center gap-2">{langToggle}{right}</div>
       </div>
     </header>
   );
