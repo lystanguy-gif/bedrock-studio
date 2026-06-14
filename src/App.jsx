@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -50,6 +50,13 @@ export default function App() {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  // Synchronise le profil public (table profils) depuis le compte, à chaque changement.
+  useEffect(() => {
+    if (!session?.user) return;
+    const u = session.user;
+    upsertProfile({ id: u.id, pseudo: pseudoOf(session), avatar: u.user_metadata?.avatar || null, interests: u.user_metadata?.interests || [] }).catch(() => {});
+  }, [session]);
 
   const goHome = () => { setLobby(null); setView("home"); };
   const enterLobby = (panel, isHost, pseudo) => { setLobby({ panel, isHost, pseudo }); setView("live"); };
@@ -302,8 +309,26 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [interests, setInterests] = useState(meta.interests || []);
+  const [hashtags, setHashtags] = useState([]);
+  const [hSearch, setHSearch] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => { fetch("/avatars.json").then((r) => r.json()).then(setAvatars).catch(() => {}); }, []);
+  useEffect(() => { fetch("/hashtags.json").then((r) => r.json()).then(setHashtags).catch(() => {}); }, []);
+
+  function toggleInterest(tag) {
+    setInterests((cur) => cur.includes(tag) ? cur.filter((t) => t !== tag) : (cur.length >= 12 ? cur : [...cur, tag]));
+  }
+  async function saveInterests() {
+    setErr(""); setMsg(""); setBusy(true);
+    const { error } = await supabase.auth.updateUser({ data: { interests } });
+    if (!error) await upsertProfile({ id: session.user.id, pseudo: meta.pseudo || pseudoOf(session), avatar: meta.avatar || null, interests });
+    setBusy(false);
+    if (error) setErr(traduireErreur(error.message)); else setMsg("Centres d'intérêt enregistrés.");
+  }
+  const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const filtered = hSearch ? hashtags.filter((h) => norm(h.libelle).includes(norm(hSearch))) : hashtags;
 
   const FIFTEEN = 15 * 24 * 3600 * 1000;
   const lastChange = meta.pseudo_changed_at ? new Date(meta.pseudo_changed_at) : null;
@@ -370,10 +395,28 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
           <button onClick={savePassword} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><KeyRound size={14} /> Mettre à jour le mot de passe</button>
         </div>
 
+        <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
+          <Label>Centres d'intérêt ({interests.length}/12)</Label>
+          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 10 }}>Choisis jusqu'à 12 sujets qui te représentent (ils s'affichent sur ton profil).</p>
+          <input value={hSearch} onChange={(e) => setHSearch(e.target.value)} placeholder="Rechercher un sujet…" className="w-full" style={{ ...fieldStyle, padding: "9px 13px", marginBottom: 10, fontSize: 14 }} />
+          <div className="flex flex-wrap gap-2" style={{ maxHeight: 180, overflowY: "auto" }}>
+            {filtered.slice(0, 120).map((h) => { const on = interests.includes(h.tag); return (
+              <button key={h.tag} onClick={() => toggleInterest(h.tag)} style={{ fontSize: 12, color: on ? C.bg : C.gold, background: on ? C.gold : C.pill, border: "1px solid " + (on ? C.gold : C.line), borderRadius: 999, padding: "5px 11px", cursor: "pointer", fontWeight: on ? 700 : 400 }}>#{h.libelle}</button>
+            ); })}
+          </div>
+          <button onClick={saveInterests} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 14, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><Check size={14} /> Enregistrer mes centres d'intérêt</button>
+        </div>
+
+        <button onClick={() => setShowProfile(true)} className="w-full inline-flex items-center justify-between" style={{ ...cardStyle, padding: 18, cursor: "pointer", marginBottom: 16 }}>
+          <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>Voir mon profil public</span>
+          <ArrowRight size={16} color={C.gold} />
+        </button>
+
         <button onClick={onTrophies} className="w-full inline-flex items-center justify-between" style={{ ...cardStyle, padding: 18, cursor: "pointer", marginBottom: 16 }}>
           <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>Mes trophées</span>
           <ArrowRight size={16} color={C.gold} />
         </button>
+        {showProfile && <ProfileModal id={session.user.id} onClose={() => setShowProfile(false)} />}
         <p style={{ marginTop: 6 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
       </div>
       <Footer />
@@ -515,6 +558,48 @@ function Agora({ onHome, onOpenPanel }) {
   );
 }
 
+/* ----------------------------- FICHE PROFIL ----------------------------- */
+function ProfileModal({ id, onClose }) {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [hashtags, setHashtags] = useState([]);
+  useEffect(() => { getProfile(id).then(({ profile }) => { setProfile(profile); setLoading(false); }); }, [id]);
+  useEffect(() => { fetch("/hashtags.json").then((r) => r.json()).then(setHashtags).catch(() => {}); }, []);
+  const labelOf = (tag) => hashtags.find((h) => h.tag === tag)?.libelle || tag;
+  return (
+    <div onClick={onClose} className="fixed inset-0 flex items-center justify-center" style={{ background: "rgba(2,3,4,0.9)", zIndex: 60, padding: 24, cursor: "pointer" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ ...cardStyle, padding: 26, maxWidth: 420, width: "100%" }}>
+        {loading ? <p style={{ color: C.mute }}>Chargement…</p> : !profile ? (
+          <p style={{ color: C.mute, fontSize: 14 }}>Profil indisponible (ce membre n'a pas encore de profil public).</p>
+        ) : (<>
+          <div className="flex items-center gap-3">
+            <span style={{ width: 64, height: 64, borderRadius: "50%", overflow: "hidden", border: "2px solid " + C.gold, display: "inline-block", flexShrink: 0 }}>
+              {profile.avatar ? <img src={"/avatars/" + profile.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute }}>—</span>}
+            </span>
+            <div>
+              <div style={{ fontFamily: SERIF, fontSize: 22 }}>{profile.pseudo || "Anonyme"}</div>
+              <div style={{ color: "#6f6b63", fontSize: 12 }}>Membre depuis {hhmmDate(profile.created_at)}</div>
+            </div>
+          </div>
+          {Array.isArray(profile.interests) && profile.interests.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <Label>Centres d'intérêt</Label>
+              <div className="flex flex-wrap gap-2">
+                {profile.interests.map((t) => <span key={t} style={{ fontSize: 12, color: C.gold, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "4px 10px" }}>#{labelOf(t)}</span>)}
+              </div>
+            </div>
+          )}
+          <div style={{ marginTop: 16 }}>
+            <Label>Trophées</Label>
+            <p style={{ color: "#6f6b63", fontSize: 12 }}>Les trophées apparaîtront ici dès que le vote de fin de débat sera en place.</p>
+          </div>
+        </>)}
+        <button onClick={onClose} className="pill w-full" style={{ marginTop: 18, padding: "9px 18px", fontSize: 12 }}>Fermer</button>
+      </div>
+    </div>
+  );
+}
+
 /* ----------------------------- SETUP ----------------------------- */
 function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
@@ -586,6 +671,7 @@ function Live({ lobby, session, onHome }) {
   const [spectators, setSpectators] = useState(1);
   const [roomRank, setRoomRank] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [viewedProfile, setViewedProfile] = useState(null);
   const [micOn, setMicOn] = useState(false);
   const [segments, setSegments] = useState([]);
   const [interim, setInterim] = useState("");
@@ -636,7 +722,7 @@ function Live({ lobby, session, onHome }) {
       messages.forEach((m) => {
         seenMsgRef.current.add(m.id);
         if (m.kind === "transcript") segInit.push({ side: m.side ?? 0, text: m.content });
-        else if (m.kind === "comment") comInit.unshift({ id: m.id, txt: m.content, author: m.author, t: hhmm(m.created_at) });
+        else if (m.kind === "comment") comInit.unshift({ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) });
       });
       if (!isHost && segInit.length) setSegments(mergeSegments(segInit));
       if (comInit.length) setComments(comInit);
@@ -653,7 +739,7 @@ function Live({ lobby, session, onHome }) {
         if (seenMsgRef.current.has(m.id)) return;
         seenMsgRef.current.add(m.id);
         if (m.kind === "transcript") { if (!isHost) appendSegment(m.side ?? 0, m.content); }
-        else if (m.kind === "comment") setComments((c) => [{ id: m.id, txt: m.content, author: m.author, t: hhmm(m.created_at) }, ...c]);
+        else if (m.kind === "comment") setComments((c) => [{ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) }, ...c]);
       })
       .subscribe();
 
@@ -810,7 +896,7 @@ Rien à vérifier -> []. sources peut être vide.`;
     const low = " " + v.toLowerCase().replace(/[^a-zàâçéèêëîïôûùü\s]/g, " ") + " ";
     if (BANNED.some((w) => low.includes(" " + w + " ") || low.includes(" " + w))) { setCError("Commentaire bloqué : langage interdit."); return; }
     setCError(""); setDraft("");
-    postMessage(panel.id, { kind: "comment", author: pseudo, content: v });
+    postMessage(panel.id, { kind: "comment", author: pseudo, author_id: session.user.id, content: v });
   }
 
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
@@ -962,7 +1048,7 @@ Rien à vérifier -> []. sources peut être vide.`;
               {cError && <div style={{ color: C.red, fontSize: 12, marginBottom: 8 }}>{cError}</div>}
               <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: 120 }}>
                 {comments.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires s'afficheront ici, en direct. Les mots interdits sont refusés.</div>}
-                {comments.map((c) => (<div key={c.id} className="flex gap-2" style={{ fontSize: 14 }}><span style={{ color: "#6f6b63" }}>{c.t}</span>{c.author && <span style={{ color: C.gold, fontWeight: 600 }}>{c.author}</span>}<span>{c.txt}</span></div>))}
+                {comments.map((c) => (<div key={c.id} className="flex gap-2" style={{ fontSize: 14 }}><span style={{ color: "#6f6b63" }}>{c.t}</span>{c.author && <span onClick={() => c.author_id && setViewedProfile(c.author_id)} style={{ color: C.gold, fontWeight: 600, cursor: c.author_id ? "pointer" : "default" }}>{c.author}</span>}<span>{c.txt}</span></div>))}
               </div>
             </>
           ) : <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires sont désactivés pour ce panel.</div>}
@@ -977,6 +1063,7 @@ Rien à vérifier -> []. sources peut être vide.`;
           <img src={lightbox} alt="" style={{ maxWidth: "90%", maxHeight: "90%", borderRadius: 12 }} />
         </div>
       )}
+      {viewedProfile && <ProfileModal id={viewedProfile} onClose={() => setViewedProfile(null)} />}
     </>
   );
 }

@@ -52,8 +52,24 @@ export async function pushPanelState(panelId, partial) {
 }
 
 export async function postMessage(panelId, msg) {
-  const { error } = await supabase.from('messages').insert({ panel_id: panelId, ...msg })
+  let { error } = await supabase.from('messages').insert({ panel_id: panelId, ...msg })
+  // Si la colonne author_id n'existe pas encore (migration non faite), on réessaie sans.
+  if (error && /author_id/.test(error.message || '')) {
+    const { author_id, ...rest } = msg
+    ;({ error } = await supabase.from('messages').insert({ panel_id: panelId, ...rest }))
+  }
   return { error: error?.message }
+}
+
+// Profils publics (identité visible par les autres).
+export async function upsertProfile(p) {
+  const { error } = await supabase.from('profiles').upsert({ ...p, updated_at: new Date().toISOString() })
+  return { error: error?.message }
+}
+export async function getProfile(id) {
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', id).maybeSingle()
+  if (error) return { error: error.message }
+  return { profile: data }
 }
 
 // Liste les débats publics (pour L'Agora), les plus récents d'abord.
