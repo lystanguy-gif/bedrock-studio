@@ -3,10 +3,11 @@ import {
   Play, Pause, Mic, MicOff, Search, Loader2, ExternalLink, AlertTriangle,
   HelpCircle, XCircle, CheckCircle2, Video, VideoOff, ImagePlus, X,
   MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag, BookOpen, ChevronDown,
-  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner
+  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner, Users, Copy
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured } from "./lib/supabaseClient.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -27,6 +28,8 @@ const BANNED = ["connard","conard","connasse","pute","salope","encule","enculé"
 
 const fmt = (s) => (s < 0 ? "-" : "") + String(Math.floor(Math.abs(s) / 60)).padStart(2, "0") + ":" + String(Math.abs(s) % 60).padStart(2, "0");
 const other = (i) => (i === 0 ? 1 : 0);
+const hhmm = (iso) => { try { return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }); } catch { return ""; } };
+const mergeSegments = (list) => { const out = []; for (const s of list) { if (out.length && out[out.length - 1].side === s.side) out[out.length - 1].text = (out[out.length - 1].text + " " + s.text).trim(); else out.push({ side: s.side, text: s.text }); } return out; };
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = "Inter, Arial, system-ui, sans-serif";
 
@@ -36,7 +39,8 @@ const fieldStyle = { background: C.field, border: "1px solid " + C.line, color: 
 export default function App() {
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
-  const [view, setView] = useState("home"); // home | auth | debate
+  const [view, setView] = useState("home"); // home | auth | create | join | live
+  const [lobby, setLobby] = useState(null); // { panel, isHost, pseudo }
 
   useEffect(() => {
     if (!isSupabaseConfigured) { setAuthReady(true); return; }
@@ -45,17 +49,26 @@ export default function App() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const goHome = () => { setLobby(null); setView("home"); };
+  const enterLobby = (panel, isHost, pseudo) => { setLobby({ panel, isHost, pseudo }); setView("live"); };
+
   return (
     <Shell>
       {view === "auth" ? (
         <AuthScreen onBack={() => setView("home")} onDone={() => setView("home")} />
-      ) : view === "debate" ? (
-        <DebateApp onHome={() => setView("home")} />
+      ) : view === "create" ? (
+        <CreateFlow session={session} onHome={goHome} onLaunched={(panel) => enterLobby(panel, true, pseudoOf(session))} />
+      ) : view === "join" ? (
+        <JoinScreen session={session} onHome={goHome}
+          onJoined={(panel, pseudo) => enterLobby(panel, !!(session && panel.owner_id === session.user.id), pseudo)} />
+      ) : view === "live" && lobby ? (
+        <Live lobby={lobby} session={session} onHome={goHome} />
       ) : (
         <Home
           session={session}
           authReady={authReady}
-          onCreate={() => setView(session ? "debate" : "auth")}
+          onCreate={() => setView(session ? "create" : "auth")}
+          onJoin={() => setView("join")}
           onSignIn={() => setView("auth")}
         />
       )}
@@ -63,16 +76,23 @@ export default function App() {
   );
 }
 
-// Le flux de débat existant (configuration + direct), inchangé visuellement.
-function DebateApp({ onHome }) {
-  const [phase, setPhase] = useState("setup");
+// Création d'un lobby : configuration (Setup) puis enregistrement dans Supabase.
+function CreateFlow({ session, onHome, onLaunched }) {
   const [cfg, setCfg] = useState({
     panel: "Le contrechamp", topic: "L'État doit-il encadrer les prix de l'énergie ?",
     camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true,
   });
-  return phase === "setup"
-    ? <Setup cfg={cfg} setCfg={setCfg} onStart={() => setPhase("live")} onHome={onHome} />
-    : <Live cfg={cfg} onBack={() => setPhase("setup")} />;
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  async function start() {
+    if (!session) { setErr("Tu dois être connecté pour créer un débat."); return; }
+    setBusy(true); setErr("");
+    const { panel, error } = await createPanel(cfg, session.user.id);
+    setBusy(false);
+    if (error) { setErr(error); return; }
+    onLaunched(panel);
+  }
+  return <Setup cfg={cfg} setCfg={setCfg} onStart={start} onHome={onHome} busy={busy} error={err} />;
 }
 
 // Pseudo affichable d'une session (métadonnée "pseudo" sinon début de l'email).
@@ -82,7 +102,7 @@ function pseudoOf(session) {
 }
 
 /* ----------------------------- ACCUEIL ----------------------------- */
-function Home({ session, authReady, onCreate, onSignIn }) {
+function Home({ session, authReady, onCreate, onJoin, onSignIn }) {
   const pseudo = pseudoOf(session);
   const accountRight = !authReady ? null : (session ? (
     <div className="flex items-center gap-2">
@@ -105,8 +125,8 @@ function Home({ session, authReady, onCreate, onSignIn }) {
           <button onClick={onCreate} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: "pointer" }}>
             Créer un débat <ArrowRight size={16} />
           </button>
-          <button disabled className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.pill, color: "#6f6b63", border: "1px solid " + C.line, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: "default" }}>
-            Rejoindre un débat · bientôt
+          <button onClick={onJoin} className="pill inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13 }}>
+            Rejoindre un débat
           </button>
         </div>
         {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Créer un débat nécessite un compte (gratuit, rapide).</p>}
@@ -197,8 +217,55 @@ function AuthScreen({ onBack, onDone }) {
   );
 }
 
+/* ----------------------------- REJOINDRE ----------------------------- */
+function JoinScreen({ session, onHome, onJoined }) {
+  const [code, setCode] = useState("");
+  const [pseudo, setPseudo] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const sessionPseudo = pseudoOf(session);
+
+  async function join() {
+    setErr("");
+    const c = code.trim();
+    if (!c) { setErr("Entre un code de salle."); return; }
+    const finalPseudo = sessionPseudo || pseudo.trim() || "Spectateur";
+    setBusy(true);
+    const { panel, error } = await getPanelByCode(c);
+    if (error) { setBusy(false); setErr(error); return; }
+    await joinAsParticipant(panel.id, finalPseudo, "spectateur");
+    setBusy(false);
+    onJoined(panel, finalPseudo);
+  }
+
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  return (
+    <>
+      <Header right={back} />
+      <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
+        <Kicker>Rejoindre</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 24px", fontWeight: 700 }}>Rejoindre un débat</h1>
+        <div style={{ ...cardStyle, padding: 24, maxWidth: 460 }}>
+          <Label>Code de salle</Label>
+          <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="Ex. K7P2M" maxLength={8} onKeyDown={(e) => e.key === "Enter" && join()} className="w-full" style={{ ...fieldStyle, padding: "12px 14px", marginBottom: 18, fontFamily: SERIF, fontSize: 22, letterSpacing: "0.3em", textAlign: "center" }} />
+          {!sessionPseudo && (<>
+            <Label>Ton pseudo (pour regarder)</Label>
+            <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} placeholder="Spectateur" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
+          </>)}
+          {err && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{err}</div>}
+          <button onClick={join} disabled={busy} className="inline-flex items-center justify-center gap-2 uppercase w-full" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 13, cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1 }}>
+            {busy ? <Spinner size={15} className="spin" /> : <ArrowRight size={15} />} Rejoindre
+          </button>
+        </div>
+        <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Regarder est libre. Pour commenter, il faut un compte.</p>
+      </div>
+      <Footer />
+    </>
+  );
+}
+
 /* ----------------------------- SETUP ----------------------------- */
-function Setup({ cfg, setCfg, onStart, onHome }) {
+function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
   return (
     <>
@@ -236,11 +303,12 @@ function Setup({ cfg, setCfg, onStart, onHome }) {
           <Toggle on={cfg.comments} onClick={() => set("comments", !cfg.comments)} icon={<MessageSquare size={14} />} label={cfg.comments ? "Commentaires des spectateurs autorisés" : "Commentaires bloqués"} wide />
         </div>
 
-        <button onClick={onStart} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 26, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: "pointer" }}>
-          Ouvrir le débat <ArrowRight size={16} />
+        {error && <div style={{ color: C.red, fontSize: 13, marginTop: 18 }}>{error}</div>}
+        <button onClick={onStart} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 18, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1 }}>
+          {busy ? <><Spinner size={16} className="spin" /> Création…</> : <>Ouvrir le débat <ArrowRight size={16} /></>}
         </button>
         <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>
-          Maquette une-fenêtre. Codes de salle, salons audio par camp et comptes arriveront avec la version serveur.
+          Un code de salle unique sera généré : partage-le pour que d'autres rejoignent ton débat.
         </p>
       </div>
       <Footer />
@@ -249,12 +317,23 @@ function Setup({ cfg, setCfg, onStart, onHome }) {
 }
 
 /* ----------------------------- LIVE ----------------------------- */
-function Live({ cfg, onBack }) {
-  const [floor, setFloor] = useState(null);
-  const [clockRunning, setClockRunning] = useState(false);
+function Live({ lobby, session, onHome }) {
+  const { panel, isHost, pseudo } = lobby;
+  const cfg = {
+    panel: "Le contrechamp",
+    topic: panel.topic,
+    camps: (panel.camps && panel.camps.length >= 2) ? panel.camps : ["Pour", "Contre"],
+    minutes: panel.minutes || 5,
+    visibility: panel.visibility || "prive",
+    comments: panel.comments_allowed !== false,
+  };
+  const [floor, setFloor] = useState(panel.floor ?? null);
+  const [clockRunning, setClockRunning] = useState(!!panel.clock_running);
   const [pending, setPending] = useState(null);
   const [request, setRequest] = useState(null);
-  const [remaining, setRemaining] = useState([cfg.minutes * 60, cfg.minutes * 60]);
+  const [remaining, setRemaining] = useState(panel.remaining && panel.remaining.length === 2 ? panel.remaining : [cfg.minutes * 60, cfg.minutes * 60]);
+  const [spectators, setSpectators] = useState(1);
+  const [copied, setCopied] = useState(false);
   const [micOn, setMicOn] = useState(false);
   const [segments, setSegments] = useState([]);
   const [interim, setInterim] = useState("");
@@ -277,8 +356,62 @@ function Live({ cfg, onBack }) {
   const recRef = useRef(null), wantRef = useRef(false), busyRef = useRef(false);
   const lastLenRef = useRef(0), floorRef = useRef(null), joinedRef = useRef("");
   const camStreamRef = useRef(null), vidRefs = [useRef(null), useRef(null)];
+  const remainingRef = useRef(remaining), seenMsgRef = useRef(new Set());
 
   useEffect(() => { floorRef.current = floor; }, [floor]);
+  useEffect(() => { remainingRef.current = remaining; }, [remaining]);
+
+  // ---- Synchro temps réel du lobby ----
+  // Hôte : pousse l'état partagé (parole + chrono) à chaque changement.
+  useEffect(() => {
+    if (!isHost) return;
+    pushPanelState(panel.id, { floor, clock_running: clockRunning, remaining });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [floor, clockRunning]);
+  // Hôte : pousse régulièrement le temps restant pendant que le chrono tourne.
+  useEffect(() => {
+    if (!isHost || !clockRunning) return;
+    const id = setInterval(() => pushPanelState(panel.id, { remaining: remainingRef.current }), 2000);
+    return () => clearInterval(id);
+  }, [isHost, clockRunning, panel.id]);
+
+  // Tout le monde : écoute les changements du panel + l'arrivée des messages.
+  useEffect(() => {
+    let segInit = [], comInit = [];
+    loadMessages(panel.id).then(({ messages }) => {
+      messages.forEach((m) => {
+        seenMsgRef.current.add(m.id);
+        if (m.kind === "transcript") segInit.push({ side: m.side ?? 0, text: m.content });
+        else if (m.kind === "comment") comInit.unshift({ id: m.id, txt: m.content, author: m.author, t: hhmm(m.created_at) });
+      });
+      if (!isHost && segInit.length) setSegments(mergeSegments(segInit));
+      if (comInit.length) setComments(comInit);
+    });
+
+    const ch = supabase.channel("panel-" + panel.id)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "panels", filter: "id=eq." + panel.id }, ({ new: row }) => {
+        if (isHost) return; // l'hôte fait autorité, il n'applique pas ses propres échos
+        setFloor(row.floor ?? null);
+        setClockRunning(!!row.clock_running);
+        if (Array.isArray(row.remaining) && row.remaining.length === 2) setRemaining(row.remaining);
+      })
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "panel_id=eq." + panel.id }, ({ new: m }) => {
+        if (seenMsgRef.current.has(m.id)) return;
+        seenMsgRef.current.add(m.id);
+        if (m.kind === "transcript") { if (!isHost) appendSegment(m.side ?? 0, m.content); }
+        else if (m.kind === "comment") setComments((c) => [{ id: m.id, txt: m.content, author: m.author, t: hhmm(m.created_at) }, ...c]);
+      })
+      .subscribe();
+
+    const pres = supabase.channel("presence-" + panel.id, { config: { presence: { key: pseudo || "anon" } } })
+      .on("presence", { event: "sync" }, () => {
+        setSpectators(Object.keys(pres.presenceState()).length || 1);
+      })
+      .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, at: Date.now() }); });
+
+    return () => { supabase.removeChannel(ch); supabase.removeChannel(pres); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panel.id]);
   useEffect(() => { busyRef.current = analyzing; }, [analyzing]);
   useEffect(() => { joinedRef.current = segments.map((s) => s.text).join(" "); }, [segments]);
 
@@ -351,14 +484,18 @@ Rien à vérifier -> []. sources peut être vide.`;
     return () => clearInterval(id);
   }, [micOn, analyze]);
 
-  function appendSpeech(txt) {
+  function appendSegment(side, txt) {
     setSegments((prev) => {
-      const side = floorRef.current ?? 0;
       if (prev.length && prev[prev.length - 1].side === side) {
         const c = [...prev]; c[c.length - 1] = { side, text: (c[c.length - 1].text + " " + txt).trim() }; return c;
       }
       return [...prev, { side, text: txt.trim() }];
     });
+  }
+  function appendSpeech(txt) {
+    const side = floorRef.current ?? 0;
+    appendSegment(side, txt);
+    if (isHost) postMessage(panel.id, { kind: "transcript", side, author: pseudo, content: txt.trim() });
   }
   function startMic() {
     if (floor === null) return;
@@ -397,28 +534,36 @@ Rien à vérifier -> []. sources peut être vide.`;
   }
   function postComment() {
     const v = draft.trim(); if (!v || !cfg.comments) return;
+    if (!session) { setCError("Connecte-toi pour commenter."); return; }
     const low = " " + v.toLowerCase().replace(/[^a-zàâçéèêëîïôûùü\s]/g, " ") + " ";
     if (BANNED.some((w) => low.includes(" " + w + " ") || low.includes(" " + w))) { setCError("Commentaire bloqué : langage interdit."); return; }
-    setCError(""); setComments((c) => [{ id: Date.now(), txt: v, t: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) }, ...c]); setDraft("");
+    setCError(""); setDraft("");
+    postMessage(panel.id, { kind: "comment", author: pseudo, content: v });
   }
 
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
   // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
   // l'état nécessaire en props.
-  const campProps = { floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages };
+  const campProps = { floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages, interactive: isHost };
 
   const bannerStatus = floor === null ? "Le modérateur lance le débat"
     : clockRunning ? "au temps de parole"
     : pending !== null ? "parole cédée — " + cfg.camps[pending] + " doit accepter"
     : "en pause";
 
+  function copyCode() { try { navigator.clipboard.writeText(panel.code); } catch (e) {} setCopied(true); setTimeout(() => setCopied(false), 1500); }
+
   const headerRight = (
     <div className="flex items-center gap-2">
-      {floor === null
+      <button onClick={copyCode} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 13 }} title="Copier le code de salle">
+        <span style={{ fontFamily: SERIF, letterSpacing: "0.18em", color: C.gold }}>{panel.code}</span>
+        {copied ? <span style={{ fontSize: 11, color: C.green }}>copié</span> : <Copy size={13} />}
+      </button>
+      {isHost && (floor === null
         ? <button onClick={launch} className="inline-flex items-center gap-1.5 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 16px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><Flag size={13} /> Lancer</button>
-        : <button onClick={() => pending === null && setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13, opacity: pending === null ? 1 : 0.5 }}>{clockRunning ? <><Pause size={13} /> Pause</> : <><Play size={13} /> Reprendre</>}</button>}
-      <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title="Réinitialiser"><RotateCcw size={13} /></button>
-      <button onClick={onBack} className="pill" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}>Réglages</button>
+        : <button onClick={() => pending === null && setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13, opacity: pending === null ? 1 : 0.5 }}>{clockRunning ? <><Pause size={13} /> Pause</> : <><Play size={13} /> Reprendre</>}</button>)}
+      {isHost && <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title="Réinitialiser"><RotateCcw size={13} /></button>}
+      <button onClick={onHome} className="pill" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}>Quitter</button>
     </div>
   );
 
@@ -504,10 +649,12 @@ Rien à vérifier -> []. sources peut être vide.`;
                   {it.sources && it.sources.map((s, k) => (<a key={k} href={s.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 truncate" style={{ fontSize: 12, color: C.gold, marginTop: 4 }}><ExternalLink size={11} /> {s.titre || s.url}</a>))}
                 </div>); })())}
           </div>
-          <div className="flex items-end gap-2">
-            <textarea value={manual} onChange={(e) => setManual(e.target.value)} rows={2} placeholder="Saisie manuelle (ou phrase de l'adversaire)…" className="flex-1" style={{ ...fieldStyle, padding: "8px 12px", fontSize: 14, resize: "none" }} />
-            <button onClick={() => { if (manual.trim()) { appendSpeech(manual.trim()); analyze(manual, true); setManual(""); } }} className="pill inline-flex items-center" style={{ padding: "9px 13px" }}><Send size={14} /></button>
-          </div>
+          {isHost && (
+            <div className="flex items-end gap-2">
+              <textarea value={manual} onChange={(e) => setManual(e.target.value)} rows={2} placeholder="Saisie manuelle (ou phrase de l'adversaire)…" className="flex-1" style={{ ...fieldStyle, padding: "8px 12px", fontSize: 14, resize: "none" }} />
+              <button onClick={() => { if (manual.trim()) { appendSpeech(manual.trim()); analyze(manual, true); setManual(""); } }} className="pill inline-flex items-center" style={{ padding: "9px 13px" }}><Send size={14} /></button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -516,7 +663,8 @@ Rien à vérifier -> []. sources peut être vide.`;
           <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
             <MessageSquare size={14} color={C.gold} />
             <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 13, letterSpacing: "0.08em" }}>Spectateurs</span>
-            <span style={{ color: "#6f6b63", fontSize: 12 }}>{cfg.visibility === "public" ? "panel public · " : "panel privé · "}{cfg.comments ? "commentaires ouverts · filtre de mots actif" : "commentaires bloqués"}</span>
+            <span className="inline-flex items-center gap-1" style={{ color: C.gold, fontSize: 12 }}><Users size={12} /> {spectators}</span>
+            <span style={{ color: "#6f6b63", fontSize: 12 }}>· {cfg.visibility === "public" ? "public · " : "privé · "}{cfg.comments ? "commentaires ouverts" : "commentaires bloqués"}</span>
           </div>
           {cfg.comments ? (
             <>
@@ -526,8 +674,8 @@ Rien à vérifier -> []. sources peut être vide.`;
               </div>
               {cError && <div style={{ color: C.red, fontSize: 12, marginBottom: 8 }}>{cError}</div>}
               <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: 120 }}>
-                {comments.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires s'afficheront ici. Les mots interdits sont refusés. (Les vrais spectateurs à distance arrivent en v2.)</div>}
-                {comments.map((c) => (<div key={c.id} className="flex gap-2" style={{ fontSize: 14 }}><span style={{ color: "#6f6b63" }}>{c.t}</span><span>{c.txt}</span></div>))}
+                {comments.length === 0 && <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires s'afficheront ici, en direct. Les mots interdits sont refusés.</div>}
+                {comments.map((c) => (<div key={c.id} className="flex gap-2" style={{ fontSize: 14 }}><span style={{ color: "#6f6b63" }}>{c.t}</span>{c.author && <span style={{ color: C.gold, fontWeight: 600 }}>{c.author}</span>}<span>{c.txt}</span></div>))}
               </div>
             </>
           ) : <div style={{ color: "#6f6b63", fontSize: 12 }}>Les commentaires sont désactivés pour ce panel.</div>}
@@ -549,7 +697,7 @@ Rien à vérifier -> []. sources peut être vide.`;
 /* --------------------------- CAMP (stable) --------------------------- */
 // Défini au niveau module pour conserver son identité entre les rendus :
 // ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
-function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages }) {
+function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs, camStreamRef, remaining, micOn, startMic, stopMic, cede, accept, askFloor, toggleCam, images, setImages, setLightbox, addImages, interactive = true }) {
   const has = i === floor, isPending = pending === i, started = floor !== null;
   return (
     <div className="flex flex-col gap-2.5" style={{ background: has ? C.panel2 : C.panel, border: "1px solid " + (has ? C.gold : C.line), borderRadius: 18, padding: 14, boxShadow: has ? "0 16px 44px -26px " + C.gold : "none", transition: "border-color .15s,box-shadow .15s" }}>
@@ -568,7 +716,9 @@ function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs
 
       <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
 
-      {!started ? (
+      {!interactive ? (
+        <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{!started ? "en attente du lancement" : has ? (clockRunning ? "au temps de parole" : "en pause") : "à l'écoute"}</div>
+      ) : !started ? (
         <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>en attente du lancement</div>
       ) : has ? (
         <div className="flex gap-2">
@@ -585,15 +735,17 @@ function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs
         </button>
       )}
 
-      <div className="flex gap-2">
-        <button onClick={() => toggleCam(i)} className={camOwner === i ? "" : "pill"} style={camOwner === i ? pillSolid(CAMP[i]) : pillBase()}>
-          {camOwner === i ? <Video size={12} /> : <VideoOff size={12} />} Caméra
-        </button>
-        <label className="pill inline-flex items-center justify-center gap-1.5 cursor-pointer" style={{ ...pillBase(), flex: 1 }}>
-          <ImagePlus size={12} /> Image
-          <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => { addImages(i, e.target.files); e.target.value = ""; }} />
-        </label>
-      </div>
+      {interactive && (
+        <div className="flex gap-2">
+          <button onClick={() => toggleCam(i)} className={camOwner === i ? "" : "pill"} style={camOwner === i ? pillSolid(CAMP[i]) : pillBase()}>
+            {camOwner === i ? <Video size={12} /> : <VideoOff size={12} />} Caméra
+          </button>
+          <label className="pill inline-flex items-center justify-center gap-1.5 cursor-pointer" style={{ ...pillBase(), flex: 1 }}>
+            <ImagePlus size={12} /> Image
+            <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => { addImages(i, e.target.files); e.target.value = ""; }} />
+          </label>
+        </div>
+      )}
 
       {images[i].length > 0 && (
         <div className="flex flex-wrap gap-2">
