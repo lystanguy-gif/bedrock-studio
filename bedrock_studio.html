@@ -308,8 +308,14 @@ textarea{resize:vertical;min-height:70px}
 
 /* ── CREATURE 3D EDITOR ── */
 #page-creature{display:none}
-#page-creature.active{display:flex}
-.cr-tree{width:250px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;padding:16px 12px;background:var(--bg1);display:flex;flex-direction:column;gap:12px}
+#page-creature.active{display:flex;flex-direction:column}
+.cr-topbar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0}
+.cr-modeswitch{display:flex;border:1px solid var(--border2);border-radius:3px;overflow:hidden}
+.cr-modeswitch button{background:var(--bg2);border:none;color:var(--muted);padding:7px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;transition:all .2s}
+.cr-modeswitch button.active{background:var(--gold);color:#0a0c12}
+.cr-topbar .cr-tip{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.cr-main{display:flex;flex:1;overflow:hidden;min-height:0}
+.cr-tree{width:255px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;padding:16px 12px;background:var(--bg1);display:flex;flex-direction:column;gap:10px}
 .cr-viewport{flex:1;position:relative;background:radial-gradient(ellipse at center,#10151f 0%,#06070a 80%);overflow:hidden;min-width:0}
 #creatureCanvas{display:block;width:100%;height:100%}
 .cr-vp-hint{position:absolute;bottom:10px;left:12px;font-size:10px;color:var(--muted);letter-spacing:1px;pointer-events:none;line-height:1.6;text-shadow:0 1px 3px #000}
@@ -335,6 +341,36 @@ textarea{resize:vertical;min-height:70px}
 .cr-btn.blue:hover{border-color:var(--blue);color:var(--blue)}
 .cr-btn-row{display:flex;gap:6px}
 .cr-empty{color:var(--muted);font-size:12px;text-align:center;padding:30px 10px;line-height:1.7}
+/* help "?" inline */
+.qm{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;min-width:15px;border-radius:50%;border:1px solid var(--blue);color:var(--blue);font-size:10px;cursor:pointer;margin-left:4px;background:var(--bg1);transition:all .2s;vertical-align:middle;font-family:'Rajdhani',sans-serif}
+.qm:hover{background:var(--blue);color:#0a0c12}
+.cr-info{background:var(--bg2);border-left:2px solid var(--blue);padding:8px 10px;font-size:11px;line-height:1.6;color:var(--text)}
+.cr-info b{color:var(--blue)}
+/* preset gallery */
+.cr-gallery{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cr-preset{background:var(--bg2);border:1px solid var(--border);padding:10px 6px;cursor:pointer;transition:all .2s;text-align:center;border-radius:3px}
+.cr-preset:hover{border-color:var(--gold);background:var(--bg3);transform:translateY(-1px)}
+.cr-preset .pe{font-size:24px;display:block;margin-bottom:3px}
+.cr-preset .pn{font-size:10px;color:var(--text);letter-spacing:.5px}
+.cr-role{font-size:9px;letter-spacing:1px;color:var(--bluedim);background:var(--bg1);border:1px solid var(--bluedim);padding:1px 5px;border-radius:8px;margin-left:auto;color:var(--blue)}
+/* timeline */
+.cr-timeline{flex-shrink:0;background:var(--bg1);border-top:1px solid var(--border);padding:10px 14px;display:flex;flex-direction:column;gap:8px;max-height:230px;overflow-y:auto}
+.cr-tl-head{display:flex;align-items:center;gap:10px}
+.cr-play{background:var(--green);border:none;color:#06120a;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0}
+.cr-play.playing{background:var(--gold)}
+.cr-scrub{flex:1;-webkit-appearance:none;height:6px;background:var(--border);border-radius:3px;outline:none}
+.cr-scrub::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer}
+.cr-time{font-size:11px;color:var(--muted);font-family:monospace;min-width:78px;text-align:right}
+.cr-animchips{display:flex;gap:6px;flex-wrap:wrap}
+.cr-chip{background:var(--bg2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;cursor:pointer;font-size:11px;letter-spacing:1px;border-radius:14px;transition:all .2s;display:flex;align-items:center;gap:6px}
+.cr-chip.active{border-color:var(--gold);color:var(--gold);background:var(--glow-gold)}
+.cr-chip .cr-del{font-size:11px;color:var(--muted)}
+.cr-chip .cr-del:hover{color:var(--red)}
+.cr-kf-track{display:flex;align-items:center;gap:8px;font-size:11px}
+.cr-kf-lane{flex:1;height:22px;background:var(--bg2);border:1px solid var(--border);position:relative;border-radius:2px}
+.cr-kf-dot{position:absolute;top:3px;width:14px;height:14px;background:var(--gold);border:1px solid #0a0c12;border-radius:50%;transform:translateX(-50%);cursor:pointer}
+.cr-kf-dot:hover{background:var(--gold2);box-shadow:0 0 6px var(--gold)}
+.cr-playhead{position:absolute;top:-2px;width:2px;height:26px;background:var(--blue);transform:translateX(-50%);pointer-events:none}
 
 /* Animations page load */
 .card{animation:fadeIn .3s ease both}
@@ -511,17 +547,28 @@ textarea{resize:vertical;min-height:70px}
 
   <!-- CREATURE 3D PAGE -->
   <div class="page" id="page-creature">
-    <div class="cr-tree" id="creature-tree">
-      <div class="cr-empty">Crée une créature ou choisis un modèle de départ dans la liste de gauche.</div>
+    <div class="cr-topbar">
+      <div class="cr-modeswitch">
+        <button id="mode-build" class="active" onclick="setCrMode('build')">🧱 Construire</button>
+        <button id="mode-animate" onclick="setCrMode('animate')">🎬 Animer</button>
+      </div>
+      <span class="cr-tip" id="cr-topbar-tip">Empile des boîtes pour créer ta créature. <span class="qm" onclick="openHelp('crBuild')">?</span></span>
+      <button class="btn-export-all" style="margin-left:auto" onclick="openHelp('crGuide')">📖 Comment ça marche</button>
     </div>
-    <div class="cr-viewport">
-      <canvas id="creatureCanvas"></canvas>
-      <div class="cr-vp-name" id="cr-vp-name"></div>
-      <div class="cr-vp-hint">🖱 Glisser = tourner &nbsp;·&nbsp; Molette = zoom &nbsp;·&nbsp; Clic droit glisser = déplacer &nbsp;·&nbsp; Clic sur une partie = sélectionner</div>
+    <div class="cr-main">
+      <div class="cr-tree" id="creature-tree">
+        <div class="cr-empty">Crée une créature ou choisis un modèle de départ.</div>
+      </div>
+      <div class="cr-viewport">
+        <canvas id="creatureCanvas"></canvas>
+        <div class="cr-vp-name" id="cr-vp-name"></div>
+        <div class="cr-vp-hint">🖱 Glisser = tourner &nbsp;·&nbsp; Molette = zoom &nbsp;·&nbsp; Clic droit = déplacer &nbsp;·&nbsp; Clic sur une partie = sélectionner</div>
+      </div>
+      <div class="cr-props" id="creature-props">
+        <div class="cr-empty">Sélectionne une partie pour l'éditer.</div>
+      </div>
     </div>
-    <div class="cr-props" id="creature-props">
-      <div class="cr-empty">Sélectionne une partie du modèle pour modifier sa forme, sa taille et sa couleur.</div>
-    </div>
+    <div class="cr-timeline" id="creature-timeline" style="display:none"></div>
   </div>
 
   <!-- EFFECT PAGE -->
@@ -1671,45 +1718,99 @@ const DEG = Math.PI/180;
 const CR_COLORS = ['#b9805a','#8a5a3a','#d8b48a','#5a6e8a','#3a4a66','#7a8a4a','#4a6a3a','#8a3030','#c0392b','#e0a040','#d8d8d8','#9aa0a8','#5a5e66','#2d3238','#1a1d22','#8e44ad','#2980b9','#27ae60','#16a085','#ffffff','#000000'];
 
 // ── Modèles de départ ────────────────────────────────────
-function bone(name, parent, pivot, cubes, rotation){ return {name, parent:parent||null, pivot, rotation:rotation||[0,0,0], cubes:cubes||[]}; }
+// "role" sert à générer automatiquement les animations (marche, vol...).
+function bone(name, parent, pivot, cubes, rotation, role){ return {name, parent:parent||null, pivot, rotation:rotation||[0,0,0], role:role||null, cubes:cubes||[]}; }
 function cube(origin, size, color, opts){ return Object.assign({origin, size, color:color||'#b9805a', inflate:0, uv:[0,0]}, opts||{}); }
 
-function presetHumanoid(){
-  return [
-    bone('body', null, [0,24,0], [cube([-4,12,-2],[8,12,4],'#2980b9')]),
-    bone('head', 'body', [0,24,0], [cube([-4,24,-4],[8,8,8],'#d8b48a')]),
-    bone('rightArm','body', [-5,22,0], [cube([-8,12,-2],[4,12,4],'#d8b48a')]),
-    bone('leftArm','body', [5,22,0],  [cube([4,12,-2],[4,12,4],'#d8b48a')]),
-    bone('rightLeg','body', [-2,12,0], [cube([-4,0,-2],[4,12,4],'#5a6e8a')]),
-    bone('leftLeg','body', [2,12,0],  [cube([0,0,-2],[4,12,4],'#5a6e8a')])
-  ];
-}
-function presetQuadruped(){
-  return [
-    bone('body', null, [0,12,0], [cube([-4,10,-7],[8,8,14],'#8a5a3a')]),
-    bone('head', 'body', [0,16,-7], [cube([-3,13,-12],[6,6,6],'#b9805a'), cube([-2,14,-15],[4,3,3],'#8a5a3a')]),
-    bone('leg0','body', [-3,10,5], [cube([-4,0,4],[3,10,3],'#5a4030')]),
-    bone('leg1','body', [3,10,5],  [cube([1,0,4],[3,10,3],'#5a4030')]),
-    bone('leg2','body', [-3,10,-6],[cube([-4,0,-7],[3,10,3],'#5a4030')]),
-    bone('leg3','body', [3,10,-6], [cube([1,0,-7],[3,10,3],'#5a4030')]),
-    bone('tail','body', [0,15,7],  [cube([-1,12,7],[2,2,6],'#8a5a3a')], [-35,0,0])
-  ];
-}
-function presetBlob(){
-  return [ bone('body', null, [0,4,0], [cube([-5,0,-5],[10,8,10],'#27ae60'), cube([-3,8,-3],[6,2,6],'#27ae60')]),
-           bone('eyes','body',[0,5,-5],[cube([-3,4,-6],[2,2,1],'#ffffff'), cube([1,4,-6],[2,2,1],'#ffffff')]) ];
-}
+// Catalogue des modèles : {key:{emoji,label,build}}
+const CR_PRESETS = {
+  humanoid:{emoji:'🧍',label:'Humanoïde',build:()=>[
+    bone('body', null, [0,24,0], [cube([-4,12,-2],[8,12,4],'#2980b9')], [0,0,0],'body'),
+    bone('head', 'body', [0,24,0], [cube([-4,24,-4],[8,8,8],'#d8b48a')], [0,0,0],'head'),
+    bone('rightArm','body', [-5,22,0], [cube([-8,12,-2],[4,12,4],'#d8b48a')], [0,0,0],'armR'),
+    bone('leftArm','body', [5,22,0],  [cube([4,12,-2],[4,12,4],'#d8b48a')], [0,0,0],'armL'),
+    bone('rightLeg','body', [-2,12,0], [cube([-4,0,-2],[4,12,4],'#5a6e8a')], [0,0,0],'legR'),
+    bone('leftLeg','body', [2,12,0],  [cube([0,0,-2],[4,12,4],'#5a6e8a')], [0,0,0],'legL')
+  ]},
+  quadruped:{emoji:'🐾',label:'Quadrupède',build:()=>[
+    bone('body', null, [0,12,0], [cube([-4,10,-7],[8,8,14],'#8a5a3a')], [0,0,0],'body'),
+    bone('head', 'body', [0,16,-7], [cube([-3,13,-12],[6,6,6],'#b9805a'), cube([-2,14,-15],[4,3,3],'#8a5a3a')], [0,0,0],'head'),
+    bone('legFL','body', [3,10,-6], [cube([1,0,-7],[3,10,3],'#5a4030')], [0,0,0],'legFL'),
+    bone('legFR','body', [-3,10,-6],[cube([-4,0,-7],[3,10,3],'#5a4030')], [0,0,0],'legFR'),
+    bone('legBL','body', [3,10,5],  [cube([1,0,4],[3,10,3],'#5a4030')], [0,0,0],'legBL'),
+    bone('legBR','body', [-3,10,5], [cube([-4,0,4],[3,10,3],'#5a4030')], [0,0,0],'legBR'),
+    bone('tail','body', [0,16,7],  [cube([-1,13,7],[2,2,6],'#8a5a3a')], [-35,0,0],'tail')
+  ]},
+  spider:{emoji:'🕷️',label:'Araignée',build:()=>{
+    const legs=[]; const ys=[1,0,-1,-2]; // 4 paires
+    ys.forEach((zoff,i)=>{
+      legs.push(bone('legL'+i,'body',[3,5,zoff*3],[cube([3,4,zoff*3-1],[10,2,2],'#2d2230')],[0,0,-(15+i*8)],i%2?'legL':'legFL'));
+      legs.push(bone('legR'+i,'body',[-3,5,zoff*3],[cube([-13,4,zoff*3-1],[10,2,2],'#2d2230')],[0,0,(15+i*8)],i%2?'legR':'legFR'));
+    });
+    return [
+      bone('body', null, [0,5,0], [cube([-5,2,-1],[10,6,8],'#352a3a')], [0,0,0],'body'),
+      bone('head','body',[0,5,-1],[cube([-4,2,-7],[8,6,6],'#2d2230'), cube([-2,6,-8],[2,2,1],'#c0392b'), cube([1,6,-8],[2,2,1],'#c0392b')],[0,0,0],'head'),
+      ...legs
+    ];
+  }},
+  dragon:{emoji:'🐲',label:'Dragon (ailes)',build:()=>[
+    bone('body', null, [0,16,0], [cube([-5,12,-8],[10,10,18],'#7a2230')], [0,0,0],'body'),
+    bone('neck','body',[0,22,-8],[cube([-3,20,-14],[6,7,7],'#8a2a38')],[ -20,0,0],'head'),
+    bone('head','neck',[0,27,-13],[cube([-4,24,-20],[8,7,8],'#7a2230'), cube([-3,31,-18],[2,3,2],'#5a1822'), cube([2,31,-18],[2,3,2],'#5a1822')],[0,0,0],'head'),
+    bone('wingL','body',[5,21,-2],[cube([5,20,-3],[18,2,12],'#9a3040')],[0,0,-8],'wingL'),
+    bone('wingR','body',[-5,21,-2],[cube([-23,20,-3],[18,2,12],'#9a3040')],[0,0,8],'wingR'),
+    bone('legL','body',[4,12,4],[cube([2,0,2],[4,12,4],'#5a1822')],[0,0,0],'legL'),
+    bone('legR','body',[-4,12,4],[cube([-6,0,2],[4,12,4],'#5a1822')],[0,0,0],'legR'),
+    bone('tail','body',[0,17,10],[cube([-3,14,10],[6,6,16],'#7a2230')],[10,0,0],'tail')
+  ]},
+  bird:{emoji:'🐦',label:'Oiseau',build:()=>[
+    bone('body', null, [0,8,0], [cube([-3,5,-4],[6,7,9],'#e0a040')], [0,0,0],'body'),
+    bone('head','body',[0,13,-4],[cube([-3,12,-8],[6,6,6],'#e8b860'), cube([-1,12,-10],[2,2,3],'#d87020')],[0,0,0],'head'),
+    bone('wingL','body',[3,12,-1],[cube([3,11,-3],[10,1,8],'#c88820')],[0,0,0],'wingL'),
+    bone('wingR','body',[-3,12,-1],[cube([-13,11,-3],[10,1,8],'#c88820')],[0,0,0],'wingR'),
+    bone('legL','body',[2,5,2],[cube([1,0,1],[2,5,2],'#d87020')],[0,0,0],'legL'),
+    bone('legR','body',[-2,5,2],[cube([-3,0,1],[2,5,2],'#d87020')],[0,0,0],'legR'),
+    bone('tail','body',[0,8,5],[cube([-3,6,5],[6,1,7],'#c88820')],[0,0,0],'tail')
+  ]},
+  golem:{emoji:'🗿',label:'Golem (boss)',build:()=>[
+    bone('body', null, [0,28,0], [cube([-9,14,-5],[18,20,10],'#7a7068')], [0,0,0],'body'),
+    bone('head','body',[0,34,0],[cube([-5,34,-5],[10,10,10],'#8a8078'), cube([-2,36,-6],[1,2,1],'#c0392b'), cube([1,36,-6],[1,2,1],'#c0392b')],[0,0,0],'head'),
+    bone('armL','body',[10,33,0],[cube([9,12,-3],[6,22,6],'#6e645c')],[0,0,0],'armL'),
+    bone('armR','body',[-10,33,0],[cube([-15,12,-3],[6,22,6],'#6e645c')],[0,0,0],'armR'),
+    bone('legL','body',[4,14,0],[cube([1,0,-3],[6,14,6],'#5e554e')],[0,0,0],'legL'),
+    bone('legR','body',[-4,14,0],[cube([-7,0,-3],[6,14,6],'#5e554e')],[0,0,0],'legR')
+  ]},
+  snake:{emoji:'🐍',label:'Serpent',build:()=>[
+    bone('body', null, [0,3,-6], [cube([-3,0,-9],[6,5,8],'#2e7a3a')], [0,0,0],'head'),
+    bone('seg1','body',[0,3,-1],[cube([-2,0,-1],[4,4,8],'#3a8a46')], [0,0,0],'body'),
+    bone('seg2','seg1',[0,3,7],[cube([-2,0,7],[4,4,8],'#2e7a3a')], [0,8,0],'tail'),
+    bone('head_d','body',[0,3,-9],[cube([-2,4,-10],[1,1,1],'#c0392b'), cube([1,4,-10],[1,1,1],'#c0392b')],[0,0,0],null)
+  ]},
+  blob:{emoji:'🫧',label:'Blob / Slime',build:()=>[
+    bone('body', null, [0,4,0], [cube([-5,0,-5],[10,8,10],'#27ae60'), cube([-3,8,-3],[6,2,6],'#27ae60')], [0,0,0],'body'),
+    bone('eyes','body',[0,5,-5],[cube([-3,4,-6],[2,2,1],'#ffffff'), cube([1,4,-6],[2,2,1],'#ffffff')], [0,0,0],'head')
+  ]}
+};
 
 function newCreature(preset){
-  const presets = {humanoid:presetHumanoid, quadruped:presetQuadruped, blob:presetBlob};
   const n = creatures.length+1;
+  const def = CR_PRESETS[preset]||CR_PRESETS.humanoid;
+  const bones = def.build();
   return {
     id:'cr_'+Date.now(),
-    name:'Créature '+n, namespace:'monaddon', entityId:'creature_'+n,
+    name:(def.label||'Créature')+' '+n, namespace:'monaddon', entityId:'creature_'+n,
     hostile:false, health:20, scale:1,
-    bones:(presets[preset]||presetHumanoid)()
+    bones,
+    animations: defaultAnimations(bones)
   };
 }
+
+// ── État de l'éditeur 3D ─────────────────────────────────
+let crMode='build';      // 'build' | 'animate'
+let crAnimIndex=0;
+let crTime=0;
+let crPlaying=false;
+let crBoneGroups={};
 
 function addCreature(preset){
   const c = newCreature(preset);
@@ -1722,62 +1823,77 @@ function addCreature(preset){
 
 function selectCreature(id){
   currentCreature = creatures.find(c=>c.id===id);
-  crSel = null;
+  crSel = null; crAnimIndex=0; crTime=0; crPlaying=false;
+  if(currentCreature && !currentCreature.animations) currentCreature.animations = defaultAnimations(currentCreature.bones);
   renderSidebar();
-  renderCreatureTree();
-  renderCreatureProps();
   ensureThree();
   rebuildCreatureMesh();
+  renderCreatureTree();
+  renderCreatureProps();
+  renderTimeline();
   if(currentCreature) document.getElementById('cr-vp-name').textContent = currentCreature.name;
 }
 
 // ── ARBRE (os / boîtes) ──────────────────────────────────
 let crSel = null; // {bone:index} ou {bone:index, cube:index}
 
+const ROLE_LABELS={head:'tête',body:'corps',armL:'bras G',armR:'bras D',legL:'jambe G',legR:'jambe D',legFL:'patte AV-G',legFR:'patte AV-D',legBL:'patte AR-G',legBR:'patte AR-D',wingL:'aile G',wingR:'aile D',tail:'queue'};
+const ROLE_KEYS=['',...Object.keys(ROLE_LABELS)];
+
 function renderCreatureTree(){
   const el = document.getElementById('creature-tree');
   if(!el) return;
-  if(!currentCreature){
-    el.innerHTML = `<div class="cr-empty">Aucune créature.<br><br><button class="cr-btn" onclick="addCreature('humanoid')">+ Humanoïde</button></div>`;
-    return;
-  }
+  // Galerie de modèles (toujours visible en haut)
+  let gallery = `<div class="cr-section-lbl">Nouveau modèle <span class="qm" onclick="openHelp('crPresets')">?</span></div><div class="cr-gallery">`;
+  Object.entries(CR_PRESETS).forEach(([k,p])=>{ gallery += `<div class="cr-preset" onclick="addCreature('${k}')"><span class="pe">${p.emoji}</span><span class="pn">${p.label}</span></div>`; });
+  gallery += `</div>`;
+
+  if(!currentCreature){ el.innerHTML = gallery + `<div class="cr-empty">Choisis un modèle ci-dessus pour commencer.</div>`; return; }
   const c = currentCreature;
-  let html = `
-    <div class="cr-section-lbl">Modèles de départ</div>
-    <div class="cr-btn-row">
-      <button class="cr-btn" onclick="addCreature('humanoid')" title="Humanoïde">🧍</button>
-      <button class="cr-btn" onclick="addCreature('quadruped')" title="Quadrupède">🐾</button>
-      <button class="cr-btn" onclick="addCreature('blob')" title="Blob / slime">🫧</button>
-    </div>
-    <div class="cr-section-lbl">Parties (os) — clique pour éditer</div>
-  `;
+
+  // Liste des parties (partagée build/animate)
+  let parts = `<div class="cr-section-lbl" style="margin-top:6px">Parties du corps <span class="qm" onclick="openHelp('crParts')">?</span></div>`;
   c.bones.forEach((b,bi)=>{
     const bsel = crSel && crSel.bone===bi && crSel.cube===undefined ? ' sel':'';
-    html += `<div class="cr-bone">
+    const roleBadge = b.role ? `<span class="cr-role">${ROLE_LABELS[b.role]||b.role}</span>` : '';
+    parts += `<div class="cr-bone">
       <div class="cr-bone-head${bsel}" onclick="selectBone(${bi})">
-        <span class="cr-caret">▸</span><span>🦴 ${b.name}</span>
-        <span class="cr-del" onclick="event.stopPropagation();deleteBone(${bi})">✕</span>
+        <span class="cr-caret">▸</span><span>🦴 ${b.name}</span>${roleBadge}
+        ${crMode==='build'?`<span class="cr-del" onclick="event.stopPropagation();deleteBone(${bi})">✕</span>`:''}
       </div>`;
-    b.cubes.forEach((cu,ci)=>{
-      const csel = crSel && crSel.bone===bi && crSel.cube===ci ? ' sel':'';
-      html += `<div class="cr-cube${csel}" onclick="selectCube(${bi},${ci})">
-        <span class="cr-swatch" style="background:${cu.color}"></span>
-        <span>boîte ${ci+1} · ${cu.size.join('×')}</span>
-        <span class="cr-del" onclick="event.stopPropagation();deleteCube(${bi},${ci})">✕</span>
-      </div>`;
-    });
-    html += `<div class="cr-cube" style="color:var(--muted)" onclick="addCube(${bi})">＋ ajouter une boîte</div>`;
-    html += `</div>`;
+    if(crMode==='build'){
+      b.cubes.forEach((cu,ci)=>{
+        const csel = crSel && crSel.bone===bi && crSel.cube===ci ? ' sel':'';
+        parts += `<div class="cr-cube${csel}" onclick="selectCube(${bi},${ci})">
+          <span class="cr-swatch" style="background:${cu.color}"></span>
+          <span>boîte · ${cu.size.join('×')}</span>
+          <span class="cr-del" onclick="event.stopPropagation();deleteCube(${bi},${ci})">✕</span>
+        </div>`;
+      });
+      parts += `<div class="cr-cube" style="color:var(--muted)" onclick="addCube(${bi})">＋ ajouter une boîte</div>`;
+    }
+    parts += `</div>`;
   });
-  html += `<button class="cr-btn" onclick="addBone()" style="margin-top:8px">＋ Nouvelle partie (os)</button>`;
-  html += `<div class="cr-section-lbl" style="margin-top:14px">Échanger avec une IA</div>`;
-  html += `<button class="cr-btn blue" onclick="copyLLMPrompt()">📋 Copier le prompt IA</button>`;
-  html += `<button class="cr-btn blue" onclick="importGeoPrompt()">📥 Importer un .geo.json</button>`;
+
+  let html = gallery + parts;
+  if(crMode==='build'){
+    html += `<button class="cr-btn" onclick="addBone()" style="margin-top:8px">＋ Nouvelle partie</button>`;
+    html += `<div class="cr-section-lbl" style="margin-top:14px">Avec une IA <span class="qm" onclick="openHelp('aiBridge')">?</span></div>`;
+    html += `<button class="cr-btn blue" onclick="copyLLMPrompt()">📋 Copier le prompt IA</button>`;
+    html += `<button class="cr-btn blue" onclick="importGeoPrompt()">📥 Importer un .geo.json</button>`;
+  } else {
+    html += `<div class="cr-section-lbl" style="margin-top:14px">Ajouter une animation auto <span class="qm" onclick="openHelp('crAutoAnim')">?</span></div>`;
+    html += `<button class="cr-btn" onclick="addAutoAnim('walk')">🚶 Marche</button>`;
+    html += `<button class="cr-btn" onclick="addAutoAnim('idle')">🌬 Repos (respiration)</button>`;
+    html += `<button class="cr-btn" onclick="addAutoAnim('flap')">🦋 Battement d'ailes</button>`;
+    html += `<button class="cr-btn" onclick="addAutoAnim('attack')">⚔ Attaque</button>`;
+    html += `<button class="cr-btn" onclick="addBlankAnim()" style="margin-top:4px">＋ Animation vide</button>`;
+  }
   el.innerHTML = html;
 }
 
-function selectBone(bi){ crSel={bone:bi}; renderCreatureTree(); renderCreatureProps(); highlightSelection(); }
-function selectCube(bi,ci){ crSel={bone:bi,cube:ci}; renderCreatureTree(); renderCreatureProps(); highlightSelection(); }
+function selectBone(bi){ crSel={bone:bi}; renderCreatureTree(); renderCreatureProps(); renderTimeline(); highlightSelection(); }
+function selectCube(bi,ci){ crSel={bone:bi,cube:ci}; renderCreatureTree(); renderCreatureProps(); renderTimeline(); highlightSelection(); }
 
 function addBone(){
   if(!currentCreature) return;
@@ -1817,7 +1933,7 @@ function renderCreatureProps(){
   if(!currentCreature){ el.innerHTML=`<div class="cr-empty">Sélectionne une créature.</div>`; return; }
   const c = currentCreature;
   let html = `
-    <div class="cr-section-lbl">Créature</div>
+    <div class="cr-section-lbl">Créature <span class="qm" onclick="openHelp('crEntity')">?</span></div>
     <div class="field"><label class="lbl">Nom</label><input type="text" value="${c.name}" oninput="currentCreature.name=this.value;document.getElementById('cr-vp-name').textContent=this.value;renderSidebar()"></div>
     <div class="cr-mini" style="grid-template-columns:1fr 1fr;margin-top:6px">
       <div class="field"><label>Namespace</label><input type="text" value="${c.namespace}" oninput="currentCreature.namespace=this.value"></div>
@@ -1825,39 +1941,45 @@ function renderCreatureProps(){
     </div>
     <div class="cr-mini" style="grid-template-columns:1fr 1fr;margin-top:6px">
       <div class="field"><label>❤ Vie</label><input type="number" min="1" value="${c.health}" oninput="currentCreature.health=+this.value"></div>
-      <div class="field"><label>Comportement</label>
-        <select onchange="currentCreature.hostile=(this.value==='1')" style="padding:5px 6px;font-size:12px">
-          <option value="0" ${!c.hostile?'selected':''}>Passif</option>
-          <option value="1" ${c.hostile?'selected':''}>Hostile</option>
-        </select></div>
+      <div class="field"><label>Taille ×</label><input type="number" min="0.1" step="0.1" value="${c.scale}" oninput="currentCreature.scale=+this.value"></div>
     </div>
-    <hr style="border:none;border-top:1px solid var(--border);margin:6px 0">
+    <div class="field" style="margin-top:6px"><label>Comportement</label>
+      <select onchange="currentCreature.hostile=(this.value==='1')" style="padding:5px 6px;font-size:12px">
+        <option value="0" ${!c.hostile?'selected':''}>Passif (fuit)</option>
+        <option value="1" ${c.hostile?'selected':''}>Hostile (attaque)</option>
+      </select></div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:8px 0">
   `;
 
-  if(crSel && crSel.cube!==undefined){
+  if(crMode==='animate'){
+    html += renderAnimProps(c);
+  } else if(crSel && crSel.cube!==undefined){
     const cu = c.bones[crSel.bone].cubes[crSel.cube];
-    html += `<div class="cr-section-lbl" style="color:var(--blue)">📦 Boîte sélectionnée (os : ${c.bones[crSel.bone].name})</div>`;
-    html += vec3field('Position (origine, en pixels)', cu.origin, 'setCubeOrigin');
+    html += `<div class="cr-section-lbl" style="color:var(--blue)">📦 Boîte · os « ${c.bones[crSel.bone].name} » <span class="qm" onclick="openHelp('crCube')">?</span></div>`;
+    html += vec3field('Position (coin bas, en pixels)', cu.origin, 'setCubeOrigin');
     html += vec3field('Taille (largeur · hauteur · profondeur)', cu.size, 'setCubeSize');
-    html += `<div class="cr-section-lbl">Épaisseur (inflate)</div><div class="field"><input type="number" step="0.5" value="${cu.inflate||0}" oninput="setCubeInflate(this.value)"></div>`;
+    html += `<div class="cr-section-lbl">Marge (inflate) <span class="qm" onclick="openHelp('crInflate')">?</span></div><div class="field"><input type="number" step="0.5" value="${cu.inflate||0}" oninput="setCubeInflate(this.value)"></div>`;
     html += `<div class="cr-section-lbl">Couleur</div><div style="display:flex;flex-wrap:wrap;gap:4px">`;
     CR_COLORS.forEach(col=>{ html += `<div onclick="setCubeColor('${col}')" style="width:20px;height:20px;background:${col};cursor:pointer;border:2px solid ${cu.color===col?'#fff':'transparent'}"></div>`; });
     html += `</div><div style="display:flex;align-items:center;gap:6px;margin-top:6px"><input type="color" value="${cu.color}" oninput="setCubeColor(this.value)" style="width:34px;height:26px;border:1px solid var(--border);background:none;cursor:pointer"><span style="font-size:10px;color:var(--muted)">couleur perso</span></div>`;
     html += `<button class="cr-btn" style="margin-top:10px" onclick="duplicateCube()">⧉ Dupliquer cette boîte</button>`;
   } else if(crSel){
     const b = c.bones[crSel.bone];
-    html += `<div class="cr-section-lbl" style="color:var(--gold)">🦴 Os sélectionné</div>`;
-    html += `<div class="field"><label class="lbl">Nom de l'os</label><input type="text" value="${b.name}" oninput="setBoneName(this.value)"></div>`;
-    html += `<div class="cr-section-lbl" style="margin-top:8px">Rattaché à (parent)</div><select onchange="setBoneParent(this.value)" style="padding:6px;font-size:12px"><option value="">(racine)</option>${c.bones.filter((x,i)=>i!==crSel.bone).map(x=>`<option value="${x.name}" ${b.parent===x.name?'selected':''}>${x.name}</option>`).join('')}</select>`;
-    html += vec3field('Pivot (point de rotation)', b.pivot, 'setBonePivot');
-    html += vec3field('Rotation (degrés)', b.rotation, 'setBoneRot');
+    html += `<div class="cr-section-lbl" style="color:var(--gold)">🦴 Os « ${b.name} » <span class="qm" onclick="openHelp('crBone')">?</span></div>`;
+    html += `<div class="field"><label class="lbl">Nom</label><input type="text" value="${b.name}" oninput="setBoneName(this.value)"></div>`;
+    html += `<div class="cr-section-lbl" style="margin-top:8px">Rôle (pour l'animation auto) <span class="qm" onclick="openHelp('crRole')">?</span></div>
+      <select onchange="setBoneRole(this.value)" style="padding:6px;font-size:12px">${ROLE_KEYS.map(r=>`<option value="${r}" ${(b.role||'')===r?'selected':''}>${r?ROLE_LABELS[r]:'(aucun)'}</option>`).join('')}</select>`;
+    html += `<div class="cr-section-lbl" style="margin-top:8px">Rattaché à <span class="qm" onclick="openHelp('crParent')">?</span></div><select onchange="setBoneParent(this.value)" style="padding:6px;font-size:12px"><option value="">(racine)</option>${c.bones.filter((x,i)=>i!==crSel.bone).map(x=>`<option value="${x.name}" ${b.parent===x.name?'selected':''}>${x.name}</option>`).join('')}</select>`;
+    html += vec3field('Pivot (point de pliage) ⓘ', b.pivot, 'setBonePivot');
+    html += vec3field('Rotation de base (degrés)', b.rotation, 'setBoneRot');
+    html += `<div class="cr-btn-row" style="margin-top:10px"><button class="cr-btn" onclick="mirrorBone()" title="Crée la partie symétrique">🪞 Miroir</button><button class="cr-btn" onclick="duplicateBone()">⧉ Dupliquer</button></div>`;
   } else {
-    html += `<div class="cr-empty" style="padding:14px 4px">Clique sur une partie du modèle (dans la vue 3D ou la liste) pour l'éditer.</div>`;
+    html += `<div class="cr-info">👆 Clique sur une partie de la créature (dans la vue 3D ou la liste de gauche) pour changer sa <b>forme</b>, sa <b>taille</b> et sa <b>couleur</b>.</div>`;
   }
 
   html += `<div style="margin-top:auto;padding-top:14px">
-    <button class="export-btn eb-all" onclick="exportCreature()">⬇ Exporter la créature (.mcpack)</button>
-    <button class="cr-btn blue" style="margin-top:6px" onclick="exportGeoOnly()">⬇ Exporter le modèle .geo.json seul</button>
+    <button class="export-btn eb-all" onclick="exportCreature()">⬇ Exporter pour Minecraft (.mcpack)</button>
+    <button class="cr-btn blue" style="margin-top:6px" onclick="exportGeoOnly()">⬇ Modèle .geo.json seul</button>
     <div class="status-msg" id="creature-status">Prêt</div>
   </div>`;
   el.innerHTML = html;
@@ -1874,12 +1996,37 @@ function setBoneName(v){ _cur().name=v; renderCreatureTree(); }
 function setBoneParent(v){ _cur().parent=v||null; rebuildCreatureMesh(); }
 function setBonePivot(i,v){ _cur().pivot[i]=+v; rebuildCreatureMesh(); }
 function setBoneRot(i,v){ _cur().rotation[i]=+v; rebuildCreatureMesh(); }
+function setBoneRole(v){ _cur().role=v||null; renderCreatureTree(); }
+function duplicateBone(){
+  if(!_cur()) return;
+  const b=JSON.parse(JSON.stringify(_cur())); b.name=b.name+'_2'; b.role=null;
+  currentCreature.bones.push(b);
+  crSel={bone:currentCreature.bones.length-1};
+  rebuildCreatureMesh(); renderCreatureTree(); renderCreatureProps(); highlightSelection();
+}
+function mirrorBone(){
+  // crée la version symétrique (axe X) d'un os — pratique pour ailes, bras, pattes
+  if(!_cur()) return;
+  const src=_cur();
+  const b=JSON.parse(JSON.stringify(src));
+  b.name=src.name.replace(/L$|R$|_g$|_d$/i,'')+'_m';
+  b.pivot=[-src.pivot[0], src.pivot[1], src.pivot[2]];
+  b.rotation=[src.rotation[0], -src.rotation[1], -src.rotation[2]];
+  b.cubes=src.cubes.map(cu=>cube([-(cu.origin[0]+cu.size[0]), cu.origin[1], cu.origin[2]], cu.size.slice(), cu.color, {inflate:cu.inflate||0}));
+  // rôle miroir
+  const mir={armL:'armR',armR:'armL',legL:'legR',legR:'legL',legFL:'legFR',legFR:'legFL',legBL:'legBR',legBR:'legBL',wingL:'wingR',wingR:'wingL'};
+  b.role=mir[src.role]||null;
+  currentCreature.bones.push(b);
+  crSel={bone:currentCreature.bones.length-1};
+  rebuildCreatureMesh(); renderCreatureTree(); renderCreatureProps(); highlightSelection();
+  toast('🪞 Partie symétrique créée');
+}
 
 // ════════════════════════════════════════════════════════
 //  RENDU 3D (Three.js)
 // ════════════════════════════════════════════════════════
 let crScene, crCam, crRenderer, crRoot, crRAF, crMeshes=[], crRaycaster, crSelHelper;
-let crCamOrbit = {theta:-0.6, phi:1.15, radius:3.4, target:new THREE.Vector3(0,0.9,0)};
+let crCamOrbit = {theta:2.5, phi:1.2, radius:3.4, target:new THREE.Vector3(0,0.9,0)};
 
 function ensureThree(){
   if(crRenderer) return;
@@ -1903,7 +2050,8 @@ function ensureThree(){
   updateCamera();
 
   window.addEventListener('resize', resizeCreatureViewport);
-  const loop = ()=>{ crRAF=requestAnimationFrame(loop); crRenderer.render(crScene,crCam); };
+  let last=performance.now();
+  const loop = ()=>{ crRAF=requestAnimationFrame(loop); const now=performance.now(); const dt=Math.min(0.05,(now-last)/1000); last=now; crTick(dt); if(crSelHelper) crSelHelper.update(); crRenderer.render(crScene,crCam); };
   loop();
 }
 
@@ -1975,7 +2123,6 @@ function rebuildCreatureMesh(){
   if(!currentCreature) return;
   const c=currentCreature;
   crRoot=new THREE.Group();
-  crRoot.rotation.y=Math.PI; // face le modèle (avant = -Z) vers la caméra par défaut
   const groups={};
   c.bones.forEach(b=>{ groups[b.name]=new THREE.Group(); groups[b.name].userData.pivot=b.pivot; });
   c.bones.forEach((b,bi)=>{
@@ -1985,6 +2132,8 @@ function rebuildCreatureMesh(){
     g.position.set((b.pivot[0]-pp[0])/16, (b.pivot[1]-pp[1])/16, (b.pivot[2]-pp[2])/16);
     g.rotation.order='ZYX';
     g.rotation.set(-rad(b.rotation[0]), -rad(b.rotation[1]), rad(b.rotation[2]));
+    g.userData.baseRot=b.rotation.slice();
+    g.userData.basePos=g.position.clone();
     parent.add(g);
     b.cubes.forEach((cu,ci)=>{
       const inf=cu.inflate||0;
@@ -2002,10 +2151,12 @@ function rebuildCreatureMesh(){
     });
   });
   crScene.add(crRoot);
+  crBoneGroups=groups;
   // recadre la cible caméra sur le centre du modèle
   const box=new THREE.Box3().setFromObject(crRoot);
   if(box.isEmpty()===false){ const ctr=box.getCenter(new THREE.Vector3()); crCamOrbit.target.set(0,ctr.y,0); updateCamera(); }
   highlightSelection();
+  if(crMode==='animate') applyAnimFrame(currentAnim(), crTime); else resetPose();
 }
 
 function highlightSelection(){
@@ -2014,6 +2165,193 @@ function highlightSelection(){
   if(!crSel || crSel.cube===undefined) return;
   const target=crMeshes.find(m=>m.userData.bone===crSel.bone && m.userData.cube===crSel.cube);
   if(target){ crSelHelper=new THREE.BoxHelper(target, 0xe8c878); crScene.add(crSelHelper); }
+}
+
+// ════════════════════════════════════════════════════════
+//  ANIMATIONS
+// ════════════════════════════════════════════════════════
+function setCrMode(mode){
+  crMode=mode; crPlaying=false; crTime=0;
+  document.getElementById('mode-build').classList.toggle('active',mode==='build');
+  document.getElementById('mode-animate').classList.toggle('active',mode==='animate');
+  document.getElementById('creature-timeline').style.display = mode==='animate'?'flex':'none';
+  document.getElementById('cr-topbar-tip').innerHTML = mode==='animate'
+    ? `Anime ta créature : choisis une animation, appuie sur ▶, ou pose des images-clés. <span class="qm" onclick="openHelp('crAnimate')">?</span>`
+    : `Empile des boîtes pour créer ta créature. <span class="qm" onclick="openHelp('crBuild')">?</span>`;
+  renderCreatureTree(); renderCreatureProps(); renderTimeline();
+  if(mode==='animate') applyAnimFrame(currentAnim(),0); else resetPose();
+  resizeCreatureViewport();
+}
+
+// — générateurs d'animations à partir des rôles —
+function byRole(bones,role){ return bones.filter(b=>b.role===role).map(b=>b.name); }
+function trackRot(tr,names,keys){ names.forEach(n=>{ tr[n]=tr[n]||{}; tr[n].rotation=keys.map(k=>({t:k[0],v:k[1]})); }); }
+function trackPos(tr,names,keys){ names.forEach(n=>{ tr[n]=tr[n]||{}; tr[n].position=keys.map(k=>({t:k[0],v:k[1]})); }); }
+
+function genWalk(bones){
+  const tr={}, s=38, a=26, L=0.8, H=L/2;
+  const fwd={legL:1,legFL:1,legBR:1,armR:1, legR:-1,legFR:-1,legBL:-1,armL:-1};
+  Object.keys(fwd).forEach(role=>{
+    const sw=(role.startsWith('arm')?a:s)*fwd[role];
+    trackRot(tr, byRole(bones,role), [[0,[0,0,0]],[H/2,[sw,0,0]],[H,[0,0,0]],[H*1.5,[-sw,0,0]],[L,[0,0,0]]]);
+  });
+  trackRot(tr, byRole(bones,'tail'), [[0,[0,0,-6]],[H,[0,0,6]],[L,[0,0,-6]]]);
+  return {name:'walk', loop:true, length:L, always:false, walkControlled:true, tracks:tr};
+}
+function genIdle(bones){
+  const tr={}, L=3, H=L/2;
+  trackRot(tr, byRole(bones,'head'), [[0,[0,0,0]],[H,[3,0,0]],[L,[0,0,0]]]);
+  trackRot(tr, byRole(bones,'armL'), [[0,[0,0,3]],[H,[0,0,-3]],[L,[0,0,3]]]);
+  trackRot(tr, byRole(bones,'armR'), [[0,[0,0,-3]],[H,[0,0,3]],[L,[0,0,-3]]]);
+  trackPos(tr, byRole(bones,'body'), [[0,[0,0,0]],[H,[0,0.4,0]],[L,[0,0,0]]]);
+  return {name:'idle', loop:true, length:L, always:true, walkControlled:false, tracks:tr};
+}
+function genFlap(bones){
+  const tr={}, L=0.6, H=L/2;
+  trackRot(tr, byRole(bones,'wingL'), [[0,[0,0,-12]],[H,[0,0,42]],[L,[0,0,-12]]]);
+  trackRot(tr, byRole(bones,'wingR'), [[0,[0,0,12]],[H,[0,0,-42]],[L,[0,0,12]]]);
+  return {name:'flap', loop:true, length:L, always:true, walkControlled:false, tracks:tr};
+}
+function genAttack(bones){
+  const tr={}, L=0.7;
+  trackRot(tr, byRole(bones,'armR'), [[0,[0,0,0]],[0.2,[-120,0,0]],[0.4,[10,0,0]],[L,[0,0,0]]]);
+  trackRot(tr, byRole(bones,'armL'), [[0,[0,0,0]],[0.25,[-90,0,0]],[0.45,[10,0,0]],[L,[0,0,0]]]);
+  trackRot(tr, byRole(bones,'head'), [[0,[0,0,0]],[0.2,[12,0,0]],[L,[0,0,0]]]);
+  return {name:'attack', loop:false, length:L, always:false, walkControlled:false, tracks:tr};
+}
+function defaultAnimations(bones){
+  const a=[genIdle(bones), genWalk(bones)];
+  if(bones.some(b=>b.role==='wingL'||b.role==='wingR')) a.push(genFlap(bones));
+  return a;
+}
+function addAutoAnim(kind){
+  if(!currentCreature) return;
+  const gen={walk:genWalk, idle:genIdle, flap:genFlap, attack:genAttack}[kind];
+  const an=gen(currentCreature.bones);
+  if(Object.keys(an.tracks).length===0){ toast('⚠ Donne d\'abord un rôle aux os (ex: aile, jambe) en mode Construire'); openHelp('crRole'); return; }
+  const i=currentCreature.animations.findIndex(x=>x.name===an.name);
+  if(i>=0) currentCreature.animations[i]=an; else currentCreature.animations.push(an);
+  crAnimIndex=currentCreature.animations.findIndex(x=>x.name===an.name); crTime=0; crPlaying=true;
+  renderTimeline(); renderCreatureProps(); applyAnimFrame(currentAnim(),0); toast('🎬 « '+an.name+' » prête — regarde la 3D !');
+}
+function addBlankAnim(){
+  if(!currentCreature) return;
+  const n=currentCreature.animations.length+1;
+  currentCreature.animations.push({name:'anim_'+n, loop:true, length:1, always:false, walkControlled:false, tracks:{}});
+  crAnimIndex=currentCreature.animations.length-1; crTime=0;
+  renderTimeline(); renderCreatureProps();
+}
+function deleteAnim(i){
+  if(!currentCreature) return;
+  currentCreature.animations.splice(i,1);
+  if(crAnimIndex>=currentCreature.animations.length) crAnimIndex=Math.max(0,currentCreature.animations.length-1);
+  crTime=0; renderTimeline(); renderCreatureProps(); applyAnimFrame(currentAnim(),0);
+}
+function selectAnim(i){ crAnimIndex=i; crTime=0; crPlaying=false; renderTimeline(); renderCreatureProps(); applyAnimFrame(currentAnim(),0); }
+function currentAnim(){ return currentCreature && currentCreature.animations ? currentCreature.animations[crAnimIndex] : null; }
+function animEmoji(a){ return {walk:'🚶',idle:'🌬',flap:'🦋',attack:'⚔'}[a.name]||'🎬'; }
+
+function sampleChannel(ch,t){
+  if(!ch||!ch.length) return [0,0,0];
+  if(t<=ch[0].t) return ch[0].v.slice();
+  if(t>=ch[ch.length-1].t) return ch[ch.length-1].v.slice();
+  for(let i=0;i<ch.length-1;i++){ const A=ch[i],B=ch[i+1]; if(t>=A.t&&t<=B.t){ const f=(t-A.t)/((B.t-A.t)||1); return [0,1,2].map(j=>A.v[j]+(B.v[j]-A.v[j])*f); } }
+  return ch[ch.length-1].v.slice();
+}
+function applyAnimFrame(anim,t){
+  if(!crBoneGroups) return;
+  Object.entries(crBoneGroups).forEach(([name,g])=>{
+    const base=g.userData.baseRot||[0,0,0], bp=g.userData.basePos;
+    let rd=[0,0,0], pd=[0,0,0];
+    if(anim && anim.tracks[name]){ const tk=anim.tracks[name]; if(tk.rotation) rd=sampleChannel(tk.rotation,t); if(tk.position) pd=sampleChannel(tk.position,t); }
+    g.rotation.set(-rad(base[0]+rd[0]), -rad(base[1]+rd[1]), rad(base[2]+rd[2]));
+    if(bp) g.position.set(bp.x+pd[0]/16, bp.y+pd[1]/16, bp.z+pd[2]/16);
+  });
+}
+function resetPose(){ applyAnimFrame(null,0); }
+function crTick(dt){
+  if(!currentCreature || crMode!=='animate' || !crPlaying) return;
+  const anim=currentAnim(); if(!anim) return;
+  crTime+=dt;
+  if(crTime>=anim.length){ if(anim.loop) crTime%=anim.length; else { crTime=anim.length; crPlaying=false; updatePlayBtn(); } }
+  applyAnimFrame(anim,crTime); updateScrubUI();
+}
+
+// — UI timeline —
+function renderTimeline(){
+  const el=document.getElementById('creature-timeline'); if(!el) return;
+  if(crMode!=='animate' || !currentCreature){ el.style.display='none'; return; }
+  el.style.display='flex';
+  const anims=currentCreature.animations||[];
+  const chips=anims.map((a,i)=>`<span class="cr-chip ${i===crAnimIndex?'active':''}" onclick="selectAnim(${i})">${animEmoji(a)} ${a.name}<span class="cr-del" onclick="event.stopPropagation();deleteAnim(${i})">✕</span></span>`).join('')
+    + `<span class="cr-chip" style="color:var(--gold)" onclick="addBlankAnim()">＋</span>`;
+  const anim=currentAnim();
+  let body='';
+  if(anim){
+    body=`<div class="cr-tl-head">
+      <button class="cr-play ${crPlaying?'playing':''}" id="cr-playbtn" onclick="togglePlay()">${crPlaying?'⏸':'▶'}</button>
+      <input class="cr-scrub" id="cr-scrub" type="range" min="0" max="${anim.length}" step="0.01" value="${crTime}" oninput="scrubTo(this.value)">
+      <span class="cr-time" id="cr-time">${crTime.toFixed(2)} / ${anim.length}s</span>
+      <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px">durée<input type="number" min="0.1" step="0.1" value="${anim.length}" style="width:52px;padding:3px;font-size:11px" oninput="setAnimLength(this.value)"></label>
+      <label style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px"><input type="checkbox" ${anim.loop?'checked':''} onchange="setAnimLoop(this.checked)">boucle</label>
+      <span class="qm" onclick="openHelp('crKeyframe')">?</span>
+    </div>`;
+    const bn = crSel ? (currentCreature.bones[crSel.bone]||{}).name : null;
+    if(bn){
+      const ch=(anim.tracks[bn]&&anim.tracks[bn].rotation)||[];
+      const dots=ch.map(k=>`<div class="cr-kf-dot" style="left:${k.t/anim.length*100}%" title="${k.t}s — clique pour aller à cet instant" onclick="scrubTo(${k.t})"></div>`).join('');
+      body+=`<div class="cr-kf-track"><span style="width:96px;color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🦴 ${bn}</span><div class="cr-kf-lane">${dots}<div class="cr-playhead" id="cr-playhead" style="left:${crTime/anim.length*100}%"></div></div></div>`;
+    } else {
+      body+=`<div class="cr-info">👆 Clique une partie de la créature pour voir/éditer ses images-clés.</div>`;
+    }
+  }
+  el.innerHTML=`<div class="cr-animchips">${chips}</div>${body}`;
+}
+function updateScrubUI(){
+  const a=currentAnim(); if(!a) return;
+  const s=document.getElementById('cr-scrub'); if(s) s.value=crTime;
+  const t=document.getElementById('cr-time'); if(t) t.textContent=crTime.toFixed(2)+' / '+a.length+'s';
+  const ph=document.getElementById('cr-playhead'); if(ph) ph.style.left=(crTime/a.length*100)+'%';
+}
+function updatePlayBtn(){ const b=document.getElementById('cr-playbtn'); if(b){ b.textContent=crPlaying?'⏸':'▶'; b.classList.toggle('playing',crPlaying); } }
+function togglePlay(){ const a=currentAnim(); if(!a) return; if(!crPlaying && crTime>=a.length) crTime=0; crPlaying=!crPlaying; updatePlayBtn(); }
+function scrubTo(v){ crPlaying=false; crTime=Math.max(0,+v); applyAnimFrame(currentAnim(),crTime); updateScrubUI(); updatePlayBtn(); }
+function setAnimLength(v){ const a=currentAnim(); if(!a) return; a.length=Math.max(0.1,+v); crTime=Math.min(crTime,a.length); renderTimeline(); }
+function setAnimLoop(b){ const a=currentAnim(); if(a) a.loop=b; }
+
+// — édition d'images-clés —
+function renderAnimProps(c){
+  const anim=currentAnim();
+  if(!anim) return `<div class="cr-info">Aucune animation. Clique « Marche » ou « Repos » à gauche pour en créer une automatiquement. 🎬</div>`;
+  if(!crSel) return `<div class="cr-info">🎬 Animation « <b>${anim.name}</b> ».<br><br>Le plus simple : utilise les boutons d'<b>animation auto</b> à gauche (marche, vol, attaque…).<br><br>Pour affiner : clique une partie de la créature, déplace le curseur de temps (en bas) et change sa rotation.</div>`;
+  const b=c.bones[crSel.bone], t=crTime;
+  const tk=anim.tracks[b.name]||{};
+  const rot=sampleChannel(tk.rotation,t), pos=sampleChannel(tk.position,t);
+  let h=`<div class="cr-section-lbl" style="color:var(--gold)">🎬 ${anim.name} · « ${b.name} » <span class="qm" onclick="openHelp('crKeyframe')">?</span></div>`;
+  h+=`<div class="cr-info">Place le curseur (timeline en bas) sur un instant, puis change la rotation : une <b>image-clé</b> est créée. Répète à un autre instant pour créer le mouvement.</div>`;
+  h+=`<div class="cr-section-lbl">Rotation à ${t.toFixed(2)}s (°)</div><div class="cr-mini">${['X','Y','Z'].map((ax,i)=>`<div class="field"><label>${ax}</label><input type="number" step="5" value="${+rot[i].toFixed(1)}" oninput="setKf('rotation',${i},this.value)"></div>`).join('')}</div>`;
+  h+=`<div class="cr-section-lbl">Décalage (pixels)</div><div class="cr-mini">${['X','Y','Z'].map((ax,i)=>`<div class="field"><label>${ax}</label><input type="number" step="0.5" value="${+pos[i].toFixed(1)}" oninput="setKf('position',${i},this.value)"></div>`).join('')}</div>`;
+  h+=`<button class="cr-btn" style="margin-top:8px" onclick="deleteKfHere()">🗑 Effacer l'image-clé à ${t.toFixed(2)}s</button>`;
+  return h;
+}
+function upsertKey(ch,t,v){
+  const i=ch.findIndex(k=>Math.abs(k.t-t)<0.005);
+  if(i>=0) ch[i].v=v; else { ch.push({t:+t.toFixed(3),v}); ch.sort((a,b)=>a.t-b.t); }
+}
+function setKf(channel,axis,value){
+  const anim=currentAnim(); if(!anim||!crSel) return;
+  const name=currentCreature.bones[crSel.bone].name;
+  anim.tracks[name]=anim.tracks[name]||{};
+  const ch=anim.tracks[name][channel]=anim.tracks[name][channel]||[];
+  const cur=sampleChannel(ch,crTime).slice(); cur[axis]=+value;
+  upsertKey(ch,crTime,cur);
+  applyAnimFrame(anim,crTime); renderTimeline();
+}
+function deleteKfHere(){
+  const anim=currentAnim(); if(!anim||!crSel) return;
+  const name=currentCreature.bones[crSel.bone].name; const tk=anim.tracks[name]; if(!tk) return;
+  ['rotation','position'].forEach(chn=>{ if(tk[chn]) tk[chn]=tk[chn].filter(k=>Math.abs(k.t-crTime)>=0.005); });
+  applyAnimFrame(anim,crTime); renderTimeline(); renderCreatureProps();
 }
 
 // ════════════════════════════════════════════════════════
@@ -2102,17 +2440,38 @@ async function exportCreature(){
   },null,2));
   rp.file(`models/entity/${id}.geo.json`, JSON.stringify(buildGeo(c,atlas),null,2));
   rp.file(`textures/entity/${id}.png`, b64toBlob(buildTexturePng(c,atlas)));
-  rp.file(`entity/${id}.entity.json`, JSON.stringify({
-    format_version:'1.10.0',
-    'minecraft:client_entity':{ description:{
-      identifier:full,
-      materials:{default:'entity_alphatest'},
-      textures:{default:`textures/entity/${id}`},
-      geometry:{default:'geometry.'+id},
-      render_controllers:['controller.render.'+id],
-      spawn_egg:{base_color:c.bones[0]?.cubes[0]?.color||'#888888', overlay_color:'#333333'}
-    }}
-  },null,2));
+  // — animations (.animation.json) + câblage —
+  const clientDesc={
+    identifier:full,
+    materials:{default:'entity_alphatest'},
+    textures:{default:`textures/entity/${id}`},
+    geometry:{default:'geometry.'+id},
+    render_controllers:['controller.render.'+id],
+    spawn_egg:{base_color:c.bones[0]?.cubes[0]?.color||'#888888', overlay_color:'#333333'}
+  };
+  const anims=(c.animations||[]).filter(a=>Object.keys(a.tracks||{}).length);
+  if(anims.length){
+    const animFile={format_version:'1.8.0', animations:{}};
+    const animMap={}, animateList=[];
+    anims.forEach(a=>{
+      const fullName='animation.'+id+'.'+a.name, bonesObj={};
+      Object.entries(a.tracks).forEach(([bn,tk])=>{
+        const bo={};
+        if(tk.rotation&&tk.rotation.length){ bo.rotation={}; tk.rotation.forEach(k=>bo.rotation[(+k.t).toString()]=k.v.map(n=>+n.toFixed(2))); }
+        if(tk.position&&tk.position.length){ bo.position={}; tk.position.forEach(k=>bo.position[(+k.t).toString()]=k.v.map(n=>+n.toFixed(2))); }
+        if(Object.keys(bo).length) bonesObj[bn]=bo;
+      });
+      const def={loop:a.loop, animation_length:a.length, bones:bonesObj};
+      animFile.animations[fullName]=def;
+      animMap[a.name]=fullName;
+      if(a.always) animateList.push(a.name);
+      else if(a.walkControlled) animateList.push({[a.name]:'query.modified_move_speed'});
+    });
+    rp.file(`animations/${id}.animation.json`, JSON.stringify(animFile,null,2));
+    clientDesc.animations=animMap;
+    if(animateList.length) clientDesc.scripts={animate:animateList};
+  }
+  rp.file(`entity/${id}.entity.json`, JSON.stringify({ format_version:'1.10.0', 'minecraft:client_entity':{ description:clientDesc } },null,2));
   rp.file(`render_controllers/${id}.render.json`, JSON.stringify({
     format_version:'1.10.0',
     render_controllers:{['controller.render.'+id]:{geometry:'Geometry.default', materials:[{'*':'Material.default'}], textures:['Texture.default']}}
@@ -2184,13 +2543,15 @@ Réponds UNIQUEMENT avec un objet JSON (sans texte autour) au format exact suiva
       "parent": null,
       "pivot": [0, 12, 0],
       "rotation": [0, 0, 0],
+      "role": "body",
       "cubes": [
         { "origin": [-4, 10, -2], "size": [8, 8, 4], "color": "#2980b9", "inflate": 0 }
       ]
     }
   ]
 }
-Règles : 16 pixels = 1 bloc. "origin" = coin le plus bas de la boîte (x,y,z). "size" = [largeur, hauteur, profondeur] en pixels. "pivot" = point de rotation de l'os. "color" = couleur hex unie de la boîte. Utilise plusieurs os (corps, tête, pattes...) et plusieurs boîtes pour une créature détaillée. Le sol est à y=0. Imagine maintenant cette créature : `;
+Règles : 16 pixels = 1 bloc. "origin" = coin le plus bas de la boîte (x,y,z). "size" = [largeur, hauteur, profondeur] en pixels. "pivot" = point de pliage/rotation de l'os. "color" = couleur hex unie de la boîte. Le sol est à y=0. L'avant de la créature regarde vers -Z (la tête doit être en -Z).
+IMPORTANT — mets un "role" sur chaque os pour activer les animations automatiques (marche, vol). Rôles possibles : "body", "head", "armL", "armR", "legL", "legR", "legFL", "legFR", "legBL", "legBR" (patte avant/arrière gauche/droite), "wingL", "wingR" (ailes), "tail". Utilise plusieurs os et plusieurs boîtes pour du détail. Imagine maintenant cette créature : `;
   navigator.clipboard?.writeText(prompt).then(
     ()=>toast('✓ Prompt copié — colle-le dans Claude ou ChatGPT'),
     ()=>{ prompt && window.prompt('Copie ce texte :', prompt); }
@@ -2210,16 +2571,17 @@ function importCreatureJSON(data){
   let cr=null;
   if(data && data.bones && Array.isArray(data.bones)){
     // format "Bedrock Studio" (issu d'une IA)
+    const bones=data.bones.map(b=>({ name:b.name||'bone', parent:b.parent||null, pivot:b.pivot||[0,0,0], rotation:b.rotation||[0,0,0], role:b.role||null,
+        cubes:(b.cubes||[]).map((cu,i)=>cube(cu.origin||[0,0,0], cu.size||[4,4,4], cu.color||CR_COLORS[i%CR_COLORS.length], {inflate:cu.inflate||0})) }));
     cr={ id:'cr_'+Date.now(), name:data.name||'Importée', namespace:data.namespace||'monaddon',
       entityId:data.entityId||'creature_import', hostile:!!data.hostile, health:data.health||20, scale:data.scale||1,
-      bones:data.bones.map(b=>({ name:b.name||'bone', parent:b.parent||null, pivot:b.pivot||[0,0,0], rotation:b.rotation||[0,0,0],
-        cubes:(b.cubes||[]).map((cu,i)=>cube(cu.origin||[0,0,0], cu.size||[4,4,4], cu.color||CR_COLORS[i%CR_COLORS.length], {inflate:cu.inflate||0})) })) };
+      bones, animations: Array.isArray(data.animations)&&data.animations.length ? data.animations : defaultAnimations(bones) };
   } else if(data && data['minecraft:geometry']){
     // format géométrie Bedrock natif (.geo.json) — couleurs auto
     const g=data['minecraft:geometry'][0];
-    cr={ id:'cr_'+Date.now(), name:'Importée', namespace:'monaddon', entityId:(g.description?.identifier||'geometry.import').replace('geometry.',''), hostile:false, health:20, scale:1,
-      bones:(g.bones||[]).map((b,bi)=>({ name:b.name||('bone'+bi), parent:b.parent||null, pivot:b.pivot||[0,0,0], rotation:b.rotation||[0,0,0],
-        cubes:(b.cubes||[]).map((cu,i)=>cube(cu.origin||[0,0,0], cu.size||[1,1,1], CR_COLORS[(bi+i)%CR_COLORS.length], {inflate:cu.inflate||0})) })) };
+    const bones=(g.bones||[]).map((b,bi)=>({ name:b.name||('bone'+bi), parent:b.parent||null, pivot:b.pivot||[0,0,0], rotation:b.rotation||[0,0,0], role:null,
+        cubes:(b.cubes||[]).map((cu,i)=>cube(cu.origin||[0,0,0], cu.size||[1,1,1], CR_COLORS[(bi+i)%CR_COLORS.length], {inflate:cu.inflate||0})) }));
+    cr={ id:'cr_'+Date.now(), name:'Importée', namespace:'monaddon', entityId:(g.description?.identifier||'geometry.import').replace('geometry.',''), hostile:false, health:20, scale:1, bones, animations:defaultAnimations(bones) };
   }
   if(!cr){ toast('⚠ Format non reconnu'); return; }
   creatures.push(cr);
@@ -2229,10 +2591,33 @@ function importCreatureJSON(data){
 }
 
 // ── INIT ─────────────────────────────────────────────────
-helpContent.aiBridge = { title:'🤖 Travailler avec Claude / ChatGPT', body:`
-  <p>Le prompt vient d'être copié. <strong>Colle-le dans Claude ou ChatGPT</strong>, puis décris la créature que tu veux (ex: « un dragon rouge à deux têtes »).</p>
-  <p>L'IA te renverra un <code>JSON</code>. Enregistre-le dans un fichier <code>.json</code> et importe-le ici avec <strong>« Importer un .geo.json »</strong> — ta créature apparaît en 3D, prête à exporter pour Minecraft.</p>
-  <p>Tu peux aussi importer n'importe quel modèle <code>.geo.json</code> Bedrock (ex: fait sur Blockbench).</p>` };
+Object.assign(helpContent, {
+  aiBridge:{ title:'🤖 Travailler avec Claude / ChatGPT', body:`
+    <p>Le prompt vient d'être copié. <strong>Colle-le dans Claude ou ChatGPT</strong>, puis décris la créature voulue (ex : « un dragon rouge à deux têtes »).</p>
+    <p>L'IA renvoie un <code>JSON</code>. Enregistre-le en fichier <code>.json</code> et importe-le ici via <strong>« Importer un .geo.json »</strong> — ta créature apparaît en 3D, animée et prête à exporter.</p>
+    <p>Tu peux aussi importer n'importe quel modèle <code>.geo.json</code> Bedrock (ex : fait sur Blockbench).</p>` },
+  crGuide:{ title:'📖 Comment créer une créature animée', body:`
+    <p><strong>1. Choisis un modèle de départ</strong> (humanoïde, araignée, dragon…) en haut à gauche. Tu n'es jamais devant une page blanche.</p>
+    <p><strong>2. Mode 🧱 Construire</strong> : clique une partie du corps (dans la 3D ou la liste) et change sa taille, sa position, sa couleur. Ajoute des boîtes pour les détails, ou des parties entières (corne, aile…). Le bouton 🪞 <strong>Miroir</strong> crée la partie symétrique automatiquement.</p>
+    <p><strong>3. Mode 🎬 Animer</strong> : clique « Marche », « Repos » ou « Battement d'ailes » → l'animation est générée toute seule. Appuie sur ▶ pour la voir. Pour affiner, déplace le curseur de temps et change la rotation d'une partie : ça crée une <strong>image-clé</strong>.</p>
+    <p><strong>4. Exporte</strong> → 2 fichiers <code>.mcpack</code>. Installe-les, puis en jeu : <code>/summon monaddon:ton_id</code>. La créature bouge exactement comme dans l'aperçu.</p>` },
+  crBuild:{ title:'🧱 Mode Construire', body:`
+    <p>Une créature Bedrock est faite de <strong>boîtes</strong> regroupées en <strong>os</strong> (parties du corps). C'est exactement le format de Minecraft : ce que tu vois ici = ce que tu verras en jeu.</p>
+    <p>Clique une partie pour l'éditer. <code>Position</code> et <code>Taille</code> sont en pixels (16 px = 1 bloc).</p>` },
+  crAnimate:{ title:'🎬 Mode Animer', body:`
+    <p>Le plus simple : les boutons d'<strong>animation auto</strong> à gauche. Ils utilisent le « rôle » de chaque os (jambe, aile…) pour créer un mouvement crédible.</p>
+    <p>▶ joue l'animation. Le curseur de temps (en bas) permet de te placer à un instant précis. Change alors la rotation d'une partie : une <strong>image-clé</strong> (point doré) apparaît. Le jeu fait la transition douce entre les images-clés.</p>
+    <p>En jeu : <strong>idle</strong> (repos) et le <strong>battement d'ailes</strong> jouent en boucle ; <strong>walk</strong> (marche) se déclenche dès que la créature bouge.</p>` },
+  crPresets:{ title:'🐾 Modèles de départ', body:`<p>Des squelettes prêts à l'emploi : humanoïde, araignée à 8 pattes, dragon ailé, boss golem, oiseau, serpent, slime… Pars de l'un d'eux puis modifie-le. Chaque partie a déjà un « rôle » → les animations marchent immédiatement.</p>` },
+  crParts:{ title:'🦴 Parties du corps (os)', body:`<p>Chaque <strong>os</strong> est une partie qui peut bouger indépendamment (tête, bras, aile…). Un os contient une ou plusieurs <strong>boîtes</strong>. En animation, on fait pivoter les os, pas les boîtes.</p>` },
+  crCube:{ title:'📦 Boîte', body:`<p><strong>Position</strong> = le coin le plus bas de la boîte (x = gauche/droite, y = hauteur, z = avant/arrière). <strong>Taille</strong> = largeur × hauteur × profondeur, en pixels. Empile plusieurs boîtes pour sculpter une forme.</p>` },
+  crInflate:{ title:'➕ Marge (inflate)', body:`<p>Agrandit la boîte de façon uniforme dans toutes les directions, sans bouger son centre. Pratique pour une couche par-dessus une autre (fourrure, armure) sans qu'elles se chevauchent exactement.</p>` },
+  crBone:{ title:'🦴 Os', body:`<p>Le <strong>pivot</strong> est le point autour duquel l'os tourne (l'articulation). Pour un bras, mets le pivot à l'épaule. La <strong>rotation de base</strong> incline l'os au repos.</p>` },
+  crRole:{ title:"🏷 Rôle de l'os", body:`<p>Le rôle indique à quoi sert la partie (jambe gauche, aile droite…). Les <strong>animations automatiques</strong> s'en servent : « Marche » fait avancer les os « jambe », « Battement » fait bouger les os « aile ». Sans rôle, une partie reste immobile pendant les animations auto (tu peux quand même l'animer à la main).</p>` },
+  crParent:{ title:'🔗 Rattachement (parent)', body:`<p>Rattacher un os à un autre fait qu'il <strong>suit</strong> son parent. La tête rattachée au corps bougera avec le corps. Une main rattachée au bras suit le bras. Laisse « racine » pour le corps principal.</p>` },
+  crKeyframe:{ title:'🔑 Images-clés', body:`<p>Une <strong>image-clé</strong> enregistre la pose d'une partie à un instant. Avec 2 poses différentes à 2 instants, le jeu crée le mouvement entre les deux. Ex : jambe en avant à 0,2 s, en arrière à 0,6 s → elle marche.</p><p>Place le curseur de temps, change la rotation → image-clé créée (point doré sur la piste).</p>` },
+  crEntity:{ title:'🐲 Réglages de la créature', body:`<p><strong>Vie</strong> = points de vie. <strong>Taille ×</strong> agrandit/réduit toute la créature en jeu. <strong>Comportement</strong> : passive (fuit) ou hostile (attaque les joueurs).</p>` }
+});
 
 renderSidebar();
 renderEffects();
