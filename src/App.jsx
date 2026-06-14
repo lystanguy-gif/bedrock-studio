@@ -787,6 +787,7 @@ function Live({ lobby, session, onHome }) {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStreams, setRemoteStreams] = useState({}); // cléPair -> MediaStream
   const [peerUid, setPeerUid] = useState({}); // cléPair -> identifiant de compte
+  const [pubByUid, setPubByUid] = useState({}); // identifiant de compte -> camp diffusé (0/1)
   const [lightbox, setLightbox] = useState(null);
   const [comments, setComments] = useState([]);
   const [draft, setDraft] = useState("");
@@ -808,6 +809,8 @@ function Live({ lobby, session, onHome }) {
   const localStreamRef = useRef(null), meshRef = useRef(null);
   const remainingRef = useRef(remaining), seenMsgRef = useRef(new Set());
   const presenceKeyRef = useRef("p" + Math.random().toString(36).slice(2));
+  const presRef = useRef(null); // canal de présence (pour réannoncer le camp diffusé)
+  const myAtRef = useRef(Date.now()); // horodatage d'arrivée stable (rang dans le salon)
 
   const clockRunningRef = useRef(clockRunning);
   useEffect(() => { floorRef.current = floor; }, [floor]);
@@ -902,12 +905,13 @@ function Live({ lobby, session, onHome }) {
         const state = pres.presenceState();
         const keys = Object.keys(state);
         setSpectators(keys.length || 1);
-        // Identifiants des comptes présents (pour le cycle de vie du débat) et
-        // correspondance clé-de-présence -> compte (pour relier flux vidéo et siège).
-        const ids = new Set(); const uidByKey = {};
-        keys.forEach((k) => { const u = state[k][0] && state[k][0].uid; if (u) { ids.add(u); uidByKey[k] = u; } });
+        // Identifiants des comptes présents (cycle de vie), correspondance
+        // clé-de-présence -> compte, et camp diffusé par chacun (pour la vidéo).
+        const ids = new Set(); const uidByKey = {}; const pubBy = {};
+        keys.forEach((k) => { const s0 = state[k][0]; const u = s0 && s0.uid; if (u) { ids.add(u); uidByKey[k] = u; if (s0.pub === 0 || s0.pub === 1) pubBy[u] = s0.pub; } });
         setPresentIds(ids);
         setPeerUid(uidByKey);
+        setPubByUid(pubBy);
         if (meshRef.current) meshRef.current.setPeers(keys); // met à jour le réseau vidéo
         setPresenceReady(true);
         // Rang d'arrivée du client courant (pour ne bloquer que les places au-delà de la limite).
@@ -915,7 +919,8 @@ function Live({ lobby, session, onHome }) {
         const rank = order.findIndex((x) => x.k === presenceKeyRef.current) + 1;
         setRoomRank(rank || keys.length);
       })
-      .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, uid: myUserId, at: Date.now() }); });
+      .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, uid: myUserId, at: myAtRef.current, pub: null }); });
+    presRef.current = pres;
 
     // Spectateur : rattrapage de l'état 3,5 s après l'abonnement (au cas où un
     // changement aurait eu lieu pendant le démarrage de l'écoute temps réel).
@@ -929,9 +934,17 @@ function Live({ lobby, session, onHome }) {
       });
     }, 3500);
 
-    return () => { clearTimeout(resync); supabase.removeChannel(ch); supabase.removeChannel(pres); };
+    return () => { clearTimeout(resync); presRef.current = null; supabase.removeChannel(ch); supabase.removeChannel(pres); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel.id]);
+  // Réannonce, via la présence, le camp dans lequel je diffuse (ou rien) : ainsi
+  // tout le monde sait où afficher ma vidéo, indépendamment des sièges.
+  useEffect(() => {
+    if (presRef.current && presenceReady) {
+      try { presRef.current.track({ pseudo, uid: myUserId, at: myAtRef.current, pub: publishing ? pubCamp : null }); } catch (e) {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publishing, pubCamp, presenceReady]);
   useEffect(() => { busyRef.current = analyzing; }, [analyzing]);
   useEffect(() => { joinedRef.current = segments.map((s) => s.text).join(" "); }, [segments]);
 
@@ -1150,7 +1163,15 @@ Rien à vérifier -> []. sources peut être vide.`;
       const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
       localStreamRef.current = s; setLocalStream(s); setPublishing(true); setPubCamp(i);
       if (meshRef.current) meshRef.current.setLocalStream(s);
-    } catch (e) { setMicError("Caméra/micro bloqués dans l'aperçu intégré. Ouvre la maquette dans son onglet, et autorise l'accès."); }
+    } catch (e) {
+      const n = e && e.name;
+      setMicError(
+        n === "NotAllowedError" ? "Accès caméra/micro refusé. Clique sur l'icône caméra (ou le cadenas) dans la barre d'adresse pour autoriser, puis réessaie."
+        : n === "NotFoundError" ? "Aucune caméra ou micro détecté sur cet appareil."
+        : n === "NotReadableError" ? "Caméra/micro déjà utilisés par une autre application. Ferme-la et réessaie."
+        : "Impossible d'accéder à la caméra/au micro. Vérifie les autorisations du navigateur, puis réessaie."
+      );
+    }
   }
   useEffect(() => () => { wantRef.current = false; try { recRef.current && recRef.current.stop(); } catch (e) {} if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop()); }, []);
 
@@ -1170,13 +1191,19 @@ Rien à vérifier -> []. sources peut être vide.`;
   }
 
   // Flux distants rangés par compte (pour les afficher dans le bon siège).
-  const remoteByUid = {};
-  Object.entries(remoteStreams).forEach(([key, stream]) => { const u = peerUid[key]; if (u) remoteByUid[u] = stream; });
+  // Vidéos par camp, d'après QUI diffuse (annoncé via la présence), pas le siège :
+  // ainsi un hôte qui parle sans siège est visible par tout le monde.
+  const videosByCamp = { 0: [], 1: [] };
+  if (publishing && (pubCamp === 0 || pubCamp === 1) && localStream) videosByCamp[pubCamp].push({ key: "me", stream: localStream, me: true });
+  Object.entries(remoteStreams).forEach(([key, stream]) => {
+    const uid = peerUid[key]; const camp = pubByUid[uid];
+    if (camp === 0 || camp === 1) videosByCamp[camp].push({ key, stream, me: false });
+  });
 
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
   // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
   // l'état nécessaire en props.
-  const campProps = { floor, clockRunning, remaining, cfg, publishing, pubCamp, localStream, remoteByUid, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController: iAmController, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
+  const campProps = { floor, clockRunning, remaining, cfg, publishing, pubCamp, videosByCamp, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController: iAmController, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
 
   const bannerStatus = floor === null ? "Le modérateur lance le débat"
     : clockRunning ? "au temps de parole"
@@ -1408,24 +1435,15 @@ function VideoTile({ stream, muted, mirror }) {
 /* --------------------------- CAMP (stable) --------------------------- */
 // Défini au niveau module pour conserver son identité entre les rendus :
 // ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
-function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, localStream, remoteByUid, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
+function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, videosByCamp, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
   const has = i === floor, started = floor !== null;
   const occ = (seats && seats[String(i)]) || [];
   const canSpeak = canSpeakCamp(i);
   const max = cfg.maxPerCamp || 1;
   const canClaim = loggedIn && mySeat == null && occ.length < max;
   const iPublishHere = publishing && pubCamp === i;
-  // Une vignette vidéo par siège : mon flux local si c'est moi, sinon le flux
-  // distant du débatteur assis là. Plus une prévisualisation pour l'hôte qui
-  // teste en solo dans un camp vide.
-  const videoSlots = [];
-  for (let s = 0; s < max; s++) {
-    const uid = occ[s];
-    if (uid && uid === myUserId) videoSlots.push({ key: "me", stream: localStream, me: true });
-    else if (uid) videoSlots.push({ key: uid, stream: remoteByUid[uid] || null, me: false });
-    else videoSlots.push({ key: "empty" + s, stream: null, me: false });
-  }
-  if (mySeat == null && iPublishHere && occ.length === 0) videoSlots[0] = { key: "me", stream: localStream, me: true };
+  // Vidéos diffusées dans ce camp (mon flux + les flux distants), d'après la présence.
+  const videos = (videosByCamp && videosByCamp[i]) || [];
   return (
     <div className="flex flex-col gap-2.5" style={{ background: has ? C.panel2 : C.panel, border: "1px solid " + (has ? C.gold : C.line), borderRadius: 18, padding: 14, boxShadow: has ? "0 16px 44px -26px " + C.gold : "none", transition: "border-color .15s,box-shadow .15s" }}>
       <div className="flex items-center justify-between">
@@ -1460,9 +1478,13 @@ function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, loc
       </div>
 
       <div className="flex gap-2">
-        {videoSlots.map((v) => (
+        {videos.length === 0 ? (
+          <div className="overflow-hidden flex items-center justify-center" style={{ flex: 1, background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
+            <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>
+          </div>
+        ) : videos.map((v) => (
           <div key={v.key} className="overflow-hidden flex items-center justify-center" style={{ flex: 1, background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
-            {v.stream ? <VideoTile stream={v.stream} muted={v.me} mirror={v.me} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
+            <VideoTile stream={v.stream} muted={v.me} mirror={v.me} />
           </div>
         ))}
       </div>
