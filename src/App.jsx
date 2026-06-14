@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -519,7 +519,15 @@ function TrophyGallery({ session, onHome }) {
 /* ----------------------------- L'AGORA ----------------------------- */
 function Agora({ onHome, onOpenPanel }) {
   const [publics, setPublics] = useState(null);
-  useEffect(() => { listPublicPanels().then(({ panels }) => setPublics(panels || [])); }, []);
+  const [creators, setCreators] = useState({});
+  const [viewedProfile, setViewedProfile] = useState(null);
+  useEffect(() => {
+    listPublicPanels().then(async ({ panels }) => {
+      setPublics(panels || []);
+      const { profiles } = await getProfiles((panels || []).map((p) => p.owner_id));
+      setCreators(profiles || {});
+    });
+  }, []);
   const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
   return (
     <>
@@ -527,7 +535,7 @@ function Agora({ onHome, onOpenPanel }) {
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
         <Kicker>L'Agora</Kicker>
         <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 10px", fontWeight: 700 }}>Débats publics</h1>
-        <p style={{ color: C.mute, fontSize: 14, marginBottom: 8 }}>Choisis un débat en cours et rejoins-le. <span style={{ color: "#6f6b63" }}>(Filtres par sujet et par pays, et cartes détaillées à venir.)</span></p>
+        <p style={{ color: C.mute, fontSize: 14, marginBottom: 8 }}>Choisis un débat en cours et rejoins-le. <span style={{ color: "#6f6b63" }}>(Filtres par sujet et par pays à venir.)</span></p>
         {publics === null ? (
           <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Chargement…</p>
         ) : publics.length === 0 ? (
@@ -536,8 +544,15 @@ function Agora({ onHome, onOpenPanel }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ marginTop: 16 }}>
             {publics.map((p) => {
               const camps = (p.camps && p.camps.length >= 2) ? p.camps : ["Pour", "Contre"];
+              const c = creators[p.owner_id];
               return (
-                <button key={p.id} onClick={() => onOpenPanel(p)} className="text-left" style={{ ...cardStyle, padding: 16, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}>
+                <div key={p.id} style={{ ...cardStyle, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div className="flex items-center gap-2">
+                    <span onClick={() => c && setViewedProfile(c.id)} style={{ width: 34, height: 34, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.gold, display: "inline-block", flexShrink: 0, cursor: c ? "pointer" : "default" }}>
+                      {c && c.avatar ? <img src={"/avatars/" + c.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 12 }}>—</span>}
+                    </span>
+                    <span style={{ fontSize: 12, color: "#6f6b63" }}>par <span onClick={() => c && setViewedProfile(c.id)} style={{ color: C.gold, fontWeight: 600, cursor: c ? "pointer" : "default" }}>{c ? c.pseudo : "un membre"}</span></span>
+                  </div>
                   <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || "Débat"}</div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2" style={{ fontSize: 13 }}>
@@ -545,14 +560,15 @@ function Agora({ onHome, onOpenPanel }) {
                       <span style={{ color: C.mute }}>vs</span>
                       <span style={{ color: CAMP[1] }}>●</span> {camps[1]}
                     </div>
-                    <span className="inline-flex items-center gap-1 uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.08em" }}>Rejoindre <ArrowRight size={13} /></span>
+                    <button onClick={() => onOpenPanel(p)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "7px 16px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 11, cursor: "pointer" }}>Rejoindre <ArrowRight size={13} /></button>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
         )}
       </div>
+      {viewedProfile && <ProfileModal id={viewedProfile} onClose={() => setViewedProfile(null)} />}
       <Footer />
     </>
   );

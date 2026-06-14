@@ -71,6 +71,14 @@ export async function getProfile(id) {
   if (error) return { error: error.message }
   return { profile: data }
 }
+export async function getProfiles(ids) {
+  const list = [...new Set((ids || []).filter(Boolean))]
+  if (!list.length) return { profiles: {} }
+  const { data, error } = await supabase.from('profiles').select('*').in('id', list)
+  if (error) return { error: error.message, profiles: {} }
+  const map = {}; (data || []).forEach((p) => { map[p.id] = p })
+  return { profiles: map }
+}
 
 // Liste les débats publics (pour L'Agora), les plus récents d'abord.
 export async function listPublicPanels(limit = 24) {
