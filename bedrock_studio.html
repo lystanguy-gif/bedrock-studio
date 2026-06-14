@@ -371,6 +371,23 @@ textarea{resize:vertical;min-height:70px}
 .cr-kf-dot{position:absolute;top:3px;width:14px;height:14px;background:var(--gold);border:1px solid #0a0c12;border-radius:50%;transform:translateX(-50%);cursor:pointer}
 .cr-kf-dot:hover{background:var(--gold2);box-shadow:0 0 6px var(--gold)}
 .cr-playhead{position:absolute;top:-2px;width:2px;height:26px;background:var(--blue);transform:translateX(-50%);pointer-events:none}
+/* paint */
+#paintCanvas{image-rendering:pixelated;cursor:crosshair;border:1px solid var(--border);background:#0d1018;display:block;margin:0 auto;max-width:100%}
+.cr-pal{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:8px}
+.cr-sw{width:20px;height:20px;cursor:pointer;border:2px solid transparent}
+.cr-sw.active{border-color:#fff;box-shadow:0 0 6px rgba(255,255,255,.5)}
+.cr-tools{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+/* modale formulaire */
+#modal .mform .row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+#modal .mform .field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px}
+#modal .mform label{font-size:11px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+#modal .mform .seclbl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold);margin:14px 0 8px;border-top:1px solid var(--border);padding-top:10px}
+#modal .mform .trow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)}
+#modal .mform .mhint{font-size:11px;color:var(--muted);line-height:1.5;margin:2px 0 8px}
+.snd-slot{display:flex;align-items:center;gap:8px;padding:7px;border:1px solid var(--border);margin-bottom:6px;background:var(--bg1)}
+.snd-slot .sn{flex:1;font-size:12px}
+.snd-slot .sok{color:var(--green);font-size:11px}
+.snd-slot button{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:4px 8px;cursor:pointer;font-size:11px}
 
 /* Animations page load */
 .card{animation:fadeIn .3s ease both}
@@ -550,10 +567,13 @@ textarea{resize:vertical;min-height:70px}
     <div class="cr-topbar">
       <div class="cr-modeswitch">
         <button id="mode-build" class="active" onclick="setCrMode('build')">🧱 Construire</button>
+        <button id="mode-paint" onclick="setCrMode('paint')">🎨 Peindre</button>
         <button id="mode-animate" onclick="setCrMode('animate')">🎬 Animer</button>
       </div>
       <span class="cr-tip" id="cr-topbar-tip">Empile des boîtes pour créer ta créature. <span class="qm" onclick="openHelp('crBuild')">?</span></span>
-      <button class="btn-export-all" style="margin-left:auto" onclick="openHelp('crGuide')">📖 Comment ça marche</button>
+      <button class="cr-btn" style="width:auto;padding:7px 12px" onclick="openCombatEditor()">⚔ Combat &amp; IA</button>
+      <button class="cr-btn" style="width:auto;padding:7px 12px" onclick="openAudioEditor()">🔊 Sons</button>
+      <button class="btn-export-all" onclick="openHelp('crGuide')">📖 Aide</button>
     </div>
     <div class="cr-main">
       <div class="cr-tree" id="creature-tree">
@@ -768,6 +788,7 @@ function openHelp(key) {
 }
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('show');
+  if(currentCreature && document.getElementById('page-creature').classList.contains('active')) renderCreatureProps();
 }
 
 // ════════════════════════════════════════════════════════
@@ -1801,8 +1822,22 @@ function newCreature(preset){
     name:(def.label||'Créature')+' '+n, namespace:'monaddon', entityId:'creature_'+n,
     hostile:false, health:20, scale:1,
     bones,
-    animations: defaultAnimations(bones)
+    animations: defaultAnimations(bones),
+    combat: defaultCombat(),
+    sounds: {}
   };
+}
+function defaultCombat(){
+  return {
+    mode:'passive', attackStyle:'melee', damage:3, attackRange:12, moveSpeed:0.25,
+    knockbackResist:0, fireImmune:false,
+    boss:{ bar:true, enrageAt:0.5, summonOn:false, summonEntity:'minecraft:zombie', summonCount:3, summonInterval:14 },
+    abilities:{ explodeOnDeath:false, explodePower:3, fireBreath:false, teleport:false, leap:false }
+  };
+}
+function ensureCreatureExtras(c){
+  if(!c.combat){ c.combat=defaultCombat(); c.combat.mode = c.hostile?'hostile':'passive'; }
+  if(!c.sounds) c.sounds={};
 }
 
 // ── État de l'éditeur 3D ─────────────────────────────────
@@ -1824,7 +1859,7 @@ function addCreature(preset){
 function selectCreature(id){
   currentCreature = creatures.find(c=>c.id===id);
   crSel = null; crAnimIndex=0; crTime=0; crPlaying=false;
-  if(currentCreature && !currentCreature.animations) currentCreature.animations = defaultAnimations(currentCreature.bones);
+  if(currentCreature){ if(!currentCreature.animations) currentCreature.animations = defaultAnimations(currentCreature.bones); ensureCreatureExtras(currentCreature); }
   renderSidebar();
   ensureThree();
   rebuildCreatureMesh();
@@ -1861,16 +1896,16 @@ function renderCreatureTree(){
         <span class="cr-caret">▸</span><span>🦴 ${b.name}</span>${roleBadge}
         ${crMode==='build'?`<span class="cr-del" onclick="event.stopPropagation();deleteBone(${bi})">✕</span>`:''}
       </div>`;
-    if(crMode==='build'){
+    if(crMode!=='animate'){
       b.cubes.forEach((cu,ci)=>{
         const csel = crSel && crSel.bone===bi && crSel.cube===ci ? ' sel':'';
         parts += `<div class="cr-cube${csel}" onclick="selectCube(${bi},${ci})">
           <span class="cr-swatch" style="background:${cu.color}"></span>
           <span>boîte · ${cu.size.join('×')}</span>
-          <span class="cr-del" onclick="event.stopPropagation();deleteCube(${bi},${ci})">✕</span>
+          ${crMode==='build'?`<span class="cr-del" onclick="event.stopPropagation();deleteCube(${bi},${ci})">✕</span>`:''}
         </div>`;
       });
-      parts += `<div class="cr-cube" style="color:var(--muted)" onclick="addCube(${bi})">＋ ajouter une boîte</div>`;
+      if(crMode==='build') parts += `<div class="cr-cube" style="color:var(--muted)" onclick="addCube(${bi})">＋ ajouter une boîte</div>`;
     }
     parts += `</div>`;
   });
@@ -1943,16 +1978,20 @@ function renderCreatureProps(){
       <div class="field"><label>❤ Vie</label><input type="number" min="1" value="${c.health}" oninput="currentCreature.health=+this.value"></div>
       <div class="field"><label>Taille ×</label><input type="number" min="0.1" step="0.1" value="${c.scale}" oninput="currentCreature.scale=+this.value"></div>
     </div>
-    <div class="field" style="margin-top:6px"><label>Comportement</label>
-      <select onchange="currentCreature.hostile=(this.value==='1')" style="padding:5px 6px;font-size:12px">
-        <option value="0" ${!c.hostile?'selected':''}>Passif (fuit)</option>
-        <option value="1" ${c.hostile?'selected':''}>Hostile (attaque)</option>
+    <div class="field" style="margin-top:6px"><label>Comportement <span class="qm" onclick="openCombatEditor()">⚔</span></label>
+      <select onchange="setCombatMode(this.value)" style="padding:5px 6px;font-size:12px">
+        <option value="passive" ${c.combat.mode==='passive'?'selected':''}>Passif (fuit)</option>
+        <option value="neutral" ${c.combat.mode==='neutral'?'selected':''}>Neutre (riposte)</option>
+        <option value="hostile" ${c.combat.mode==='hostile'?'selected':''}>Hostile (attaque)</option>
+        <option value="boss" ${c.combat.mode==='boss'?'selected':''}>BOSS</option>
       </select></div>
     <hr style="border:none;border-top:1px solid var(--border);margin:8px 0">
   `;
 
   if(crMode==='animate'){
     html += renderAnimProps(c);
+  } else if(crMode==='paint'){
+    html += renderPaintProps(c);
   } else if(crSel && crSel.cube!==undefined){
     const cu = c.bones[crSel.bone].cubes[crSel.cube];
     html += `<div class="cr-section-lbl" style="color:var(--blue)">📦 Boîte · os « ${c.bones[crSel.bone].name} » <span class="qm" onclick="openHelp('crCube')">?</span></div>`;
@@ -1983,6 +2022,7 @@ function renderCreatureProps(){
     <div class="status-msg" id="creature-status">Prêt</div>
   </div>`;
   el.innerHTML = html;
+  if(crMode==='paint' && crSel && crSel.cube!==undefined) initPaintCanvas();
 }
 
 // setters
@@ -2020,6 +2060,65 @@ function mirrorBone(){
   crSel={bone:currentCreature.bones.length-1};
   rebuildCreatureMesh(); renderCreatureTree(); renderCreatureProps(); highlightSelection();
   toast('🪞 Partie symétrique créée');
+}
+
+// ════════════════════════════════════════════════════════
+//  TEXTURES  (peinture par face — patron "croix" Bedrock)
+// ════════════════════════════════════════════════════════
+function crDims(cu){ const W=Math.max(1,Math.ceil(cu.size[0])), H=Math.max(1,Math.ceil(cu.size[1])), D=Math.max(1,Math.ceil(cu.size[2])); return {W,H,D, fw:2*D+2*W, fh:D+H}; }
+function resampleGrid(old, ow, oh, nw, nh){
+  const g=Array.from({length:nh},()=>Array(nw).fill(null));
+  for(let r=0;r<nh;r++)for(let c=0;c<nw;c++){ const sr=Math.floor(r*oh/nh), sc=Math.floor(c*ow/nw); g[r][c]=(old[sr]&&old[sr][sc])||null; }
+  return g;
+}
+function ensureCubeTex(cu){
+  const {fw,fh}=crDims(cu);
+  if(!cu.tex){ cu.tex=Array.from({length:fh},()=>Array(fw).fill(null)); cu._tw=fw; cu._th=fh; return; }
+  if(cu._tw!==fw || cu._th!==fh){ cu.tex=resampleGrid(cu.tex, cu._tw||fw, cu._th||fh, fw, fh); cu._tw=fw; cu._th=fh; }
+}
+// rectangles des 6 faces dans la croix (x,y,larg,haut) en pixels
+function faceRects(W,H,D){ return {
+  up:[D,0,W,D], down:[D+W,0,W,D],
+  west:[0,D,D,H], north:[D,D,W,H], east:[D+W,D,D,H], south:[2*D+W,D,W,H]
+};}
+function pixelAt(cu,r,c){ return (cu.tex && cu.tex[r] && cu.tex[r][c]) || cu.color; }
+function drawCubeInto(ctx, ox, oy, cu){
+  ensureCubeTex(cu); const {fw,fh}=crDims(cu);
+  for(let r=0;r<fh;r++)for(let c=0;c<fw;c++){ ctx.fillStyle=pixelAt(cu,r,c); ctx.fillRect(ox+c,oy+r,1,1); }
+}
+function getCubeCanvas(cu){
+  const {fw,fh}=crDims(cu);
+  const cv=document.createElement('canvas'); cv.width=fw; cv.height=fh;
+  drawCubeInto(cv.getContext('2d'),0,0,cu); return cv;
+}
+// géométrie cube avec UV mappées sur la croix (preview = export)
+function makeCrossBoxGeometry(w,h,d, W,H,D, fw,fh){
+  const hx=w/2, hy=h/2, hz=d/2;
+  const R=faceRects(W,H,D);
+  const pos=[], uv=[];
+  function quad(TL,TR,BR,BL, rect){
+    const [x0,y0,rw,rh]=rect;
+    const uTL=[x0/fw, 1-y0/fh], uTR=[(x0+rw)/fw,1-y0/fh], uBR=[(x0+rw)/fw,1-(y0+rh)/fh], uBL=[x0/fw,1-(y0+rh)/fh];
+    pos.push(...TL,...BL,...BR, ...TL,...BR,...TR);
+    uv.push(...uTL,...uBL,...uBR, ...uTL,...uBR,...uTR);
+  }
+  // up (+Y): row→+Z, col→+X
+  quad([-hx,hy,-hz],[hx,hy,-hz],[hx,hy,hz],[-hx,hy,hz], R.up);
+  // down (-Y)
+  quad([-hx,-hy,hz],[hx,-hy,hz],[hx,-hy,-hz],[-hx,-hy,-hz], R.down);
+  // west (-X): col→+Z, row→-Y
+  quad([-hx,hy,-hz],[-hx,hy,hz],[-hx,-hy,hz],[-hx,-hy,-hz], R.west);
+  // north (-Z front): col→+X, row→-Y
+  quad([-hx,hy,-hz],[hx,hy,-hz],[hx,-hy,-hz],[-hx,-hy,-hz], R.north);
+  // east (+X): col→-Z, row→-Y
+  quad([hx,hy,hz],[hx,hy,-hz],[hx,-hy,-hz],[hx,-hy,hz], R.east);
+  // south (+Z back): col→-X, row→-Y
+  quad([hx,hy,hz],[-hx,hy,hz],[-hx,-hy,hz],[hx,-hy,hz], R.south);
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv,2));
+  geo.computeVertexNormals();
+  return geo;
 }
 
 // ════════════════════════════════════════════════════════
@@ -2137,9 +2236,12 @@ function rebuildCreatureMesh(){
     parent.add(g);
     b.cubes.forEach((cu,ci)=>{
       const inf=cu.inflate||0;
-      const w=(cu.size[0]+2*inf)/16, h=(cu.size[1]+2*inf)/16, d=(cu.size[2]+2*inf)/16;
-      const geo=new THREE.BoxGeometry(Math.max(w,0.001),Math.max(h,0.001),Math.max(d,0.001));
-      const mat=new THREE.MeshLambertMaterial({color:cu.color});
+      const w=Math.max((cu.size[0]+2*inf)/16,0.001), h=Math.max((cu.size[1]+2*inf)/16,0.001), d=Math.max((cu.size[2]+2*inf)/16,0.001);
+      const dm=crDims(cu);
+      const geo=makeCrossBoxGeometry(w,h,d, dm.W,dm.H,dm.D, dm.fw,dm.fh);
+      const tex=new THREE.CanvasTexture(getCubeCanvas(cu));
+      tex.magFilter=THREE.NearestFilter; tex.minFilter=THREE.NearestFilter;
+      const mat=new THREE.MeshLambertMaterial({map:tex, side:THREE.DoubleSide});
       const mesh=new THREE.Mesh(geo,mat);
       mesh.position.set(
         (cu.origin[0]+cu.size[0]/2 - b.pivot[0])/16,
@@ -2172,12 +2274,14 @@ function highlightSelection(){
 // ════════════════════════════════════════════════════════
 function setCrMode(mode){
   crMode=mode; crPlaying=false; crTime=0;
-  document.getElementById('mode-build').classList.toggle('active',mode==='build');
-  document.getElementById('mode-animate').classList.toggle('active',mode==='animate');
+  ['build','paint','animate'].forEach(m=>document.getElementById('mode-'+m).classList.toggle('active',mode===m));
   document.getElementById('creature-timeline').style.display = mode==='animate'?'flex':'none';
-  document.getElementById('cr-topbar-tip').innerHTML = mode==='animate'
-    ? `Anime ta créature : choisis une animation, appuie sur ▶, ou pose des images-clés. <span class="qm" onclick="openHelp('crAnimate')">?</span>`
-    : `Empile des boîtes pour créer ta créature. <span class="qm" onclick="openHelp('crBuild')">?</span>`;
+  const tips={
+    build:`Empile des boîtes pour créer ta créature. <span class="qm" onclick="openHelp('crBuild')">?</span>`,
+    paint:`Clique une partie puis dessine ses faces case par case. <span class="qm" onclick="openHelp('crPaint')">?</span>`,
+    animate:`Choisis une animation, appuie sur ▶, ou pose des images-clés. <span class="qm" onclick="openHelp('crAnimate')">?</span>`
+  };
+  document.getElementById('cr-topbar-tip').innerHTML = tips[mode];
   renderCreatureTree(); renderCreatureProps(); renderTimeline();
   if(mode==='animate') applyAnimFrame(currentAnim(),0); else resetPose();
   resizeCreatureViewport();
@@ -2355,6 +2459,184 @@ function deleteKfHere(){
 }
 
 // ════════════════════════════════════════════════════════
+//  PEINTURE (mode 🎨)
+// ════════════════════════════════════════════════════════
+let crPaintColor='#c0392b', crPaintTool='pen', crPaintScale=8;
+function renderPaintProps(c){
+  if(!crSel || crSel.cube===undefined) return `<div class="cr-info">🎨 Clique une <b>boîte</b> de la créature (liste à gauche ou directement dans la 3D) pour peindre ses 6 faces.</div>`;
+  const cu=c.bones[crSel.bone].cubes[crSel.cube];
+  let h=`<div class="cr-section-lbl" style="color:var(--blue)">🎨 Peindre « ${c.bones[crSel.bone].name} » <span class="qm" onclick="openHelp('crPaint')">?</span></div>`;
+  h+=`<div class="cr-info">Patron déplié : <b>HAUT/BAS</b> en haut ; <b>G · FACE · D · DOS</b> en bas. FACE = l'avant (-Z).</div>`;
+  h+=`<canvas id="paintCanvas"></canvas>`;
+  h+=`<div class="cr-tools">
+    <button class="px-btn" id="pt-pen" onclick="setPaintTool('pen')">✏ Crayon</button>
+    <button class="px-btn" id="pt-fill" onclick="setPaintTool('fill')">🪣 Remplir</button>
+    <button class="px-btn" id="pt-erase" onclick="setPaintTool('erase')">◻ Gomme</button>
+    <button class="px-btn" id="pt-pick" onclick="setPaintTool('pick')">💧 Pipette</button>
+    <button class="px-btn" onclick="paintClearCube()">🗑 Tout effacer</button>
+  </div>`;
+  h+=`<div class="cr-pal" id="paint-pal"></div>`;
+  h+=`<div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:6px"><input type="color" id="paint-custom" value="${crPaintColor}" oninput="crPaintColor=this.value;renderPaintPalette()"><span style="font-size:10px;color:var(--muted)">couleur perso</span></div>`;
+  return h;
+}
+function renderPaintPalette(){
+  const el=document.getElementById('paint-pal'); if(!el) return;
+  el.innerHTML=CR_COLORS.map(col=>`<div class="cr-sw ${col===crPaintColor?'active':''}" style="background:${col}" onclick="crPaintColor='${col}';renderPaintPalette()"></div>`).join('');
+}
+function setPaintTool(t){ crPaintTool=t; ['pen','fill','erase','pick'].forEach(x=>{const b=document.getElementById('pt-'+x); if(b) b.classList.toggle('active',x===t);}); }
+function initPaintCanvas(){
+  const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube];
+  ensureCubeTex(cu);
+  const {fw,fh}=crDims(cu);
+  const cv=document.getElementById('paintCanvas'); if(!cv) return;
+  crPaintScale=Math.max(6, Math.floor(248/fw));
+  cv.width=fw*crPaintScale; cv.height=fh*crPaintScale;
+  cv.style.maxWidth='100%';
+  renderPaintPalette(); setPaintTool(crPaintTool); redrawPaint();
+  let drawing=false;
+  cv.onpointerdown=e=>{ drawing=true; cv.setPointerCapture(e.pointerId); paintCell(e); };
+  cv.onpointermove=e=>{ if(drawing) paintCell(e); };
+  cv.onpointerup=cv.onpointercancel=()=>{ if(drawing){ drawing=false; rebuildCreatureMesh(); } };
+}
+function paintCell(e){
+  const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube]; ensureCubeTex(cu);
+  const {fw,fh}=crDims(cu);
+  const cv=document.getElementById('paintCanvas'); const r=cv.getBoundingClientRect();
+  const c=Math.floor((e.clientX-r.left)/(r.width/fw)), rr=Math.floor((e.clientY-r.top)/(r.height/fh));
+  if(c<0||c>=fw||rr<0||rr>=fh) return;
+  if(crPaintTool==='pick'){ crPaintColor=pixelAt(cu,rr,c); renderPaintPalette(); return; }
+  if(crPaintTool==='erase') cu.tex[rr][c]=null;
+  else if(crPaintTool==='fill') floodCube(cu,c,rr,cu.tex[rr][c],crPaintColor);
+  else cu.tex[rr][c]=crPaintColor;
+  redrawPaint();
+}
+function floodCube(cu,c,r,target,rep){
+  if(target===rep) return; const {fw,fh}=crDims(cu); const st=[[c,r]];
+  while(st.length){ const [x,y]=st.pop(); if(x<0||x>=fw||y<0||y>=fh) continue; if((cu.tex[y][x]||null)!==(target||null)) continue; cu.tex[y][x]=rep; st.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]); }
+}
+function paintClearCube(){ const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube]; const {fw,fh}=crDims(cu); cu.tex=Array.from({length:fh},()=>Array(fw).fill(null)); cu._tw=fw; cu._th=fh; redrawPaint(); rebuildCreatureMesh(); }
+function redrawPaint(){
+  const cu=currentCreature.bones[crSel.bone].cubes[crSel.cube]; ensureCubeTex(cu);
+  const {fw,fh,W,H,D}=crDims(cu); const s=crPaintScale;
+  const cv=document.getElementById('paintCanvas'); if(!cv) return; const ctx=cv.getContext('2d');
+  for(let r=0;r<fh;r++)for(let c=0;c<fw;c++){
+    const v=cu.tex[r][c];
+    ctx.fillStyle = v? v : ((r+c)%2? '#161b24':'#11151c');
+    ctx.fillRect(c*s,r*s,s,s);
+  }
+  // contours des faces + libellés
+  const R=faceRects(W,H,D); const lbl={up:'HAUT',down:'BAS',west:'G',north:'FACE',east:'D',south:'DOS'};
+  ctx.strokeStyle='rgba(200,165,90,0.8)'; ctx.lineWidth=Math.max(1,s/6);
+  ctx.font=`${Math.max(8,s*0.85)}px Rajdhani,sans-serif`; ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  Object.keys(R).forEach(k=>{ const [x,y,w,h]=R[k]; ctx.strokeRect(x*s,y*s,w*s,h*s); ctx.fillText(lbl[k],(x+w/2)*s,(y+h/2)*s); });
+}
+
+// ════════════════════════════════════════════════════════
+//  COMBAT & IA  +  SONS  (éditeurs)
+// ════════════════════════════════════════════════════════
+function showModal(title, html){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=html;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function setCombatMode(v){ if(!currentCreature) return; currentCreature.combat.mode=v; currentCreature.hostile=(v==='hostile'||v==='boss'); renderCreatureProps(); }
+function cmb(path,val){ // set combat value by path "a.b"
+  const o=currentCreature.combat, parts=path.split('.'); let t=o;
+  for(let i=0;i<parts.length-1;i++) t=t[parts[i]];
+  t[parts[parts.length-1]]=val;
+  if(path==='mode') currentCreature.hostile=(val==='hostile'||val==='boss');
+}
+function setCmb(path, val, rerender){ cmb(path,val); if(rerender) openCombatEditor(); }
+
+function openCombatEditor(){
+  if(!currentCreature){ toast('Crée une créature d\'abord'); return; }
+  const k=currentCreature.combat;
+  const fighter = k.mode==='hostile'||k.mode==='boss'||k.mode==='neutral';
+  const aggressive = k.mode==='hostile'||k.mode==='boss';
+  let h=`<div class="mform">
+    <div class="mhint">Règle ici l'intelligence de combat de ta créature. Les boss ont une barre de vie, des phases et peuvent invoquer des sbires. <span class="qm" onclick="openHelp('crCombat')">?</span></div>
+    <div class="seclbl">Type</div>
+    <div class="row"><div class="field"><label>Comportement</label>
+      <select onchange="setCmb('mode',this.value,true)">
+        <option value="passive" ${k.mode==='passive'?'selected':''}>Passif (fuit le combat)</option>
+        <option value="neutral" ${k.mode==='neutral'?'selected':''}>Neutre (riposte si frappé)</option>
+        <option value="hostile" ${k.mode==='hostile'?'selected':''}>Hostile (attaque les joueurs)</option>
+        <option value="boss" ${k.mode==='boss'?'selected':''}>BOSS</option>
+      </select></div></div>`;
+  if(fighter){
+    h+=`<div class="seclbl">Attaque</div>
+    <div class="row">
+      <div class="field"><label>Style</label><select onchange="setCmb('attackStyle',this.value,true)">
+        <option value="melee" ${k.attackStyle==='melee'?'selected':''}>Mêlée (au corps à corps)</option>
+        <option value="ranged" ${k.attackStyle==='ranged'?'selected':''}>Distance (tire des projectiles)</option>
+        <option value="both" ${k.attackStyle==='both'?'selected':''}>Les deux</option>
+      </select></div>
+      <div class="field"><label>Dégâts</label><input type="number" min="0" value="${k.damage}" oninput="cmb('damage',+this.value)"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Vitesse déplacement</label><input type="number" step="0.05" value="${k.moveSpeed}" oninput="cmb('moveSpeed',+this.value)"></div>
+      ${k.attackStyle!=='melee'?`<div class="field"><label>Portée de tir</label><input type="number" value="${k.attackRange}" oninput="cmb('attackRange',+this.value)"></div>`:''}
+    </div>`;
+  }
+  h+=`<div class="seclbl">Résistances</div>
+    <div class="row">
+      <div class="field"><label>Résist. recul (0–1)</label><input type="number" step="0.1" min="0" max="1" value="${k.knockbackResist}" oninput="cmb('knockbackResist',+this.value)"></div>
+    </div>
+    <div class="trow"><span>🔥 Immunité au feu</span><label class="toggle"><input type="checkbox" ${k.fireImmune?'checked':''} onchange="cmb('fireImmune',this.checked)"><span class="tslider"></span></label></div>`;
+  if(k.mode==='boss'){
+    h+=`<div class="seclbl">Boss</div>
+    <div class="trow"><span>👑 Barre de vie de boss</span><label class="toggle"><input type="checkbox" ${k.boss.bar?'checked':''} onchange="cmb('boss.bar',this.checked)"><span class="tslider"></span></label></div>
+    <div class="row"><div class="field"><label>S'enrage à (% de vie)</label><input type="number" min="0" max="100" value="${Math.round(k.boss.enrageAt*100)}" oninput="cmb('boss.enrageAt',(+this.value)/100)"></div></div>
+    <div class="trow"><span>🧟 Invoque des sbires</span><label class="toggle"><input type="checkbox" ${k.boss.summonOn?'checked':''} onchange="setCmb('boss.summonOn',this.checked,true)"><span class="tslider"></span></label></div>`;
+    if(k.boss.summonOn){
+      h+=`<div class="row">
+        <div class="field"><label>Entité invoquée</label><input type="text" value="${k.boss.summonEntity}" oninput="cmb('boss.summonEntity',this.value)"></div>
+        <div class="field"><label>Nombre</label><input type="number" min="1" value="${k.boss.summonCount}" oninput="cmb('boss.summonCount',+this.value)"></div>
+        <div class="field"><label>Intervalle (s)</label><input type="number" min="1" value="${k.boss.summonInterval}" oninput="cmb('boss.summonInterval',+this.value)"></div>
+      </div>`;
+    }
+  }
+  h+=`<div class="seclbl">Capacités spéciales <span class="qm" onclick="openHelp('crAbilities')">?</span></div>
+    <div class="trow"><span>💥 Explose à la mort</span><label class="toggle"><input type="checkbox" ${k.abilities.explodeOnDeath?'checked':''} onchange="setCmb('abilities.explodeOnDeath',this.checked,true)"><span class="tslider"></span></label></div>
+    ${k.abilities.explodeOnDeath?`<div class="row"><div class="field"><label>Puissance explosion</label><input type="number" min="1" value="${k.abilities.explodePower}" oninput="cmb('abilities.explodePower',+this.value)"></div></div>`:''}
+    <div class="trow"><span>🔥 Souffle de feu (cône devant)</span><label class="toggle"><input type="checkbox" ${k.abilities.fireBreath?'checked':''} onchange="cmb('abilities.fireBreath',this.checked)"><span class="tslider"></span></label></div>
+    <div class="trow"><span>✨ Téléportation (quand frappé)</span><label class="toggle"><input type="checkbox" ${k.abilities.teleport?'checked':''} onchange="cmb('abilities.teleport',this.checked)"><span class="tslider"></span></label></div>
+    <div class="trow"><span>🦘 Bond sur la cible</span><label class="toggle"><input type="checkbox" ${k.abilities.leap?'checked':''} onchange="cmb('abilities.leap',this.checked)"><span class="tslider"></span></label></div>
+    <div class="mhint" style="margin-top:10px">💡 Les capacités spéciales et l'invocation utilisent l'API de script (active « Scripting » dans les options expérimentales du monde).</div>
+  </div>`;
+  showModal('⚔ Combat & Intelligence', h);
+}
+
+// — SONS —
+const SND_EVENTS=[['ambient','🗣 Cri ambiant (en boucle)'],['hurt','💢 Quand blessé'],['death','💀 À la mort'],['attack','⚔ À l\'attaque'],['step','👣 Pas']];
+function openAudioEditor(){
+  if(!currentCreature){ toast('Crée une créature d\'abord'); return; }
+  ensureCreatureExtras(currentCreature);
+  const s=currentCreature.sounds;
+  let h=`<div class="mform"><div class="mhint">Donne une voix à ta créature ! Choisis un fichier audio (<b>.ogg</b> recommandé, sinon .mp3/.wav) pour chaque moment. Les fichiers sont intégrés dans le pack. <span class="qm" onclick="openHelp('crAudio')">?</span></div>`;
+  SND_EVENTS.forEach(([ev,label])=>{
+    const has=s[ev];
+    h+=`<div class="snd-slot">
+      <span class="sn">${label}${has?` <span class="sok">✓ ${has.name}</span>`:''}</span>
+      ${has?`<button onclick="playSound('${ev}')">▶</button><button onclick="removeSound('${ev}')">✕</button>`:`<button onclick="document.getElementById('snd-${ev}').click()">＋ Fichier</button>`}
+      <input id="snd-${ev}" type="file" accept="audio/*" style="display:none" onchange="loadSound('${ev}',this)">
+    </div>`;
+  });
+  if(s.ambient){ h+=`<div class="row"><div class="field"><label>Intervalle cri ambiant (s)</label><input type="number" min="1" value="${currentCreature.ambientInterval||8}" oninput="currentCreature.ambientInterval=+this.value"></div></div>`; }
+  h+=`</div>`;
+  showModal('🔊 Sons de la créature', h);
+}
+function loadSound(ev, input){
+  const f=input.files[0]; if(!f) return;
+  const ext=(f.name.split('.').pop()||'ogg').toLowerCase();
+  const rd=new FileReader();
+  rd.onload=()=>{ currentCreature.sounds[ev]={ b64:rd.result.split(',')[1], ext, name:f.name, dataUrl:rd.result }; openAudioEditor(); toast('✓ Son ajouté'); };
+  rd.readAsDataURL(f);
+}
+function removeSound(ev){ delete currentCreature.sounds[ev]; openAudioEditor(); }
+function playSound(ev){ const s=currentCreature.sounds[ev]; if(s){ try{ new Audio(s.dataUrl).play(); }catch(e){} } }
+
+// ════════════════════════════════════════════════════════
 //  EXPORT CRÉATURE  (géométrie + texture + entité jouable)
 // ════════════════════════════════════════════════════════
 function packUVs(c){
@@ -2378,7 +2660,7 @@ function packUVs(c){
 function buildTexturePng(c, atlas){
   const cv=document.createElement('canvas'); cv.width=atlas.texW; cv.height=atlas.texH;
   const ctx=cv.getContext('2d');
-  atlas.rects.forEach(r=>{ ctx.fillStyle=c.bones[r.bi].cubes[r.ci].color; ctx.fillRect(r.x,r.y,r.fw,r.fh); });
+  atlas.rects.forEach(r=>{ drawCubeInto(ctx, r.x, r.y, c.bones[r.bi].cubes[r.ci]); });
   return cv.toDataURL('image/png').split(',')[1];
 }
 
@@ -2479,43 +2761,74 @@ async function exportCreature(){
   rp.file('texts/fr_FR.lang', `entity.${full}.name=${c.name}\nitem.spawn_egg.entity.${full}.name=Apparaître ${c.name}\n`);
   rp.file('texts/en_US.lang', `entity.${full}.name=${c.name}\nitem.spawn_egg.entity.${full}.name=Spawn ${c.name}\n`);
 
+  // — sons —
+  const snd=c.sounds||{}; const sndKeys=Object.keys(snd);
+  if(sndKeys.length){
+    const defs={}, events={};
+    sndKeys.forEach(ev=>{
+      const sid=`${ns}.${id}.${ev}`, path=`sounds/custom/${id}_${ev}`;
+      rp.file(`${path}.${snd[ev].ext}`, b64toBlob(snd[ev].b64));
+      defs[sid]={category:'neutral', sounds:[path]};
+      events[ev]=sid;
+    });
+    rp.file('sounds/sound_definitions.json', JSON.stringify({format_version:'1.14.0', sound_definitions:defs},null,2));
+    rp.file('sounds.json', JSON.stringify({entity_sounds:{entities:{[id]:{volume:1.0, pitch:[0.9,1.1], events}}}},null,2));
+  }
+
   // ── BEHAVIOR PACK ──
+  const k=c.combat, aggressive=(k.mode==='hostile'||k.mode==='boss'), fighter=(k.mode!=='passive');
+  const ab=k.abilities||{}, scriptNeeded=(k.mode==='boss'&&k.boss.summonOn)||ab.explodeOnDeath||ab.fireBreath||ab.teleport||ab.leap;
   const bp=new JSZip();
+  const bpMods=[{type:'data', uuid:crypto.randomUUID(), version:[1,0,0]}];
+  const bpDeps=[{uuid:rpUuid, version:[1,0,0]}];
+  if(scriptNeeded){ bpMods.push({type:'script', language:'javascript', uuid:crypto.randomUUID(), version:[1,0,0], entry:'scripts/main.js'}); bpDeps.push({module_name:'@minecraft/server', version:'1.11.0'}); }
   bp.file('manifest.json', JSON.stringify({
     format_version:2,
-    header:{name:c.name+' - BP', description:'Comportement de '+c.name, uuid:bpUuid, version:[1,0,0], min_engine_version:[1,20,0]},
-    modules:[{type:'data', uuid:crypto.randomUUID(), version:[1,0,0]}],
-    dependencies:[{uuid:rpUuid, version:[1,0,0]}]
+    header:{name:c.name+' - BP', description:'Comportement de '+c.name, uuid:bpUuid, version:[1,0,0], min_engine_version:scriptNeeded?[1,20,10]:[1,20,0]},
+    modules:bpMods, dependencies:bpDeps
   },null,2));
+
   const comp={
-    'minecraft:type_family':{family:[id, c.hostile?'monster':'mob']},
+    'minecraft:type_family':{family:[id, aggressive?'monster':'mob']},
     'minecraft:collision_box':{width:Math.max(colW,colD), height:colH},
     'minecraft:health':{value:c.health, max:c.health},
     'minecraft:physics':{},
     'minecraft:pushable':{is_pushable:true, is_pushable_by_piston:true},
-    'minecraft:movement':{value:0.25},
+    'minecraft:movement':{value:k.moveSpeed},
     'minecraft:navigation.walk':{can_path_over_water:true, avoid_water:true},
     'minecraft:movement.basic':{},
     'minecraft:jump.static':{},
-    'minecraft:can_climb':{},
     'minecraft:behavior.float':{priority:0},
-    'minecraft:behavior.random_stroll':{priority:6, speed_multiplier:1},
-    'minecraft:behavior.look_at_player':{priority:7, look_distance:6},
-    'minecraft:behavior.random_look_around':{priority:8}
+    'minecraft:behavior.random_stroll':{priority:7, speed_multiplier:1},
+    'minecraft:behavior.look_at_player':{priority:8, look_distance:6},
+    'minecraft:behavior.random_look_around':{priority:9}
   };
   if(c.scale!==1) comp['minecraft:scale']={value:c.scale};
-  if(c.hostile){
-    comp['minecraft:attack']={damage:3};
-    comp['minecraft:behavior.melee_attack']={priority:3, speed_multiplier:1.1, track_target:true};
-    comp['minecraft:behavior.nearest_attackable_target']={priority:2, must_see:true, entity_types:[{filters:{test:'is_family', subject:'other', value:'player'}, max_dist:16}]};
-  } else {
+  if(k.knockbackResist>0) comp['minecraft:knockback_resistance']={value:k.knockbackResist};
+  if(k.fireImmune) comp['minecraft:fire_immune']={};
+  if(fighter){
+    comp['minecraft:attack']={damage:k.damage};
+    comp['minecraft:behavior.hurt_by_target']={priority:1};
+    if(k.attackStyle==='melee'||k.attackStyle==='both') comp['minecraft:behavior.melee_attack']={priority:3, speed_multiplier:1.1, track_target:true};
+    if(k.attackStyle==='ranged'||k.attackStyle==='both'){ comp['minecraft:shooter']={def:'minecraft:arrow'}; comp['minecraft:behavior.ranged_attack']={priority:3, attack_interval_min:1, attack_interval_max:2, attack_radius:k.attackRange}; }
+  }
+  if(aggressive){
+    comp['minecraft:behavior.nearest_attackable_target']={priority:2, must_see:true, reselect_targets:true, entity_types:[{filters:{test:'is_family', subject:'other', value:'player'}, max_dist:Math.max(16,k.attackRange)}]};
+  } else if(k.mode==='passive'){
     comp['minecraft:behavior.panic']={priority:1, speed_multiplier:1.25};
   }
-  bp.file(`entities/${id}.json`, JSON.stringify({
-    format_version:'1.18.0',
-    'minecraft:entity':{ description:{identifier:full, is_spawnable:true, is_summonable:true, is_experimental:false}, components:comp }
-  },null,2));
+
+  const entity={ format_version:'1.18.0', 'minecraft:entity':{ description:{identifier:full, is_spawnable:true, is_summonable:true, is_experimental:false}, components:comp } };
+  if(k.mode==='boss'){
+    if(k.boss.bar) comp['minecraft:boss']={should_darken_sky:false, hud_range:55, name:c.name};
+    const thr=Math.max(1,Math.round(c.health*k.boss.enrageAt));
+    entity['minecraft:entity'].component_groups={ enraged:{ 'minecraft:movement':{value:+(k.moveSpeed*1.4).toFixed(3)}, 'minecraft:attack':{damage:Math.round(k.damage*1.5)} } };
+    entity['minecraft:entity'].events={ become_enraged:{ add:{component_groups:['enraged']} } };
+    comp['minecraft:damage_sensor']={triggers:[{on_damage:{filters:{test:'health', operator:'<=', value:thr}, event:'become_enraged'}, deals_damage:true}]};
+  }
+  bp.file(`entities/${id}.json`, JSON.stringify(entity,null,2));
   bp.file('texts/fr_FR.lang', `entity.${full}.name=${c.name}\n`);
+  if(scriptNeeded) bp.file('scripts/main.js', buildCreatureScript(c));
 
   const rpBlob=await rp.generateAsync({type:'blob'});
   download(new File([rpBlob],`${c.name.replace(/\s+/g,'_')}_RP.mcpack`,{type:'application/octet-stream'}), `${c.name.replace(/\s+/g,'_')}_RP.mcpack`);
@@ -2524,6 +2837,37 @@ async function exportCreature(){
   download(new File([bpBlob],`${c.name.replace(/\s+/g,'_')}_BP.mcpack`,{type:'application/octet-stream'}), `${c.name.replace(/\s+/g,'_')}_BP.mcpack`);
   setStatus('creature','✓ Créature exportée ! Installe les 2 packs.','ok');
   toast('✓ Créature exportée — /summon '+full);
+}
+
+function buildCreatureScript(c){
+  const full=`${c.namespace}:${c.entityId}`, k=c.combat, ab=k.abilities||{}, boss=k.boss||{};
+  const summonOn = k.mode==='boss' && boss.summonOn;
+  const head=`import { world, system } from "@minecraft/server";
+const TYPE = "${full}";
+const DIMS = ["overworld","nether","the_end"];
+function eachSelf(cb){ for(const d of DIMS){ let dim; try{ dim=world.getDimension(d); }catch(e){ continue; } let list=[]; try{ list=dim.getEntities({ type:TYPE }); }catch(e){} for(const e of list){ try{ cb(e,dim); }catch(err){} } } }
+function nearestPlayer(e,max){ let best=null,bd=max*max; for(const p of world.getAllPlayers()){ if(p.dimension.id!==e.dimension.id) continue; const dx=p.location.x-e.location.x,dy=p.location.y-e.location.y,dz=p.location.z-e.location.z,d=dx*dx+dy*dy+dz*dz; if(d<bd){bd=d;best=p;} } return best; }
+`;
+  let body=head;
+  if(summonOn || ab.fireBreath || ab.leap){
+    let inner='';
+    if(summonOn) inner+=`
+    if(tick % ${Math.max(1,Math.round((boss.summonInterval||14)*4))} === 0 && nearestPlayer(e,28)){ for(let i=0;i<${boss.summonCount||3};i++){ try{ dim.spawnEntity("${boss.summonEntity||'minecraft:zombie'}", {x:e.location.x+(Math.random()*4-2), y:e.location.y, z:e.location.z+(Math.random()*4-2)}); }catch(err){} } }`;
+    if(ab.fireBreath) inner+=`
+    if(tick % 12 === 0){ const t=nearestPlayer(e,8); if(t){ try{ const dx=t.location.x-e.location.x, dz=t.location.z-e.location.z, len=Math.hypot(dx,dz)||1; for(let s2=1;s2<=6;s2++){ dim.spawnParticle("minecraft:basic_flame_particle",{x:e.location.x+dx/len*s2, y:e.location.y+1, z:e.location.z+dz/len*s2}); } t.applyDamage(4); t.setOnFire(4,true); }catch(err){} } }`;
+    if(ab.leap) inner+=`
+    if(tick % 8 === 0){ const t=nearestPlayer(e,10); if(t){ const dx=t.location.x-e.location.x, dz=t.location.z-e.location.z, len=Math.hypot(dx,dz); if(len>3){ try{ e.applyKnockback(dx/len, dz/len, 1.6, 0.5); }catch(err){} } } }`;
+    body+=`let tick=0;
+system.runInterval(()=>{ tick++; eachSelf((e,dim)=>{${inner}
+  }); }, 5);
+`;
+  }
+  if(ab.teleport) body+=`world.afterEvents.entityHurt.subscribe(ev=>{ const e=ev.hurtEntity; if(!e||e.typeId!==TYPE) return; const src=ev.damageSource&&ev.damageSource.damagingEntity; const base=src?src.location:e.location; try{ const a=Math.random()*6.28; e.teleport({x:base.x+Math.cos(a)*3, y:base.y, z:base.z+Math.sin(a)*3}); e.dimension.spawnParticle("minecraft:basic_smoke_particle", e.location); }catch(err){} });
+`;
+  if(ab.explodeOnDeath) body+=`world.afterEvents.entityDie.subscribe(ev=>{ const e=ev.deadEntity; if(!e||e.typeId!==TYPE) return; try{ e.dimension.createExplosion(e.location, ${ab.explodePower||3}, {breaksBlocks:false, causesFire:false}); }catch(err){} });
+`;
+  body+=`console.log("[${c.name}] script chargé ✓");\n`;
+  return body;
 }
 
 // ── PONT IA (Claude / ChatGPT) ───────────────────────────
@@ -2616,7 +2960,11 @@ Object.assign(helpContent, {
   crRole:{ title:"🏷 Rôle de l'os", body:`<p>Le rôle indique à quoi sert la partie (jambe gauche, aile droite…). Les <strong>animations automatiques</strong> s'en servent : « Marche » fait avancer les os « jambe », « Battement » fait bouger les os « aile ». Sans rôle, une partie reste immobile pendant les animations auto (tu peux quand même l'animer à la main).</p>` },
   crParent:{ title:'🔗 Rattachement (parent)', body:`<p>Rattacher un os à un autre fait qu'il <strong>suit</strong> son parent. La tête rattachée au corps bougera avec le corps. Une main rattachée au bras suit le bras. Laisse « racine » pour le corps principal.</p>` },
   crKeyframe:{ title:'🔑 Images-clés', body:`<p>Une <strong>image-clé</strong> enregistre la pose d'une partie à un instant. Avec 2 poses différentes à 2 instants, le jeu crée le mouvement entre les deux. Ex : jambe en avant à 0,2 s, en arrière à 0,6 s → elle marche.</p><p>Place le curseur de temps, change la rotation → image-clé créée (point doré sur la piste).</p>` },
-  crEntity:{ title:'🐲 Réglages de la créature', body:`<p><strong>Vie</strong> = points de vie. <strong>Taille ×</strong> agrandit/réduit toute la créature en jeu. <strong>Comportement</strong> : passive (fuit) ou hostile (attaque les joueurs).</p>` }
+  crEntity:{ title:'🐲 Réglages de la créature', body:`<p><strong>Vie</strong> = points de vie. <strong>Taille ×</strong> agrandit/réduit toute la créature en jeu. <strong>Comportement</strong> : passif, neutre, hostile ou boss (ouvre ⚔ pour tout régler).</p>` },
+  crPaint:{ title:'🎨 Peindre les textures', body:`<p>Chaque boîte est « dépliée » en patron : le carré <strong>HAUT</strong> et <strong>BAS</strong> en haut, puis les 4 côtés (<strong>G</strong> gauche, <strong>FACE</strong> avant, <strong>D</strong> droite, <strong>DOS</strong>) en bas.</p><p>Choisis une couleur, puis dessine case par case (✏), remplis une zone (🪣), gomme (◻) ou prélève une couleur (💧). Ce que tu peins ici apparaît exactement pareil sur la créature en 3D et en jeu.</p><p>Astuce : commence par une couleur de base en mode Construire, puis ajoute les détails ici (yeux, écailles, motifs).</p>` },
+  crCombat:{ title:'⚔ Combat & Intelligence', body:`<p><strong>Passif</strong> : fuit. <strong>Neutre</strong> : riposte si on l'attaque. <strong>Hostile</strong> : pourchasse les joueurs. <strong>Boss</strong> : barre de vie, phase d'enrage à bas PV, invocation de sbires.</p><p><strong>Style d'attaque</strong> : mêlée (corps à corps), distance (tire des flèches), ou les deux. <strong>Résistance au recul</strong> : 1 = ne bouge pas quand frappé.</p>` },
+  crAbilities:{ title:'✨ Capacités spéciales', body:`<p><strong>Explose à la mort</strong>, <strong>souffle de feu</strong>, <strong>téléportation</strong> quand frappé, <strong>bond</strong> sur la cible. Ces effets utilisent l'API de script : à l'installation du monde, active <strong>« Scripting / API GameTest »</strong> dans les options expérimentales.</p>` },
+  crAudio:{ title:'🔊 Sons', body:`<p>Ajoute un fichier audio par moment : cri ambiant (en boucle), blessure, mort, attaque, pas. Format <strong>.ogg</strong> recommandé (le plus compatible). Les fichiers sont inclus dans le pack de ressources et joués automatiquement par le jeu.</p>` }
 });
 
 renderSidebar();
