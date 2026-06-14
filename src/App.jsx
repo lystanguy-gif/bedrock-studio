@@ -321,6 +321,7 @@ function JoinScreen({ session, onHome, onJoined }) {
 
 /* ----------------------------- MON COMPTE ----------------------------- */
 function Settings({ session, onHome, onLegal, onTrophies }) {
+  const { t } = useLang();
   const meta = session.user.user_metadata || {};
   const [pseudo, setPseudo] = useState(meta.pseudo || pseudoOf(session));
   const [avatar, setAvatar] = useState(meta.avatar || null);
@@ -347,6 +348,7 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
     if (!error) await upsertProfile({ id: session.user.id, pseudo: meta.pseudo || pseudoOf(session), avatar: meta.avatar || null, interests });
     setBusy(false);
     if (error) setErr(traduireErreur(error.message)); else setMsg("Centres d'intérêt enregistrés.");
+    // (messages traduits à l'affichage via t())
   }
   const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const filtered = hSearch ? hashtags.filter((h) => norm(h.libelle).includes(norm(hSearch))) : hashtags;
@@ -381,19 +383,19 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
     if (error) setErr(traduireErreur(error.message)); else { setMsg("Mot de passe mis à jour."); setPwd(""); }
   }
 
-  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Accueil")}</button>;
   return (
     <>
       <Header right={back} />
       <div className="mx-auto" style={{ maxWidth: 720, padding: "48px 18px 60px" }}>
-        <Kicker>Mon compte</Kicker>
-        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 20px", fontWeight: 700 }}>Paramètres</h1>
-        {err && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{err}</div>}
-        {msg && <div style={{ color: C.green, fontSize: 13, marginBottom: 12 }}>{msg}</div>}
+        <Kicker>{t("Mon compte")}</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 20px", fontWeight: 700 }}>{t("Paramètres")}</h1>
+        {err && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{t(err)}</div>}
+        {msg && <div style={{ color: C.green, fontSize: 13, marginBottom: 12 }}>{t(msg)}</div>}
 
         <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
-          <Label>Photo de profil</Label>
-          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 12 }}>Choisis un avatar parmi notre bibliothèque.</p>
+          <Label>{t("Photo de profil")}</Label>
+          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 12 }}>{t("Choisis un avatar parmi notre bibliothèque.")}</p>
           <div className="flex flex-wrap gap-2">
             {avatars.map((a) => (
               <button key={a.id} onClick={() => chooseAvatar(a.id)} title={a.nom} style={{ width: 56, height: 56, borderRadius: "50%", overflow: "hidden", border: "2px solid " + (avatar === a.id ? C.gold : C.line), padding: 0, cursor: "pointer", background: C.field }}>
@@ -404,44 +406,44 @@ function Settings({ session, onHome, onLegal, onTrophies }) {
         </div>
 
         <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
-          <Label>Pseudo</Label>
+          <Label>{t("Pseudo")}</Label>
           <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 10 }} />
-          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 12 }}>{pseudoLocked ? "Changement possible une fois tous les 15 jours. Prochain changement : " + nextChange.toLocaleDateString("fr-FR") + "." : "Modifiable une fois tous les 15 jours."}</p>
-          <button onClick={savePseudo} disabled={busy || pseudoLocked} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: (busy || pseudoLocked) ? "default" : "pointer", opacity: (busy || pseudoLocked) ? 0.6 : 1 }}><Check size={14} /> Enregistrer le pseudo</button>
+          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 12 }}>{pseudoLocked ? t("Changement possible une fois tous les 15 jours.") + " " + nextChange.toLocaleDateString("fr-FR") : t("Modifiable une fois tous les 15 jours.")}</p>
+          <button onClick={savePseudo} disabled={busy || pseudoLocked} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: (busy || pseudoLocked) ? "default" : "pointer", opacity: (busy || pseudoLocked) ? 0.6 : 1 }}><Check size={14} /> {t("Enregistrer le pseudo")}</button>
         </div>
 
         <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
-          <Label>Changer le mot de passe</Label>
-          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} autoComplete="new-password" placeholder="Nouveau mot de passe (6 caractères min.)" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 12 }} />
-          <button onClick={savePassword} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><KeyRound size={14} /> Mettre à jour le mot de passe</button>
+          <Label>{t("Changer le mot de passe")}</Label>
+          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} autoComplete="new-password" placeholder={t("Nouveau mot de passe (6 caractères min.)")} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 12 }} />
+          <button onClick={savePassword} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><KeyRound size={14} /> {t("Mettre à jour le mot de passe")}</button>
         </div>
 
         <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
-          <Label>Centres d'intérêt ({interests.length}/12)</Label>
-          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 10 }}>Choisis jusqu'à 12 sujets qui te représentent (ils s'affichent sur ton profil).</p>
-          <input value={hSearch} onChange={(e) => setHSearch(e.target.value)} placeholder="Rechercher un sujet…" className="w-full" style={{ ...fieldStyle, padding: "9px 13px", marginBottom: 10, fontSize: 14 }} />
+          <Label>{t("Centres d'intérêt")} ({interests.length}/12)</Label>
+          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 10 }}>{t("Choisis jusqu'à 12 sujets qui te représentent (ils s'affichent sur ton profil).")}</p>
+          <input value={hSearch} onChange={(e) => setHSearch(e.target.value)} placeholder={t("Rechercher un sujet…")} className="w-full" style={{ ...fieldStyle, padding: "9px 13px", marginBottom: 10, fontSize: 14 }} />
           <div className="flex flex-wrap gap-2" style={{ maxHeight: 180, overflowY: "auto" }}>
             {filtered.slice(0, 120).map((h) => { const on = interests.includes(h.tag); return (
               <button key={h.tag} onClick={() => toggleInterest(h.tag)} style={{ fontSize: 12, color: on ? C.bg : C.gold, background: on ? C.gold : C.pill, border: "1px solid " + (on ? C.gold : C.line), borderRadius: 999, padding: "5px 11px", cursor: "pointer", fontWeight: on ? 700 : 400 }}>#{h.libelle}</button>
             ); })}
           </div>
-          <button onClick={saveInterests} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 14, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><Check size={14} /> Enregistrer mes centres d'intérêt</button>
+          <button onClick={saveInterests} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 14, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><Check size={14} /> {t("Enregistrer mes centres d'intérêt")}</button>
         </div>
 
         <button onClick={() => setShowProfile(true)} className="w-full inline-flex items-center justify-between" style={{ ...cardStyle, padding: 18, cursor: "pointer", marginBottom: 16 }}>
-          <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>Voir mon profil public</span>
+          <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>{t("Voir mon profil public")}</span>
           <ArrowRight size={16} color={C.gold} />
         </button>
 
         <button onClick={onTrophies} className="w-full inline-flex items-center justify-between" style={{ ...cardStyle, padding: 18, cursor: "pointer", marginBottom: 16 }}>
-          <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>Mes trophées</span>
+          <span className="uppercase" style={{ fontFamily: SERIF, fontSize: 14, letterSpacing: "0.06em", color: C.gold }}>{t("Mes trophées")}</span>
           <ArrowRight size={16} color={C.gold} />
         </button>
 
         <FriendsSection meId={session.user.id} onOpen={setViewedFriend} />
         {showProfile && <ProfileModal id={session.user.id} onClose={() => setShowProfile(false)} />}
         {viewedFriend && <ProfileModal id={viewedFriend} meId={session.user.id} onClose={() => setViewedFriend(null)} />}
-        <p style={{ marginTop: 6 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
+        <p style={{ marginTop: 6 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>{t("Mentions légales & conditions")}</button></p>
       </div>
       <Footer />
     </>
@@ -489,6 +491,7 @@ function Legal({ onBack }) {
 
 /* ----------------------------- TROPHÉES ----------------------------- */
 function TrophyGallery({ session, onHome }) {
+  const { t: tr } = useLang();
   const [all, setAll] = useState([]);
   const [sel, setSel] = useState(null);
   useEffect(() => { fetch("/trophees.json").then((r) => r.json()).then(setAll).catch(() => {}); }, []);
@@ -497,15 +500,15 @@ function TrophyGallery({ session, onHome }) {
   const earnedCount = all.filter((t) => earnedMap[t.id]).length;
   const firstE = earned.filter((e) => all.some((t) => t.id === e.id)).sort((a, b) => new Date(a.at) - new Date(b.at))[0];
   const firstT = firstE ? all.find((t) => t.id === firstE.id) : null;
-  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {tr("Accueil")}</button>;
   return (
     <>
       <Header right={back} />
       <div className="mx-auto" style={{ maxWidth: 1000, padding: "48px 18px 60px" }}>
-        <Kicker>Ma collection</Kicker>
-        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(30px,5vw,48px)", lineHeight: 1, margin: "10px 0 6px", fontWeight: 700 }}>Trophées</h1>
-        <p style={{ color: C.mute, fontSize: 14, marginBottom: 4 }}><strong style={{ color: C.gold }}>{earnedCount}</strong> / {all.length} débloqués</p>
-        {firstT && <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 8 }}>Premier trophée : « {firstT.nom} » le {hhmmDate(firstE.at)}</p>}
+        <Kicker>{tr("Ma collection")}</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(30px,5vw,48px)", lineHeight: 1, margin: "10px 0 6px", fontWeight: 700 }}>{tr("Trophées")}</h1>
+        <p style={{ color: C.mute, fontSize: 14, marginBottom: 4 }}><strong style={{ color: C.gold }}>{earnedCount}</strong> / {all.length} {tr("débloqués")}</p>
+        {firstT && <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 8 }}>{tr("Premier trophée :")} « {firstT.nom} » · {hhmmDate(firstE.at)}</p>}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 14, marginTop: 18 }}>
           {all.map((t) => {
             const got = !!earnedMap[t.id];
@@ -526,12 +529,12 @@ function TrophyGallery({ session, onHome }) {
               <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.12em", marginTop: 6 }}>{sel.t.categorie} · {sel.t.rarete}</div>
               <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "4px 0 8px" }}>{sel.t.nom}</h3>
               <p style={{ color: C.text, fontSize: 14, lineHeight: 1.5 }}>{sel.t.condition}</p>
-              {sel.at && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 8 }}>Débloqué le {hhmmDate(sel.at)}</p>}
+              {sel.at && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 8 }}>{tr("Débloqué le")} {hhmmDate(sel.at)}</p>}
             </>) : (<>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "10px 0 6px", color: C.mute }}>Trophée verrouillé</h3>
-              <p style={{ color: "#6f6b63", fontSize: 13, lineHeight: 1.5 }}>Débloque-le en débattant pour révéler son nom et comment l'obtenir.</p>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "10px 0 6px", color: C.mute }}>{tr("Trophée verrouillé")}</h3>
+              <p style={{ color: "#6f6b63", fontSize: 13, lineHeight: 1.5 }}>{tr("Débloque-le en débattant pour révéler son nom et comment l'obtenir.")}</p>
             </>)}
-            <button onClick={() => setSel(null)} className="pill" style={{ marginTop: 16, padding: "8px 18px", fontSize: 12 }}>Fermer</button>
+            <button onClick={() => setSel(null)} className="pill" style={{ marginTop: 16, padding: "8px 18px", fontSize: 12 }}>{tr("Fermer")}</button>
           </div>
         </div>
       )}
@@ -542,6 +545,7 @@ function TrophyGallery({ session, onHome }) {
 
 /* ----------------------------- L'AGORA ----------------------------- */
 function Agora({ session, onHome, onOpenPanel }) {
+  const { t } = useLang();
   const [publics, setPublics] = useState(null);
   const [creators, setCreators] = useState({});
   const [viewedProfile, setViewedProfile] = useState(null);
@@ -557,43 +561,43 @@ function Agora({ session, onHome, onOpenPanel }) {
   // Pays réellement présents dans les débats publics (pour ne proposer que l'utile).
   const usedCountries = [...new Set((publics || []).map((p) => p.country).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
   const list = (publics || []).filter((p) => (!fTheme || p.theme === fTheme) && (!fCountry || p.country === fCountry));
-  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Accueil")}</button>;
   return (
     <>
       <Header right={back} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
-        <Kicker>L'Agora</Kicker>
-        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 10px", fontWeight: 700 }}>Débats publics</h1>
-        <p style={{ color: C.mute, fontSize: 14, marginBottom: 14 }}>Choisis un débat en cours et rejoins-le. Filtre par thème et par pays.</p>
+        <Kicker>{t("L'Agora")}</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 10px", fontWeight: 700 }}>{t("Débats publics")}</h1>
+        <p style={{ color: C.mute, fontSize: 14, marginBottom: 14 }}>{t("Choisis un débat en cours et rejoins-le. Filtre par thème et par pays.")}</p>
 
         <div className="flex flex-wrap gap-3" style={{ marginBottom: 18 }}>
           <div>
-            <Label>Thème</Label>
+            <Label>{t("Thème")}</Label>
             <select value={fTheme} onChange={(e) => setFTheme(e.target.value)} style={{ ...fieldStyle, padding: "9px 13px", minWidth: 180 }}>
-              <option value="">Tous les thèmes</option>
-              {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
+              <option value="">{t("Tous les thèmes")}</option>
+              {THEMES.map((th) => <option key={th} value={th}>{t(th)}</option>)}
             </select>
           </div>
           <div>
-            <Label>Pays</Label>
+            <Label>{t("Pays")}</Label>
             <select value={fCountry} onChange={(e) => setFCountry(e.target.value)} style={{ ...fieldStyle, padding: "9px 13px", minWidth: 180 }}>
-              <option value="">Tous les pays</option>
+              <option value="">{t("Tous les pays")}</option>
               {usedCountries.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           {(fTheme || fCountry) && (
             <div style={{ alignSelf: "flex-end" }}>
-              <button onClick={() => { setFTheme(""); setFCountry(""); }} className="pill inline-flex items-center gap-1.5" style={{ padding: "9px 13px", fontSize: 12 }}><X size={13} /> Réinitialiser</button>
+              <button onClick={() => { setFTheme(""); setFCountry(""); }} className="pill inline-flex items-center gap-1.5" style={{ padding: "9px 13px", fontSize: 12 }}><X size={13} /> {t("Réinitialiser")}</button>
             </div>
           )}
         </div>
 
         {publics === null ? (
-          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Chargement…</p>
+          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>{t("Chargement…")}</p>
         ) : publics.length === 0 ? (
-          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Aucun débat public en ce moment. Crée le premier en choisissant « Public » à l'ouverture du débat.</p>
+          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>{t("Aucun débat public en ce moment. Crée le premier en choisissant « Public » à l'ouverture du débat.")}</p>
         ) : list.length === 0 ? (
-          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Aucun débat public ne correspond à ces filtres. <button onClick={() => { setFTheme(""); setFCountry(""); }} style={{ background: "none", border: "none", color: C.gold, cursor: "pointer", textDecoration: "underline" }}>Tout afficher</button></p>
+          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>{t("Aucun débat public ne correspond à ces filtres.")} <button onClick={() => { setFTheme(""); setFCountry(""); }} style={{ background: "none", border: "none", color: C.gold, cursor: "pointer", textDecoration: "underline" }}>{t("Tout afficher")}</button></p>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ marginTop: 16 }}>
             {list.map((p) => {
@@ -605,12 +609,12 @@ function Agora({ session, onHome, onOpenPanel }) {
                     <span onClick={() => c && setViewedProfile(c.id)} style={{ width: 34, height: 34, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.gold, display: "inline-block", flexShrink: 0, cursor: c ? "pointer" : "default" }}>
                       {c && c.avatar ? <img src={"/avatars/" + c.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 12 }}>—</span>}
                     </span>
-                    <span style={{ fontSize: 12, color: "#6f6b63" }}>par <span onClick={() => c && setViewedProfile(c.id)} style={{ color: C.gold, fontWeight: 600, cursor: c ? "pointer" : "default" }}>{c ? c.pseudo : "un membre"}</span></span>
+                    <span style={{ fontSize: 12, color: "#6f6b63" }}>{t("par")} <span onClick={() => c && setViewedProfile(c.id)} style={{ color: C.gold, fontWeight: 600, cursor: c ? "pointer" : "default" }}>{c ? c.pseudo : t("un membre")}</span></span>
                   </div>
-                  <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || "Débat"}</div>
+                  <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || t("Débat")}</div>
                   {(p.theme || p.country) && (
                     <div className="flex flex-wrap gap-2">
-                      {p.theme && <button onClick={() => setFTheme(p.theme)} style={{ fontSize: 11, color: C.gold, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "3px 10px", cursor: "pointer" }}>{p.theme}</button>}
+                      {p.theme && <button onClick={() => setFTheme(p.theme)} style={{ fontSize: 11, color: C.gold, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "3px 10px", cursor: "pointer" }}>{t(p.theme)}</button>}
                       {p.country && <button onClick={() => setFCountry(p.country)} style={{ fontSize: 11, color: C.mute, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "3px 10px", cursor: "pointer" }}>{p.country}</button>}
                     </div>
                   )}
@@ -620,7 +624,7 @@ function Agora({ session, onHome, onOpenPanel }) {
                       <span style={{ color: C.mute }}>vs</span>
                       <span style={{ color: CAMP[1] }}>●</span> {camps[1]}
                     </div>
-                    <button onClick={() => onOpenPanel(p)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "7px 16px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 11, cursor: "pointer" }}>Rejoindre <ArrowRight size={13} /></button>
+                    <button onClick={() => onOpenPanel(p)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "7px 16px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 11, cursor: "pointer" }}>{t("Rejoindre")} <ArrowRight size={13} /></button>
                   </div>
                 </div>
               );
@@ -636,6 +640,7 @@ function Agora({ session, onHome, onOpenPanel }) {
 
 /* ----------------------------- FICHE PROFIL ----------------------------- */
 function ProfileModal({ id, onClose, meId }) {
+  const { t: tr } = useLang();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hashtags, setHashtags] = useState([]);
@@ -667,54 +672,54 @@ function ProfileModal({ id, onClose, meId }) {
   const friendButton = !canFriend ? null : friend === undefined ? null : (
     <div style={{ marginTop: 14 }}>
       {friend === 'no-table' || friend === null ? (
-        <button onClick={askFriend} className="inline-flex items-center gap-2 uppercase w-full justify-center" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 18px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 12, cursor: "pointer" }}><UserPlus size={14} /> Ajouter en ami</button>
+        <button onClick={askFriend} className="inline-flex items-center gap-2 uppercase w-full justify-center" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 18px", fontWeight: 700, letterSpacing: "0.08em", fontSize: 12, cursor: "pointer" }}><UserPlus size={14} /> {tr("Ajouter en ami")}</button>
       ) : friend.status === 'accepted' ? (
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5" style={{ color: C.green, fontSize: 13, fontWeight: 600 }}><Check size={14} /> Amis</span>
-          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12, marginLeft: "auto" }}>Retirer</button>
+          <span className="inline-flex items-center gap-1.5" style={{ color: C.green, fontSize: 13, fontWeight: 600 }}><Check size={14} /> {tr("Amis")}</span>
+          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12, marginLeft: "auto" }}>{tr("Retirer")}</button>
         </div>
       ) : friend.addressee_id === meId ? (
         <div className="flex items-center gap-2">
-          <span style={{ color: C.mute, fontSize: 13 }}>T'a envoyé une demande</span>
-          <button onClick={acceptFriend} className="inline-flex items-center gap-1.5 uppercase" style={{ marginLeft: "auto", borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" }}><Check size={13} /> Accepter</button>
-          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12 }}>Refuser</button>
+          <span style={{ color: C.mute, fontSize: 13 }}>{tr("T'a envoyé une demande")}</span>
+          <button onClick={acceptFriend} className="inline-flex items-center gap-1.5 uppercase" style={{ marginLeft: "auto", borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" }}><Check size={13} /> {tr("Accepter")}</button>
+          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12 }}>{tr("Refuser")}</button>
         </div>
       ) : (
         <div className="flex items-center gap-2">
-          <span style={{ color: C.mute, fontSize: 13 }}>Demande envoyée</span>
-          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12, marginLeft: "auto" }}>Annuler</button>
+          <span style={{ color: C.mute, fontSize: 13 }}>{tr("Demande envoyée")}</span>
+          <button onClick={dropFriend} className="pill" style={{ padding: "7px 12px", fontSize: 12, marginLeft: "auto" }}>{tr("Annuler")}</button>
         </div>
       )}
-      {friendMsg && <div style={{ color: C.gold, fontSize: 12, marginTop: 8 }}>{friendMsg}</div>}
+      {friendMsg && <div style={{ color: C.gold, fontSize: 12, marginTop: 8 }}>{tr(friendMsg)}</div>}
     </div>
   );
   return (
     <div onClick={onClose} className="fixed inset-0 flex items-center justify-center" style={{ background: "rgba(2,3,4,0.9)", zIndex: 60, padding: 24, cursor: "pointer" }}>
       <div onClick={(e) => e.stopPropagation()} style={{ ...cardStyle, padding: 26, maxWidth: 420, width: "100%" }}>
-        {loading ? <p style={{ color: C.mute }}>Chargement…</p> : !profile ? (
-          <p style={{ color: C.mute, fontSize: 14 }}>Profil indisponible (ce membre n'a pas encore de profil public).</p>
+        {loading ? <p style={{ color: C.mute }}>{tr("Chargement…")}</p> : !profile ? (
+          <p style={{ color: C.mute, fontSize: 14 }}>{tr("Profil indisponible (ce membre n'a pas encore de profil public).")}</p>
         ) : (<>
           <div className="flex items-center gap-3">
             <span style={{ width: 64, height: 64, borderRadius: "50%", overflow: "hidden", border: "2px solid " + C.gold, display: "inline-block", flexShrink: 0 }}>
               {profile.avatar ? <img src={"/avatars/" + profile.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute }}>—</span>}
             </span>
             <div>
-              <div style={{ fontFamily: SERIF, fontSize: 22 }}>{profile.pseudo || "Anonyme"}</div>
-              <div style={{ color: "#6f6b63", fontSize: 12 }}>Membre depuis {hhmmDate(profile.created_at)}</div>
+              <div style={{ fontFamily: SERIF, fontSize: 22 }}>{profile.pseudo || tr("Anonyme")}</div>
+              <div style={{ color: "#6f6b63", fontSize: 12 }}>{tr("Membre depuis")} {hhmmDate(profile.created_at)}</div>
             </div>
           </div>
           {Array.isArray(profile.interests) && profile.interests.length > 0 && (
             <div style={{ marginTop: 16 }}>
-              <Label>Centres d'intérêt</Label>
+              <Label>{tr("Centres d'intérêt")}</Label>
               <div className="flex flex-wrap gap-2">
-                {profile.interests.map((t) => <span key={t} style={{ fontSize: 12, color: C.gold, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "4px 10px" }}>#{labelOf(t)}</span>)}
+                {profile.interests.map((tag) => <span key={tag} style={{ fontSize: 12, color: C.gold, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "4px 10px" }}>#{labelOf(tag)}</span>)}
               </div>
             </div>
           )}
           <div style={{ marginTop: 16 }}>
-            <Label>Trophées {earnedTrophs.length > 0 ? "(" + earnedTrophs.length + ")" : ""}</Label>
+            <Label>{tr("Trophées")} {earnedTrophs.length > 0 ? "(" + earnedTrophs.length + ")" : ""}</Label>
             {earnedTrophs.length === 0 ? (
-              <p style={{ color: "#6f6b63", fontSize: 12 }}>Aucun trophée pour l'instant. Ils se gagnent en remportant des débats.</p>
+              <p style={{ color: "#6f6b63", fontSize: 12 }}>{tr("Aucun trophée pour l'instant. Ils se gagnent en remportant des débats.")}</p>
             ) : (
               <div className="flex flex-wrap gap-3">
                 {earnedTrophs.map((t) => (
@@ -728,7 +733,7 @@ function ProfileModal({ id, onClose, meId }) {
           </div>
           {friendButton}
         </>)}
-        <button onClick={onClose} className="pill w-full" style={{ marginTop: 18, padding: "9px 18px", fontSize: 12 }}>Fermer</button>
+        <button onClick={onClose} className="pill w-full" style={{ marginTop: 18, padding: "9px 18px", fontSize: 12 }}>{tr("Fermer")}</button>
       </div>
     </div>
   );
@@ -736,6 +741,7 @@ function ProfileModal({ id, onClose, meId }) {
 
 /* ----------------------------- MES AMIS ----------------------------- */
 function FriendsSection({ meId, onOpen }) {
+  const { t } = useLang();
   const [rows, setRows] = useState(null);
   const [profiles, setProfiles] = useState({});
   const [noTable, setNoTable] = useState(false);
@@ -761,7 +767,7 @@ function FriendsSection({ meId, onOpen }) {
         <span style={{ width: 30, height: 30, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.line, flexShrink: 0 }}>
           {pr && pr.avatar ? <img src={"/avatars/" + pr.avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /> : <span style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center", color: C.mute, fontSize: 11 }}>—</span>}
         </span>
-        <span style={{ fontSize: 14, color: C.text }}>{(pr && pr.pseudo) || "Membre"}</span>
+        <span style={{ fontSize: 14, color: C.text }}>{(pr && pr.pseudo) || t("Membre")}</span>
       </button>
       {right}
     </div>
@@ -769,31 +775,31 @@ function FriendsSection({ meId, onOpen }) {
 
   return (
     <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
-      <Label>Mes amis {friends.length > 0 ? "(" + friends.length + ")" : ""}</Label>
+      <Label>{t("Mes amis")} {friends.length > 0 ? "(" + friends.length + ")" : ""}</Label>
       {noTable ? (
-        <p style={{ color: "#6f6b63", fontSize: 12 }}>Bientôt disponible (une petite mise à jour de la base est nécessaire).</p>
+        <p style={{ color: "#6f6b63", fontSize: 12 }}>{t("Bientôt disponible (une petite mise à jour de la base est nécessaire).")}</p>
       ) : rows === null ? (
-        <p style={{ color: "#6f6b63", fontSize: 12 }}>Chargement…</p>
+        <p style={{ color: "#6f6b63", fontSize: 12 }}>{t("Chargement…")}</p>
       ) : (<>
         {incoming.length > 0 && (
           <div style={{ marginBottom: 8 }}>
-            <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>Demandes reçues</div>
+            <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>{t("Demandes reçues")}</div>
             {incoming.map((r) => <Person key={r.id} oid={otherOf(r)} right={
               <span className="flex gap-2">
-                <button onClick={() => accept(r)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "6px 12px", fontWeight: 700, fontSize: 11, cursor: "pointer" }}><Check size={12} /> Accepter</button>
-                <button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>Refuser</button>
+                <button onClick={() => accept(r)} className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "6px 12px", fontWeight: 700, fontSize: 11, cursor: "pointer" }}><Check size={12} /> {t("Accepter")}</button>
+                <button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>{t("Refuser")}</button>
               </span>
             } />)}
           </div>
         )}
         {friends.length === 0 && incoming.length === 0 && outgoing.length === 0 && (
-          <p style={{ color: "#6f6b63", fontSize: 12 }}>Aucun ami pour l'instant. Ouvre le profil d'un membre et clique « Ajouter en ami ».</p>
+          <p style={{ color: "#6f6b63", fontSize: 12 }}>{t("Aucun ami pour l'instant. Ouvre le profil d'un membre et clique « Ajouter en ami ».")}</p>
         )}
-        {friends.map((r) => <Person key={r.id} oid={otherOf(r)} right={<button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>Retirer</button>} />)}
+        {friends.map((r) => <Person key={r.id} oid={otherOf(r)} right={<button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>{t("Retirer")}</button>} />)}
         {outgoing.length > 0 && (
           <div style={{ marginTop: 8 }}>
-            <div className="uppercase" style={{ color: "#6f6b63", fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>Demandes envoyées</div>
-            {outgoing.map((r) => <Person key={r.id} oid={otherOf(r)} right={<button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>Annuler</button>} />)}
+            <div className="uppercase" style={{ color: "#6f6b63", fontSize: 11, letterSpacing: "0.1em", margin: "6px 0" }}>{t("Demandes envoyées")}</div>
+            {outgoing.map((r) => <Person key={r.id} oid={otherOf(r)} right={<button onClick={() => remove(r)} className="pill" style={{ padding: "6px 10px", fontSize: 11 }}>{t("Annuler")}</button>} />)}
           </div>
         )}
       </>)}
@@ -803,71 +809,72 @@ function FriendsSection({ meId, onOpen }) {
 
 /* ----------------------------- SETUP ----------------------------- */
 function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
+  const { t } = useLang();
   const set = (k, v) => setCfg((c) => ({ ...c, [k]: v }));
   return (
     <>
-      <Header right={onHome ? <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button> : null} />
+      <Header right={onHome ? <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> {t("Accueil")}</button> : null} />
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
-        <Kicker>Régie de débat</Kicker>
+        <Kicker>{t("Régie de débat")}</Kicker>
         <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(40px,8vw,76px)", lineHeight: 0.92, margin: "10px 0 14px", fontWeight: 700 }}>
-          Ouvrir un panel
+          {t("Ouvrir un panel")}
         </h1>
         <p style={{ color: C.mute, maxWidth: 720, lineHeight: 1.6, marginBottom: 36 }}>
-          Deux camps, face à face. Le champ et le contrechamp. La vérification au centre, comme l'arbitre du débat.
+          {t("Deux camps, face à face. Le champ et le contrechamp. La vérification au centre, comme l'arbitre du débat.")}
         </p>
 
         <div style={{ ...cardStyle, padding: 24, maxWidth: 720 }}>
-          <Label>Nom du panel</Label>
+          <Label>{t("Nom du panel")}</Label>
           <input value={cfg.panel} onChange={(e) => set("panel", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
-          <Label>Sujet du débat</Label>
+          <Label>{t("Sujet du débat")}</Label>
           <input value={cfg.topic} onChange={(e) => set("topic", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 18 }} />
           <div className="flex gap-4" style={{ marginBottom: 18 }}>
             {[0, 1].map((i) => (
               <div key={i} className="flex-1">
-                <Label><span style={{ color: CAMP[i] }}>●</span> Camp {i + 1}</Label>
+                <Label><span style={{ color: CAMP[i] }}>●</span> {t("Camp")} {i + 1}</Label>
                 <input value={cfg.camps[i]} onChange={(e) => set("camps", cfg.camps.map((x, k) => k === i ? e.target.value : x))} className="w-full" style={{ ...fieldStyle, padding: "10px 14px" }} />
               </div>
             ))}
           </div>
-          <Label>Temps de parole par camp (minutes)</Label>
+          <Label>{t("Temps de parole par camp (minutes)")}</Label>
           <input type="number" min={1} max={60} value={cfg.minutes} onChange={(e) => set("minutes", Math.max(1, Math.min(60, Number(e.target.value) || 1)))} style={{ ...fieldStyle, padding: "10px 14px", width: 120, marginBottom: 22 }} />
 
           <div className="flex gap-4" style={{ marginBottom: 22 }}>
             <div className="flex-1">
-              <Label>Thème (trophées & Agora)</Label>
+              <Label>{t("Thème (trophées & Agora)")}</Label>
               <select value={cfg.theme} onChange={(e) => set("theme", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px" }}>
-                <option value="">Général (sans thème)</option>
-                {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
+                <option value="">{t("Général (sans thème)")}</option>
+                {THEMES.map((th) => <option key={th} value={th}>{t(th)}</option>)}
               </select>
             </div>
             <div className="flex-1">
-              <Label>Pays</Label>
+              <Label>{t("Pays")}</Label>
               <select value={cfg.country} onChange={(e) => set("country", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px" }}>
                 {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
           </div>
 
-          <Label>Format</Label>
+          <Label>{t("Format")}</Label>
           <div className="flex gap-3" style={{ marginBottom: 22 }}>
-            <Toggle on={cfg.maxPerCamp === 1} onClick={() => set("maxPerCamp", 1)} icon={<span style={{ fontFamily: SERIF }}>1v1</span>} label="Un contre un" />
-            <Toggle on={cfg.maxPerCamp === 2} onClick={() => set("maxPerCamp", 2)} icon={<span style={{ fontFamily: SERIF }}>2v2</span>} label="Deux contre deux" />
+            <Toggle on={cfg.maxPerCamp === 1} onClick={() => set("maxPerCamp", 1)} icon={<span style={{ fontFamily: SERIF }}>1v1</span>} label={t("Un contre un")} />
+            <Toggle on={cfg.maxPerCamp === 2} onClick={() => set("maxPerCamp", 2)} icon={<span style={{ fontFamily: SERIF }}>2v2</span>} label={t("Deux contre deux")} />
           </div>
 
-          <Label>Visibilité</Label>
+          <Label>{t("Visibilité")}</Label>
           <div className="flex gap-3" style={{ marginBottom: 16 }}>
-            <Toggle on={cfg.visibility === "prive"} onClick={() => set("visibility", "prive")} icon={<Lock size={14} />} label="Privé — sur invitation" />
-            <Toggle on={cfg.visibility === "public"} onClick={() => set("visibility", "public")} icon={<Globe size={14} />} label="Public — libre d'accès" />
+            <Toggle on={cfg.visibility === "prive"} onClick={() => set("visibility", "prive")} icon={<Lock size={14} />} label={t("Privé — sur invitation")} />
+            <Toggle on={cfg.visibility === "public"} onClick={() => set("visibility", "public")} icon={<Globe size={14} />} label={t("Public — libre d'accès")} />
           </div>
-          <Toggle on={cfg.comments} onClick={() => set("comments", !cfg.comments)} icon={<MessageSquare size={14} />} label={cfg.comments ? "Commentaires des spectateurs autorisés" : "Commentaires bloqués"} wide />
+          <Toggle on={cfg.comments} onClick={() => set("comments", !cfg.comments)} icon={<MessageSquare size={14} />} label={cfg.comments ? t("Commentaires des spectateurs autorisés") : t("Commentaires bloqués")} wide />
         </div>
 
-        {error && <div style={{ color: C.red, fontSize: 13, marginTop: 18 }}>{error}</div>}
+        {error && <div style={{ color: C.red, fontSize: 13, marginTop: 18 }}>{t(error)}</div>}
         <button onClick={onStart} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 18, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "13px 26px", fontWeight: 700, letterSpacing: "0.12em", fontSize: 13, cursor: busy ? "default" : "pointer", opacity: busy ? 0.7 : 1 }}>
-          {busy ? <><Spinner size={16} className="spin" /> Création…</> : <>Ouvrir le débat <ArrowRight size={16} /></>}
+          {busy ? <><Spinner size={16} className="spin" /> {t("Création…")}</> : <>{t("Ouvrir le débat")} <ArrowRight size={16} /></>}
         </button>
         <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>
-          Un code de salle unique sera généré : partage-le pour que d'autres rejoignent ton débat.
+          {t("Un code de salle unique sera généré : partage-le pour que d'autres rejoignent ton débat.")}
         </p>
       </div>
       <Footer />
@@ -1843,10 +1850,11 @@ function Header({ right }) {
   );
 }
 function Footer() {
+  const { t } = useLang();
   return (
     <footer style={{ borderTop: "1px solid " + C.line, marginTop: 32 }}>
       <div className="mx-auto text-center" style={{ maxWidth: 1180, padding: "18px", color: "#6f6b63", fontSize: 12, letterSpacing: "0.04em" }}>
-        Le contrechamp — régie de débat · maquette
+        {t("Le contrechamp — régie de débat · maquette")}
       </div>
     </footer>
   );
