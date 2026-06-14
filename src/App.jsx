@@ -3,7 +3,7 @@ import {
   Play, Pause, Mic, MicOff, Search, Loader2, ExternalLink, AlertTriangle,
   HelpCircle, XCircle, CheckCircle2, Video, VideoOff, ImagePlus, X,
   MessageSquare, Lock, Globe, ArrowRight, RotateCcw, Send, Hand, Flag, BookOpen, ChevronDown,
-  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner, Users, Copy, Crown
+  LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner, Users, Copy, Settings as SettingsIcon, KeyRound, Check
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
@@ -63,6 +63,10 @@ export default function App() {
           onJoined={(panel, pseudo) => enterLobby(panel, !!(session && panel.owner_id === session.user.id), pseudo)} />
       ) : view === "live" && lobby ? (
         <Live lobby={lobby} session={session} onHome={goHome} />
+      ) : view === "settings" && session ? (
+        <Settings session={session} onHome={goHome} onLegal={() => setView("legal")} />
+      ) : view === "legal" ? (
+        <Legal onBack={() => setView("home")} />
       ) : (
         <Home
           session={session}
@@ -70,6 +74,8 @@ export default function App() {
           onCreate={() => setView(session ? "create" : "auth")}
           onJoin={() => setView("join")}
           onSignIn={() => setView("auth")}
+          onSettings={() => setView("settings")}
+          onLegal={() => setView("legal")}
         />
       )}
     </Shell>
@@ -102,13 +108,17 @@ function pseudoOf(session) {
 }
 
 /* ----------------------------- ACCUEIL ----------------------------- */
-function Home({ session, authReady, onCreate, onJoin, onSignIn }) {
+function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLegal }) {
   const pseudo = pseudoOf(session);
   const admin = isAdminEmail(session?.user?.email);
+  const avatar = session?.user?.user_metadata?.avatar;
   const accountRight = !authReady ? null : (session ? (
     <div className="flex items-center gap-2">
-      {admin && <span className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, border: "1px solid " + C.gold, color: C.gold, fontSize: 10, letterSpacing: "0.08em", padding: "3px 9px", fontWeight: 700 }}><Crown size={11} /> Admin</span>}
-      <span style={{ color: C.mute, fontSize: 13 }}>Bonjour, <strong style={{ color: C.text }}>{pseudo}</strong></span>
+      {admin && <span className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, border: "1px solid " + C.gold, color: C.gold, fontSize: 10, letterSpacing: "0.08em", padding: "3px 9px", fontWeight: 700 }}><AdminSeal size={13} /> Admin</span>}
+      <button onClick={onSettings} className="flex items-center gap-2" style={{ background: "none", border: "none", cursor: "pointer", color: C.mute, fontSize: 13 }} title="Mon compte">
+        {avatar ? <span style={{ width: 26, height: 26, borderRadius: "50%", overflow: "hidden", border: "1px solid " + C.gold, display: "inline-block" }}><img src={"/avatars/" + avatar + ".svg"} alt="" style={{ width: "100%", height: "100%" }} /></span> : <SettingsIcon size={14} />}
+        <span>Bonjour, <strong style={{ color: C.text }}>{pseudo}</strong></span>
+      </button>
       <button onClick={() => supabase.auth.signOut()} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12 }}><LogOut size={13} /> Déconnexion</button>
     </div>
   ) : (
@@ -133,6 +143,7 @@ function Home({ session, authReady, onCreate, onJoin, onSignIn }) {
         </div>
         {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Créer un débat nécessite un compte (gratuit, rapide).</p>}
         {!isSupabaseConfigured && <p style={{ color: C.gold, fontSize: 12, marginTop: 16 }}>⚠️ Connexion à la base non configurée sur ce site (variables d'environnement manquantes).</p>}
+        <p style={{ marginTop: 28 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
       </div>
       <Footer />
     </>
@@ -260,6 +271,130 @@ function JoinScreen({ session, onHome, onJoined }) {
           </button>
         </div>
         <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Regarder est libre. Pour commenter, il faut un compte.</p>
+      </div>
+      <Footer />
+    </>
+  );
+}
+
+/* ----------------------------- MON COMPTE ----------------------------- */
+function Settings({ session, onHome, onLegal }) {
+  const meta = session.user.user_metadata || {};
+  const [pseudo, setPseudo] = useState(meta.pseudo || pseudoOf(session));
+  const [avatar, setAvatar] = useState(meta.avatar || null);
+  const [avatars, setAvatars] = useState([]);
+  const [pwd, setPwd] = useState("");
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => { fetch("/avatars.json").then((r) => r.json()).then(setAvatars).catch(() => {}); }, []);
+
+  const FIFTEEN = 15 * 24 * 3600 * 1000;
+  const lastChange = meta.pseudo_changed_at ? new Date(meta.pseudo_changed_at) : null;
+  const pseudoLocked = lastChange ? (Date.now() - lastChange.getTime() < FIFTEEN) : false;
+  const nextChange = lastChange ? new Date(lastChange.getTime() + FIFTEEN) : null;
+
+  async function chooseAvatar(id) {
+    setErr(""); setMsg(""); setAvatar(id);
+    const { error } = await supabase.auth.updateUser({ data: { avatar: id } });
+    if (error) setErr(traduireErreur(error.message)); else setMsg("Avatar mis à jour.");
+  }
+  async function savePseudo() {
+    setErr(""); setMsg("");
+    const p = pseudo.trim();
+    if (!p) { setErr("Le pseudo ne peut pas être vide."); return; }
+    if (p === (meta.pseudo || "")) { setErr("C'est déjà ton pseudo actuel."); return; }
+    if (pseudoLocked) { setErr("Tu pourras changer ton pseudo à partir du " + nextChange.toLocaleDateString("fr-FR") + "."); return; }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ data: { pseudo: p, pseudo_changed_at: new Date().toISOString() } });
+    setBusy(false);
+    if (error) setErr(traduireErreur(error.message)); else setMsg("Pseudo mis à jour.");
+  }
+  async function savePassword() {
+    setErr(""); setMsg("");
+    if (pwd.length < 6) { setErr("Mot de passe trop court (6 caractères minimum)."); return; }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pwd });
+    setBusy(false);
+    if (error) setErr(traduireErreur(error.message)); else { setMsg("Mot de passe mis à jour."); setPwd(""); }
+  }
+
+  const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
+  return (
+    <>
+      <Header right={back} />
+      <div className="mx-auto" style={{ maxWidth: 720, padding: "48px 18px 60px" }}>
+        <Kicker>Mon compte</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 20px", fontWeight: 700 }}>Paramètres</h1>
+        {err && <div style={{ color: C.red, fontSize: 13, marginBottom: 12 }}>{err}</div>}
+        {msg && <div style={{ color: C.green, fontSize: 13, marginBottom: 12 }}>{msg}</div>}
+
+        <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
+          <Label>Photo de profil</Label>
+          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 12 }}>Choisis un avatar parmi notre bibliothèque.</p>
+          <div className="flex flex-wrap gap-2">
+            {avatars.map((a) => (
+              <button key={a.id} onClick={() => chooseAvatar(a.id)} title={a.nom} style={{ width: 56, height: 56, borderRadius: "50%", overflow: "hidden", border: "2px solid " + (avatar === a.id ? C.gold : C.line), padding: 0, cursor: "pointer", background: C.field }}>
+                <img src={"/" + a.file} alt="" style={{ width: "100%", height: "100%" }} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
+          <Label>Pseudo</Label>
+          <input value={pseudo} onChange={(e) => setPseudo(e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 10 }} />
+          <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 12 }}>{pseudoLocked ? "Changement possible une fois tous les 15 jours. Prochain changement : " + nextChange.toLocaleDateString("fr-FR") + "." : "Modifiable une fois tous les 15 jours."}</p>
+          <button onClick={savePseudo} disabled={busy || pseudoLocked} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: (busy || pseudoLocked) ? "default" : "pointer", opacity: (busy || pseudoLocked) ? 0.6 : 1 }}><Check size={14} /> Enregistrer le pseudo</button>
+        </div>
+
+        <div style={{ ...cardStyle, padding: 22, marginBottom: 16 }}>
+          <Label>Changer le mot de passe</Label>
+          <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} autoComplete="new-password" placeholder="Nouveau mot de passe (6 caractères min.)" className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 12 }} />
+          <button onClick={savePassword} disabled={busy} className="inline-flex items-center gap-2 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: busy ? "default" : "pointer", opacity: busy ? 0.6 : 1 }}><KeyRound size={14} /> Mettre à jour le mot de passe</button>
+        </div>
+
+        <p style={{ marginTop: 18 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
+      </div>
+      <Footer />
+    </>
+  );
+}
+
+/* ----------------------------- MENTIONS LÉGALES ----------------------------- */
+function Legal({ onBack }) {
+  const back = <button onClick={onBack} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Retour</button>;
+  const H = ({ children }) => <h2 className="uppercase" style={{ fontFamily: SERIF, fontSize: 15, letterSpacing: "0.06em", color: C.gold, marginTop: 26, marginBottom: 8 }}>{children}</h2>;
+  const P = ({ children }) => <p style={{ color: C.text, fontSize: 14, lineHeight: 1.65, marginBottom: 8 }}>{children}</p>;
+  return (
+    <>
+      <Header right={back} />
+      <div className="mx-auto" style={{ maxWidth: 760, padding: "48px 18px 60px" }}>
+        <Kicker>Le Contrechamp</Kicker>
+        <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(30px,5vw,48px)", lineHeight: 1, margin: "10px 0 6px", fontWeight: 700 }}>Mentions légales & conditions</h1>
+        <p style={{ color: "#6f6b63", fontSize: 12, marginBottom: 8 }}>Document d'information, rédigé en langage clair. Il n'a pas valeur de conseil juridique.</p>
+
+        <H>But du site</H>
+        <P>Le Contrechamp est un espace de <strong>débat structuré</strong> où deux camps s'opposent avec un temps de parole, une transcription, des fiches de repère et un espace de commentaires. Son objectif est de <strong>favoriser l'échange argumenté</strong> et la confrontation honnête des idées, pas de désigner une vérité officielle.</P>
+
+        <H>Sur quoi nous nous appuyons</H>
+        <P>Les <strong>fiches documentaires</strong> et les repères affichés pendant un débat sont des <strong>aides à la compréhension</strong>. Ils s'appuient sur des notions et des faits largement établis, mais ils peuvent contenir des <strong>simplifications, des imprécisions ou des erreurs</strong>, et ne remplacent pas une recherche approfondie ni une source primaire.</P>
+
+        <H>Ce à quoi nous ne nous engageons pas</H>
+        <P>Nous ne garantissons ni l'<strong>exactitude</strong>, ni l'<strong>exhaustivité</strong>, ni la <strong>neutralité parfaite</strong> des contenus. Nous ne garantissons pas non plus la <strong>disponibilité continue</strong> du service. Les opinions exprimées par les participants n'engagent qu'eux, jamais l'éditeur du site.</P>
+
+        <H>Comptes & contenus des utilisateurs</H>
+        <P>Pour regarder un débat, aucun compte n'est nécessaire. Pour <strong>écrire, participer ou héberger</strong>, un compte est requis : c'est une condition d'<strong>identification et de responsabilité</strong>. Chacun est responsable de ce qu'il publie. Un <strong>filtre de mots</strong>, des outils de <strong>modération</strong> et le <strong>signalement</strong> visent à limiter les abus ; les contenus illégaux ou contraires aux règles peuvent être retirés et les comptes concernés suspendus.</P>
+
+        <H>Données personnelles</H>
+        <P>Nous collectons le strict nécessaire au fonctionnement : <strong>email, pseudo</strong> et les contenus que tu publies. Ces données servent à faire fonctionner les comptes et les débats. Tu peux modifier ton pseudo et ton mot de passe depuis tes paramètres. (Avant une ouverture large au public, une politique de confidentialité complète sera ajoutée.)</P>
+
+        <H>Hébergement & technique</H>
+        <P>Le site est hébergé via des prestataires tiers (déploiement et base de données). Le débat « en direct » repose sur une synchronisation entre les appareils des participants.</P>
+
+        <H>Avertissement</H>
+        <P>Ce texte est <strong>original</strong> et propre au Contrechamp : il n'est la copie d'aucune mention légale existante. Il est <strong>informatif</strong> et amené à évoluer. Avant une mise en ligne publique à grande échelle, il devra être complété par des mentions légales et des conditions d'utilisation conformes à la réglementation applicable (identité de l'éditeur, RGPD, etc.).</P>
       </div>
       <Footer />
     </>
@@ -775,6 +910,17 @@ function Camp({ i, floor, pending, clockRunning, request, cfg, camOwner, vidRefs
         </div>
       )}
     </div>
+  );
+}
+
+// Sceau "Admin" dessiné à la main (SVG), aux couleurs de la charte.
+function AdminSeal({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <defs><linearGradient id="adseal" x1="0" y1="0" x2="0" y2="24" gradientUnits="userSpaceOnUse"><stop stopColor="#e0c184" /><stop offset="1" stopColor="#b08a4a" /></linearGradient></defs>
+      <path d="M12 1.6 L20.2 5 V11 C20.2 16.6 16.6 20.2 12 22.4 C7.4 20.2 3.8 16.6 3.8 11 V5 Z" fill="none" stroke="url(#adseal)" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M12 6.6 l1.5 3.1 3.4.3 -2.6 2.2 .8 3.3 -3.1 -1.8 -3.1 1.8 .8 -3.3 -2.6 -2.2 3.4 -.3 Z" fill="url(#adseal)" />
+    </svg>
   );
 }
 
