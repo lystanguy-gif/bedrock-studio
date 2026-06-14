@@ -38,6 +38,12 @@ export async function setSeats(panelId, seats) {
   return { error: error?.message }
 }
 
+// Ferme (supprime) un débat. Les participants et messages sont supprimés en cascade.
+export async function deletePanel(panelId) {
+  const { error } = await supabase.from('panels').delete().eq('id', panelId)
+  return { error: error?.message }
+}
+
 export async function getPanelByCode(code) {
   const { data, error } = await supabase.from('panels').select('*')
     .eq('code', (code || '').trim().toUpperCase()).maybeSingle()

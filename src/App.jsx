@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -698,6 +698,8 @@ function Live({ lobby, session, onHome }) {
   const [remaining, setRemaining] = useState(panel.remaining && panel.remaining.length === 2 ? panel.remaining : [cfg.minutes * 60, cfg.minutes * 60]);
   const [spectators, setSpectators] = useState(1);
   const [roomRank, setRoomRank] = useState(1);
+  const [presentIds, setPresentIds] = useState(() => new Set());
+  const [presenceReady, setPresenceReady] = useState(false);
   const [copied, setCopied] = useState(false);
   const [viewedProfile, setViewedProfile] = useState(null);
   const [micOn, setMicOn] = useState(false);
@@ -770,6 +772,7 @@ function Live({ lobby, session, onHome }) {
         if (m.kind === "transcript") appendSegment(m.side ?? 0, m.content);
         else if (m.kind === "comment") setComments((c) => [{ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) }, ...c]);
       })
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "panels", filter: "id=eq." + panel.id }, () => { onHome(); })
       .subscribe();
 
     const pres = supabase.channel("presence-" + panel.id, { config: { presence: { key: presenceKeyRef.current } } })
@@ -777,12 +780,17 @@ function Live({ lobby, session, onHome }) {
         const state = pres.presenceState();
         const keys = Object.keys(state);
         setSpectators(keys.length || 1);
+        // Identifiants des comptes présents (pour le cycle de vie du débat).
+        const ids = new Set();
+        keys.forEach((k) => { const u = state[k][0] && state[k][0].uid; if (u) ids.add(u); });
+        setPresentIds(ids);
+        setPresenceReady(true);
         // Rang d'arrivée du client courant (pour ne bloquer que les places au-delà de la limite).
         const order = keys.map((k) => ({ k, at: (state[k][0] && state[k][0].at) || 0 })).sort((a, b) => a.at - b.at);
         const rank = order.findIndex((x) => x.k === presenceKeyRef.current) + 1;
         setRoomRank(rank || keys.length);
       })
-      .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, at: Date.now() }); });
+      .subscribe((status) => { if (status === "SUBSCRIBED") pres.track({ pseudo, uid: myUserId, at: Date.now() }); });
 
     // Spectateur : rattrapage de l'état 3,5 s après l'abonnement (au cas où un
     // changement aurait eu lieu pendant le démarrage de l'écoute temps réel).
@@ -838,13 +846,13 @@ function Live({ lobby, session, onHome }) {
     if (!ids.length) { setDebaters({}); return; }
     getProfiles(ids).then(({ profiles }) => setDebaters(profiles || {}));
   }, [seats]);
-  // Libère mon siège en quittant le débat.
+  // Libère mon siège en quittant ; et si je suis l'hôte sans aucun débatteur, je ferme le débat.
   useEffect(() => () => {
     if (!myUserId) return;
     const s = seatsRef.current;
-    if (s["0"].includes(myUserId) || s["1"].includes(myUserId)) {
-      pushSeats(panel.id, { "0": s["0"].filter((x) => x !== myUserId), "1": s["1"].filter((x) => x !== myUserId) });
-    }
+    const without = { "0": s["0"].filter((x) => x !== myUserId), "1": s["1"].filter((x) => x !== myUserId) };
+    if (s["0"].includes(myUserId) || s["1"].includes(myUserId)) pushSeats(panel.id, without);
+    if (myUserId === panel.owner_id && !without["0"].length && !without["1"].length) deletePanel(panel.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const giveFloor = (i) => { setFloor(i); setClockRunning(true); };
@@ -862,6 +870,18 @@ function Live({ lobby, session, onHome }) {
   }
   // Puis-je parler dans le camp i ? (débatteur de ce camp avec la parole, ou hôte si le camp est vide)
   const canSpeakCamp = (i) => (mySeat === i || (isHost && (seats[String(i)] || []).length === 0));
+
+  // Cycle de vie : le débat reste ouvert tant qu'il y a quelqu'un « en haut »
+  // (l'hôte OU au moins un débatteur présent). Sinon, fermeture après un court délai.
+  const hostPresent = presentIds.has(panel.owner_id);
+  const debatersPresent = [...seats["0"], ...seats["1"]].filter((id) => presentIds.has(id));
+  const aliveUpstairs = hostPresent || debatersPresent.length > 0;
+  useEffect(() => {
+    if (!presenceReady || aliveUpstairs) return;
+    const t = setTimeout(() => { deletePanel(panel.id); onHome(); }, 8000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presenceReady, aliveUpstairs, panel.id]);
 
   const analyze = useCallback(async (raw, withWeb = true) => {
     const chunk = (raw || "").trim().slice(-2000);
