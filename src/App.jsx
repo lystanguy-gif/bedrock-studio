@@ -7,8 +7,9 @@ import {
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { MeshRTC } from "./lib/rtc.js";
+import { evaluateWin, applyLoss, tally, THEMES, MIN_VOTERS } from "./lib/trophies.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -107,7 +108,7 @@ export default function App() {
 function CreateFlow({ session, onHome, onLaunched }) {
   const [cfg, setCfg] = useState({
     panel: "Le contrechamp", topic: "L'État doit-il encadrer les prix de l'énergie ?",
-    camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true, maxPerCamp: 1,
+    camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true, maxPerCamp: 1, theme: "",
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -581,9 +582,13 @@ function ProfileModal({ id, onClose }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hashtags, setHashtags] = useState([]);
+  const [trophs, setTrophs] = useState([]);
   useEffect(() => { getProfile(id).then(({ profile }) => { setProfile(profile); setLoading(false); }); }, [id]);
   useEffect(() => { fetch("/hashtags.json").then((r) => r.json()).then(setHashtags).catch(() => {}); }, []);
+  useEffect(() => { fetch("/trophees.json").then((r) => r.json()).then(setTrophs).catch(() => {}); }, []);
   const labelOf = (tag) => hashtags.find((h) => h.tag === tag)?.libelle || tag;
+  const earnedIds = Array.isArray(profile?.trophies) ? profile.trophies.map((e) => e.id) : [];
+  const earnedTrophs = trophs.filter((t) => earnedIds.includes(t.id));
   return (
     <div onClick={onClose} className="fixed inset-0 flex items-center justify-center" style={{ background: "rgba(2,3,4,0.9)", zIndex: 60, padding: 24, cursor: "pointer" }}>
       <div onClick={(e) => e.stopPropagation()} style={{ ...cardStyle, padding: 26, maxWidth: 420, width: "100%" }}>
@@ -608,8 +613,19 @@ function ProfileModal({ id, onClose }) {
             </div>
           )}
           <div style={{ marginTop: 16 }}>
-            <Label>Trophées</Label>
-            <p style={{ color: "#6f6b63", fontSize: 12 }}>Les trophées apparaîtront ici dès que le vote de fin de débat sera en place.</p>
+            <Label>Trophées {earnedTrophs.length > 0 ? "(" + earnedTrophs.length + ")" : ""}</Label>
+            {earnedTrophs.length === 0 ? (
+              <p style={{ color: "#6f6b63", fontSize: 12 }}>Aucun trophée pour l'instant. Ils se gagnent en remportant des débats.</p>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                {earnedTrophs.map((t) => (
+                  <div key={t.id} className="text-center" style={{ width: 78 }} title={t.nom}>
+                    <div style={{ height: 56 }}><TrophyBadge palier={t.palier} size={54} /></div>
+                    <div style={{ fontSize: 11, color: C.text, marginTop: 2, lineHeight: 1.2 }}>{t.nom}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </>)}
         <button onClick={onClose} className="pill w-full" style={{ marginTop: 18, padding: "9px 18px", fontSize: 12 }}>Fermer</button>
@@ -649,6 +665,12 @@ function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
           <Label>Temps de parole par camp (minutes)</Label>
           <input type="number" min={1} max={60} value={cfg.minutes} onChange={(e) => set("minutes", Math.max(1, Math.min(60, Number(e.target.value) || 1)))} style={{ ...fieldStyle, padding: "10px 14px", width: 120, marginBottom: 22 }} />
 
+          <Label>Thème (pour les trophées et L'Agora)</Label>
+          <select value={cfg.theme} onChange={(e) => set("theme", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 22 }}>
+            <option value="">Général (sans thème)</option>
+            {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+
           <Label>Format</Label>
           <div className="flex gap-3" style={{ marginBottom: 22 }}>
             <Toggle on={cfg.maxPerCamp === 1} onClick={() => set("maxPerCamp", 1)} icon={<span style={{ fontFamily: SERIF }}>1v1</span>} label="Un contre un" />
@@ -687,6 +709,7 @@ function Live({ lobby, session, onHome }) {
     visibility: panel.visibility || "prive",
     comments: panel.comments_allowed !== false,
     maxPerCamp: panel.max_per_camp === 2 ? 2 : 1,
+    theme: panel.theme || "",
   };
   const [seats, setSeats] = useState(() => normSeats(panel.seats));
   const [debaters, setDebaters] = useState({});
@@ -721,6 +744,12 @@ function Live({ lobby, session, onHome }) {
   const [comments, setComments] = useState([]);
   const [draft, setDraft] = useState("");
   const [cError, setCError] = useState("");
+  // Fin de débat : vote du public puis résultats.
+  const [phase, setPhase] = useState("live"); // live | voting | results
+  const [votes, setVotes] = useState({}); // identifiant votant -> indice de camp
+  const [result, setResult] = useState(null); // { winner, counts, voters, sharePct, audience, ... }
+  const [awarded, setAwarded] = useState([]); // trophées que JE viens de débloquer
+  const awardedRef = useRef(false);
   const [kbHits, setKbHits] = useState([]);
   const [kbReady, setKbReady] = useState(false);
   const [kbOpen, setKbOpen] = useState({});
@@ -777,17 +806,29 @@ function Live({ lobby, session, onHome }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel.id]);
 
+  // Applique un message de phase (ouverture du vote / résultats / retour au direct).
+  function applyPhaseMessage(content) {
+    if (content === "voting") { setPhase("voting"); setResult(null); }
+    else if (content === "live") { setPhase("live"); setResult(null); setVotes({}); awardedRef.current = false; setAwarded([]); }
+    else { try { setResult(JSON.parse(content)); setPhase("results"); } catch (e) {} }
+  }
+
   // Tout le monde : écoute les changements du panel + l'arrivée des messages.
   useEffect(() => {
     let segInit = [], comInit = [];
     loadMessages(panel.id).then(({ messages }) => {
+      let lastPhase = null; const voteInit = {};
       messages.forEach((m) => {
         seenMsgRef.current.add(m.id);
         if (m.kind === "transcript") segInit.push({ side: m.side ?? 0, text: m.content });
         else if (m.kind === "comment") comInit.unshift({ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) });
+        else if (m.kind === "vote") { if (m.author_id) voteInit[m.author_id] = Number(m.content); }
+        else if (m.kind === "phase") lastPhase = m.content;
       });
       if (segInit.length) setSegments(mergeSegments(segInit));
       if (comInit.length) setComments(comInit);
+      setVotes(voteInit);
+      if (lastPhase) applyPhaseMessage(lastPhase);
     });
 
     const ch = supabase.channel("panel-" + panel.id)
@@ -803,6 +844,8 @@ function Live({ lobby, session, onHome }) {
         seenMsgRef.current.add(m.id);
         if (m.kind === "transcript") appendSegment(m.side ?? 0, m.content);
         else if (m.kind === "comment") setComments((c) => [{ id: m.id, txt: m.content, author: m.author, author_id: m.author_id, t: hhmm(m.created_at) }, ...c]);
+        else if (m.kind === "vote") { if (m.author_id) setVotes((v) => ({ ...v, [m.author_id]: Number(m.content) })); }
+        else if (m.kind === "phase") applyPhaseMessage(m.content);
       })
       .on("postgres_changes", { event: "DELETE", schema: "public", table: "panels", filter: "id=eq." + panel.id }, () => { onHome(); })
       .subscribe();
@@ -923,6 +966,56 @@ function Live({ lobby, session, onHome }) {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presenceReady, aliveUpstairs, panel.id]);
+
+  // ---- Vote de fin de débat + attribution des trophées ----
+  const tallyNow = tally(votes, 2);
+  const myVote = (myUserId && votes[myUserId] != null) ? votes[myUserId] : null;
+  const isDebater = mySeat != null;
+
+  function openVote() { if (!iAmController) return; stopMic(); setClockRunning(false); postMessage(panel.id, { kind: "phase", content: "voting" }); }
+  function castVote(camp) {
+    if (!session || isDebater) return; // seul le public connecté vote
+    postMessage(panel.id, { kind: "vote", author_id: myUserId, author: pseudo, content: String(camp) });
+  }
+  function closeVote() {
+    if (!iAmController) return;
+    const t = tally(votes, 2);
+    const payload = {
+      winner: t.winner, counts: t.counts, voters: t.voters, sharePct: t.sharePct,
+      audience: spectators, theme: cfg.theme || "", format2v2: cfg.maxPerCamp === 2,
+      minutes: cfg.minutes, camps: cfg.camps, winnerIds: t.winner != null ? (seats[String(t.winner)] || []) : [],
+    };
+    postMessage(panel.id, { kind: "phase", content: JSON.stringify(payload) });
+  }
+  function backToLive() { if (!iAmController) return; reset(); postMessage(panel.id, { kind: "phase", content: "live" }); }
+
+  // Quand les résultats tombent : si je suis un débatteur, je mets à jour mes
+  // statistiques et je débloque mes trophées (chacun pour soi, côté client).
+  useEffect(() => {
+    if (phase !== "results" || !result || awardedRef.current) return;
+    if (!myUserId || !session || mySeat == null) return;
+    const validated = result.winner != null && result.voters >= MIN_VOTERS;
+    if (!validated) return; // débat non validé : aucune incidence sur le palmarès
+    awardedRef.current = true;
+    (async () => {
+      const meta = session.user.user_metadata || {};
+      const prevStats = meta.stats || { wins: 0, streak: 0, themesWon: [] };
+      if (mySeat !== result.winner) { // défaite : série rompue
+        const { stats } = applyLoss(prevStats);
+        await supabase.auth.updateUser({ data: { ...meta, stats } });
+        return;
+      }
+      const earnedBefore = (meta.trophies || []).map((e) => e.id);
+      const ctx = { audience: result.audience, theme: result.theme, format2v2: result.format2v2, minutes: result.minutes, sharePct: result.sharePct, voters: result.voters };
+      const { stats, earned } = evaluateWin(prevStats, ctx, earnedBefore);
+      const now = new Date().toISOString();
+      const newTrophies = [...(meta.trophies || []), ...earned.map((id) => ({ id, at: now }))];
+      await supabase.auth.updateUser({ data: { ...meta, stats, trophies: newTrophies } });
+      await setProfileTrophies(myUserId, newTrophies);
+      if (earned.length) setAwarded(earned);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, result]);
 
   const analyze = useCallback(async (raw, withWeb = true) => {
     const chunk = (raw || "").trim().slice(-2000);
@@ -1054,10 +1147,61 @@ Rien à vérifier -> []. sources peut être vide.`;
       {iAmController && (floor === null
         ? <button onClick={launch} className="inline-flex items-center gap-1.5 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 16px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><Flag size={13} /> Lancer</button>
         : <button onClick={() => setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13 }}>{clockRunning ? <><Pause size={13} /> Pause</> : <><Play size={13} /> Reprendre</>}</button>)}
+      {iAmController && phase === "live" && floor !== null && <button onClick={openVote} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13, color: C.gold }} title="Clore le débat et lancer le vote"><CheckCircle2 size={13} /> Clore</button>}
       {iAmController && <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title="Réinitialiser"><RotateCcw size={13} /></button>}
       <button onClick={onHome} className="pill" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}>Quitter</button>
     </div>
   );
+
+  const totalVotes = tallyNow.voters;
+  const barFor = (i) => totalVotes > 0 ? Math.round((tallyNow.counts[i] / totalVotes) * 100) : 0;
+  const voteCard = (phase === "voting" || phase === "results") ? (
+    <div className="mx-auto" style={{ maxWidth: 1180, padding: "14px 18px 0" }}>
+      <div style={{ ...cardStyle, padding: 18, borderColor: C.gold }}>
+        {phase === "voting" ? (<>
+          <Kicker>Le verdict du public</Kicker>
+          <h3 style={{ fontFamily: SERIF, fontSize: 20, margin: "6px 0 12px" }}>Qui a remporté ce débat ?</h3>
+          {!session ? (
+            <p style={{ color: C.mute, fontSize: 13 }}>Connecte-toi pour voter. (Regarder reste libre.)</p>
+          ) : isDebater ? (
+            <p style={{ color: C.mute, fontSize: 13 }}>Tu débats dans ce panel — c'est au public de voter.</p>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3">
+              {[0, 1].map((i) => (
+                <button key={i} onClick={() => castVote(i)} className="flex-1" style={{ borderRadius: 14, border: "2px solid " + (myVote === i ? CAMP[i] : C.line), background: myVote === i ? CAMP[i] : C.pill, color: myVote === i ? "#fff" : C.text, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>
+                  <span className="inline-flex items-center gap-2"><span style={{ width: 10, height: 10, borderRadius: 3, background: myVote === i ? "#fff" : CAMP[i] }} /> {cfg.camps[i]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <div style={{ marginTop: 14 }}>
+            {[0, 1].map((i) => (
+              <div key={i} style={{ marginBottom: 8 }}>
+                <div className="flex justify-between" style={{ fontSize: 12, color: C.mute, marginBottom: 4 }}><span>{cfg.camps[i]}</span><span>{tallyNow.counts[i]} voix</span></div>
+                <div style={{ height: 8, borderRadius: 6, background: C.field, overflow: "hidden" }}><div style={{ width: barFor(i) + "%", height: "100%", background: CAMP[i], transition: "width .3s" }} /></div>
+              </div>
+            ))}
+            <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 6 }}>{totalVotes} vote{totalVotes > 1 ? "s" : ""} · validé à partir de {MIN_VOTERS} votes</p>
+          </div>
+          {iAmController && <button onClick={closeVote} className="inline-flex items-center gap-2 uppercase" style={{ marginTop: 12, borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "10px 20px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><CheckCircle2 size={14} /> Clôturer le vote & révéler</button>}
+        </>) : (() => {
+          const r = result || {};
+          const validated = r.winner != null && r.voters >= MIN_VOTERS;
+          return (<>
+            <Kicker>Résultat</Kicker>
+            {r.winner == null
+              ? <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "6px 0 6px" }}>Égalité — pas de vainqueur</h3>
+              : <h3 style={{ fontFamily: SERIF, fontSize: 22, margin: "6px 0 6px" }}>Vainqueur : <span style={{ color: CAMP[r.winner] }}>{(r.camps && r.camps[r.winner]) || cfg.camps[r.winner]}</span></h3>}
+            <p style={{ color: C.mute, fontSize: 13 }}>{r.voters || 0} votant{(r.voters || 0) > 1 ? "s" : ""}{r.winner != null ? " · " + r.sharePct + "% des voix" : ""} · {r.audience || 0} présent{(r.audience || 0) > 1 ? "s" : ""}</p>
+            {!validated && <p style={{ color: C.gold, fontSize: 13, marginTop: 8 }}>Débat non validé : il faut au moins {MIN_VOTERS} votes et un vainqueur net pour décerner des trophées.</p>}
+            {awarded.length > 0 && <TrophyUnlock ids={awarded} />}
+            {validated && mySeat != null && mySeat === r.winner && awarded.length === 0 && <p style={{ color: C.green, fontSize: 13, marginTop: 8 }}>Victoire enregistrée ! (Pas de nouveau trophée cette fois.)</p>}
+            {iAmController && <button onClick={backToLive} className="pill inline-flex items-center gap-2" style={{ marginTop: 12, padding: "9px 16px", fontSize: 12 }}><RotateCcw size={13} /> Revenir au direct</button>}
+          </>);
+        })()}
+      </div>
+    </div>
+  ) : null;
 
   if (!iAmController && mySeat == null && roomRank > MAX_ROOM) {
     return (
@@ -1091,6 +1235,8 @@ Rien à vérifier -> []. sources peut être vide.`;
           </div>
         </div>
       </div>
+
+      {voteCard}
 
       <div className="mx-auto grid grid-cols-2 gap-3" style={{ maxWidth: 1180, padding: "14px 18px 0" }}>
         <Camp i={0} {...campProps} />
@@ -1355,6 +1501,26 @@ function TrophyBadge({ palier = "Bronze", size = 64, locked = false }) {
         <ellipse cx="48" cy="46" rx="9" ry="5" fill="#fff" fillOpacity=".22" transform="rotate(-30 48 46)" />
       </>)}
     </svg>
+  );
+}
+
+// Annonce des trophées débloqués à la fin d'un débat (badges + noms).
+function TrophyUnlock({ ids }) {
+  const [all, setAll] = useState([]);
+  useEffect(() => { fetch("/trophees.json").then((r) => r.json()).then(setAll).catch(() => {}); }, []);
+  const got = all.filter((t) => ids.includes(t.id));
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div className="uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.12em", marginBottom: 8 }}>{ids.length} trophée{ids.length > 1 ? "s" : ""} débloqué{ids.length > 1 ? "s" : ""} !</div>
+      <div className="flex flex-wrap gap-3">
+        {got.map((t) => (
+          <div key={t.id} className="text-center" style={{ width: 96 }}>
+            <div style={{ height: 66 }}><TrophyBadge palier={t.palier} size={64} /></div>
+            <div style={{ fontSize: 12, marginTop: 4 }}>{t.nom}</div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

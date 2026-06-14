@@ -20,10 +20,11 @@ export async function createPanel(cfg, ownerId) {
       visibility: cfg.visibility, comments_allowed: cfg.comments, owner_id: ownerId,
       floor: null, clock_running: false, remaining: [minutes * 60, minutes * 60],
     }
-    let { data, error } = await supabase.from('panels')
-      .insert({ ...base, seats: { '0': [], '1': [] }, max_per_camp: maxPerCamp }).select().single()
-    // Si les colonnes sièges n'existent pas encore (migration non faite), on insère sans.
-    if (error && /seats|max_per_camp/.test(error.message || '')) {
+    const extras = { seats: { '0': [], '1': [] }, max_per_camp: maxPerCamp }
+    if (cfg.theme) extras.theme = cfg.theme
+    let { data, error } = await supabase.from('panels').insert({ ...base, ...extras }).select().single()
+    // Si des colonnes optionnelles n'existent pas encore (migration non faite), on insère sans.
+    if (error && /seats|max_per_camp|theme/.test(error.message || '')) {
       ;({ data, error } = await supabase.from('panels').insert(base).select().single())
     }
     if (!error) return { panel: data }
@@ -76,6 +77,13 @@ export async function postMessage(panelId, msg) {
 // Profils publics (identité visible par les autres).
 export async function upsertProfile(p) {
   const { error } = await supabase.from('profiles').upsert({ ...p, updated_at: new Date().toISOString() })
+  return { error: error?.message }
+}
+// Enregistre les trophées d'un membre dans son profil public (visible par tous).
+// Sans incidence si la colonne n'existe pas encore (migration non faite).
+export async function setProfileTrophies(id, trophies) {
+  const { error } = await supabase.from('profiles').update({ trophies }).eq('id', id)
+  if (error && /trophies/.test(error.message || '')) return { error: 'no-column' }
   return { error: error?.message }
 }
 export async function getProfile(id) {

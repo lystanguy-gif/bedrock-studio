@@ -32,6 +32,15 @@ Branche de dev : `claude/contrechamp-debate-app-vqon1f`
 - Bugs caméra (clignotement) + image (iPhone) corrigés ; caméra en miroir
 - Fiches documentaires branchées (recherche de mots-clés dans la transcription)
 - Comptes : inscription / connexion (Supabase Auth)
+- Phase 1 — Vrais lobbys : création/code, rejoindre, temps réel, présence,
+  sièges jusqu'à 2v2, « monter », départs, succession de l'hôte, auto-fermeture
+- Phase 2 — Profils & identité : avatars, pseudo, fiche profil, #centres d'intérêt
+- Phase 3 — L'Agora : liste des débats publics (filtres à venir)
+- **Vidéo « maison »** : caméra + voix des débatteurs en pair-à-pair (WebRTC),
+  signalisation via Supabase Realtime (broadcast), STUN public, sans serveur média
+- Phase 5 — Fin de débat & trophées : bouton « Clore » → vote du public → résultats →
+  attribution automatique des trophées (moteur dans `src/lib/trophies.js`).
+  ⚠️ Migration SQL à passer : `docs/migration-trophees.sql` (colonnes profiles.trophies + panels.theme)
 
 ## Feuille de route
 1. **Phase 1 — Vrais lobbys** : créer (→ code) / rejoindre par code ; temps réel ;
