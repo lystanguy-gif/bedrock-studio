@@ -22,9 +22,10 @@ export async function createPanel(cfg, ownerId) {
     }
     const extras = { seats: { '0': [], '1': [] }, max_per_camp: maxPerCamp }
     if (cfg.theme) extras.theme = cfg.theme
+    if (cfg.country) extras.country = cfg.country
     let { data, error } = await supabase.from('panels').insert({ ...base, ...extras }).select().single()
     // Si des colonnes optionnelles n'existent pas encore (migration non faite), on insère sans.
-    if (error && /seats|max_per_camp|theme/.test(error.message || '')) {
+    if (error && /seats|max_per_camp|theme|country/.test(error.message || '')) {
       ;({ data, error } = await supabase.from('panels').insert(base).select().single())
     }
     if (!error) return { panel: data }

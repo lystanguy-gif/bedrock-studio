@@ -8,6 +8,7 @@ import {
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { MeshRTC } from "./lib/rtc.js";
 import { evaluateWin, applyLoss, tally, THEMES, MIN_VOTERS } from "./lib/trophies.js";
+import { COUNTRIES } from "./lib/places.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
 import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel, setProfileTrophies } from "./lib/lobby.js";
 
@@ -108,7 +109,7 @@ export default function App() {
 function CreateFlow({ session, onHome, onLaunched }) {
   const [cfg, setCfg] = useState({
     panel: "Le contrechamp", topic: "L'État doit-il encadrer les prix de l'énergie ?",
-    camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true, maxPerCamp: 1, theme: "",
+    camps: ["Pour", "Contre"], minutes: 5, visibility: "prive", comments: true, maxPerCamp: 1, theme: "", country: "France",
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -524,6 +525,8 @@ function Agora({ onHome, onOpenPanel }) {
   const [publics, setPublics] = useState(null);
   const [creators, setCreators] = useState({});
   const [viewedProfile, setViewedProfile] = useState(null);
+  const [fTheme, setFTheme] = useState("");
+  const [fCountry, setFCountry] = useState("");
   useEffect(() => {
     listPublicPanels().then(async ({ panels }) => {
       setPublics(panels || []);
@@ -531,6 +534,9 @@ function Agora({ onHome, onOpenPanel }) {
       setCreators(profiles || {});
     });
   }, []);
+  // Pays réellement présents dans les débats publics (pour ne proposer que l'utile).
+  const usedCountries = [...new Set((publics || []).map((p) => p.country).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+  const list = (publics || []).filter((p) => (!fTheme || p.theme === fTheme) && (!fCountry || p.country === fCountry));
   const back = <button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>;
   return (
     <>
@@ -538,14 +544,39 @@ function Agora({ onHome, onOpenPanel }) {
       <div className="mx-auto" style={{ maxWidth: 1180, padding: "48px 18px 60px" }}>
         <Kicker>L'Agora</Kicker>
         <h1 className="uppercase" style={{ fontFamily: SERIF, fontSize: "clamp(32px,6vw,56px)", lineHeight: 0.95, margin: "10px 0 10px", fontWeight: 700 }}>Débats publics</h1>
-        <p style={{ color: C.mute, fontSize: 14, marginBottom: 8 }}>Choisis un débat en cours et rejoins-le. <span style={{ color: "#6f6b63" }}>(Filtres par sujet et par pays à venir.)</span></p>
+        <p style={{ color: C.mute, fontSize: 14, marginBottom: 14 }}>Choisis un débat en cours et rejoins-le. Filtre par thème et par pays.</p>
+
+        <div className="flex flex-wrap gap-3" style={{ marginBottom: 18 }}>
+          <div>
+            <Label>Thème</Label>
+            <select value={fTheme} onChange={(e) => setFTheme(e.target.value)} style={{ ...fieldStyle, padding: "9px 13px", minWidth: 180 }}>
+              <option value="">Tous les thèmes</option>
+              {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <Label>Pays</Label>
+            <select value={fCountry} onChange={(e) => setFCountry(e.target.value)} style={{ ...fieldStyle, padding: "9px 13px", minWidth: 180 }}>
+              <option value="">Tous les pays</option>
+              {usedCountries.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          {(fTheme || fCountry) && (
+            <div style={{ alignSelf: "flex-end" }}>
+              <button onClick={() => { setFTheme(""); setFCountry(""); }} className="pill inline-flex items-center gap-1.5" style={{ padding: "9px 13px", fontSize: 12 }}><X size={13} /> Réinitialiser</button>
+            </div>
+          )}
+        </div>
+
         {publics === null ? (
           <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Chargement…</p>
         ) : publics.length === 0 ? (
           <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Aucun débat public en ce moment. Crée le premier en choisissant « Public » à l'ouverture du débat.</p>
+        ) : list.length === 0 ? (
+          <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 16 }}>Aucun débat public ne correspond à ces filtres. <button onClick={() => { setFTheme(""); setFCountry(""); }} style={{ background: "none", border: "none", color: C.gold, cursor: "pointer", textDecoration: "underline" }}>Tout afficher</button></p>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ marginTop: 16 }}>
-            {publics.map((p) => {
+            {list.map((p) => {
               const camps = (p.camps && p.camps.length >= 2) ? p.camps : ["Pour", "Contre"];
               const c = creators[p.owner_id];
               return (
@@ -557,6 +588,12 @@ function Agora({ onHome, onOpenPanel }) {
                     <span style={{ fontSize: 12, color: "#6f6b63" }}>par <span onClick={() => c && setViewedProfile(c.id)} style={{ color: C.gold, fontWeight: 600, cursor: c ? "pointer" : "default" }}>{c ? c.pseudo : "un membre"}</span></span>
                   </div>
                   <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || "Débat"}</div>
+                  {(p.theme || p.country) && (
+                    <div className="flex flex-wrap gap-2">
+                      {p.theme && <button onClick={() => setFTheme(p.theme)} style={{ fontSize: 11, color: C.gold, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "3px 10px", cursor: "pointer" }}>{p.theme}</button>}
+                      {p.country && <button onClick={() => setFCountry(p.country)} style={{ fontSize: 11, color: C.mute, background: C.pill, border: "1px solid " + C.line, borderRadius: 999, padding: "3px 10px", cursor: "pointer" }}>{p.country}</button>}
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2" style={{ fontSize: 13 }}>
                       <span style={{ color: CAMP[0] }}>●</span> {camps[0]}
@@ -665,11 +702,21 @@ function Setup({ cfg, setCfg, onStart, onHome, busy, error }) {
           <Label>Temps de parole par camp (minutes)</Label>
           <input type="number" min={1} max={60} value={cfg.minutes} onChange={(e) => set("minutes", Math.max(1, Math.min(60, Number(e.target.value) || 1)))} style={{ ...fieldStyle, padding: "10px 14px", width: 120, marginBottom: 22 }} />
 
-          <Label>Thème (pour les trophées et L'Agora)</Label>
-          <select value={cfg.theme} onChange={(e) => set("theme", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px", marginBottom: 22 }}>
-            <option value="">Général (sans thème)</option>
-            {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
+          <div className="flex gap-4" style={{ marginBottom: 22 }}>
+            <div className="flex-1">
+              <Label>Thème (trophées & Agora)</Label>
+              <select value={cfg.theme} onChange={(e) => set("theme", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px" }}>
+                <option value="">Général (sans thème)</option>
+                {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div className="flex-1">
+              <Label>Pays</Label>
+              <select value={cfg.country} onChange={(e) => set("country", e.target.value)} className="w-full" style={{ ...fieldStyle, padding: "10px 14px" }}>
+                {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
 
           <Label>Format</Label>
           <div className="flex gap-3" style={{ marginBottom: 22 }}>
