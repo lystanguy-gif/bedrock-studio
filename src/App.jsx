@@ -6,6 +6,7 @@ import {
   LogIn, LogOut, UserPlus, ArrowLeft, Loader2 as Spinner, Users, Copy, Settings as SettingsIcon, KeyRound, Check
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
+import { MeshRTC } from "./lib/rtc.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
 import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels, upsertProfile, getProfile, getProfiles, setSeats as pushSeats, deletePanel } from "./lib/lobby.js";
 
@@ -710,7 +711,12 @@ function Live({ lobby, session, onHome }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [manual, setManual] = useState("");
   const [images, setImages] = useState([[], []]);
-  const [camOwner, setCamOwner] = useState(null);
+  // Vidéo « maison » (WebRTC) : mon flux publié, et les flux distants reçus.
+  const [publishing, setPublishing] = useState(false);
+  const [pubCamp, setPubCamp] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStreams, setRemoteStreams] = useState({}); // cléPair -> MediaStream
+  const [peerUid, setPeerUid] = useState({}); // cléPair -> identifiant de compte
   const [lightbox, setLightbox] = useState(null);
   const [comments, setComments] = useState([]);
   const [draft, setDraft] = useState("");
@@ -723,7 +729,7 @@ function Live({ lobby, session, onHome }) {
 
   const recRef = useRef(null), wantRef = useRef(false), busyRef = useRef(false);
   const lastLenRef = useRef(0), floorRef = useRef(null), joinedRef = useRef("");
-  const camStreamRef = useRef(null), vidRefs = [useRef(null), useRef(null)];
+  const localStreamRef = useRef(null), meshRef = useRef(null);
   const remainingRef = useRef(remaining), seenMsgRef = useRef(new Set());
   const presenceKeyRef = useRef("p" + Math.random().toString(36).slice(2));
 
@@ -746,6 +752,29 @@ function Live({ lobby, session, onHome }) {
       if (iAmControllerRef.current && clockRunningRef.current) pushPanelState(panel.id, { floor: floorRef.current, clock_running: true, remaining: remainingRef.current });
     }, 2000);
     return () => clearInterval(id);
+  }, [panel.id]);
+
+  // ---- Vidéo « maison » : réseau pair-à-pair (WebRTC) ----
+  // Canal Supabase dédié à la signalisation (offres/réponses + candidats ICE).
+  useEffect(() => {
+    if (!supabase) return;
+    const selfId = presenceKeyRef.current;
+    const sig = supabase.channel("rtc-" + panel.id, { config: { broadcast: { self: false } } });
+    let sigReady = false; const outbox = [];
+    const doSend = (msg) => { try { sig.send({ type: "broadcast", event: "sig", payload: { ...msg, from: selfId } }); } catch (e) {} };
+    const mesh = new MeshRTC({
+      selfId,
+      send: (msg) => { if (sigReady) doSend(msg); else outbox.push(msg); },
+      onStream: (peerId, stream) => setRemoteStreams((m) => ({ ...m, [peerId]: stream })),
+      onClose: (peerId) => setRemoteStreams((m) => { const n = { ...m }; delete n[peerId]; return n; }),
+    });
+    meshRef.current = mesh;
+    sig.on("broadcast", { event: "sig" }, ({ payload }) => {
+      if (payload && payload.to === selfId) mesh.onSignal(payload.from, payload);
+    });
+    sig.subscribe((status) => { if (status === "SUBSCRIBED") { sigReady = true; while (outbox.length) doSend(outbox.shift()); } });
+    return () => { mesh.destroy(); meshRef.current = null; supabase.removeChannel(sig); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel.id]);
 
   // Tout le monde : écoute les changements du panel + l'arrivée des messages.
@@ -783,10 +812,13 @@ function Live({ lobby, session, onHome }) {
         const state = pres.presenceState();
         const keys = Object.keys(state);
         setSpectators(keys.length || 1);
-        // Identifiants des comptes présents (pour le cycle de vie du débat).
-        const ids = new Set();
-        keys.forEach((k) => { const u = state[k][0] && state[k][0].uid; if (u) ids.add(u); });
+        // Identifiants des comptes présents (pour le cycle de vie du débat) et
+        // correspondance clé-de-présence -> compte (pour relier flux vidéo et siège).
+        const ids = new Set(); const uidByKey = {};
+        keys.forEach((k) => { const u = state[k][0] && state[k][0].uid; if (u) { ids.add(u); uidByKey[k] = u; } });
         setPresentIds(ids);
+        setPeerUid(uidByKey);
+        if (meshRef.current) meshRef.current.setPeers(keys); // met à jour le réseau vidéo
         setPresenceReady(true);
         // Rang d'arrivée du client courant (pour ne bloquer que les places au-delà de la limite).
         const order = keys.map((k) => ({ k, at: (state[k][0] && state[k][0].at) || 0 })).sort((a, b) => a.at - b.at);
@@ -966,16 +998,21 @@ Rien à vérifier -> []. sources peut être vide.`;
   }
   function stopMic() { wantRef.current = false; try { recRef.current && recRef.current.stop(); } catch (e) {} setMicOn(false); setInterim(""); }
 
-  async function toggleCam(i) {
-    if (camOwner === i) { camStreamRef.current && camStreamRef.current.getTracks().forEach((t) => t.stop()); camStreamRef.current = null; setCamOwner(null); return; }
-    try {
-      camStreamRef.current && camStreamRef.current.getTracks().forEach((t) => t.stop());
-      const s = await navigator.mediaDevices.getUserMedia({ video: true });
-      camStreamRef.current = s; setCamOwner(i);
-    } catch (e) { setMicError("Caméra bloquée dans l'aperçu intégré. Ouvre la maquette dans son onglet."); }
+  function stopPublish() {
+    if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop());
+    localStreamRef.current = null; setLocalStream(null); setPublishing(false); setPubCamp(null);
+    if (meshRef.current) meshRef.current.setLocalStream(null);
   }
-  useEffect(() => { if (camOwner !== null && vidRefs[camOwner].current && camStreamRef.current) vidRefs[camOwner].current.srcObject = camStreamRef.current; }, [camOwner]);
-  useEffect(() => () => { wantRef.current = false; try { recRef.current && recRef.current.stop(); } catch (e) {} camStreamRef.current && camStreamRef.current.getTracks().forEach((t) => t.stop()); }, []);
+  // Caméra « maison » : publie caméra + voix vers tous les participants (i = mon camp).
+  async function toggleCam(i) {
+    if (publishing) { stopPublish(); return; }
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true });
+      localStreamRef.current = s; setLocalStream(s); setPublishing(true); setPubCamp(i);
+      if (meshRef.current) meshRef.current.setLocalStream(s);
+    } catch (e) { setMicError("Caméra/micro bloqués dans l'aperçu intégré. Ouvre la maquette dans son onglet, et autorise l'accès."); }
+  }
+  useEffect(() => () => { wantRef.current = false; try { recRef.current && recRef.current.stop(); } catch (e) {} if (localStreamRef.current) localStreamRef.current.getTracks().forEach((t) => t.stop()); }, []);
 
   function addImages(i, files) {
     // Sur iPhone, le "type" du fichier est souvent vide : on accepte alors le
@@ -992,10 +1029,14 @@ Rien à vérifier -> []. sources peut être vide.`;
     postMessage(panel.id, { kind: "comment", author: pseudo, author_id: session.user.id, content: v });
   }
 
+  // Flux distants rangés par compte (pour les afficher dans le bon siège).
+  const remoteByUid = {};
+  Object.entries(remoteStreams).forEach(([key, stream]) => { const u = peerUid[key]; if (u) remoteByUid[u] = stream; });
+
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
   // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
   // l'état nécessaire en props.
-  const campProps = { floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController: iAmController, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
+  const campProps = { floor, clockRunning, remaining, cfg, publishing, pubCamp, localStream, remoteByUid, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController: iAmController, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
 
   const bannerStatus = floor === null ? "Le modérateur lance le débat"
     : clockRunning ? "au temps de parole"
@@ -1161,15 +1202,37 @@ Rien à vérifier -> []. sources peut être vide.`;
   );
 }
 
+/* --------------------------- VIDÉO (stable) --------------------------- */
+// Vignette vidéo : l'élément <video> reste le même entre les rendus, on ne
+// fait que remplacer la source (srcObject) — donc pas de clignotement.
+// muted = mon propre flux (pour éviter l'écho) ; mirror = effet miroir (selfie).
+function VideoTile({ stream, muted, mirror }) {
+  const ref = useRef(null);
+  useEffect(() => { if (ref.current && ref.current.srcObject !== (stream || null)) ref.current.srcObject = stream || null; }, [stream]);
+  return <video ref={ref} autoPlay playsInline muted={muted} style={{ width: "100%", height: "100%", objectFit: "cover", transform: mirror ? "scaleX(-1)" : "none" }} />;
+}
+
 /* --------------------------- CAMP (stable) --------------------------- */
 // Défini au niveau module pour conserver son identité entre les rendus :
 // ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
-function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
+function Camp({ i, floor, clockRunning, remaining, cfg, publishing, pubCamp, localStream, remoteByUid, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
   const has = i === floor, started = floor !== null;
   const occ = (seats && seats[String(i)]) || [];
   const canSpeak = canSpeakCamp(i);
   const max = cfg.maxPerCamp || 1;
   const canClaim = loggedIn && mySeat == null && occ.length < max;
+  const iPublishHere = publishing && pubCamp === i;
+  // Une vignette vidéo par siège : mon flux local si c'est moi, sinon le flux
+  // distant du débatteur assis là. Plus une prévisualisation pour l'hôte qui
+  // teste en solo dans un camp vide.
+  const videoSlots = [];
+  for (let s = 0; s < max; s++) {
+    const uid = occ[s];
+    if (uid && uid === myUserId) videoSlots.push({ key: "me", stream: localStream, me: true });
+    else if (uid) videoSlots.push({ key: uid, stream: remoteByUid[uid] || null, me: false });
+    else videoSlots.push({ key: "empty" + s, stream: null, me: false });
+  }
+  if (mySeat == null && iPublishHere && occ.length === 0) videoSlots[0] = { key: "me", stream: localStream, me: true };
   return (
     <div className="flex flex-col gap-2.5" style={{ background: has ? C.panel2 : C.panel, border: "1px solid " + (has ? C.gold : C.line), borderRadius: 18, padding: 14, boxShadow: has ? "0 16px 44px -26px " + C.gold : "none", transition: "border-color .15s,box-shadow .15s" }}>
       <div className="flex items-center justify-between">
@@ -1203,8 +1266,12 @@ function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camSt
         })}
       </div>
 
-      <div className="overflow-hidden flex items-center justify-center" style={{ background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
-        {camOwner === i ? <video ref={(el) => { vidRefs[i].current = el; if (el && camStreamRef.current && el.srcObject !== camStreamRef.current) el.srcObject = camStreamRef.current; }} autoPlay muted playsInline style={{ width: "100%", height: "100%", objectFit: "cover", transform: "scaleX(-1)" }} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
+      <div className="flex gap-2">
+        {videoSlots.map((v) => (
+          <div key={v.key} className="overflow-hidden flex items-center justify-center" style={{ flex: 1, background: C.field, border: "1px solid " + C.line, borderRadius: 12, aspectRatio: "16/10" }}>
+            {v.stream ? <VideoTile stream={v.stream} muted={v.me} mirror={v.me} /> : <span style={{ color: "#6f6b63", fontSize: 12 }}>caméra éteinte</span>}
+          </div>
+        ))}
       </div>
 
       <div className="text-center" style={{ fontFamily: SERIF, fontVariantNumeric: "tabular-nums", fontSize: 30, color: remaining[i] < 0 ? C.red : C.text }}>{fmt(remaining[i])}</div>
@@ -1223,8 +1290,8 @@ function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camSt
 
       {canSpeak && (
         <div className="flex gap-2">
-          <button onClick={() => toggleCam(i)} className={camOwner === i ? "" : "pill"} style={camOwner === i ? pillSolid(CAMP[i]) : pillBase()}>
-            {camOwner === i ? <Video size={12} /> : <VideoOff size={12} />} Caméra
+          <button onClick={() => toggleCam(i)} className={iPublishHere ? "" : "pill"} style={iPublishHere ? pillSolid(CAMP[i]) : pillBase()}>
+            {iPublishHere ? <Video size={12} /> : <VideoOff size={12} />} {iPublishHere ? "Caméra + voix" : "Caméra"}
           </button>
           <label className="pill inline-flex items-center justify-center gap-1.5 cursor-pointer" style={{ ...pillBase(), flex: 1 }}>
             <ImagePlus size={12} /> Image
