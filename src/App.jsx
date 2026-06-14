@@ -727,23 +727,26 @@ function Live({ lobby, session, onHome }) {
   const remainingRef = useRef(remaining), seenMsgRef = useRef(new Set());
   const presenceKeyRef = useRef("p" + Math.random().toString(36).slice(2));
 
+  const clockRunningRef = useRef(clockRunning);
   useEffect(() => { floorRef.current = floor; }, [floor]);
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
+  useEffect(() => { clockRunningRef.current = clockRunning; }, [clockRunning]);
 
   // ---- Synchro temps réel du lobby ----
-  // Hôte : pousse l'état partagé (parole + chrono) à chaque changement.
+  // Le CONTRÔLEUR (hôte, ou premier débatteur en cas de succession) pousse l'état partagé.
   useEffect(() => {
-    if (!isHost) return;
+    if (!iAmControllerRef.current) return;
     pushPanelState(panel.id, { floor, clock_running: clockRunning, remaining });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [floor, clockRunning]);
-  // Hôte : pousse régulièrement l'état complet pendant que le chrono tourne
-  // (auto-resynchronisation : un spectateur qui vient de rejoindre se cale en ~2 s).
+  // Push régulier de l'état complet pendant que le chrono tourne (auto-resync).
+  // Intervalle toujours actif : seul le contrôleur pousse réellement (via refs).
   useEffect(() => {
-    if (!isHost || !clockRunning) return;
-    const id = setInterval(() => pushPanelState(panel.id, { floor: floorRef.current, clock_running: true, remaining: remainingRef.current }), 2000);
+    const id = setInterval(() => {
+      if (iAmControllerRef.current && clockRunningRef.current) pushPanelState(panel.id, { floor: floorRef.current, clock_running: true, remaining: remainingRef.current });
+    }, 2000);
     return () => clearInterval(id);
-  }, [isHost, clockRunning, panel.id]);
+  }, [panel.id]);
 
   // Tout le monde : écoute les changements du panel + l'arrivée des messages.
   useEffect(() => {
@@ -761,7 +764,7 @@ function Live({ lobby, session, onHome }) {
     const ch = supabase.channel("panel-" + panel.id)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "panels", filter: "id=eq." + panel.id }, ({ new: row }) => {
         if (row.seats) setSeats(normSeats(row.seats)); // sièges synchronisés pour tout le monde
-        if (isHost) return; // l'hôte fait autorité pour parole/chrono
+        if (iAmControllerRef.current) return; // le contrôleur fait autorité pour parole/chrono
         setFloor(row.floor ?? null);
         setClockRunning(!!row.clock_running);
         if (Array.isArray(row.remaining) && row.remaining.length === 2) setRemaining(row.remaining);
@@ -795,7 +798,7 @@ function Live({ lobby, session, onHome }) {
     // Spectateur : rattrapage de l'état 3,5 s après l'abonnement (au cas où un
     // changement aurait eu lieu pendant le démarrage de l'écoute temps réel).
     const resync = setTimeout(() => {
-      if (isHost) return;
+      if (iAmControllerRef.current) return;
       supabase.from("panels").select("floor,clock_running,remaining").eq("id", panel.id).maybeSingle().then(({ data }) => {
         if (!data) return;
         setFloor(data.floor ?? null);
@@ -869,13 +872,19 @@ function Live({ lobby, session, onHome }) {
     setSeats(next); await pushSeats(panel.id, next);
   }
   // Puis-je parler dans le camp i ? (débatteur de ce camp avec la parole, ou hôte si le camp est vide)
-  const canSpeakCamp = (i) => (mySeat === i || (isHost && (seats[String(i)] || []).length === 0));
+  const canSpeakCamp = (i) => (mySeat === i || (iAmController && (seats[String(i)] || []).length === 0));
 
   // Cycle de vie : le débat reste ouvert tant qu'il y a quelqu'un « en haut »
   // (l'hôte OU au moins un débatteur présent). Sinon, fermeture après un court délai.
   const hostPresent = presentIds.has(panel.owner_id);
   const debatersPresent = [...seats["0"], ...seats["1"]].filter((id) => presentIds.has(id));
   const aliveUpstairs = hostPresent || debatersPresent.length > 0;
+  // Contrôleur du débat : l'hôte par défaut (et tant que la présence n'est pas mesurée) ;
+  // s'il est confirmé absent, le premier débatteur présent prend les commandes (succession).
+  const controllerId = (!presenceReady || hostPresent) ? panel.owner_id : (debatersPresent[0] || null);
+  const iAmController = !!myUserId && controllerId === myUserId;
+  const iAmControllerRef = useRef(false);
+  useEffect(() => { iAmControllerRef.current = iAmController; }, [iAmController]);
   useEffect(() => {
     if (!presenceReady || aliveUpstairs) return;
     const t = setTimeout(() => { deletePanel(panel.id); onHome(); }, 8000);
@@ -986,7 +995,7 @@ Rien à vérifier -> []. sources peut être vide.`;
   // Le composant Camp est défini au niveau module (voir plus bas), pour ne
   // PAS se reconstruire à chaque rendu (sinon la vidéo clignote). On lui passe
   // l'état nécessaire en props.
-  const campProps = { floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isHost, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
+  const campProps = { floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController: iAmController, loggedIn: !!session, claimSeat, leaveSeat, giveFloor, onViewProfile: setViewedProfile, canSpeakCamp };
 
   const bannerStatus = floor === null ? "Le modérateur lance le débat"
     : clockRunning ? "au temps de parole"
@@ -1001,15 +1010,15 @@ Rien à vérifier -> []. sources peut être vide.`;
         <span style={{ fontFamily: SERIF, letterSpacing: "0.18em", color: C.gold }}>{panel.code}</span>
         {copied ? <span style={{ fontSize: 11, color: C.green }}>copié</span> : <Copy size={13} />}
       </button>
-      {isHost && (floor === null
+      {iAmController && (floor === null
         ? <button onClick={launch} className="inline-flex items-center gap-1.5 uppercase" style={{ borderRadius: 999, background: C.gold, color: C.bg, border: "1px solid " + C.gold, padding: "8px 16px", fontWeight: 700, letterSpacing: "0.1em", fontSize: 12, cursor: "pointer" }}><Flag size={13} /> Lancer</button>
-        : <button onClick={() => pending === null && setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13, opacity: pending === null ? 1 : 0.5 }}>{clockRunning ? <><Pause size={13} /> Pause</> : <><Play size={13} /> Reprendre</>}</button>)}
-      {isHost && <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title="Réinitialiser"><RotateCcw size={13} /></button>}
+        : <button onClick={() => setClockRunning((r) => !r)} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 14px", fontSize: 13 }}>{clockRunning ? <><Pause size={13} /> Pause</> : <><Play size={13} /> Reprendre</>}</button>)}
+      {iAmController && <button onClick={reset} className="pill" style={{ padding: "8px 10px" }} title="Réinitialiser"><RotateCcw size={13} /></button>}
       <button onClick={onHome} className="pill" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}>Quitter</button>
     </div>
   );
 
-  if (!isHost && roomRank > MAX_ROOM) {
+  if (!iAmController && mySeat == null && roomRank > MAX_ROOM) {
     return (
       <>
         <Header right={<button onClick={onHome} className="pill inline-flex items-center gap-1.5" style={{ padding: "8px 12px", fontSize: 12, color: C.mute }}><ArrowLeft size={13} /> Accueil</button>} />
@@ -1155,7 +1164,7 @@ Rien à vérifier -> []. sources peut être vide.`;
 /* --------------------------- CAMP (stable) --------------------------- */
 // Défini au niveau module pour conserver son identité entre les rendus :
 // ainsi React ne remonte pas l'élément vidéo (plus de clignotement caméra).
-function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isHost, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
+function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camStreamRef, micOn, startMic, stopMic, toggleCam, images, setImages, setLightbox, addImages, seats, debaters, mySeat, myUserId, isController, loggedIn, claimSeat, leaveSeat, giveFloor, onViewProfile, canSpeakCamp }) {
   const has = i === floor, started = floor !== null;
   const occ = (seats && seats[String(i)]) || [];
   const canSpeak = canSpeakCamp(i);
@@ -1206,7 +1215,7 @@ function Camp({ i, floor, clockRunning, remaining, cfg, camOwner, vidRefs, camSt
         <button onClick={() => micOn ? stopMic() : startMic()} className={micOn ? "" : "pill"} style={micOn ? pillSolid(C.red) : pillBase()}>
           {micOn ? <><MicOff size={13} /> Couper le micro</> : <><Mic size={13} /> Activer le micro</>}
         </button>
-      ) : isHost && !has ? (
+      ) : isController && !has ? (
         <button onClick={() => giveFloor(i)} style={pillSolid(C.gold, C.bg)}><ArrowRight size={13} /> Donner la parole</button>
       ) : (
         <div className="text-center" style={{ color: "#6f6b63", fontSize: 12, padding: "4px 0" }}>{has ? (clockRunning ? "au temps de parole" : "en pause") : "à l'écoute"}</div>
