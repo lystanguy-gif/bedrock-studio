@@ -13,7 +13,14 @@
 
 const ICE = {
   iceServers: [
+    // STUN : aide les deux pairs à découvrir leur adresse publique.
     { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+    // TURN (relais public gratuit) : quand la connexion directe échoue (réseaux
+    // fermés, mobiles), le flux passe par ce relais. Le port 443/TCP traverse
+    // quasiment tous les pare-feux. C'est ce qui fait marcher la visio « partout ».
+    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
   ],
 }
 

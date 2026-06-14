@@ -1428,7 +1428,11 @@ Rien à vérifier -> []. sources peut être vide.`;
 // muted = mon propre flux (pour éviter l'écho) ; mirror = effet miroir (selfie).
 function VideoTile({ stream, muted, mirror }) {
   const ref = useRef(null);
-  useEffect(() => { if (ref.current && ref.current.srcObject !== (stream || null)) ref.current.srcObject = stream || null; }, [stream]);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    if (el.srcObject !== (stream || null)) el.srcObject = stream || null;
+    if (stream) { const p = el.play(); if (p && p.catch) p.catch(() => {}); } // force la lecture (et le son)
+  }, [stream]);
   return <video ref={ref} autoPlay playsInline muted={muted} style={{ width: "100%", height: "100%", objectFit: "cover", transform: mirror ? "scaleX(-1)" : "none" }} />;
 }
 
