@@ -56,6 +56,14 @@ export async function postMessage(panelId, msg) {
   return { error: error?.message }
 }
 
+// Liste les débats publics (pour L'Agora), les plus récents d'abord.
+export async function listPublicPanels(limit = 24) {
+  const { data, error } = await supabase.from('panels').select('*')
+    .eq('visibility', 'public').order('created_at', { ascending: false }).limit(limit)
+  if (error) return { error: error.message, panels: [] }
+  return { panels: data || [] }
+}
+
 export async function loadMessages(panelId) {
   const { data, error } = await supabase.from('messages').select('*')
     .eq('panel_id', panelId).order('created_at', { ascending: true })

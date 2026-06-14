@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { loadKnowledgeBase, scanForFiches } from "./lib/knowledgeBase.js";
 import { supabase, isSupabaseConfigured, isAdminEmail } from "./lib/supabaseClient.js";
-import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages } from "./lib/lobby.js";
+import { createPanel, getPanelByCode, joinAsParticipant, pushPanelState, postMessage, loadMessages, listPublicPanels } from "./lib/lobby.js";
 
 const C = {
   bg: "#08090b", panel: "#111318", panel2: "#171a21", line: "#30343d",
@@ -51,6 +51,11 @@ export default function App() {
 
   const goHome = () => { setLobby(null); setView("home"); };
   const enterLobby = (panel, isHost, pseudo) => { setLobby({ panel, isHost, pseudo }); setView("live"); };
+  const openPanel = async (panel) => {
+    const p = pseudoOf(session) || "Spectateur";
+    await joinAsParticipant(panel.id, p, "spectateur");
+    enterLobby(panel, !!(session && panel.owner_id === session.user.id), p);
+  };
 
   return (
     <Shell>
@@ -76,6 +81,7 @@ export default function App() {
           onSignIn={() => setView("auth")}
           onSettings={() => setView("settings")}
           onLegal={() => setView("legal")}
+          onOpenPanel={openPanel}
         />
       )}
     </Shell>
@@ -108,10 +114,12 @@ function pseudoOf(session) {
 }
 
 /* ----------------------------- ACCUEIL ----------------------------- */
-function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLegal }) {
+function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLegal, onOpenPanel }) {
   const pseudo = pseudoOf(session);
   const admin = isAdminEmail(session?.user?.email);
   const avatar = session?.user?.user_metadata?.avatar;
+  const [publics, setPublics] = useState([]);
+  useEffect(() => { let on = true; listPublicPanels().then(({ panels }) => { if (on) setPublics(panels || []); }); return () => { on = false; }; }, []);
   const accountRight = !authReady ? null : (session ? (
     <div className="flex items-center gap-2">
       {admin && <span className="inline-flex items-center gap-1 uppercase" style={{ borderRadius: 999, border: "1px solid " + C.gold, color: C.gold, fontSize: 10, letterSpacing: "0.08em", padding: "3px 9px", fontWeight: 700 }}><AdminSeal size={13} /> Admin</span>}
@@ -143,6 +151,31 @@ function Home({ session, authReady, onCreate, onJoin, onSignIn, onSettings, onLe
         </div>
         {authReady && !session && <p style={{ color: "#6f6b63", fontSize: 12, marginTop: 16 }}>Créer un débat nécessite un compte (gratuit, rapide).</p>}
         {!isSupabaseConfigured && <p style={{ color: C.gold, fontSize: 12, marginTop: 16 }}>⚠️ Connexion à la base non configurée sur ce site (variables d'environnement manquantes).</p>}
+        <div style={{ marginTop: 44 }}>
+          <Kicker>L'Agora · débats publics</Kicker>
+          {publics.length === 0 ? (
+            <p style={{ color: "#6f6b63", fontSize: 13, marginTop: 10 }}>Aucun débat public en ce moment. Crée le premier en choisissant « Public » à l'ouverture du débat.</p>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3" style={{ marginTop: 12 }}>
+              {publics.map((p) => {
+                const camps = (p.camps && p.camps.length >= 2) ? p.camps : ["Pour", "Contre"];
+                return (
+                  <button key={p.id} onClick={() => onOpenPanel(p)} className="text-left" style={{ ...cardStyle, padding: 16, cursor: "pointer", display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.25 }}>{p.topic || "Débat"}</div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2" style={{ fontSize: 13 }}>
+                        <span style={{ color: CAMP[0] }}>●</span> {camps[0]}
+                        <span style={{ color: C.mute }}>vs</span>
+                        <span style={{ color: CAMP[1] }}>●</span> {camps[1]}
+                      </div>
+                      <span className="inline-flex items-center gap-1 uppercase" style={{ color: C.gold, fontSize: 11, letterSpacing: "0.08em" }}>Rejoindre <ArrowRight size={13} /></span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
         <p style={{ marginTop: 28 }}><button onClick={onLegal} style={{ background: "none", border: "none", color: "#6f6b63", fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Mentions légales & conditions</button></p>
       </div>
       <Footer />
