@@ -25,9 +25,8 @@ input,select,textarea{font:inherit}
 a{color:var(--teal)}
 .mono{font-family:var(--ff-mono)}
 
-/* layout */
 .top{position:sticky;top:0;z-index:20;background:linear-gradient(100deg,#0c2334,#0e2b3d);color:#fff;border-bottom:2px solid var(--brass)}
-.top__in{max-width:1320px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.top__in{max-width:1340px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:11px}
 .brand__badge{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 50% 38%,#15405a,#0b2334);border:2px solid var(--brass);display:grid;place-items:center;flex:none;font-family:var(--ff-disp);font-style:italic;color:var(--brass-soft);font-size:1.1rem}
 .brand__t b{font-family:var(--ff-disp);font-style:italic;font-size:1.2rem;color:#fff;display:block;line-height:1}
@@ -37,8 +36,8 @@ a{color:var(--teal)}
 .kpi b{font-family:var(--ff-disp);font-size:1.25rem;color:#fff;display:block;line-height:1}
 .kpi span{font-family:var(--ff-mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--aqua-soft)}
 
-.wrap{max-width:1320px;margin:0 auto;padding:20px 24px 60px}
-.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.wrap{max-width:1340px;margin:0 auto;padding:20px 24px 70px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
 .search{flex:1;min-width:200px;position:relative}
 .search input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid var(--line);border-radius:11px;background:var(--cloud);color:var(--ink)}
 .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
@@ -47,22 +46,43 @@ a{color:var(--teal)}
 .btn svg{width:16px;height:16px}
 .btn--p{background:var(--brass);border-color:var(--brass);color:#231603}
 .btn--p:hover{filter:brightness(1.05);color:#231603}
-.btn--ink{background:var(--ink);border-color:var(--ink);color:#fff}
-.btn--ink:hover{color:#fff;background:var(--deep)}
+.btn--sm{padding:7px 11px;font-size:.82rem}
+select.btn{font-weight:500}
 
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.menu{position:relative}
+.menu__list{position:absolute;right:0;top:calc(100% + 6px);background:var(--cloud);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;min-width:230px;z-index:30;display:none}
+.menu.is-open .menu__list{display:block}
+.menu__list button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;border-radius:8px;font-size:.88rem;font-weight:500;color:var(--ink)}
+.menu__list button:hover{background:var(--paper)}
+.menu__list button svg{width:16px;height:16px;color:var(--muted);flex:none}
+.menu__list hr{border:0;border-top:1px solid var(--line);margin:5px 2px}
+.menu__list .danger{color:var(--bad)}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .chip{padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);background:var(--cloud);font-size:.82rem;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:7px}
 .chip:hover{border-color:var(--brass)}
 .chip.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
 .chip .n{font-family:var(--ff-mono);font-size:.72rem;opacity:.8}
 
+.bulkbar{display:none;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);color:#fff;border-radius:12px;padding:9px 14px;margin-bottom:12px}
+.bulkbar.show{display:flex}
+.bulkbar b{font-family:var(--ff-disp);font-size:1.05rem}
+.bulkbar select{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:9px;padding:7px 10px;font-size:.85rem}
+.bulkbar select option{color:#000}
+.bulkbar .sp{flex:1}
+.bulkbar .lk{font-size:.85rem;color:var(--aqua-soft);font-weight:600}
+
 .layout{display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
 @media(max-width:1040px){.layout{grid-template-columns:1fr}.detail{position:static!important}}
 
 .list{display:flex;flex-direction:column;gap:9px}
-.card{background:var(--cloud);border:1.5px solid var(--line);border-radius:var(--rad);padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;cursor:pointer;transition:.15s}
+.card{background:var(--cloud);border:1.5px solid var(--line);border-radius:var(--rad);padding:13px 16px;display:grid;grid-template-columns:auto auto 1fr auto;gap:14px;align-items:center;cursor:pointer;transition:.15s}
 .card:hover{border-color:var(--brass);box-shadow:var(--shadow)}
 .card.is-sel{border-color:var(--brass);box-shadow:0 0 0 2px rgba(199,154,75,.25),var(--shadow)}
+.check{width:20px;height:20px;border:1.5px solid var(--line);border-radius:6px;display:grid;place-items:center;flex:none;background:var(--cloud)}
+.check.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.check svg{width:13px;height:13px;opacity:0}
+.check.on svg{opacity:1}
 .card__date{text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:58px}
 .card__date b{font-family:var(--ff-disp);font-size:1.3rem;color:var(--ink);display:block;line-height:1}
 .card__date span{font-family:var(--ff-mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -76,6 +96,7 @@ a{color:var(--teal)}
 .st-annule{background:#fae3e1;color:var(--bad)}
 .st-archive{background:#eef2f4;color:var(--muted)}
 .empty{text-align:center;color:var(--muted);padding:60px 20px;border:1.5px dashed var(--line);border-radius:var(--rad);background:var(--cloud)}
+.pager{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;font-size:.85rem;color:var(--muted)}
 
 .detail{position:sticky;top:96px;background:var(--cloud);border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;box-shadow:var(--shadow)}
 .detail__empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:.92rem}
@@ -93,11 +114,10 @@ a{color:var(--teal)}
 .tplgrid .btn{justify-content:center;font-size:.82rem;padding:9px 8px}
 .detail__foot{display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
 
-/* modal */
 .ov{position:fixed;inset:0;background:rgba(8,24,36,.6);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
 .ov.show{display:flex}
-.modal{background:var(--cloud);border-radius:18px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:26px;position:relative;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
-.modal h2{font-size:1.4rem;color:var(--ink);margin-bottom:16px}
+.modal{background:var(--cloud);border-radius:18px;max-width:580px;width:100%;max-height:90vh;overflow:auto;padding:26px;position:relative;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+.modal h2{font-size:1.4rem;color:var(--ink);margin-bottom:14px}
 .modal .x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;color:var(--muted);font-size:18px}
 .modal .x:hover{background:var(--paper);color:var(--bad)}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
@@ -105,7 +125,9 @@ a{color:var(--teal)}
 .field input,.field select,.field textarea{padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
 .field textarea{min-height:80px;resize:vertical}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.help{font-size:.8rem;color:var(--muted);margin-top:6px;line-height:1.5}
+.help{font-size:.8rem;color:var(--muted);margin-top:4px;line-height:1.5}
+.split{border:0;border-top:1px solid var(--line);margin:18px 0}
+.split-lbl{font-family:var(--ff-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .kbd{font-family:var(--ff-mono);font-size:.7rem;background:var(--paper);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--txt)}
 
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:11px;font-weight:600;font-size:.9rem;opacity:0;transition:.3s;z-index:80;box-shadow:var(--shadow)}
@@ -114,7 +136,23 @@ a{color:var(--teal)}
 .banner{background:linear-gradient(120deg,#fff7e6,#fdf0d6);border:1px solid var(--brass-soft);border-radius:var(--rad);padding:13px 16px;font-size:.86rem;color:#6b4f17;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
 .banner svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--brass-deep)}
 .banner b{color:#4d3a10}
+
+/* feuille du jour */
+.sheet h3{font-size:1.15rem;color:var(--ink);margin:16px 0 8px}
+.sheet__group{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.sheet__h{background:var(--paper);padding:8px 12px;font-family:var(--ff-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);display:flex;justify-content:space-between}
+.sheet table{width:100%;border-collapse:collapse;font-size:.88rem}
+.sheet td{padding:7px 12px;border-top:1px solid var(--line)}
+.sheet .tot{font-weight:700;color:var(--ink)}
+
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:absolute;left:0;top:0;width:100%;padding:0;color:#000}
+  .modal .x,#sheet-print{display:none}
+}
 </style>
 </head>
 <body>
@@ -133,7 +171,7 @@ a{color:var(--teal)}
 
   <div class="banner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-    <div><b>Version locale sécurisée (sur cet appareil).</b> Les réservations sont enregistrées dans ce navigateur. Importez les demandes reçues (CSV Netlify / e-mail) ou ajoutez-les à la main. Pour un accès multi-postes protégé par mot de passe avec base de données et lien direct au paiement, voir « <a href="#" id="roadmap-link">Évolution serveur</a> ».</div>
+    <div>Tout se passe ici, sans aucun autre site à connaître. Une demande arrive par e-mail ? <b>Collez-la</b> (Importer) ou ajoutez-la à la main. Pensez à faire une <b>Sauvegarde</b> de temps en temps (menu ⋯) — vos données restent sur cet appareil.</div>
   </div>
 
   <div class="toolbar">
@@ -141,22 +179,46 @@ a{color:var(--teal)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
       <input id="search" type="search" placeholder="Rechercher un nom, téléphone, e-mail, date…  ( / )">
     </div>
-    <select id="sort" class="btn" style="font-weight:500">
+    <select id="sort" class="btn">
       <option value="created">Tri : plus récentes</option>
       <option value="dateAsc">Tri : date de départ ↑</option>
+      <option value="dateDesc">Tri : date de départ ↓</option>
       <option value="name">Tri : nom A→Z</option>
     </select>
     <button class="btn" id="btn-import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Importer</button>
     <button class="btn" id="btn-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4M7 10l5-5 5 5M12 5v10"/></svg>Excel / CSV</button>
-    <button class="btn btn--p" id="btn-new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nouvelle <span class="kbd" style="margin-left:2px">N</span></button>
+    <button class="btn btn--p" id="btn-new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nouvelle</button>
+    <div class="menu" id="menu">
+      <button class="btn" id="menu-btn" aria-label="Plus d'options"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
+      <div class="menu__list">
+        <button id="m-sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13M9 9l12-2M6 16a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>Feuille du jour (impression)</button>
+        <hr>
+        <button id="m-backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4M7 10l5-5 5 5M12 5v10"/></svg>Sauvegarder (fichier)</button>
+        <button id="m-restore"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Restaurer une sauvegarde</button>
+        <hr>
+        <button id="m-demo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg>Générer 200 réservations (démo)</button>
+        <button id="m-clear" class="danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Tout effacer</button>
+      </div>
+    </div>
   </div>
 
   <div class="chips" id="chips"></div>
 
+  <div class="bulkbar" id="bulkbar">
+    <b id="bulk-n">0 sélectionnées</b>
+    <span style="font-size:.85rem;opacity:.85">→ statut</span>
+    <select id="bulk-status"><option value="">Choisir…</option><option value="confirme">Confirmé</option><option value="attente">En attente</option><option value="annule">Annulé</option><option value="archive">Archivé</option><option value="nouveau">Nouveau</option></select>
+    <button class="btn btn--sm" id="bulk-export">Exporter la sélection</button>
+    <button class="btn btn--sm" id="bulk-del">Supprimer</button>
+    <span class="sp"></span>
+    <button class="lk" id="bulk-clear">Tout désélectionner</button>
+  </div>
+
   <div class="layout">
     <div>
       <div class="list" id="list"></div>
-      <div class="empty" id="empty" style="display:none">Aucune réservation ne correspond. Ajoutez-en une (<span class="kbd">N</span>) ou changez le filtre.</div>
+      <div class="empty" id="empty" style="display:none">Aucune réservation ne correspond. Ajoutez-en une, importez un e-mail, ou changez le filtre.</div>
+      <div class="pager" id="pager" style="display:none"></div>
     </div>
     <aside class="detail" id="detail">
       <div class="detail__empty">Sélectionnez une réservation pour voir le détail, changer son statut et répondre au client.</div>
@@ -198,15 +260,38 @@ a{color:var(--teal)}
 <div class="ov" id="ov-import">
   <div class="modal">
     <button class="x" data-close>✕</button>
-    <h2>Importer des réservations</h2>
-    <p class="help">Collez un export CSV (colonnes <span class="mono">nom, telephone, email, personnes, date, depart, message</span> — c'est exactement le format exporté par les formulaires Netlify) ou un fichier CSV/JSON. Les doublons (même nom + date) sont ignorés.</p>
-    <div class="field" style="margin-top:10px"><label>Coller le CSV / JSON ici</label><textarea id="imp-text" style="min-height:150px" placeholder="nom,telephone,email,personnes,date,depart,message&#10;Marie Dupont,0612345678,marie@email.com,3,2026-07-12,14h30,Anniversaire"></textarea></div>
+    <h2>Ajouter des réservations reçues</h2>
+
+    <div class="split-lbl">① Une demande reçue par e-mail</div>
+    <p class="help">Copiez l'e-mail de réservation et collez-le ci-dessous. La console le lit toute seule (nom, téléphone, date, personnes…). Fonctionne pour les e-mails du site, dans toutes les langues.</p>
+    <div class="field" style="margin-top:8px"><textarea id="imp-mail" style="min-height:120px" placeholder="Bonjour,&#10;Je souhaite réserver une promenade…&#10;Nom : Marie Dupont&#10;Téléphone : 06 12 34 56 78&#10;Personnes : 3&#10;Date souhaitée : 2026-07-12&#10;Départ : 14h30"></textarea></div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn btn--p btn--sm" id="imp-mail-run">Lire l'e-mail</button></div>
+
+    <hr class="split">
+
+    <div class="split-lbl">② Plusieurs réservations (fichier CSV ou JSON)</div>
+    <p class="help">Collez un tableau CSV (colonnes <span class="mono">nom, telephone, email, personnes, date, depart, message</span>) ou choisissez un fichier. Les doublons (même nom + date) sont ignorés.</p>
+    <div class="field" style="margin-top:8px"><textarea id="imp-text" style="min-height:90px" placeholder="nom,telephone,email,personnes,date,depart,message&#10;Marie Dupont,0612345678,marie@email.com,3,2026-07-12,14h30,Anniversaire"></textarea></div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <label class="btn" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>Choisir un fichier<input id="imp-file" type="file" accept=".csv,.json,.txt" hidden></label>
+      <label class="btn btn--sm" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>Choisir un fichier<input id="imp-file" type="file" accept=".csv,.json,.txt" hidden></label>
       <span style="flex:1"></span>
-      <button class="btn" data-close>Annuler</button>
-      <button class="btn btn--p" id="imp-run">Importer</button>
+      <button class="btn" data-close>Fermer</button>
+      <button class="btn btn--p btn--sm" id="imp-run">Importer le tableau</button>
     </div>
+  </div>
+</div>
+
+<!-- modal: feuille du jour -->
+<div class="ov" id="ov-sheet">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px">
+      <div class="field" style="margin:0"><label>Feuille d'embarquement du</label><input id="sheet-date" type="date"></div>
+      <button class="btn btn--sm" id="sheet-today">Aujourd'hui</button>
+      <span style="flex:1"></span>
+      <button class="btn btn--p btn--sm" id="sheet-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Imprimer</button>
+    </div>
+    <div id="printArea" class="sheet"></div>
   </div>
 </div>
 
@@ -214,20 +299,19 @@ a{color:var(--teal)}
 <div class="ov" id="ov-road">
   <div class="modal">
     <button class="x" data-close>✕</button>
-    <h2>Évolution : plateforme serveur sécurisée</h2>
-    <p class="help" style="font-size:.9rem;line-height:1.7">Cette console fonctionne sans serveur, sur l'appareil. Pour une solution « hyper pro » multi-postes, voici l'étape suivante recommandée :</p>
+    <h2>Pour aller plus loin (automatique)</h2>
     <ul style="font-size:.9rem;line-height:1.8;color:var(--txt);padding-left:18px">
-      <li><b>Réception automatique</b> : le formulaire du site écrit directement dans une base de données (les demandes arrivent ici sans import).</li>
-      <li><b>Accès protégé</b> : connexion par mot de passe / double authentification, plusieurs comptes équipage.</li>
-      <li><b>Paiement relié</b> : statut « payé » mis à jour automatiquement par Stripe (webhook), reçus PDF.</li>
-      <li><b>Hébergement</b> : Supabase / Firebase / petit serveur Node — chiffré (HTTPS), conforme RGPD, sauvegardes automatiques.</li>
-      <li><b>E-mails automatiques</b> : confirmation envoyée toute seule, rappel la veille du départ.</li>
+      <li>Les demandes arrivent <b>toutes seules</b> dans la console (sans copier-coller).</li>
+      <li><b>E-mail de confirmation</b> envoyé automatiquement, <b>rappel</b> la veille du départ.</li>
+      <li>Statut « payé » <b>mis à jour par Stripe</b>, reçus PDF.</li>
+      <li>Plusieurs comptes équipage, accès par mot de passe, sauvegardes automatiques (RGPD).</li>
     </ul>
-    <p class="help">Les données déjà saisies ici s'exportent en CSV/Excel et se réimportent dans la future plateforme — rien n'est perdu.</p>
+    <p class="help">Réalisable sur des outils <b>gratuits</b> (quotas largement suffisants). Les données d'ici s'exportent/réimportent : rien n'est perdu.</p>
     <div style="display:flex;justify-content:flex-end"><button class="btn btn--p" data-close>Compris</button></div>
   </div>
 </div>
 
+<input id="restore-file" type="file" accept=".json" hidden>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -235,16 +319,28 @@ a{color:var(--teal)}
 const $=(s,c=document)=>c.querySelector(s);
 const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
 const STORE="carline_bookings_v1";
-const RESA_EMAIL="bateaulacarline@gmail.com";
+const ADULT=14.5;
 const STATUS={nouveau:"Nouveau",confirme:"Confirmé",attente:"En attente",annule:"Annulé",archive:"Archivé"};
 const MONTHS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const PAGE=60;
+
+/* étiquettes e-mail multilingues -> champ */
+const LABELS={
+  name:["nom","name","nome","nombre","naam"],
+  phone:["téléphone","telephone","phone","telefono","telefon","teléfono","telefoon"],
+  email:["email","e-mail","correo"],
+  persons:["nombre de personnes","number of people","numero di persone","anzahl der personen","aantal personen","número de personas","personnes","personne","persons"],
+  date:["date souhaitée","preferred date","data desiderata","wunschdatum","gewenste datum","fecha deseada","date"],
+  departure:["départ","depart","departure","partenza","abfahrt","vertrek","salida"],
+  message:["message","messaggio","nachricht","bericht","mensaje"]
+};
 
 let data=load();
 let filter="all", query="", sort="created", selId=null, editId=null;
+let selected=new Set(), shown=PAGE, searchTimer=null;
 
 function load(){
   try{ const r=JSON.parse(localStorage.getItem(STORE)); if(Array.isArray(r)) return r; }catch(e){}
-  // jeu de démonstration (au premier lancement)
   const today=new Date(); const d=n=>{const x=new Date(today);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
   return [
     {id:uid(),status:"nouveau",name:"Marie Lefèvre",phone:"06 24 18 90 22",email:"marie.lefevre@email.com",persons:4,date:d(6),departure:"14h30",message:"Anniversaire de ma fille, possible un gâteau à bord ?",createdAt:Date.now()-3600e3},
@@ -252,44 +348,48 @@ function load(){
     {id:uid(),status:"attente",name:"Famille Rossi",phone:"06 71 02 44 13",email:"rossi.fam@email.it",persons:12,date:d(12),departure:"La balade du Capitaine",message:"Groupe — attend confirmation du nombre exact.",createdAt:Date.now()-9e5}
   ];
 }
-function save(){ localStorage.setItem(STORE,JSON.stringify(data)); }
+function save(){ try{ localStorage.setItem(STORE,JSON.stringify(data)); }catch(e){ toast("Mémoire pleine — faites une sauvegarde fichier"); } }
 function uid(){ return "b"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 function firstName(n){ return (n||"").trim().split(/\s+/)[0]||""; }
-function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2300); }
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
 function fmtDate(s){ if(!s) return null; const p=s.split("-"); if(p.length<3) return {d:s,m:""}; return {d:p[2],m:MONTHS[(+p[1])-1]||""}; }
 
-/* ---------- rendu ---------- */
+/* ---------- KPIs / chips ---------- */
 function counts(){ const c={all:data.length}; Object.keys(STATUS).forEach(k=>c[k]=0); data.forEach(b=>c[b.status]=(c[b.status]||0)+1); return c; }
-
 function renderKpis(){
-  const c=counts();
-  const today=new Date().toISOString().slice(0,10);
+  const c=counts(), today=new Date().toISOString().slice(0,10);
   const upcoming=data.filter(b=>b.date>=today&&b.status!=="annule"&&b.status!=="archive").length;
-  const k=[["Total",c.all],["Nouvelles",c.nouveau||0],["Confirmées",c.confirme||0],["À venir",upcoming]];
+  const ca=data.filter(b=>b.status==="confirme").reduce((s,b)=>s+(+b.persons||0)*ADULT,0);
+  const k=[["Total",c.all],["Nouvelles",c.nouveau||0],["Confirmées",c.confirme||0],["À venir",upcoming],["CA estimé",Math.round(ca)+" €"]];
   $("#kpis").innerHTML=k.map(([l,n])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("");
 }
 function renderChips(){
   const c=counts();
   const defs=[["all","Toutes"],["nouveau","Nouveau"],["confirme","Confirmé"],["attente","En attente"],["annule","Annulé"],["archive","Archivé"]];
   $("#chips").innerHTML=defs.map(([k,l])=>`<button class="chip ${filter===k?"is-on":""}" data-f="${k}">${l}<span class="n">${c[k]||0}</span></button>`).join("");
-  $$("#chips .chip").forEach(ch=>ch.onclick=()=>{filter=ch.dataset.f;render();});
+  $$("#chips .chip").forEach(ch=>ch.onclick=()=>{filter=ch.dataset.f;shown=PAGE;renderList();});
 }
+
+/* ---------- liste ---------- */
 function visible(){
-  const today=new Date().toISOString().slice(0,10);
   let r=data.filter(b=>filter==="all"?true:b.status===filter);
-  if(query){ const q=query.toLowerCase(); r=r.filter(b=>[b.name,b.phone,b.email,b.date,b.departure,b.message].join(" ").toLowerCase().includes(q)); }
+  if(query){ const q=query.toLowerCase(); r=r.filter(b=>(b._s||(b._s=[b.name,b.phone,b.email,b.date,b.departure,b.message].join(" ").toLowerCase())).includes(q)); }
   if(sort==="created") r.sort((a,b)=>b.createdAt-a.createdAt);
   else if(sort==="name") r.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
   else if(sort==="dateAsc") r.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
+  else if(sort==="dateDesc") r.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   return r;
 }
-function render(){
-  renderKpis(); renderChips();
+function renderList(){
+  renderKpis(); renderChips(); renderBulk();
   const rows=visible();
   $("#empty").style.display=rows.length?"none":"block";
-  $("#list").innerHTML=rows.map(b=>{
+  const slice=rows.slice(0,shown);
+  $("#list").innerHTML=slice.map(b=>{
     const dt=fmtDate(b.date);
     return `<div class="card ${selId===b.id?"is-sel":""}" data-id="${b.id}">
+      <div class="check ${selected.has(b.id)?"on":""}" data-check="${b.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
       <div class="card__date">${dt?`<b>${dt.d}</b><span>${dt.m}</span>`:`<b>—</b><span>date</span>`}</div>
       <div class="card__main"><b>${esc(b.name)||"Sans nom"}</b>
         <div class="card__meta"><em>${b.persons||"?"} pers.</em><span>${esc(b.departure)||""}</span>${b.phone?`<span>${esc(b.phone)}</span>`:""}</div>
@@ -297,14 +397,26 @@ function render(){
       <span class="tag st-${b.status}">${STATUS[b.status]||b.status}</span>
     </div>`;
   }).join("");
-  $$("#list .card").forEach(c=>c.onclick=()=>{selId=c.dataset.id;render();renderDetail();});
-  renderDetail();
+  $$("#list .card").forEach(c=>{
+    c.onclick=e=>{ if(e.target.closest("[data-check]")) return; selId=c.dataset.id; renderList(); renderDetail(); };
+  });
+  $$("#list [data-check]").forEach(c=>c.onclick=e=>{ e.stopPropagation(); toggleSel(c.dataset.check); });
+  const pg=$("#pager");
+  if(rows.length>shown){ pg.style.display="flex"; pg.innerHTML=`<span>${shown} sur ${rows.length} affichées</span><button class="btn btn--sm" id="more">Charger plus</button>`; $("#more").onclick=()=>{shown+=PAGE;renderList();}; }
+  else{ pg.style.display=rows.length>PAGE?"flex":"none"; if(rows.length>PAGE) pg.innerHTML=`<span>${rows.length} affichées</span>`; }
 }
-function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
 
+/* ---------- sélection multiple ---------- */
+function toggleSel(id){ if(selected.has(id)) selected.delete(id); else selected.add(id); renderList(); }
+function renderBulk(){
+  const bar=$("#bulkbar");
+  if(selected.size){ bar.classList.add("show"); $("#bulk-n").textContent=selected.size+" sélectionnée"+(selected.size>1?"s":""); }
+  else bar.classList.remove("show");
+}
+
+/* ---------- détail ---------- */
 function renderDetail(){
-  const b=data.find(x=>x.id===selId);
-  const el=$("#detail");
+  const b=data.find(x=>x.id===selId), el=$("#detail");
   if(!b){ el.innerHTML='<div class="detail__empty">Sélectionnez une réservation pour voir le détail, changer son statut et répondre au client.</div>'; return; }
   const dt=fmtDate(b.date);
   el.innerHTML=`
@@ -317,7 +429,7 @@ function renderDetail(){
       <dt>Reçue</dt><dd>${new Date(b.createdAt).toLocaleDateString("fr-FR")}</dd>
     </dl>
     ${b.message?`<div class="note">${esc(b.message)}</div>`:""}
-    <div class="sec-lbl">Statut <span style="text-transform:none;color:var(--muted)">— raccourcis : <span class="kbd">C</span> confirmer · <span class="kbd">A</span> archiver</span></div>
+    <div class="sec-lbl">Statut <span style="text-transform:none;color:var(--muted)">— <span class="kbd">C</span> confirmer · <span class="kbd">A</span> archiver</span></div>
     <div class="statusrow" id="statusrow">${Object.keys(STATUS).map(k=>`<button class="chip ${b.status===k?"is-on":""}" data-s="${k}">${STATUS[k]}</button>`).join("")}</div>
     <div class="sec-lbl">Répondre au client (e-mail pré-rempli au prénom)</div>
     <div class="tplgrid" id="tplgrid">
@@ -334,55 +446,44 @@ function renderDetail(){
   $$("#statusrow .chip").forEach(c=>c.onclick=()=>setStatus(b.id,c.dataset.s));
   $$("#tplgrid .btn").forEach(c=>c.onclick=()=>sendTemplate(b,c.dataset.tpl));
   $("#d-edit").onclick=()=>openEdit(b.id);
-  $("#d-del").onclick=()=>{ if(confirm("Supprimer définitivement cette réservation ?")){ data=data.filter(x=>x.id!==b.id); selId=null; save(); render(); toast("Réservation supprimée"); } };
+  $("#d-del").onclick=()=>{ if(confirm("Supprimer définitivement cette réservation ?")){ data=data.filter(x=>x.id!==b.id); selected.delete(b.id); selId=null; save(); renderList(); renderDetail(); toast("Supprimée"); } };
 }
+function setStatus(id,s){ const b=data.find(x=>x.id===id); if(!b)return; b.status=s; save(); renderList(); renderDetail(); toast("Statut : "+STATUS[s]); }
 
-function setStatus(id,s){ const b=data.find(x=>x.id===id); if(!b)return; b.status=s; save(); render(); toast("Statut : "+STATUS[s]); }
-
-/* ---------- modèles d'e-mail personnalisés ---------- */
-function tarifLine(){ return "Adultes 14,50 € · Enfants 4-12 ans 10 € · -4 ans gratuit."; }
+/* ---------- modèles d'e-mail ---------- */
 function templates(b){
   const fn=firstName(b.name)||"Madame, Monsieur";
   const dateTxt=b.date?(()=>{const d=fmtDate(b.date);return d.d+" "+d.m;})():"la date souhaitée";
   const dep=b.departure||"votre horaire";
+  const tarif="Adultes 14,50 € · Enfants 4-12 ans 10 € · -4 ans gratuit.";
   const sign="\r\n\r\nÀ bord, à bientôt sur le lac,\r\nL'équipage de La Carline\r\n+33 4 92 44 26 88";
   return {
     confirm:{subject:"Votre réservation La Carline est confirmée",
-      body:`Bonjour ${fn},\r\n\r\nNous avons le plaisir de confirmer votre promenade pour ${b.persons||""} personne(s) le ${dateTxt}, départ ${dep}.\r\n\r\nMerci de vous présenter au chalet d'accueil 20 minutes avant le départ. ${tarifLine()}${sign}`},
+      body:`Bonjour ${fn},\r\n\r\nNous avons le plaisir de confirmer votre promenade pour ${b.persons||""} personne(s) le ${dateTxt}, départ ${dep}.\r\n\r\nMerci de vous présenter au chalet d'accueil 20 minutes avant le départ. ${tarif}${sign}`},
     wait:{subject:"Votre demande de réservation — La Carline",
-      body:`Bonjour ${fn},\r\n\r\nMerci pour votre demande de promenade le ${dateTxt} (${dep}, ${b.persons||""} pers.). Ce départ est actuellement complet ; nous vous plaçons en liste d'attente et revenons vers vous dès qu'une place se libère.\r\n\r\nN'hésitez pas à nous appeler pour un autre horaire.${sign}`},
+      body:`Bonjour ${fn},\r\n\r\nMerci pour votre demande de promenade le ${dateTxt} (${dep}, ${b.persons||""} pers.). Ce départ est actuellement complet ; nous vous plaçons en liste d'attente et revenons vers vous dès qu'une place se libère.${sign}`},
     quote:{subject:"Votre devis groupe — La Carline",
-      body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie groupe (${b.persons||""} personnes) le ${dateTxt}. Pour les groupes à partir de 20 personnes, nous établissons un tarif sur devis et pouvons privatiser un départ.\r\n\r\nPouvez-vous nous préciser le nombre exact de participants et l'horaire souhaité ? Nous vous envoyons le devis en retour.${sign}`},
+      body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie groupe (${b.persons||""} personnes) le ${dateTxt}. Pour les groupes à partir de 20 personnes, nous établissons un tarif sur devis et pouvons privatiser un départ.\r\n\r\nPouvez-vous préciser le nombre exact de participants et l'horaire souhaité ?${sign}`},
     cancel:{subject:"Annulation de votre réservation — La Carline",
-      body:`Bonjour ${fn},\r\n\r\nNous confirmons l'annulation de votre réservation du ${dateTxt} (${dep}). En cas d'acompte réglé, celui-ci vous sera remboursé.\r\n\r\nNous espérons vous accueillir lors d'une prochaine promenade.${sign}`},
+      body:`Bonjour ${fn},\r\n\r\nNous confirmons l'annulation de votre réservation du ${dateTxt} (${dep}). En cas d'acompte réglé, celui-ci vous sera remboursé.\r\n\r\nAu plaisir de vous accueillir une prochaine fois.${sign}`},
     reminder:{subject:"Rappel — votre promenade La Carline demain",
-      body:`Bonjour ${fn},\r\n\r\nPetit rappel : votre promenade est prévue demain ${dateTxt}, départ ${dep}, pour ${b.persons||""} personne(s). Merci d'arriver au chalet d'accueil 20 minutes avant.\r\n\r\nEn cas d'imprévu météo, nous vous tiendrons informé.${sign}`}
+      body:`Bonjour ${fn},\r\n\r\nPetit rappel : votre promenade est prévue demain ${dateTxt}, départ ${dep}, pour ${b.persons||""} personne(s). Merci d'arriver au chalet d'accueil 20 minutes avant.${sign}`}
   };
 }
 function sendTemplate(b,key){
   const t=templates(b)[key]; if(!t) return;
-  if(b.email){
-    window.location.href="mailto:"+encodeURIComponent(b.email)+"?subject="+encodeURIComponent(t.subject)+"&body="+encodeURIComponent(t.body);
-    toast("E-mail ouvert pour "+(firstName(b.name)||"le client"));
-  }else{
-    navigator.clipboard?.writeText(t.subject+"\r\n\r\n"+t.body);
-    toast("Pas d'e-mail — message copié dans le presse-papier");
-  }
+  if(b.email){ window.location.href="mailto:"+encodeURIComponent(b.email)+"?subject="+encodeURIComponent(t.subject)+"&body="+encodeURIComponent(t.body); toast("E-mail ouvert pour "+(firstName(b.name)||"le client")); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(t.subject+"\r\n\r\n"+t.body); toast("Pas d'e-mail — message copié"); }
+  else toast("Pas d'adresse e-mail pour ce client");
 }
 
 /* ---------- création / édition ---------- */
 function openEdit(id){
-  editId=id||null;
-  const b=id?data.find(x=>x.id===id):null;
+  editId=id||null; const b=id?data.find(x=>x.id===id):null;
   $("#edit-title").textContent=id?"Modifier la réservation":"Nouvelle réservation";
-  $("#e-name").value=b?b.name||"":"";
-  $("#e-phone").value=b?b.phone||"":"";
-  $("#e-email").value=b?b.email||"":"";
-  $("#e-date").value=b?b.date||"":"";
-  $("#e-dep").value=b?b.departure||"10h00":"10h00";
-  $("#e-persons").value=b?b.persons||2:2;
-  $("#e-status").value=b?b.status:"nouveau";
-  $("#e-msg").value=b?b.message||"":"";
+  $("#e-name").value=b?b.name||"":""; $("#e-phone").value=b?b.phone||"":""; $("#e-email").value=b?b.email||"":"";
+  $("#e-date").value=b?b.date||"":""; $("#e-dep").value=b?b.departure||"10h00":"10h00";
+  $("#e-persons").value=b?b.persons||2:2; $("#e-status").value=b?b.status:"nouveau"; $("#e-msg").value=b?b.message||"":"";
   show("#ov-edit"); setTimeout(()=>$("#e-name").focus(),50);
 }
 $("#e-save").onclick=()=>{
@@ -390,18 +491,39 @@ $("#e-save").onclick=()=>{
     date:$("#e-date").value,departure:$("#e-dep").value,persons:+$("#e-persons").value||1,
     status:$("#e-status").value,message:$("#e-msg").value.trim()};
   if(!o.name){ toast("Indiquez au moins un nom"); $("#e-name").focus(); return; }
-  if(editId){ Object.assign(data.find(x=>x.id===editId),o); toast("Réservation mise à jour"); }
+  if(editId){ const b=data.find(x=>x.id===editId); Object.assign(b,o); b._s=null; toast("Mise à jour"); }
   else{ o.id=uid(); o.createdAt=Date.now(); data.unshift(o); selId=o.id; toast("Réservation ajoutée"); }
-  save(); hideAll(); render();
+  save(); hideAll(); renderList(); renderDetail();
 };
 
-/* ---------- import ---------- */
+/* ---------- import e-mail ---------- */
+function matchLabel(left){ left=left.trim().toLowerCase(); for(const f in LABELS){ if(LABELS[f].includes(left)) return f; } return null; }
+function parseEmail(text){
+  const o={persons:1}; let got=false;
+  text.split(/\r?\n/).forEach(line=>{
+    const i=line.indexOf(":"); if(i<1) return;
+    const f=matchLabel(line.slice(0,i)); if(!f) return;
+    let v=line.slice(i+1).trim(); if(!v) return; got=true;
+    if(f==="persons") o.persons=+String(v).replace(/\D/g,"")||1;
+    else if(f==="date") o.date=normDate(v);
+    else o[f]=v;
+  });
+  return (got&&o.name)?o:null;
+}
+$("#imp-mail-run").onclick=()=>{
+  const r=parseEmail($("#imp-mail").value);
+  if(!r){ toast("Impossible de lire — vérifiez qu'il y a au moins « Nom : … »"); return; }
+  r.id=uid(); r.createdAt=Date.now(); r.status="nouveau"; data.unshift(r); selId=r.id;
+  save(); hideAll(); shown=PAGE; renderList(); renderDetail(); toast("Réservation ajoutée depuis l'e-mail");
+};
+
+/* ---------- import CSV / JSON ---------- */
 function parseCSV(text){
   const rows=[]; let i=0,f="",row=[],q=false;
   while(i<text.length){ const c=text[i];
     if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
     else if(c==='"') q=true;
-    else if(c===","){ row.push(f); f=""; }
+    else if(c===","||c===";"){ row.push(f); f=""; }
     else if(c==="\n"||c==="\r"){ if(c==="\r"&&text[i+1]==="\n")i++; if(f!==""||row.length){ row.push(f); rows.push(row);} f="";row=[]; }
     else f+=c;
     i++;
@@ -414,7 +536,7 @@ function importText(text){
   let recs=[];
   if(text[0]==="["||text[0]==="{"){ try{ const j=JSON.parse(text); recs=Array.isArray(j)?j:[j]; }catch(e){ toast("JSON invalide"); return 0; } }
   else{
-    const rows=parseCSV(text); if(rows.length<2){ toast("CSV vide ou sans en-tête"); return 0; }
+    const rows=parseCSV(text); if(rows.length<2){ toast("Tableau vide ou sans en-tête"); return 0; }
     const head=rows[0].map(h=>h.trim().toLowerCase());
     const idx=n=>head.findIndex(h=>h===n||h.includes(n));
     const map={name:idx("nom"),phone:idx("telephone"),email:idx("email"),persons:idx("personne"),date:idx("date"),departure:idx("depart"),message:idx("message")};
@@ -428,13 +550,12 @@ function importText(text){
   let added=0;
   recs.forEach(r=>{
     if(!r.name||!r.name.trim()) return;
-    const dup=data.some(b=>b.name.trim().toLowerCase()===r.name.trim().toLowerCase()&&(b.date||"")===(r.date||""));
-    if(dup) return;
+    if(data.some(b=>b.name.trim().toLowerCase()===r.name.trim().toLowerCase()&&(b.date||"")===(r.date||""))) return;
     data.unshift({id:uid(),status:r.status||"nouveau",name:r.name.trim(),phone:r.phone||"",email:r.email||"",
       persons:r.persons||1,date:r.date||"",departure:r.departure||"",message:r.message||"",createdAt:Date.now()});
     added++;
   });
-  if(added){ save(); render(); }
+  if(added){ save(); shown=PAGE; renderList(); }
   return added;
 }
 function normDate(s){ if(!s) return ""; s=s.trim(); if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
@@ -442,57 +563,109 @@ function normDate(s){ if(!s) return ""; s=s.trim(); if(/^\d{4}-\d{2}-\d{2}/.test
 $("#imp-run").onclick=()=>{ const n=importText($("#imp-text").value); hideAll(); toast(n?n+" réservation(s) importée(s)":"Aucune nouvelle réservation"); };
 $("#imp-file").onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>$("#imp-text").value=r.result; r.readAsText(f); };
 
-/* ---------- export ---------- */
-function exportRows(){
+/* ---------- export Excel / CSV ---------- */
+function rowsFor(list){
   const cols=["nom","telephone","email","personnes","date","depart","statut","message","recue_le"];
-  const rows=visible().map(b=>[b.name,b.phone,b.email,b.persons,b.date,b.departure,STATUS[b.status]||b.status,(b.message||"").replace(/\r?\n/g," "),new Date(b.createdAt).toLocaleString("fr-FR")]);
+  const rows=list.map(b=>[b.name,b.phone,b.email,b.persons,b.date,b.departure,STATUS[b.status]||b.status,(b.message||"").replace(/\r?\n/g," "),new Date(b.createdAt).toLocaleString("fr-FR")]);
   return {cols,rows};
 }
 function download(name,mime,content){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:mime})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
-function exportCSV(){
-  const {cols,rows}=exportRows();
+function exportCSV(list){
+  const {cols,rows}=rowsFor(list);
   const q=v=>{ v=v==null?"":String(v); return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
-  const csv="﻿"+[cols.join(";"),...rows.map(r=>r.map(q).join(";"))].join("\r\n");
-  download("reservations-carline-"+new Date().toISOString().slice(0,10)+".csv","text/csv;charset=utf-8",csv);
+  download("reservations-carline-"+new Date().toISOString().slice(0,10)+".csv","text/csv;charset=utf-8","﻿"+[cols.join(";"),...rows.map(r=>r.map(q).join(";"))].join("\r\n"));
   toast("Export CSV téléchargé");
 }
-function exportXLS(){
-  const {cols,rows}=exportRows();
-  const td=v=>"<td>"+esc(v)+"</td>";
-  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><tr style="background:#0e2b3d;color:#fff">'+cols.map(c=>"<th>"+esc(c)+"</th>").join("")+"</tr>"+rows.map(r=>"<tr>"+r.map(td).join("")+"</tr>").join("")+"</table></body></html>";
+function exportXLS(list){
+  const {cols,rows}=rowsFor(list);
+  const html='<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><tr style="background:#0e2b3d;color:#fff">'+cols.map(c=>"<th>"+esc(c)+"</th>").join("")+"</tr>"+rows.map(r=>"<tr>"+r.map(v=>"<td>"+esc(v)+"</td>").join("")+"</tr>").join("")+"</table></body></html>";
   download("reservations-carline-"+new Date().toISOString().slice(0,10)+".xls","application/vnd.ms-excel",html);
   toast("Export Excel téléchargé");
 }
-$("#btn-export").onclick=()=>{ const x=confirm("OK = Excel (.xls)\nAnnuler = CSV (.csv)"); x?exportXLS():exportCSV(); };
+$("#btn-export").onclick=()=>{ confirm("OK = Excel (.xls)\nAnnuler = CSV (.csv)")?exportXLS(visible()):exportCSV(visible()); };
+$("#bulk-export").onclick=()=>{ const list=data.filter(b=>selected.has(b.id)); confirm("OK = Excel\nAnnuler = CSV")?exportXLS(list):exportCSV(list); };
+$("#bulk-del").onclick=()=>{ if(!selected.size)return; if(confirm("Supprimer les "+selected.size+" réservations sélectionnées ?")){ data=data.filter(b=>!selected.has(b.id)); selected.clear(); save(); renderList(); renderDetail(); toast("Sélection supprimée"); } };
+$("#bulk-clear").onclick=()=>{ selected.clear(); renderList(); };
+$("#bulk-status").onchange=e=>{ const s=e.target.value; if(!s)return; data.forEach(b=>{ if(selected.has(b.id)) b.status=s; }); save(); e.target.value=""; renderList(); renderDetail(); toast(selected.size+" mises en « "+STATUS[s]+" »"); };
 
-/* ---------- modals plumbing ---------- */
+/* ---------- sauvegarde / restauration ---------- */
+$("#m-backup").onclick=()=>{ closeMenu(); download("sauvegarde-carline-"+new Date().toISOString().slice(0,10)+".json","application/json",JSON.stringify(data,null,2)); toast("Sauvegarde téléchargée"); };
+$("#m-restore").onclick=()=>{ closeMenu(); $("#restore-file").click(); };
+$("#restore-file").onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{ try{ const j=JSON.parse(r.result); if(!Array.isArray(j)) throw 0;
+    if(confirm("Restaurer "+j.length+" réservations ? Cela REMPLACE les données actuelles.")){ data=j.map(b=>(b._s=null,b)); selected.clear(); selId=null; save(); shown=PAGE; renderList(); renderDetail(); toast("Sauvegarde restaurée"); } }
+    catch(err){ toast("Fichier de sauvegarde invalide"); } };
+  r.readAsText(f); e.target.value=""; };
+
+/* ---------- générateur de démo (prouver la montée en charge) ---------- */
+$("#m-demo").onclick=()=>{ closeMenu();
+  const fn=["Marie","Jean","Sophie","Luc","Emma","Paul","Léa","Thomas","Chloé","Hugo","Anna","Marco","Hans","Lena","Pieter","Sofia","Pierre","Julie","Karl","Nadia"];
+  const ln=["Dupont","Martin","Bernard","Rossi","Müller","Garcia","Lefèvre","Moreau","Bianchi","Schmidt","Jansen","Lopez","Fontaine","Roux","Klein","Costa","Petit","Girard","Weber","Mercier"];
+  const deps=["10h00","14h30","16h30","La balade du Capitaine"], sts=["nouveau","nouveau","confirme","confirme","confirme","attente","annule"];
+  const today=new Date();
+  for(let i=0;i<200;i++){ const dd=new Date(today); dd.setDate(dd.getDate()+Math.floor(Math.random()*120)-10);
+    data.unshift({id:uid(),status:sts[Math.floor(Math.random()*sts.length)],name:fn[Math.random()*fn.length|0]+" "+ln[Math.random()*ln.length|0],
+      phone:"06 "+String(Math.floor(Math.random()*1e8)).padStart(8,"0").replace(/(\d2)/g,"$1 ").trim(),
+      email:"client"+i+"@email.com",persons:1+Math.floor(Math.random()*18),date:dd.toISOString().slice(0,10),
+      departure:deps[Math.random()*deps.length|0],message:"",createdAt:Date.now()-Math.floor(Math.random()*1e9)});
+  }
+  save(); shown=PAGE; renderList(); toast("200 réservations de démonstration ajoutées");
+};
+$("#m-clear").onclick=()=>{ closeMenu(); if(confirm("Tout effacer ? (faites d'abord une sauvegarde si besoin)")){ data=[]; selected.clear(); selId=null; save(); renderList(); renderDetail(); toast("Console vidée"); } };
+
+/* ---------- feuille du jour (impression) ---------- */
+function buildSheet(date){
+  const area=$("#printArea");
+  if(!date){ area.innerHTML='<p class="help">Choisissez une date.</p>'; return; }
+  const dd=fmtDate(date); const list=data.filter(b=>b.date===date&&b.status!=="annule"&&b.status!=="archive");
+  let html=`<h3>Feuille d'embarquement — ${dd?dd.d+" "+dd.m:date}</h3>`;
+  if(!list.length){ area.innerHTML=html+'<p class="help">Aucun départ ce jour-là.</p>'; return; }
+  const byDep={}; list.forEach(b=>{ (byDep[b.departure||"À préciser"]=byDep[b.departure||"À préciser"]||[]).push(b); });
+  Object.keys(byDep).sort().forEach(dep=>{
+    const g=byDep[dep], tot=g.reduce((s,b)=>s+(+b.persons||0),0);
+    html+=`<div class="sheet__group"><div class="sheet__h"><span>${esc(dep)}</span><span>${g.length} résa · ${tot} pers.</span></div><table>`+
+      g.map(b=>`<tr><td>${esc(b.name)}</td><td>${b.persons||"?"} pers.</td><td>${esc(b.phone)||""}</td><td>${STATUS[b.status]}</td></tr>`).join("")+
+      `</table></div>`;
+  });
+  const grand=list.reduce((s,b)=>s+(+b.persons||0),0);
+  html+=`<p class="tot">Total du jour : ${list.length} réservations · ${grand} personnes.</p>`;
+  area.innerHTML=html;
+}
+$("#m-sheet").onclick=()=>{ closeMenu(); const t=new Date().toISOString().slice(0,10); $("#sheet-date").value=t; buildSheet(t); show("#ov-sheet"); };
+$("#sheet-date").oninput=e=>buildSheet(e.target.value);
+$("#sheet-today").onclick=()=>{ const t=new Date().toISOString().slice(0,10); $("#sheet-date").value=t; buildSheet(t); };
+$("#sheet-print").onclick=()=>window.print();
+
+/* ---------- menus / modales ---------- */
+const menu=$("#menu");
+function closeMenu(){ menu.classList.remove("is-open"); }
+$("#menu-btn").onclick=e=>{ e.stopPropagation(); menu.classList.toggle("is-open"); };
+document.addEventListener("click",e=>{ if(!menu.contains(e.target)) closeMenu(); });
 function show(sel){ $(sel).classList.add("show"); }
 function hideAll(){ $$(".ov").forEach(o=>o.classList.remove("show")); }
 $$("[data-close]").forEach(b=>b.onclick=hideAll);
 $$(".ov").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) hideAll(); }));
 $("#btn-new").onclick=()=>openEdit(null);
-$("#btn-import").onclick=()=>{ $("#imp-text").value=""; show("#ov-import"); };
-$("#roadmap-link").onclick=e=>{ e.preventDefault(); show("#ov-road"); };
+$("#btn-import").onclick=()=>{ $("#imp-mail").value=""; $("#imp-text").value=""; show("#ov-import"); };
 
-/* ---------- search + sort ---------- */
-$("#search").addEventListener("input",e=>{ query=e.target.value; render(); });
-$("#sort").addEventListener("change",e=>{ sort=e.target.value; render(); });
+/* ---------- recherche / tri ---------- */
+$("#search").addEventListener("input",e=>{ clearTimeout(searchTimer); const v=e.target.value; searchTimer=setTimeout(()=>{ query=v; shown=PAGE; renderList(); },140); });
+$("#sort").addEventListener("change",e=>{ sort=e.target.value; renderList(); });
 
 /* ---------- raccourcis clavier ---------- */
 document.addEventListener("keydown",e=>{
-  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
-  if(e.key==="Escape"){ hideAll(); return; }
-  if(typing) return;
+  if(e.key==="Escape"){ hideAll(); closeMenu(); return; }
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
   const rows=visible();
   if(e.key==="n"||e.key==="N"){ e.preventDefault(); openEdit(null); }
   else if(e.key==="/"){ e.preventDefault(); $("#search").focus(); }
-  else if(e.key==="j"||e.key==="k"){ if(!rows.length)return; let i=rows.findIndex(b=>b.id===selId); i=e.key==="j"?Math.min(rows.length-1,i+1):Math.max(0,i-1); if(i<0)i=0; selId=rows[i].id; render(); $(".card.is-sel")?.scrollIntoView({block:"nearest"}); }
-  else if(selId&&(e.key==="c"||e.key==="C")){ setStatus(selId,"confirme"); }
-  else if(selId&&(e.key==="a"||e.key==="A")){ setStatus(selId,"archive"); }
+  else if(e.key==="j"||e.key==="k"){ if(!rows.length)return; let i=rows.findIndex(b=>b.id===selId); i=e.key==="j"?Math.min(rows.length-1,i+1):Math.max(0,i-1); if(i<0)i=0; selId=rows[i].id; renderList(); renderDetail(); $(".card.is-sel")?.scrollIntoView({block:"nearest"}); }
+  else if(selId&&(e.key==="c"||e.key==="C")) setStatus(selId,"confirme");
+  else if(selId&&(e.key==="a"||e.key==="A")) setStatus(selId,"archive");
   else if(selId&&(e.key==="e"||e.key==="E")){ const b=data.find(x=>x.id===selId); if(b)sendTemplate(b,"confirm"); }
 });
 
-render();
+renderList(); renderDetail();
 </script>
 </body>
 </html>
