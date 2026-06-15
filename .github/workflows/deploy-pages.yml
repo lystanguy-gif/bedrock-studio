@@ -1,0 +1,37 @@
+name: Publier sur GitHub Pages (gratuit)
+
+# Publie le site dès qu'il arrive sur la branche principale.
+# GitHub Pages est gratuit : aucun frais pour le bateau ni pour vous.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurer Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Préparer les fichiers
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Déployer
+        id: deployment
+        uses: actions/deploy-pages@v4

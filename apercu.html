@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>La Carline · Aperçu du projet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b2030;--deep:#0e2b3d;--teal:#1d7a8e;--aqua:#3cb0c4;--aqua-soft:#8ed3dd;
+  --brass:#c79a4b;--brass-deep:#a87f33;--brass-soft:#e6cf9c;--hull:#cf3a30;
+  --paper:#f3f7f8;--cloud:#ffffff;--line:#dde8ea;--txt:#21404f;--muted:#5b7585;--ok:#1f9d57;
+  --ff-disp:"Fraunces",Georgia,serif;--ff-sans:"Instrument Sans",system-ui,sans-serif;--ff-mono:"JetBrains Mono",ui-monospace,monospace;
+  --rad:16px;--shadow:0 18px 44px -26px rgba(7,28,40,.4);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--ff-sans);background:var(--paper);color:var(--txt);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--ff-disp);font-weight:500;margin:0;letter-spacing:-.01em;line-height:1.1}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+
+.top{position:sticky;top:0;z-index:30;background:linear-gradient(100deg,#0c2334,#0e2b3d);color:#fff;border-bottom:2px solid var(--brass);padding:13px 18px;display:flex;align-items:center;gap:11px}
+.badge{width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 50% 38%,#15405a,#0b2334);border:2px solid var(--brass);display:grid;place-items:center;font-family:var(--ff-disp);font-style:italic;color:var(--brass-soft);flex:none}
+.top b{font-family:var(--ff-disp);font-style:italic;font-size:1.15rem;display:block;line-height:1}
+.top span{font-family:var(--ff-mono);font-size:.55rem;letter-spacing:.26em;text-transform:uppercase;color:var(--aqua-soft)}
+
+.wrap{max-width:680px;margin:0 auto;padding:22px 18px 70px}
+.hero{text-align:center;padding:14px 4px 6px}
+.eyebrow{font-family:var(--ff-mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--brass-deep);font-weight:600}
+.hero h1{font-size:2rem;color:var(--ink);margin:10px 0}
+.hero p{color:var(--muted);max-width:46ch;margin:0 auto}
+
+.card{background:var(--cloud);border:1.5px solid var(--line);border-radius:var(--rad);padding:22px;margin-top:18px;box-shadow:var(--shadow)}
+.card__top{display:flex;align-items:center;gap:13px;margin-bottom:6px}
+.ic{width:46px;height:46px;border-radius:13px;background:linear-gradient(150deg,#eafaff,#d4eef3);border:1px solid #cbe7ec;color:var(--teal);display:grid;place-items:center;flex:none}
+.ic svg{width:24px;height:24px}
+.card h2{font-size:1.35rem;color:var(--ink)}
+.card .role{font-family:var(--ff-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.flist{list-style:none;padding:0;margin:14px 0 4px}
+.flist li{display:flex;gap:10px;align-items:flex-start;font-size:.95rem;padding:5px 0;color:var(--txt)}
+.flist li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brass);margin-top:8px;flex:none}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{flex:1;min-width:150px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px;border-radius:12px;font-weight:600;font-size:.95rem;border:1.5px solid var(--line);background:var(--cloud);color:var(--ink);transition:.18s;cursor:pointer}
+.btn svg{width:17px;height:17px}
+.btn:hover{border-color:var(--brass);color:var(--brass-deep)}
+.btn--p{background:var(--brass);border-color:var(--brass);color:#231603}
+.btn--p:hover{filter:brightness(1.05);color:#231603}
+
+.frame{margin-top:14px;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);position:relative}
+.frame__ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:34px 16px;text-align:center;color:var(--muted);cursor:pointer}
+.frame__ph svg{width:26px;height:26px;color:var(--teal)}
+.frame__ph b{color:var(--ink)}
+.frame__ph small{font-size:.78rem}
+.frame iframe{display:block;width:100%;height:74vh;border:0;background:#fff}
+.frame.is-live .frame__ph{display:none}
+
+.steps{counter-reset:s;margin-top:8px}
+.step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.step:last-child{border-bottom:0}
+.step__n{counter-increment:s;flex:none;width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--ff-disp);font-size:1.05rem}
+.step__n::before{content:counter(s)}
+.step b{color:var(--ink)}
+.step p{margin:2px 0 0;font-size:.92rem;color:var(--muted)}
+
+.safe{margin-top:18px;background:linear-gradient(120deg,#e7f7ee,#dff3ea);border:1px solid #bfe6cf;border-radius:var(--rad);padding:18px 20px}
+.safe h3{font-size:1.1rem;color:#0f5f37;display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.safe h3 svg{width:20px;height:20px}
+.safe ul{margin:0;padding-left:18px;font-size:.92rem;color:#1c4e36;line-height:1.7}
+.safe b{color:#0c3f27}
+
+.note{font-size:.82rem;color:var(--muted);text-align:center;margin-top:24px;line-height:1.6}
+.tag{display:inline-block;font-family:var(--ff-mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="badge">C</div>
+  <div><b>La Carline</b><span>Aperçu du projet</span></div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Pour vous, à montrer au client</div>
+    <h1>Votre projet, en deux pièces</h1>
+    <p>Le <b>site public</b> que verront les visiteurs, et la <b>console privée</b> qui vous sert à gérer les réservations. Touchez « Aperçu » pour les essayer ici même, ou « Plein écran » pour les ouvrir en entier.</p>
+  </div>
+
+  <!-- SITE -->
+  <section class="card">
+    <div class="card__top">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg></div>
+      <div><div class="role">Vu par les visiteurs</div><h2>Le site public</h2></div>
+    </div>
+    <ul class="flist">
+      <li>Carte animée fidèle du lac : le bateau passe par les 6 escales, l'une après l'autre.</li>
+      <li>Réservation en ligne → la demande arrive sur votre boîte mail.</li>
+      <li>Paiement par carte sécurisé (Stripe) : la carte ne passe jamais par le site.</li>
+      <li>En 6 langues, lisible parfaitement sur téléphone.</li>
+    </ul>
+    <div class="actions">
+      <button class="btn btn--p" data-frame="site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Aperçu ici</button>
+      <a class="btn" href="index.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Plein écran</a>
+    </div>
+    <div class="frame" id="frame-site">
+      <div class="frame__ph" data-frame="site">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3 19 12 5 21V3z"/></svg>
+        <b>Toucher pour charger l'aperçu du site</b>
+        <small>chargé seulement à la demande (économise vos données)</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONSOLE -->
+  <section class="card">
+    <div class="card__top">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 14h6"/></svg></div>
+      <div><div class="role">Privé · équipage</div><h2>La console de réservation</h2></div>
+    </div>
+    <ul class="flist">
+      <li>Boîte de réception de toutes les demandes, classées par statut.</li>
+      <li>Réponses e-mail toutes prêtes, déjà adaptées au prénom du client.</li>
+      <li>Export Excel / CSV en un clic, recherche et raccourcis clavier.</li>
+      <li>Sur ordinateur : essayez d'ajouter une réservation et de cliquer « Confirmation ».</li>
+    </ul>
+    <div class="actions">
+      <button class="btn btn--p" data-frame="admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Aperçu ici</button>
+      <a class="btn" href="admin.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Plein écran</a>
+    </div>
+    <div class="frame" id="frame-admin">
+      <div class="frame__ph" data-frame="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3 19 12 5 21V3z"/></svg>
+        <b>Toucher pour charger l'aperçu de la console</b>
+        <small>vos essais restent privés, sur cet appareil</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="card">
+    <div class="card__top">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div><div class="role">Le parcours d'une réservation</div><h2>Comment ça marche</h2></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step__n"></div><div><b>Le client réserve</b><p>Il remplit le formulaire sur le site et, s'il le souhaite, paie sa balade par carte (Stripe).</p></div></div>
+      <div class="step"><div class="step__n"></div><div><b>Vous recevez</b><p>La demande arrive par e-mail. Vous la retrouvez (ou l'importez) dans la console, classée « Nouveau ».</p></div></div>
+      <div class="step"><div class="step__n"></div><div><b>Vous répondez et confirmez</b><p>Un bouton ouvre l'e-mail de confirmation déjà rédigé au prénom du client. Statut passé en « Confirmé ».</p></div></div>
+    </div>
+  </section>
+
+  <!-- SECURITY & COST -->
+  <section class="safe">
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Sécurité &amp; coûts</h3>
+    <ul>
+      <li><b>Aucun abonnement</b> pour le bateau : l'hébergement du site est gratuit.</li>
+      <li><b>Paiement ultra-sécurisé</b> : c'est Stripe (certifié bancaire) qui traite la carte, pas le site. Stripe prend seulement une petite commission <b>par vente</b> — jamais de frais fixe mensuel.</li>
+      <li><b>Données protégées</b> : la console est privée et conforme RGPD (e-mail de contact dédié, droit de suppression).</li>
+      <li>La seule dépense côté bateau, c'est <b>vous</b> : la création du site + la console.</li>
+    </ul>
+  </section>
+
+  <p class="note">
+    <span class="tag">Étape suivante possible</span><br>
+    Tout automatiser les e-mails (confirmation envoyée toute seule, rappel la veille, statut « payé » mis à jour par Stripe) — entièrement sur des outils <b>gratuits</b>. Dites-le-moi et je le mets en place.
+  </p>
+</main>
+
+<script>
+document.querySelectorAll("[data-frame]").forEach(function(b){
+  b.addEventListener("click",function(){
+    var key=b.getAttribute("data-frame");
+    var box=document.getElementById("frame-"+key);
+    if(!box||box.classList.contains("is-live")) return;
+    var f=document.createElement("iframe");
+    f.src=(key==="site")?"index.html":"admin.html";
+    f.title=(key==="site")?"Aperçu du site":"Aperçu de la console";
+    f.loading="lazy";
+    box.appendChild(f);
+    box.classList.add("is-live");
+    box.scrollIntoView({behavior:"smooth",block:"center"});
+  });
+});
+</script>
+</body>
+</html>
