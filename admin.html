@@ -453,10 +453,11 @@ function renderDetail(){
     <div class="tplgrid" id="tplgrid">
       <button class="btn" data-tpl="confirm">✓ Confirmation</button>
       <button class="btn" data-tpl="availability">📅 Disponibilité</button>
+      <button class="btn" data-tpl="redirect">↪ Autre créneau</button>
       <button class="btn" data-tpl="quote">👥 Devis groupe</button>
       <button class="btn" data-tpl="refund">↩ Remboursement</button>
       <button class="btn" data-tpl="weather">⛈ Annulation météo</button>
-      <button class="btn" data-tpl="reminder">🔔 Rappel la veille</button>
+      <button class="btn" data-tpl="reminder" style="grid-column:1/-1">🔔 Rappel la veille</button>
     </div>
     <div class="detail__foot">
       <button class="btn" id="d-edit" style="flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Modifier</button>
@@ -497,13 +498,28 @@ function templates(b){
     else if(left>0) dispo=`Il reste encore quelques places (environ ${left}) pour le ${dateTxt}. Souhaitez-vous que nous bloquions ${b.persons||""} place(s) ? Nous vous conseillons de confirmer rapidement.`;
     else dispo=`Le départ du ${dateTxt} affiche complet. Nous pouvons vous proposer un autre horaire le même jour (10h, 14h30, 16h30) ou une autre date — dites-nous ce qui vous arrange.`;
   } else dispo=`Avec plaisir. Nos départs ont lieu à 10h, 14h30 et 16h30, de mi-juin à mi-septembre. Indiquez-nous la date et le nombre de personnes souhaités, et nous vérifions aussitôt les places disponibles.`;
+  // devis groupe cohérent avec le nombre (le tarif groupe commence à 20 personnes)
+  let quote;
+  if(grp) quote={subject:"Votre devis groupe — La Carline",
+    body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie en groupe. Pour votre groupe de ${b.persons} personnes${b.date?(" le "+dateTxt):""}, nous établissons un tarif sur devis et pouvons même privatiser un départ rien que pour vous.\r\n\r\nPouvez-vous nous confirmer l'horaire souhaité${b.departure&&b.departure!=="À préciser"?(" ("+dep+")"):""} ? Nous vous envoyons le devis en retour.${spLine}${sign}`};
+  else if(+b.persons>0) quote={subject:"Votre demande — La Carline",
+    body:`Bonjour ${fn},\r\n\r\nMerci de votre message. Le tarif de groupe s'applique à partir de 20 personnes ; pour ${b.persons} personne(s), ce sont nos tarifs individuels (adultes 14,50 €, enfants 4-12 ans 10 €, gratuit pour les moins de 4 ans).\r\n\r\nSouhaitez-vous que nous vous réservions ${b.persons} place(s)${b.date?(" pour le "+dateTxt):""} ?${spLine}${sign}`};
+  else quote={subject:"Votre devis groupe — La Carline",
+    body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie groupe. Pour les groupes à partir de 20 personnes, nous établissons un tarif sur devis et pouvons privatiser un départ.\r\n\r\nPouvez-vous préciser le nombre exact de participants et l'horaire souhaité ?${sign}`};
+  // indisponible / proposer un autre créneau (complet, ou autre motif à compléter)
+  const full = b.date ? (118-dayLoad(b.date, b.departure&&b.departure!=="À préciser"?b.departure:null))<=0 : false;
+  let redirect;
+  if(full) redirect={subject:"Un autre créneau ? — La Carline",
+    body:`Bonjour ${fn},\r\n\r\nLe départ du ${dateTxt}${b.departure&&b.departure!=="À préciser"?(", "+dep):""} affiche malheureusement complet. Nous pouvons vous proposer un autre horaire le même jour (10h, 14h30 ou 16h30) ou une date proche.\r\n\r\nQuelle solution vous conviendrait le mieux ? Nous gardons volontiers une option pour vous.${sign}`};
+  else redirect={subject:"Un autre créneau ? — La Carline",
+    body:`Bonjour ${fn},\r\n\r\nNous ne pourrons malheureusement pas vous accueillir sur le créneau du ${dateTxt} [précisez ici le motif si besoin]. Nous serions toutefois ravis de vous proposer un autre horaire (10h, 14h30, 16h30) ou une autre date.\r\n\r\nDites-nous vos disponibilités, nous trouverons une solution.${sign}`};
   return {
     confirm:{subject:"Votre réservation La Carline est confirmée",
       body:`Bonjour ${fn},\r\n\r\nNous avons le plaisir de confirmer votre promenade pour ${b.persons||""} personne(s) le ${dateTxt}, départ ${dep}.\r\n\r\nMerci de vous présenter au chalet d'accueil 20 minutes avant le départ. ${tarif}${spLine}${sign}`},
     availability:{subject:"Disponibilité — promenade La Carline",
       body:`Bonjour ${fn},\r\n\r\nMerci de votre message. ${dispo}${spLine}${sign}`},
-    quote:{subject:"Votre devis groupe — La Carline",
-      body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie groupe (${b.persons||""} personnes) le ${dateTxt}. Pour les groupes à partir de 20 personnes, nous établissons un tarif sur devis et pouvons privatiser un départ.\r\n\r\nPouvez-vous préciser le nombre exact de participants et l'horaire souhaité ?${sign}`},
+    redirect,
+    quote,
     refund:{subject:"Votre demande de remboursement — La Carline",
       body:`Bonjour ${fn},\r\n\r\nNous confirmons l'annulation de votre réservation du ${dateTxt} (${dep}) et procédons au remboursement de la somme réglée sous quelques jours, sur le moyen de paiement utilisé.\r\n\r\nNous restons à votre disposition et espérons vous accueillir une prochaine fois.${sign}`},
     reminder:{subject:"Rappel — votre promenade La Carline demain",
@@ -512,7 +528,7 @@ function templates(b){
       body:`Bonjour ${fn},\r\n\r\nEn raison des conditions météo annoncées sur le lac (vent/orage), nous devons malheureusement annuler${grp?" la sortie de votre groupe":" votre promenade"} prévue le ${dateTxt}, départ ${dep}${b.persons?` (${b.persons} pers.)`:""}, pour des raisons de sécurité.\r\n\r\nNous vous proposons de la reporter à une autre date qui vous conviendra${grp?", en maintenant les conditions de votre groupe,":""} ou un remboursement intégral si vous préférez. Dites-nous simplement ce que vous souhaitez.${sign}`}
   };
 }
-const TPL_LABEL={confirm:"Confirmation",availability:"Disponibilité",quote:"Devis groupe",refund:"Remboursement",weather:"Annulation météo",reminder:"Rappel la veille"};
+const TPL_LABEL={confirm:"Confirmation",availability:"Disponibilité",redirect:"Autre créneau",quote:"Devis groupe",refund:"Remboursement",weather:"Annulation météo",reminder:"Rappel la veille"};
 function openReply(b,key){
   const t=templates(b)[key]; if(!t) return;
   replyTo=b.email||"";

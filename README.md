@@ -34,7 +34,12 @@ Ouvrir le fichier dans un navigateur (à garder privé, non publié). Version lo
 
 - **Recevoir les demandes** : bouton *Importer* — coller le CSV exporté par Netlify (colonnes `nom, telephone, email, personnes, date, depart, message`) ou un fichier ; ou *Nouvelle* pour saisir à la main. Les doublons (même nom + date) sont ignorés.
 - **Classer** : filtres par statut (Nouveau / Confirmé / En attente / Annulé / Archivé), recherche, tri.
-- **Répondre (rien ne s'envoie tout seul)** : modèles d'e-mail personnalisés au prénom **et à la date** — Confirmation, **Disponibilité** (le texte s'adapte aux places déjà réservées ce jour-là), Devis groupe, Remboursement, Rappel. L'e-mail s'ouvre pré-rempli ; la personne relit et envoie elle-même.
+- **Répondre (rien ne s'envoie tout seul)** : un clic ouvre un **aperçu de la réponse, visible et modifiable** (objet + message), avec la demande du client rappelée. Boutons *Copier* ou *Ouvrir la messagerie*. Réponses adaptées :
+  - personnalisées au **prénom** et à la **date** ;
+  - **Disponibilité** : le texte s'adapte aux places déjà réservées ce jour-là (place dispo / presque complet / complet + alternatives) ;
+  - **Devis groupe** : cohérent avec le nombre (tarif groupe à partir de 20 ; en dessous, propose le tarif individuel) ;
+  - **Autre créneau** (rediriger si complet ou indisponible), **Remboursement**, **Annulation météo** (formulée pour les groupes), **Rappel la veille** ;
+  - phrase ajoutée selon la demande écrite (gâteau/anniversaire, animal, poussette, PMR, pique-nique, parking).
 - **Exporter** : Excel (`.xls`) ou CSV.
 - **Raccourcis clavier** : `N` nouvelle · `/` rechercher · `J`/`K` naviguer · `C` confirmer · `A` archiver · `E` e-mail de confirmation · `Échap` fermer.
 
