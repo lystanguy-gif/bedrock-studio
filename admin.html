@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>La Carline · Console de réservation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b2030;--deep:#0e2b3d;--deep-2:#103349;--teal:#1d7a8e;--aqua:#3cb0c4;--aqua-soft:#8ed3dd;
+  --brass:#c79a4b;--brass-deep:#a87f33;--brass-soft:#e6cf9c;--hull:#cf3a30;
+  --paper:#f3f7f8;--cloud:#ffffff;--line:#dde8ea;--txt:#21404f;--muted:#5b7585;
+  --ok:#1f9d57;--warn:#c98a16;--bad:#c0392b;--new:#2275b5;
+  --ff-disp:"Fraunces",Georgia,serif;--ff-sans:"Instrument Sans",system-ui,sans-serif;--ff-mono:"JetBrains Mono",ui-monospace,monospace;
+  --rad:14px;--shadow:0 18px 44px -26px rgba(7,28,40,.4);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--ff-sans);background:var(--paper);color:var(--txt);font-size:15px;line-height:1.5}
+h1,h2,h3{font-family:var(--ff-disp);font-weight:500;margin:0;letter-spacing:-.01em}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font:inherit}
+a{color:var(--teal)}
+.mono{font-family:var(--ff-mono)}
+
+/* layout */
+.top{position:sticky;top:0;z-index:20;background:linear-gradient(100deg,#0c2334,#0e2b3d);color:#fff;border-bottom:2px solid var(--brass)}
+.top__in{max-width:1320px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:11px}
+.brand__badge{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 50% 38%,#15405a,#0b2334);border:2px solid var(--brass);display:grid;place-items:center;flex:none;font-family:var(--ff-disp);font-style:italic;color:var(--brass-soft);font-size:1.1rem}
+.brand__t b{font-family:var(--ff-disp);font-style:italic;font-size:1.2rem;color:#fff;display:block;line-height:1}
+.brand__t span{font-family:var(--ff-mono);font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--aqua-soft)}
+.top__stats{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:7px 13px;min-width:80px}
+.kpi b{font-family:var(--ff-disp);font-size:1.25rem;color:#fff;display:block;line-height:1}
+.kpi span{font-family:var(--ff-mono);font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--aqua-soft)}
+
+.wrap{max-width:1320px;margin:0 auto;padding:20px 24px 60px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;padding:11px 14px 11px 38px;border:1.5px solid var(--line);border-radius:11px;background:var(--cloud);color:var(--ink)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border-radius:11px;font-weight:600;font-size:.9rem;border:1.5px solid var(--line);background:var(--cloud);color:var(--ink);transition:.18s;white-space:nowrap}
+.btn:hover{border-color:var(--brass);color:var(--brass-deep)}
+.btn svg{width:16px;height:16px}
+.btn--p{background:var(--brass);border-color:var(--brass);color:#231603}
+.btn--p:hover{filter:brightness(1.05);color:#231603}
+.btn--ink{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn--ink:hover{color:#fff;background:var(--deep)}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);background:var(--cloud);font-size:.82rem;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+.chip:hover{border-color:var(--brass)}
+.chip.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip .n{font-family:var(--ff-mono);font-size:.72rem;opacity:.8}
+
+.layout{display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
+@media(max-width:1040px){.layout{grid-template-columns:1fr}.detail{position:static!important}}
+
+.list{display:flex;flex-direction:column;gap:9px}
+.card{background:var(--cloud);border:1.5px solid var(--line);border-radius:var(--rad);padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;cursor:pointer;transition:.15s}
+.card:hover{border-color:var(--brass);box-shadow:var(--shadow)}
+.card.is-sel{border-color:var(--brass);box-shadow:0 0 0 2px rgba(199,154,75,.25),var(--shadow)}
+.card__date{text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-width:58px}
+.card__date b{font-family:var(--ff-disp);font-size:1.3rem;color:var(--ink);display:block;line-height:1}
+.card__date span{font-family:var(--ff-mono);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.card__main b{font-size:1rem;color:var(--ink)}
+.card__meta{font-size:.83rem;color:var(--muted);margin-top:2px;display:flex;gap:12px;flex-wrap:wrap}
+.card__meta em{font-style:normal;color:var(--txt)}
+.tag{font-family:var(--ff-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:999px;font-weight:500;white-space:nowrap}
+.st-nouveau{background:#e3f0fa;color:var(--new)}
+.st-confirme{background:#e0f5ea;color:var(--ok)}
+.st-attente{background:#fbf0db;color:var(--warn)}
+.st-annule{background:#fae3e1;color:var(--bad)}
+.st-archive{background:#eef2f4;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:60px 20px;border:1.5px dashed var(--line);border-radius:var(--rad);background:var(--cloud)}
+
+.detail{position:sticky;top:96px;background:var(--cloud);border:1.5px solid var(--line);border-radius:var(--rad);padding:20px;box-shadow:var(--shadow)}
+.detail__empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:.92rem}
+.detail h2{font-size:1.4rem;color:var(--ink);margin-bottom:3px}
+.detail__sub{font-family:var(--ff-mono);font-size:.66rem;letter-spacing:.06em;color:var(--muted);margin-bottom:14px}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:.92rem;margin-bottom:14px}
+.dl dt{font-family:var(--ff-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.dl dd{margin:0;color:var(--ink);font-weight:500}
+.dl dd a{color:var(--teal)}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.88rem;color:var(--txt);margin-bottom:14px;white-space:pre-wrap}
+.sec-lbl{font-family:var(--ff-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.statusrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.statusrow .chip{font-size:.76rem;padding:6px 11px}
+.tplgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tplgrid .btn{justify-content:center;font-size:.82rem;padding:9px 8px}
+.detail__foot{display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(8,24,36,.6);z-index:60;display:none;align-items:center;justify-content:center;padding:20px}
+.ov.show{display:flex}
+.modal{background:var(--cloud);border-radius:18px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:26px;position:relative;box-shadow:0 30px 80px -30px rgba(0,0,0,.5)}
+.modal h2{font-size:1.4rem;color:var(--ink);margin-bottom:16px}
+.modal .x{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;color:var(--muted);font-size:18px}
+.modal .x:hover{background:var(--paper);color:var(--bad)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.field label{font-family:var(--ff-mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+.field textarea{min-height:80px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.help{font-size:.8rem;color:var(--muted);margin-top:6px;line-height:1.5}
+.kbd{font-family:var(--ff-mono);font-size:.7rem;background:var(--paper);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--txt)}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:11px;font-weight:600;font-size:.9rem;opacity:0;transition:.3s;z-index:80;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.banner{background:linear-gradient(120deg,#fff7e6,#fdf0d6);border:1px solid var(--brass-soft);border-radius:var(--rad);padding:13px 16px;font-size:.86rem;color:#6b4f17;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+.banner svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--brass-deep)}
+.banner b{color:#4d3a10}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top__in">
+    <div class="brand">
+      <div class="brand__badge">C</div>
+      <div class="brand__t"><b>La Carline</b><span>Console de réservation</span></div>
+    </div>
+    <div class="top__stats" id="kpis"></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+    <div><b>Version locale sécurisée (sur cet appareil).</b> Les réservations sont enregistrées dans ce navigateur. Importez les demandes reçues (CSV Netlify / e-mail) ou ajoutez-les à la main. Pour un accès multi-postes protégé par mot de passe avec base de données et lien direct au paiement, voir « <a href="#" id="roadmap-link">Évolution serveur</a> ».</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="Rechercher un nom, téléphone, e-mail, date…  ( / )">
+    </div>
+    <select id="sort" class="btn" style="font-weight:500">
+      <option value="created">Tri : plus récentes</option>
+      <option value="dateAsc">Tri : date de départ ↑</option>
+      <option value="name">Tri : nom A→Z</option>
+    </select>
+    <button class="btn" id="btn-import"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Importer</button>
+    <button class="btn" id="btn-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4M7 10l5-5 5 5M12 5v10"/></svg>Excel / CSV</button>
+    <button class="btn btn--p" id="btn-new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Nouvelle <span class="kbd" style="margin-left:2px">N</span></button>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="layout">
+    <div>
+      <div class="list" id="list"></div>
+      <div class="empty" id="empty" style="display:none">Aucune réservation ne correspond. Ajoutez-en une (<span class="kbd">N</span>) ou changez le filtre.</div>
+    </div>
+    <aside class="detail" id="detail">
+      <div class="detail__empty">Sélectionnez une réservation pour voir le détail, changer son statut et répondre au client.</div>
+    </aside>
+  </div>
+</main>
+
+<!-- modal: edit/new -->
+<div class="ov" id="ov-edit">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <h2 id="edit-title">Nouvelle réservation</h2>
+    <div class="grid2">
+      <div class="field"><label>Nom et prénom</label><input id="e-name" placeholder="Marie Dupont"></div>
+      <div class="field"><label>Téléphone</label><input id="e-phone" placeholder="06 12 34 56 78"></div>
+    </div>
+    <div class="field"><label>E-mail</label><input id="e-email" type="email" placeholder="marie@email.com"></div>
+    <div class="grid2">
+      <div class="field"><label>Date de départ</label><input id="e-date" type="date"></div>
+      <div class="field"><label>Horaire / formule</label>
+        <select id="e-dep"><option>10h00</option><option>14h30</option><option>16h30</option><option>La balade du Capitaine</option><option>À préciser</option></select>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Personnes</label><input id="e-persons" type="number" min="1" value="2"></div>
+      <div class="field"><label>Statut</label>
+        <select id="e-status"><option value="nouveau">Nouveau</option><option value="confirme">Confirmé</option><option value="attente">En attente</option><option value="annule">Annulé</option><option value="archive">Archivé</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Message / note interne</label><textarea id="e-msg" placeholder="Demande du client, occasion spéciale, acompte reçu…"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+      <button class="btn" data-close>Annuler</button>
+      <button class="btn btn--p" id="e-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal: import -->
+<div class="ov" id="ov-import">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <h2>Importer des réservations</h2>
+    <p class="help">Collez un export CSV (colonnes <span class="mono">nom, telephone, email, personnes, date, depart, message</span> — c'est exactement le format exporté par les formulaires Netlify) ou un fichier CSV/JSON. Les doublons (même nom + date) sont ignorés.</p>
+    <div class="field" style="margin-top:10px"><label>Coller le CSV / JSON ici</label><textarea id="imp-text" style="min-height:150px" placeholder="nom,telephone,email,personnes,date,depart,message&#10;Marie Dupont,0612345678,marie@email.com,3,2026-07-12,14h30,Anniversaire"></textarea></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <label class="btn" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/></svg>Choisir un fichier<input id="imp-file" type="file" accept=".csv,.json,.txt" hidden></label>
+      <span style="flex:1"></span>
+      <button class="btn" data-close>Annuler</button>
+      <button class="btn btn--p" id="imp-run">Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- modal: roadmap -->
+<div class="ov" id="ov-road">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <h2>Évolution : plateforme serveur sécurisée</h2>
+    <p class="help" style="font-size:.9rem;line-height:1.7">Cette console fonctionne sans serveur, sur l'appareil. Pour une solution « hyper pro » multi-postes, voici l'étape suivante recommandée :</p>
+    <ul style="font-size:.9rem;line-height:1.8;color:var(--txt);padding-left:18px">
+      <li><b>Réception automatique</b> : le formulaire du site écrit directement dans une base de données (les demandes arrivent ici sans import).</li>
+      <li><b>Accès protégé</b> : connexion par mot de passe / double authentification, plusieurs comptes équipage.</li>
+      <li><b>Paiement relié</b> : statut « payé » mis à jour automatiquement par Stripe (webhook), reçus PDF.</li>
+      <li><b>Hébergement</b> : Supabase / Firebase / petit serveur Node — chiffré (HTTPS), conforme RGPD, sauvegardes automatiques.</li>
+      <li><b>E-mails automatiques</b> : confirmation envoyée toute seule, rappel la veille du départ.</li>
+    </ul>
+    <p class="help">Les données déjà saisies ici s'exportent en CSV/Excel et se réimportent dans la future plateforme — rien n'est perdu.</p>
+    <div style="display:flex;justify-content:flex-end"><button class="btn btn--p" data-close>Compris</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $=(s,c=document)=>c.querySelector(s);
+const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
+const STORE="carline_bookings_v1";
+const RESA_EMAIL="bateaulacarline@gmail.com";
+const STATUS={nouveau:"Nouveau",confirme:"Confirmé",attente:"En attente",annule:"Annulé",archive:"Archivé"};
+const MONTHS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+
+let data=load();
+let filter="all", query="", sort="created", selId=null, editId=null;
+
+function load(){
+  try{ const r=JSON.parse(localStorage.getItem(STORE)); if(Array.isArray(r)) return r; }catch(e){}
+  // jeu de démonstration (au premier lancement)
+  const today=new Date(); const d=n=>{const x=new Date(today);x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
+  return [
+    {id:uid(),status:"nouveau",name:"Marie Lefèvre",phone:"06 24 18 90 22",email:"marie.lefevre@email.com",persons:4,date:d(6),departure:"14h30",message:"Anniversaire de ma fille, possible un gâteau à bord ?",createdAt:Date.now()-3600e3},
+    {id:uid(),status:"confirme",name:"Hans Müller",phone:"+49 170 555 21",email:"h.muller@email.de",persons:2,date:d(3),departure:"10h00",message:"Acompte de 15 € reçu.",createdAt:Date.now()-7200e3},
+    {id:uid(),status:"attente",name:"Famille Rossi",phone:"06 71 02 44 13",email:"rossi.fam@email.it",persons:12,date:d(12),departure:"La balade du Capitaine",message:"Groupe — attend confirmation du nombre exact.",createdAt:Date.now()-9e5}
+  ];
+}
+function save(){ localStorage.setItem(STORE,JSON.stringify(data)); }
+function uid(){ return "b"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function firstName(n){ return (n||"").trim().split(/\s+/)[0]||""; }
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+function fmtDate(s){ if(!s) return null; const p=s.split("-"); if(p.length<3) return {d:s,m:""}; return {d:p[2],m:MONTHS[(+p[1])-1]||""}; }
+
+/* ---------- rendu ---------- */
+function counts(){ const c={all:data.length}; Object.keys(STATUS).forEach(k=>c[k]=0); data.forEach(b=>c[b.status]=(c[b.status]||0)+1); return c; }
+
+function renderKpis(){
+  const c=counts();
+  const today=new Date().toISOString().slice(0,10);
+  const upcoming=data.filter(b=>b.date>=today&&b.status!=="annule"&&b.status!=="archive").length;
+  const k=[["Total",c.all],["Nouvelles",c.nouveau||0],["Confirmées",c.confirme||0],["À venir",upcoming]];
+  $("#kpis").innerHTML=k.map(([l,n])=>`<div class="kpi"><b>${n}</b><span>${l}</span></div>`).join("");
+}
+function renderChips(){
+  const c=counts();
+  const defs=[["all","Toutes"],["nouveau","Nouveau"],["confirme","Confirmé"],["attente","En attente"],["annule","Annulé"],["archive","Archivé"]];
+  $("#chips").innerHTML=defs.map(([k,l])=>`<button class="chip ${filter===k?"is-on":""}" data-f="${k}">${l}<span class="n">${c[k]||0}</span></button>`).join("");
+  $$("#chips .chip").forEach(ch=>ch.onclick=()=>{filter=ch.dataset.f;render();});
+}
+function visible(){
+  const today=new Date().toISOString().slice(0,10);
+  let r=data.filter(b=>filter==="all"?true:b.status===filter);
+  if(query){ const q=query.toLowerCase(); r=r.filter(b=>[b.name,b.phone,b.email,b.date,b.departure,b.message].join(" ").toLowerCase().includes(q)); }
+  if(sort==="created") r.sort((a,b)=>b.createdAt-a.createdAt);
+  else if(sort==="name") r.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  else if(sort==="dateAsc") r.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
+  return r;
+}
+function render(){
+  renderKpis(); renderChips();
+  const rows=visible();
+  $("#empty").style.display=rows.length?"none":"block";
+  $("#list").innerHTML=rows.map(b=>{
+    const dt=fmtDate(b.date);
+    return `<div class="card ${selId===b.id?"is-sel":""}" data-id="${b.id}">
+      <div class="card__date">${dt?`<b>${dt.d}</b><span>${dt.m}</span>`:`<b>—</b><span>date</span>`}</div>
+      <div class="card__main"><b>${esc(b.name)||"Sans nom"}</b>
+        <div class="card__meta"><em>${b.persons||"?"} pers.</em><span>${esc(b.departure)||""}</span>${b.phone?`<span>${esc(b.phone)}</span>`:""}</div>
+      </div>
+      <span class="tag st-${b.status}">${STATUS[b.status]||b.status}</span>
+    </div>`;
+  }).join("");
+  $$("#list .card").forEach(c=>c.onclick=()=>{selId=c.dataset.id;render();renderDetail();});
+  renderDetail();
+}
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m])); }
+
+function renderDetail(){
+  const b=data.find(x=>x.id===selId);
+  const el=$("#detail");
+  if(!b){ el.innerHTML='<div class="detail__empty">Sélectionnez une réservation pour voir le détail, changer son statut et répondre au client.</div>'; return; }
+  const dt=fmtDate(b.date);
+  el.innerHTML=`
+    <h2>${esc(b.name)||"Sans nom"}</h2>
+    <div class="detail__sub">${dt?dt.d+" "+dt.m:"date à préciser"} · ${esc(b.departure)||""} · réf ${b.id.slice(0,7).toUpperCase()}</div>
+    <dl class="dl">
+      <dt>Personnes</dt><dd>${b.persons||"?"}</dd>
+      <dt>Téléphone</dt><dd>${b.phone?`<a href="tel:${esc(b.phone).replace(/\s/g,"")}">${esc(b.phone)}</a>`:"—"}</dd>
+      <dt>E-mail</dt><dd>${b.email?`<a href="mailto:${esc(b.email)}">${esc(b.email)}</a>`:"—"}</dd>
+      <dt>Reçue</dt><dd>${new Date(b.createdAt).toLocaleDateString("fr-FR")}</dd>
+    </dl>
+    ${b.message?`<div class="note">${esc(b.message)}</div>`:""}
+    <div class="sec-lbl">Statut <span style="text-transform:none;color:var(--muted)">— raccourcis : <span class="kbd">C</span> confirmer · <span class="kbd">A</span> archiver</span></div>
+    <div class="statusrow" id="statusrow">${Object.keys(STATUS).map(k=>`<button class="chip ${b.status===k?"is-on":""}" data-s="${k}">${STATUS[k]}</button>`).join("")}</div>
+    <div class="sec-lbl">Répondre au client (e-mail pré-rempli au prénom)</div>
+    <div class="tplgrid" id="tplgrid">
+      <button class="btn" data-tpl="confirm">✓ Confirmation</button>
+      <button class="btn" data-tpl="wait">⏳ Liste d'attente</button>
+      <button class="btn" data-tpl="quote">👥 Devis groupe</button>
+      <button class="btn" data-tpl="cancel">✕ Annulation</button>
+      <button class="btn" data-tpl="reminder" style="grid-column:1/-1">🔔 Rappel la veille</button>
+    </div>
+    <div class="detail__foot">
+      <button class="btn" id="d-edit" style="flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Modifier</button>
+      <button class="btn" id="d-del" title="Supprimer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+    </div>`;
+  $$("#statusrow .chip").forEach(c=>c.onclick=()=>setStatus(b.id,c.dataset.s));
+  $$("#tplgrid .btn").forEach(c=>c.onclick=()=>sendTemplate(b,c.dataset.tpl));
+  $("#d-edit").onclick=()=>openEdit(b.id);
+  $("#d-del").onclick=()=>{ if(confirm("Supprimer définitivement cette réservation ?")){ data=data.filter(x=>x.id!==b.id); selId=null; save(); render(); toast("Réservation supprimée"); } };
+}
+
+function setStatus(id,s){ const b=data.find(x=>x.id===id); if(!b)return; b.status=s; save(); render(); toast("Statut : "+STATUS[s]); }
+
+/* ---------- modèles d'e-mail personnalisés ---------- */
+function tarifLine(){ return "Adultes 14,50 € · Enfants 4-12 ans 10 € · -4 ans gratuit."; }
+function templates(b){
+  const fn=firstName(b.name)||"Madame, Monsieur";
+  const dateTxt=b.date?(()=>{const d=fmtDate(b.date);return d.d+" "+d.m;})():"la date souhaitée";
+  const dep=b.departure||"votre horaire";
+  const sign="\r\n\r\nÀ bord, à bientôt sur le lac,\r\nL'équipage de La Carline\r\n+33 4 92 44 26 88";
+  return {
+    confirm:{subject:"Votre réservation La Carline est confirmée",
+      body:`Bonjour ${fn},\r\n\r\nNous avons le plaisir de confirmer votre promenade pour ${b.persons||""} personne(s) le ${dateTxt}, départ ${dep}.\r\n\r\nMerci de vous présenter au chalet d'accueil 20 minutes avant le départ. ${tarifLine()}${sign}`},
+    wait:{subject:"Votre demande de réservation — La Carline",
+      body:`Bonjour ${fn},\r\n\r\nMerci pour votre demande de promenade le ${dateTxt} (${dep}, ${b.persons||""} pers.). Ce départ est actuellement complet ; nous vous plaçons en liste d'attente et revenons vers vous dès qu'une place se libère.\r\n\r\nN'hésitez pas à nous appeler pour un autre horaire.${sign}`},
+    quote:{subject:"Votre devis groupe — La Carline",
+      body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie groupe (${b.persons||""} personnes) le ${dateTxt}. Pour les groupes à partir de 20 personnes, nous établissons un tarif sur devis et pouvons privatiser un départ.\r\n\r\nPouvez-vous nous préciser le nombre exact de participants et l'horaire souhaité ? Nous vous envoyons le devis en retour.${sign}`},
+    cancel:{subject:"Annulation de votre réservation — La Carline",
+      body:`Bonjour ${fn},\r\n\r\nNous confirmons l'annulation de votre réservation du ${dateTxt} (${dep}). En cas d'acompte réglé, celui-ci vous sera remboursé.\r\n\r\nNous espérons vous accueillir lors d'une prochaine promenade.${sign}`},
+    reminder:{subject:"Rappel — votre promenade La Carline demain",
+      body:`Bonjour ${fn},\r\n\r\nPetit rappel : votre promenade est prévue demain ${dateTxt}, départ ${dep}, pour ${b.persons||""} personne(s). Merci d'arriver au chalet d'accueil 20 minutes avant.\r\n\r\nEn cas d'imprévu météo, nous vous tiendrons informé.${sign}`}
+  };
+}
+function sendTemplate(b,key){
+  const t=templates(b)[key]; if(!t) return;
+  if(b.email){
+    window.location.href="mailto:"+encodeURIComponent(b.email)+"?subject="+encodeURIComponent(t.subject)+"&body="+encodeURIComponent(t.body);
+    toast("E-mail ouvert pour "+(firstName(b.name)||"le client"));
+  }else{
+    navigator.clipboard?.writeText(t.subject+"\r\n\r\n"+t.body);
+    toast("Pas d'e-mail — message copié dans le presse-papier");
+  }
+}
+
+/* ---------- création / édition ---------- */
+function openEdit(id){
+  editId=id||null;
+  const b=id?data.find(x=>x.id===id):null;
+  $("#edit-title").textContent=id?"Modifier la réservation":"Nouvelle réservation";
+  $("#e-name").value=b?b.name||"":"";
+  $("#e-phone").value=b?b.phone||"":"";
+  $("#e-email").value=b?b.email||"":"";
+  $("#e-date").value=b?b.date||"":"";
+  $("#e-dep").value=b?b.departure||"10h00":"10h00";
+  $("#e-persons").value=b?b.persons||2:2;
+  $("#e-status").value=b?b.status:"nouveau";
+  $("#e-msg").value=b?b.message||"":"";
+  show("#ov-edit"); setTimeout(()=>$("#e-name").focus(),50);
+}
+$("#e-save").onclick=()=>{
+  const o={name:$("#e-name").value.trim(),phone:$("#e-phone").value.trim(),email:$("#e-email").value.trim(),
+    date:$("#e-date").value,departure:$("#e-dep").value,persons:+$("#e-persons").value||1,
+    status:$("#e-status").value,message:$("#e-msg").value.trim()};
+  if(!o.name){ toast("Indiquez au moins un nom"); $("#e-name").focus(); return; }
+  if(editId){ Object.assign(data.find(x=>x.id===editId),o); toast("Réservation mise à jour"); }
+  else{ o.id=uid(); o.createdAt=Date.now(); data.unshift(o); selId=o.id; toast("Réservation ajoutée"); }
+  save(); hideAll(); render();
+};
+
+/* ---------- import ---------- */
+function parseCSV(text){
+  const rows=[]; let i=0,f="",row=[],q=false;
+  while(i<text.length){ const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===","){ row.push(f); f=""; }
+    else if(c==="\n"||c==="\r"){ if(c==="\r"&&text[i+1]==="\n")i++; if(f!==""||row.length){ row.push(f); rows.push(row);} f="";row=[]; }
+    else f+=c;
+    i++;
+  }
+  if(f!==""||row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+function importText(text){
+  text=text.trim(); if(!text) return 0;
+  let recs=[];
+  if(text[0]==="["||text[0]==="{"){ try{ const j=JSON.parse(text); recs=Array.isArray(j)?j:[j]; }catch(e){ toast("JSON invalide"); return 0; } }
+  else{
+    const rows=parseCSV(text); if(rows.length<2){ toast("CSV vide ou sans en-tête"); return 0; }
+    const head=rows[0].map(h=>h.trim().toLowerCase());
+    const idx=n=>head.findIndex(h=>h===n||h.includes(n));
+    const map={name:idx("nom"),phone:idx("telephone"),email:idx("email"),persons:idx("personne"),date:idx("date"),departure:idx("depart"),message:idx("message")};
+    if(map.name<0){ toast("Colonne 'nom' introuvable"); return 0; }
+    recs=rows.slice(1).filter(r=>r.some(c=>c&&c.trim())).map(r=>({
+      name:r[map.name]||"",phone:map.phone>=0?r[map.phone]||"":"",email:map.email>=0?r[map.email]||"":"",
+      persons:map.persons>=0?(+String(r[map.persons]).replace(/\D/g,"")||1):1,
+      date:map.date>=0?normDate(r[map.date]):"",departure:map.departure>=0?r[map.departure]||"":"",message:map.message>=0?r[map.message]||"":""
+    }));
+  }
+  let added=0;
+  recs.forEach(r=>{
+    if(!r.name||!r.name.trim()) return;
+    const dup=data.some(b=>b.name.trim().toLowerCase()===r.name.trim().toLowerCase()&&(b.date||"")===(r.date||""));
+    if(dup) return;
+    data.unshift({id:uid(),status:r.status||"nouveau",name:r.name.trim(),phone:r.phone||"",email:r.email||"",
+      persons:r.persons||1,date:r.date||"",departure:r.departure||"",message:r.message||"",createdAt:Date.now()});
+    added++;
+  });
+  if(added){ save(); render(); }
+  return added;
+}
+function normDate(s){ if(!s) return ""; s=s.trim(); if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  const m=s.match(/(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/); if(m){ let y=m[3]; if(y.length===2)y="20"+y; return `${y}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`; } return ""; }
+$("#imp-run").onclick=()=>{ const n=importText($("#imp-text").value); hideAll(); toast(n?n+" réservation(s) importée(s)":"Aucune nouvelle réservation"); };
+$("#imp-file").onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>$("#imp-text").value=r.result; r.readAsText(f); };
+
+/* ---------- export ---------- */
+function exportRows(){
+  const cols=["nom","telephone","email","personnes","date","depart","statut","message","recue_le"];
+  const rows=visible().map(b=>[b.name,b.phone,b.email,b.persons,b.date,b.departure,STATUS[b.status]||b.status,(b.message||"").replace(/\r?\n/g," "),new Date(b.createdAt).toLocaleString("fr-FR")]);
+  return {cols,rows};
+}
+function download(name,mime,content){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:mime})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+function exportCSV(){
+  const {cols,rows}=exportRows();
+  const q=v=>{ v=v==null?"":String(v); return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const csv="﻿"+[cols.join(";"),...rows.map(r=>r.map(q).join(";"))].join("\r\n");
+  download("reservations-carline-"+new Date().toISOString().slice(0,10)+".csv","text/csv;charset=utf-8",csv);
+  toast("Export CSV téléchargé");
+}
+function exportXLS(){
+  const {cols,rows}=exportRows();
+  const td=v=>"<td>"+esc(v)+"</td>";
+  const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table border="1"><tr style="background:#0e2b3d;color:#fff">'+cols.map(c=>"<th>"+esc(c)+"</th>").join("")+"</tr>"+rows.map(r=>"<tr>"+r.map(td).join("")+"</tr>").join("")+"</table></body></html>";
+  download("reservations-carline-"+new Date().toISOString().slice(0,10)+".xls","application/vnd.ms-excel",html);
+  toast("Export Excel téléchargé");
+}
+$("#btn-export").onclick=()=>{ const x=confirm("OK = Excel (.xls)\nAnnuler = CSV (.csv)"); x?exportXLS():exportCSV(); };
+
+/* ---------- modals plumbing ---------- */
+function show(sel){ $(sel).classList.add("show"); }
+function hideAll(){ $$(".ov").forEach(o=>o.classList.remove("show")); }
+$$("[data-close]").forEach(b=>b.onclick=hideAll);
+$$(".ov").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) hideAll(); }));
+$("#btn-new").onclick=()=>openEdit(null);
+$("#btn-import").onclick=()=>{ $("#imp-text").value=""; show("#ov-import"); };
+$("#roadmap-link").onclick=e=>{ e.preventDefault(); show("#ov-road"); };
+
+/* ---------- search + sort ---------- */
+$("#search").addEventListener("input",e=>{ query=e.target.value; render(); });
+$("#sort").addEventListener("change",e=>{ sort=e.target.value; render(); });
+
+/* ---------- raccourcis clavier ---------- */
+document.addEventListener("keydown",e=>{
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if(e.key==="Escape"){ hideAll(); return; }
+  if(typing) return;
+  const rows=visible();
+  if(e.key==="n"||e.key==="N"){ e.preventDefault(); openEdit(null); }
+  else if(e.key==="/"){ e.preventDefault(); $("#search").focus(); }
+  else if(e.key==="j"||e.key==="k"){ if(!rows.length)return; let i=rows.findIndex(b=>b.id===selId); i=e.key==="j"?Math.min(rows.length-1,i+1):Math.max(0,i-1); if(i<0)i=0; selId=rows[i].id; render(); $(".card.is-sel")?.scrollIntoView({block:"nearest"}); }
+  else if(selId&&(e.key==="c"||e.key==="C")){ setStatus(selId,"confirme"); }
+  else if(selId&&(e.key==="a"||e.key==="A")){ setStatus(selId,"archive"); }
+  else if(selId&&(e.key==="e"||e.key==="E")){ const b=data.find(x=>x.id===selId); if(b)sendTemplate(b,"confirm"); }
+});
+
+render();
+</script>
+</body>
+</html>
