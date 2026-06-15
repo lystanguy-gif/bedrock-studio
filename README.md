@@ -34,7 +34,7 @@ Ouvrir le fichier dans un navigateur (à garder privé, non publié). Version lo
 
 - **Recevoir les demandes** : bouton *Importer* — coller le CSV exporté par Netlify (colonnes `nom, telephone, email, personnes, date, depart, message`) ou un fichier ; ou *Nouvelle* pour saisir à la main. Les doublons (même nom + date) sont ignorés.
 - **Classer** : filtres par statut (Nouveau / Confirmé / En attente / Annulé / Archivé), recherche, tri.
-- **Répondre** : modèles d'e-mail personnalisés au prénom (Confirmation, Liste d'attente, Devis groupe, Annulation, Rappel) — ouvre la messagerie pré-remplie.
+- **Répondre (rien ne s'envoie tout seul)** : modèles d'e-mail personnalisés au prénom **et à la date** — Confirmation, **Disponibilité** (le texte s'adapte aux places déjà réservées ce jour-là), Devis groupe, Remboursement, Rappel. L'e-mail s'ouvre pré-rempli ; la personne relit et envoie elle-même.
 - **Exporter** : Excel (`.xls`) ou CSV.
 - **Raccourcis clavier** : `N` nouvelle · `/` rechercher · `J`/`K` naviguer · `C` confirmer · `A` archiver · `E` e-mail de confirmation · `Échap` fermer.
 

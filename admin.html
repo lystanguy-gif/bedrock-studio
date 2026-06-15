@@ -431,12 +431,12 @@ function renderDetail(){
     ${b.message?`<div class="note">${esc(b.message)}</div>`:""}
     <div class="sec-lbl">Statut <span style="text-transform:none;color:var(--muted)">— <span class="kbd">C</span> confirmer · <span class="kbd">A</span> archiver</span></div>
     <div class="statusrow" id="statusrow">${Object.keys(STATUS).map(k=>`<button class="chip ${b.status===k?"is-on":""}" data-s="${k}">${STATUS[k]}</button>`).join("")}</div>
-    <div class="sec-lbl">Répondre au client (e-mail pré-rempli au prénom)</div>
+    <div class="sec-lbl">Réponse selon la demande — nom &amp; date déjà remplis · <span style="text-transform:none;color:var(--muted)">rien ne s'envoie tout seul, vous relisez et envoyez</span></div>
     <div class="tplgrid" id="tplgrid">
       <button class="btn" data-tpl="confirm">✓ Confirmation</button>
-      <button class="btn" data-tpl="wait">⏳ Liste d'attente</button>
+      <button class="btn" data-tpl="availability">📅 Disponibilité</button>
       <button class="btn" data-tpl="quote">👥 Devis groupe</button>
-      <button class="btn" data-tpl="cancel">✕ Annulation</button>
+      <button class="btn" data-tpl="refund">↩ Remboursement</button>
       <button class="btn" data-tpl="reminder" style="grid-column:1/-1">🔔 Rappel la veille</button>
     </div>
     <div class="detail__foot">
@@ -451,21 +451,29 @@ function renderDetail(){
 function setStatus(id,s){ const b=data.find(x=>x.id===id); if(!b)return; b.status=s; save(); renderList(); renderDetail(); toast("Statut : "+STATUS[s]); }
 
 /* ---------- modèles d'e-mail ---------- */
+function dayLoad(date,dep){ if(!date) return 0; let p=0; data.forEach(b=>{ if(b.date===date && b.status==="confirme" && (!dep||b.departure===dep)) p+=(+b.persons||0); }); return p; }
 function templates(b){
   const fn=firstName(b.name)||"Madame, Monsieur";
   const dateTxt=b.date?(()=>{const d=fmtDate(b.date);return d.d+" "+d.m;})():"la date souhaitée";
   const dep=b.departure||"votre horaire";
   const tarif="Adultes 14,50 € · Enfants 4-12 ans 10 € · -4 ans gratuit.";
-  const sign="\r\n\r\nÀ bord, à bientôt sur le lac,\r\nL'équipage de La Carline\r\n+33 4 92 44 26 88";
+  const sign="\r\n\r\nBien à vous,\r\nL'équipage de La Carline · +33 4 92 44 26 88";
+  /* réponse disponibilité, calculée selon les places déjà confirmées ce jour-là (118 à bord) */
+  let dispo;
+  if(b.date){ const left=118-dayLoad(b.date, b.departure&&b.departure!=="À préciser"?b.departure:null);
+    if(left>=30) dispo=`Bonne nouvelle : il reste de la place pour la promenade du ${dateTxt}${b.departure&&b.departure!=="À préciser"?", départ "+dep:""}. Nous pouvons vous réserver ${b.persons||""} place(s).`;
+    else if(left>0) dispo=`Il reste encore quelques places (environ ${left}) pour le ${dateTxt}. Souhaitez-vous que nous bloquions ${b.persons||""} place(s) ? Nous vous conseillons de confirmer rapidement.`;
+    else dispo=`Le départ du ${dateTxt} affiche complet. Nous pouvons vous proposer un autre horaire le même jour (10h, 14h30, 16h30) ou une autre date — dites-nous ce qui vous arrange.`;
+  } else dispo=`Avec plaisir. Nos départs ont lieu à 10h, 14h30 et 16h30, de mi-juin à mi-septembre. Indiquez-nous la date et le nombre de personnes souhaités, et nous vérifions aussitôt les places disponibles.`;
   return {
     confirm:{subject:"Votre réservation La Carline est confirmée",
       body:`Bonjour ${fn},\r\n\r\nNous avons le plaisir de confirmer votre promenade pour ${b.persons||""} personne(s) le ${dateTxt}, départ ${dep}.\r\n\r\nMerci de vous présenter au chalet d'accueil 20 minutes avant le départ. ${tarif}${sign}`},
-    wait:{subject:"Votre demande de réservation — La Carline",
-      body:`Bonjour ${fn},\r\n\r\nMerci pour votre demande de promenade le ${dateTxt} (${dep}, ${b.persons||""} pers.). Ce départ est actuellement complet ; nous vous plaçons en liste d'attente et revenons vers vous dès qu'une place se libère.${sign}`},
+    availability:{subject:"Disponibilité — promenade La Carline",
+      body:`Bonjour ${fn},\r\n\r\nMerci de votre message. ${dispo}${sign}`},
     quote:{subject:"Votre devis groupe — La Carline",
       body:`Bonjour ${fn},\r\n\r\nMerci de votre intérêt pour une sortie groupe (${b.persons||""} personnes) le ${dateTxt}. Pour les groupes à partir de 20 personnes, nous établissons un tarif sur devis et pouvons privatiser un départ.\r\n\r\nPouvez-vous préciser le nombre exact de participants et l'horaire souhaité ?${sign}`},
-    cancel:{subject:"Annulation de votre réservation — La Carline",
-      body:`Bonjour ${fn},\r\n\r\nNous confirmons l'annulation de votre réservation du ${dateTxt} (${dep}). En cas d'acompte réglé, celui-ci vous sera remboursé.\r\n\r\nAu plaisir de vous accueillir une prochaine fois.${sign}`},
+    refund:{subject:"Votre demande de remboursement — La Carline",
+      body:`Bonjour ${fn},\r\n\r\nNous confirmons l'annulation de votre réservation du ${dateTxt} (${dep}) et procédons au remboursement de la somme réglée sous quelques jours, sur le moyen de paiement utilisé.\r\n\r\nNous restons à votre disposition et espérons vous accueillir une prochaine fois.${sign}`},
     reminder:{subject:"Rappel — votre promenade La Carline demain",
       body:`Bonjour ${fn},\r\n\r\nPetit rappel : votre promenade est prévue demain ${dateTxt}, départ ${dep}, pour ${b.persons||""} personne(s). Merci d'arriver au chalet d'accueil 20 minutes avant.${sign}`}
   };
