@@ -391,6 +391,19 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
 .vmap__stage{aspect-ratio:1000/1095;max-width:600px}
 @media(max-width:680px){.vmap__stage{max-width:100%}}
 .vmap__wp text{font-size:20px}
+
+/* bandeau cookies + consentement de la carte (RGPD) */
+.cookie{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:300;width:min(700px,calc(100% - 24px));background:#0c2334;color:#fff;border:1px solid var(--brass);border-radius:16px;box-shadow:0 24px 60px -28px rgba(7,28,40,.7);padding:16px 18px}
+.cookie[hidden]{display:none}
+.cookie__in{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.cookie__txt{font-size:.88rem;color:#e8f1f3;flex:1;min-width:230px;line-height:1.5}
+.cookie__txt a{color:var(--brass-soft);text-decoration:underline}
+.cookie__btns{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:560px){.cookie__btns{width:100%}.cookie__btns .btn{flex:1;justify-content:center}}
+.access__map .mapconsent{position:absolute;inset:0;z-index:2;background:linear-gradient(160deg,#10303f,#0b2535);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;color:#dfeaee}
+.access__map .mapconsent svg{width:34px;height:34px;color:var(--brass-soft)}
+.access__map .mapconsent p{font-size:.9rem;max-width:36ch;color:#cfe0e6;margin:0}
+.access__map.is-on .mapconsent{display:none}
 </style>
 </head>
 <body>
@@ -690,7 +703,14 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
       <p class="access__note" data-i18n="ac.note">L'embarcadère se situe à l'entrée du village, juste après le pont de Savines. Plusieurs parkings à proximité.</p>
       <a class="btn btn--line-ink" href="https://www.google.com/maps/dir/?api=1&destination=44.526747,6.400085" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-8-8 18-2-8z"/></svg><span data-i18n="ac.dir">Itinéraire</span></a>
     </div>
-    <div class="access__map reveal" data-d="1"><iframe title="Carte de l'embarcadère de La Carline à Savines-le-Lac" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=6.3825%2C44.5195%2C6.4175%2C44.5340&amp;layer=mapnik&amp;marker=44.526747%2C6.400085"></iframe></div>
+    <div class="access__map reveal" data-d="1">
+      <iframe id="osmMap" title="Carte de l'embarcadère de La Carline à Savines-le-Lac" loading="lazy" data-src="https://www.openstreetmap.org/export/embed.html?bbox=6.3825%2C44.5195%2C6.4175%2C44.5340&amp;layer=mapnik&amp;marker=44.526747%2C6.400085"></iframe>
+      <div class="mapconsent" id="mapConsent">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+        <p>La carte interactive est fournie par OpenStreetMap et peut déposer des cookies. Activez-la pour l'afficher.</p>
+        <button class="btn btn--primary" id="mapActivate" type="button">Afficher la carte</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -733,11 +753,10 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
         <summary data-i18n="leg.s1">Mentions légales</summary>
         <div class="legal__body">
           <p>Site édité par <b>La Carline</b>, bateau promenade sur le lac de Serre-Ponçon.</p>
-          <p>Raison sociale <span class="ph">[à compléter]</span>, forme juridique <span class="ph">[à compléter]</span>, capital social <span class="ph">[à compléter]</span>.</p>
-          <p>Siège social 2 avenue du Faubourg, Route du Sauze, 05160 Savines-le-Lac.</p>
-          <p>SIRET <span class="ph">[à compléter]</span>, TVA intracommunautaire <span class="ph">[à compléter]</span>.</p>
-          <p>Directeur de la publication <span class="ph">[à compléter]</span>. Téléphone +33 4 92 44 26 88. Courriel bateaulacarline@gmail.com.</p>
-          <p>Hébergement du site <span class="ph">[hébergeur retenu, ex. Netlify]</span>.</p>
+          <p>Adresse : Route du Sauze, 05160 Savines-le-Lac, France. Téléphone +33 4 92 44 26 88. Courriel bateaulacarline@gmail.com.</p>
+          <p>Forme juridique <span class="ph">[à compléter]</span>, capital social <span class="ph">[à compléter]</span>, SIRET <span class="ph">[à compléter]</span>, TVA intracommunautaire <span class="ph">[à compléter]</span>.</p>
+          <p>Directeur de la publication : le représentant légal de La Carline.</p>
+          <p>Hébergement du site <span class="ph">[à compléter selon l'hébergeur choisi]</span>.</p>
         </div>
       </details>
       <details>
@@ -753,9 +772,9 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
       <details>
         <summary data-i18n="leg.s3">Données personnelles et cookies</summary>
         <div class="legal__body">
-          <p>Les informations transmises via le formulaire (nom, téléphone, courriel, détails de la demande) servent uniquement à traiter votre réservation et ne sont pas cédées à des tiers.</p>
-          <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données en écrivant à bateaulacarline@gmail.com.</p>
-          <p>Ce site ne dépose ni cookie publicitaire ni traceur. La carte est fournie par OpenStreetMap et le paiement par Stripe, susceptibles de déposer des cookies techniques lors de leur utilisation.</p>
+          <p>Aucune information personnelle n'est collectée à votre insu. Les informations transmises via le formulaire (nom, téléphone, courriel, détails de la demande) servent uniquement à traiter votre réservation, ne sont pas cédées à des tiers et sont supprimées une fois la demande traitée.</p>
+          <p>Conformément à la loi Informatique et Libertés et au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données en écrivant à bateaulacarline@gmail.com.</p>
+          <p><b>Cookies.</b> Ce site ne dépose aucun cookie publicitaire ni traceur ; seuls des cookies strictement nécessaires au fonctionnement sont utilisés. La carte interactive (OpenStreetMap) ne se charge qu'après votre accord, et le paiement est traité par Stripe sur sa propre page sécurisée. Vous pouvez modifier votre choix à tout moment : <a href="#" class="ck-manage">gérer les cookies</a>.</p>
         </div>
       </details>
     </div>
@@ -774,7 +793,7 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
       <div><h4 data-i18n="ft.contact">Contact</h4><ul><li data-i18n-html="ac.addr">2 avenue du Faubourg<br>05160 Savines-le-Lac</li><li><a href="tel:+33492442688">+33 4 92 44 26 88</a></li></ul></div>
       <div><h4 data-i18n="ft.hours">Horaires d'accueil</h4><ul><li data-i18n="ft.hoursVal">Lundi au vendredi</li><li>9h30 – 12h00</li><li>13h30 – 17h00</li></ul></div>
     </div>
-    <div class="ft__bot"><span data-i18n="ft.rights">© 2026 La Carline. Tous droits réservés.</span><span><a href="#mentions" data-i18n="ft.legal">Mentions légales</a> · <a href="#reservation" data-i18n="nav.book">Réserver</a> · Savines-le-Lac, France</span></div>
+    <div class="ft__bot"><span data-i18n="ft.rights">© 2026 La Carline. Tous droits réservés.</span><span><a href="#mentions" data-i18n="ft.legal">Mentions légales</a> · <a href="#" class="ck-manage">Cookies</a> · <a href="#reservation" data-i18n="nav.book">Réserver</a> · Savines-le-Lac, France</span></div>
   </div>
 </footer>
 <script>
@@ -1077,6 +1096,33 @@ const STRIPE_LINK = "";
   });
 })();
 
+
+/* --- consentement cookies + carte OpenStreetMap --- */
+(function(){
+  var KEY="carline_cookies";
+  var banner=document.getElementById("cookie");
+  var mapWrap=document.querySelector(".access__map");
+  var iframe=document.getElementById("osmMap");
+  function loadMap(){ if(iframe && !iframe.src && iframe.dataset.src) iframe.src=iframe.dataset.src; if(mapWrap) mapWrap.classList.add("is-on"); }
+  function decide(v){ try{localStorage.setItem(KEY,v);}catch(e){} if(banner) banner.hidden=true; if(v==="accept") loadMap(); }
+  var c=null; try{c=localStorage.getItem(KEY);}catch(e){}
+  if(c==="accept") loadMap();
+  else if(!c && banner) banner.hidden=false;
+  var a=document.getElementById("ckAccept"), r=document.getElementById("ckRefuse"), m=document.getElementById("mapActivate");
+  if(a) a.addEventListener("click",function(){decide("accept");});
+  if(r) r.addEventListener("click",function(){decide("refuse");});
+  if(m) m.addEventListener("click",function(){decide("accept");});
+  Array.prototype.forEach.call(document.querySelectorAll(".ck-manage"),function(el){ el.addEventListener("click",function(e){ e.preventDefault(); if(banner) banner.hidden=false; window.scrollTo({top:0,behavior:"smooth"}); }); });
+})();
 </script>
+<div class="cookie" id="cookie" hidden>
+  <div class="cookie__in">
+    <p class="cookie__txt">Nous utilisons uniquement des cookies nécessaires au fonctionnement du site. La carte (OpenStreetMap) et le paiement (Stripe) ne se chargent qu'avec votre accord. <a href="#mentions">En savoir plus</a></p>
+    <div class="cookie__btns">
+      <button class="btn btn--ghost" id="ckRefuse" type="button" style="border-color:rgba(255,255,255,.45)">Refuser</button>
+      <button class="btn btn--primary" id="ckAccept" type="button">Accepter</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
