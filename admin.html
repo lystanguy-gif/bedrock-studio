@@ -191,6 +191,9 @@ select.btn{font-weight:500}
     <div class="menu" id="menu">
       <button class="btn" id="menu-btn" aria-label="Plus d'options"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button>
       <div class="menu__list">
+        <button id="m-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6h.09A1.65 1.65 0 0 0 11 3.09V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 4.6c.55.32 1.24.32 1.82 0l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9z"/></svg>Réglages du site (horaires, prix)</button>
+        <button id="m-sync"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Recevoir les réservations en ligne</button>
+        <hr>
         <button id="m-sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13M9 9l12-2M6 16a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/></svg>Feuille du jour (impression)</button>
         <hr>
         <button id="m-backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4M7 10l5-5 5 5M12 5v10"/></svg>Sauvegarder (fichier)</button>
@@ -329,6 +332,32 @@ select.btn{font-weight:500}
   </div>
 </div>
 
+<!-- modal: réglages du site (horaires / dates / prix) en ligne -->
+<div class="ov" id="ov-settings">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <h2>Réglages du site</h2>
+    <div id="set-need" style="display:none"><p class="help">Pour modifier les horaires, dates et prix <b>en ligne</b> (repris automatiquement sur le site public), reliez Supabase — voir le guide <span class="mono">supabase-setup.md</span>. Sans cela, vos modifications restent sur cet appareil (mode démo).</p></div>
+    <div id="set-login" style="display:none">
+      <p class="help">Connectez-vous avec le compte équipage pour modifier le site.</p>
+      <div class="field"><label>E-mail</label><input id="set-email" type="email" autocomplete="username"></div>
+      <div class="field"><label>Mot de passe</label><input id="set-pwd" type="password" autocomplete="current-password"></div>
+      <div style="display:flex;justify-content:flex-end"><button class="btn btn--p" id="set-signin">Se connecter</button></div>
+    </div>
+    <div id="set-form" style="display:none">
+      <div class="field"><label>Horaires de départ (un par ligne)</label><textarea id="set-horaires" style="min-height:90px"></textarea></div>
+      <div class="field"><label>Saison / disponibilité (texte sous les horaires)</label><textarea id="set-saison" style="min-height:64px"></textarea></div>
+      <div class="grid2">
+        <div class="field"><label>Tarif adulte</label><input id="set-padulte"></div>
+        <div class="field"><label>Tarif enfant</label><input id="set-penfant"></div>
+      </div>
+      <div class="field"><label>Tarif « balade du Capitaine »</label><input id="set-pcapitaine"></div>
+      <p class="help">Ces valeurs s'affichent immédiatement sur le site public.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-close>Fermer</button><button class="btn btn--p" id="set-save">Enregistrer</button></div>
+    </div>
+  </div>
+</div>
+
 <input id="restore-file" type="file" accept=".json" hidden>
 <div class="toast" id="toast"></div>
 
@@ -337,6 +366,8 @@ select.btn{font-weight:500}
 const $=(s,c=document)=>c.querySelector(s);
 const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
 const STORE="carline_bookings_v1";
+/* Supabase (mêmes valeurs que dans index.html) — voir supabase-setup.md */
+const SB_URL="", SB_KEY="";
 const ADULT=14.5;
 const STATUS={nouveau:"Nouveau",confirme:"Confirmé",attente:"En attente",annule:"Annulé",archive:"Archivé"};
 const MONTHS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
@@ -731,6 +762,59 @@ document.addEventListener("keydown",e=>{
   else if(selId&&(e.key==="a"||e.key==="A")) setStatus(selId,"archive");
   else if(selId&&(e.key==="e"||e.key==="E")){ const b=data.find(x=>x.id===selId); if(b)openReply(b,"confirm"); }
 });
+
+/* ===== Supabase : réglages en ligne + réception des réservations ===== */
+function sbTok(){ try{return sessionStorage.getItem('carline_sb_token')||"";}catch(e){return "";} }
+function sbH(auth){ var h={apikey:SB_KEY,'Content-Type':'application/json'}; var t=auth?sbTok():""; h.Authorization='Bearer '+(t||SB_KEY); return h; }
+function loadLocalSettings(){ try{return JSON.parse(localStorage.getItem('carline_settings'))||{};}catch(e){return {};} }
+function fillSettings(s){ s=s||{}; var p=s.prix||{};
+  $("#set-horaires").value=(s.horaires||["10h00","14h30","16h30"]).join("\n");
+  $("#set-saison").value=s.saison||"";
+  $("#set-padulte").value=p.adulte||"14,50 €"; $("#set-penfant").value=p.enfant||"10 €"; $("#set-pcapitaine").value=p.capitaine||"40 €";
+  $("#set-form").style.display="block";
+}
+function loadSettingsForm(){
+  if(SB_URL&&SB_KEY){ fetch(SB_URL+'/rest/v1/settings?id=eq.1&select=data',{headers:sbH(false)}).then(function(r){return r.ok?r.json():[];}).then(function(rows){ fillSettings(rows&&rows[0]&&rows[0].data); }).catch(function(){ fillSettings(loadLocalSettings()); }); }
+  else fillSettings(loadLocalSettings());
+}
+function openSettings(){
+  var conf=!!(SB_URL&&SB_KEY);
+  $("#set-need").style.display=conf?"none":"block";
+  if(conf && !sbTok()){ $("#set-login").style.display="block"; $("#set-form").style.display="none"; }
+  else { $("#set-login").style.display="none"; loadSettingsForm(); }
+  show("#ov-settings");
+}
+$("#set-signin").onclick=function(){
+  var em=$("#set-email").value.trim(), pw=$("#set-pwd").value;
+  fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw})})
+   .then(function(r){return r.json();}).then(function(j){ if(j.access_token){ try{sessionStorage.setItem('carline_sb_token',j.access_token);}catch(e){} $("#set-login").style.display="none"; loadSettingsForm(); toast("Connecté"); } else toast("Identifiants incorrects"); })
+   .catch(function(){ toast("Connexion impossible"); });
+};
+$("#set-save").onclick=function(){
+  var s={horaires:$("#set-horaires").value.split("\n").map(function(x){return x.trim();}).filter(Boolean),saison:$("#set-saison").value.trim(),prix:{adulte:$("#set-padulte").value.trim(),enfant:$("#set-penfant").value.trim(),capitaine:$("#set-pcapitaine").value.trim()}};
+  if(SB_URL&&SB_KEY){
+    fetch(SB_URL+'/rest/v1/settings?id=eq.1',{method:'PATCH',headers:Object.assign(sbH(true),{Prefer:'return=minimal'}),body:JSON.stringify({data:s})})
+     .then(function(r){ if(!r.ok) throw 0; toast("Réglages enregistrés — visibles sur le site"); hideAll(); })
+     .catch(function(){ toast("Échec — reconnectez-vous"); });
+  } else { try{localStorage.setItem('carline_settings',JSON.stringify(s));}catch(e){} toast("Enregistré (local — démo)"); hideAll(); }
+};
+function syncReservations(){
+  if(!(SB_URL&&SB_KEY)){ toast("Configurez Supabase pour la réception en ligne"); openSettings(); return; }
+  if(!sbTok()){ toast("Connectez-vous d'abord"); openSettings(); return; }
+  fetch(SB_URL+'/rest/v1/reservations?select=*&order=created_at.desc',{headers:sbH(true)})
+   .then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(rows){
+     var added=0;
+     rows.forEach(function(r){
+       if(data.some(function(b){return b.sbid===r.id;})) return;
+       data.unshift({id:uid(),sbid:r.id,status:r.statut||'nouveau',name:r.nom||'',phone:r.telephone||'',email:r.email||'',persons:r.personnes||1,date:r.date||'',departure:r.depart||'',message:r.message||'',createdAt:r.created_at?Date.parse(r.created_at):Date.now()});
+       added++;
+     });
+     if(added){ save(); shown=PAGE; renderList(); renderDetail(); }
+     toast(added?(added+" réservation(s) reçue(s)"):"Aucune nouvelle réservation");
+   }).catch(function(){ toast("Échec — reconnectez-vous (Réglages)"); });
+}
+$("#m-settings").onclick=function(){ closeMenu(); openSettings(); };
+$("#m-sync").onclick=function(){ closeMenu(); syncReservations(); };
 
 renderList(); renderDetail();
 </script>

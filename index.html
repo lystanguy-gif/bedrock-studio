@@ -604,14 +604,14 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
     <div class="prices__grid">
       <div class="pcard pcard--dep reveal">
         <span class="eyebrow" data-i18n="pr.depTitle">Départs</span>
-        <div class="pcard__times">10h <em>·</em> 14h30 <em>·</em> 16h30</div>
-        <p data-i18n="pr.depNote">De mi-juin à mi-septembre, tous les jours. Au printemps et à l'automne, sur réservation (30 personnes minimum).</p>
+        <div class="pcard__times" id="depTimes">10h <em>·</em> 14h30 <em>·</em> 16h30</div>
+        <p id="depSeason" data-i18n="pr.depNote">De mi-juin à mi-septembre, tous les jours. Au printemps et à l'automne, sur réservation (30 personnes minimum).</p>
         <div class="pcard__present"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-i18n="pr.present">Présentez-vous au chalet d'accueil 20 minutes avant le départ.</span></div>
       </div>
       <div class="pcard pcard--tar reveal" data-d="1">
         <span class="eyebrow" data-i18n="pr.tarTitle">Tarifs individuels</span>
-        <div class="tarrow"><span class="tarrow__name" data-i18n="pr.adult">Adultes</span><span class="tarrow__dots"></span><span class="tarrow__price">14,50 €</span></div>
-        <div class="tarrow"><span class="tarrow__name" data-i18n="pr.child">Enfants de 4 à 12 ans</span><span class="tarrow__dots"></span><span class="tarrow__price">10 €</span></div>
+        <div class="tarrow"><span class="tarrow__name" data-i18n="pr.adult">Adultes</span><span class="tarrow__dots"></span><span class="tarrow__price" id="priceAdulte">14,50 €</span></div>
+        <div class="tarrow"><span class="tarrow__name" data-i18n="pr.child">Enfants de 4 à 12 ans</span><span class="tarrow__dots"></span><span class="tarrow__price" id="priceEnfant">10 €</span></div>
         <div class="tarrow"><span class="tarrow__name" data-i18n="pr.baby">Moins de 4 ans</span><span class="tarrow__dots"></span><span class="tarrow__price free" data-i18n="pr.free">Gratuit</span></div>
         <div class="tarrow"><span class="tarrow__name" data-i18n="pr.group">Groupes<small data-i18n="pr.groupS">à partir de 20 personnes</small></span><span class="tarrow__dots"></span><span class="tarrow__price free" data-i18n="pr.quote">sur devis</span></div>
       </div>
@@ -619,7 +619,7 @@ section[id],#top,footer[id],div.vmap[id]{scroll-margin-top:88px}
     <div class="apero reveal">
       <span class="apero__tag" data-i18n="pr.aperoTag">Nouveauté</span>
       <div><h3 data-i18n="pr.aperoTitle">La balade du Capitaine</h3><p class="apero__sub" data-i18n="pr.aperoSub">Apéritif gourmand</p><p data-i18n="pr.aperoText">Un moment de détente et de partage autour d'un apéritif gourmand. Visite du lac et arrêt à la chapelle de la Baie Saint-Michel. Sur réservation, 30 personnes minimum.</p></div>
-      <div class="apero__price">40 €<small data-i18n="pr.aperoUnit">par personne</small></div>
+      <div class="apero__price" id="priceCapitaine">40 €<small data-i18n="pr.aperoUnit">par personne</small></div>
     </div>
   </div>
 </section>
@@ -1011,6 +1011,15 @@ if(reduce || !("IntersectionObserver" in window)){
    ============================================================ */
 const STRIPE_LINK = "";
 
+/* ============================================================
+   RÉGLAGES & RÉSERVATIONS EN LIGNE — Supabase (gratuit)
+   Collez l'URL et la clé "anon" de votre projet Supabase (voir
+   supabase-setup.md). Tant que c'est vide, le site garde les valeurs
+   par défaut et le formulaire fonctionne comme avant.
+   ============================================================ */
+const SB_URL = "";
+const SB_KEY = "";
+
 /* --- carte animée (lac tracé) --- */
 (function(){
   var stage=document.getElementById('vmapStage'); if(!stage) return;
@@ -1087,15 +1096,47 @@ const STRIPE_LINK = "";
     var enc=Object.keys(data).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(data[k]);}).join('&');
     send.disabled=true;
     var sp=send.querySelector('span'); if(sp) sp.textContent=d['fm.sending']||'…';
-    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc})
-      .then(function(r){ if(!r.ok) throw 0;
-        if(note){ note.textContent=d['fm.sent']; note.classList.add('form__note--ok'); }
-        send.style.display='none';
-      })
-      .catch(function(){ window.location.href=mailto; send.disabled=false; if(sp) sp.textContent=d['fm.submit']; });
+    function ok(){ if(note){ note.textContent=d['fm.sent']; note.classList.add('form__note--ok'); } send.style.display='none'; }
+    function fallbackNetlify(){
+      fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:enc})
+        .then(function(r){ if(!r.ok) throw 0; ok(); })
+        .catch(function(){ window.location.href=mailto; send.disabled=false; if(sp) sp.textContent=d['fm.submit']; });
+    }
+    if(SB_URL && SB_KEY){
+      fetch(SB_URL+'/rest/v1/reservations',{method:'POST',headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({nom:name,telephone:phone,email:email,personnes:parseInt(persons,10)||null,date:date,depart:dep,message:msg,statut:'nouveau'})})
+        .then(function(r){ if(!r.ok) throw 0; ok(); })
+        .catch(fallbackNetlify);
+    } else { fallbackNetlify(); }
   });
 })();
 
+
+/* --- lecture des réglages en ligne (horaires, saison, prix) --- */
+(function(){
+  if(!SB_URL||!SB_KEY) return;
+  fetch(SB_URL+'/rest/v1/settings?id=eq.1&select=data',{headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}})
+    .then(function(r){return r.ok?r.json():[];})
+    .then(function(rows){ var s=rows&&rows[0]&&rows[0].data; if(s) apply(s); })
+    .catch(function(){});
+  function apply(s){
+    if(s.horaires&&s.horaires.length){
+      var t=document.getElementById('depTimes'); if(t) t.innerHTML=s.horaires.join(' <em>·</em> ');
+      var sel=document.getElementById('f-dep');
+      if(sel){
+        var keep=[]; Array.prototype.forEach.call(sel.options,function(o){ if(o.value==='apero'||o.value==='autre') keep.push(o); });
+        sel.innerHTML='';
+        s.horaires.forEach(function(h){ var o=document.createElement('option'); o.value=h; o.textContent=h; sel.appendChild(o); });
+        keep.forEach(function(o){ sel.appendChild(o); });
+      }
+    }
+    if(s.saison){ var sn=document.getElementById('depSeason'); if(sn) sn.textContent=s.saison; }
+    if(s.prix){
+      if(s.prix.adulte){ var a=document.getElementById('priceAdulte'); if(a) a.textContent=s.prix.adulte; }
+      if(s.prix.enfant){ var e=document.getElementById('priceEnfant'); if(e) e.textContent=s.prix.enfant; }
+      if(s.prix.capitaine){ var c=document.getElementById('priceCapitaine'); if(c&&c.firstChild) c.firstChild.nodeValue=s.prix.capitaine; }
+    }
+  }
+})();
 
 /* --- consentement cookies + carte OpenStreetMap --- */
 (function(){
