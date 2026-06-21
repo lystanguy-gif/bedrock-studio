@@ -9,7 +9,7 @@
       "medium": "Huile sur toile",
       "price": 590,
       "sold": false,
-      "image_file": "images/01-serre-poncon.jpg"
+      "image_file": "images/01-serre-poncon-arc-en-ciel.jpg"
     },
     {
       "sort_order": 1,
@@ -38,7 +38,7 @@
       "title": "L'appel",
       "category": "imaginaire",
       "description": "",
-      "dimensions": "120 x 60 cm",
+      "dimensions": "100 x 50 cm",
       "medium": "Huile sur toile",
       "price": 620,
       "sold": false,
@@ -79,94 +79,6 @@
     },
     {
       "sort_order": 7,
-      "title": "Le cerf dans la brume",
-      "category": "paysages",
-      "description": "",
-      "dimensions": "80 x 65 cm",
-      "medium": "Huile sur toile",
-      "price": 420,
-      "sold": false,
-      "image_file": "images/08-cerf-brume.jpg"
-    },
-    {
-      "sort_order": 8,
-      "title": "Lac gelé",
-      "category": "paysages",
-      "description": "",
-      "dimensions": "73 x 54 cm",
-      "medium": "Huile sur toile",
-      "price": 360,
-      "sold": false,
-      "image_file": "images/09-lac-gele.jpg"
-    },
-    {
-      "sort_order": 9,
-      "title": "Silence d'hiver",
-      "category": "paysages",
-      "description": "",
-      "dimensions": "73 x 54 cm",
-      "medium": "Huile sur toile",
-      "price": 360,
-      "sold": false,
-      "image_file": "images/10-silence-hiver.jpg"
-    },
-    {
-      "sort_order": 10,
-      "title": "Le moulin de lumière",
-      "category": "paysages",
-      "description": "",
-      "dimensions": "70 x 50 cm",
-      "medium": "Huile sur toile",
-      "price": 340,
-      "sold": false,
-      "image_file": "images/11-moulin-lumiere.jpg"
-    },
-    {
-      "sort_order": 11,
-      "title": "Le passage",
-      "category": "imaginaire",
-      "description": "",
-      "dimensions": "100 x 50 cm",
-      "medium": "Huile sur toile",
-      "price": 480,
-      "sold": false,
-      "image_file": "images/12-passage.jpg"
-    },
-    {
-      "sort_order": 12,
-      "title": "Cerisier sur le lac",
-      "category": "marines",
-      "description": "",
-      "dimensions": "73 x 50 cm",
-      "medium": "Huile sur toile",
-      "price": 360,
-      "sold": false,
-      "image_file": "images/13-cerisier-lac.jpg"
-    },
-    {
-      "sort_order": 13,
-      "title": "Le gréement échoué",
-      "category": "marines",
-      "description": "",
-      "dimensions": "90 x 60 cm",
-      "medium": "Huile sur toile",
-      "price": 420,
-      "sold": false,
-      "image_file": "images/14-greement-echoue.jpg"
-    },
-    {
-      "sort_order": 14,
-      "title": "Mouillage d'hiver",
-      "category": "marines",
-      "description": "",
-      "dimensions": "73 x 50 cm",
-      "medium": "Huile sur toile",
-      "price": 360,
-      "sold": false,
-      "image_file": "images/15-mouillage-hiver.jpg"
-    },
-    {
-      "sort_order": 15,
       "title": "Le chalet d'altitude",
       "category": "paysages",
       "description": "",
@@ -174,10 +86,76 @@
       "medium": "Huile sur toile",
       "price": 460,
       "sold": false,
-      "image_file": "images/16-chalet-altitude.jpg"
+      "image_file": "images/08-chalet-altitude.jpg"
     },
     {
-      "sort_order": 16,
+      "sort_order": 8,
+      "title": "Silence d'hiver",
+      "category": "paysages",
+      "description": "",
+      "dimensions": "73 x 54 cm",
+      "medium": "Huile sur toile",
+      "price": 360,
+      "sold": false,
+      "image_file": "images/09-silence-hiver.jpg"
+    },
+    {
+      "sort_order": 9,
+      "title": "La maison de lumière",
+      "category": "paysages",
+      "description": "",
+      "dimensions": "70 x 50 cm",
+      "medium": "Huile sur toile",
+      "price": 340,
+      "sold": false,
+      "image_file": "images/10-maison-lumiere.jpg"
+    },
+    {
+      "sort_order": 10,
+      "title": "Le passage",
+      "category": "imaginaire",
+      "description": "",
+      "dimensions": "100 x 50 cm",
+      "medium": "Huile sur toile",
+      "price": 480,
+      "sold": false,
+      "image_file": "images/11-passage.jpg"
+    },
+    {
+      "sort_order": 11,
+      "title": "Cerisier sur le lac",
+      "category": "marines",
+      "description": "",
+      "dimensions": "73 x 50 cm",
+      "medium": "Huile sur toile",
+      "price": 360,
+      "sold": false,
+      "image_file": "images/12-cerisier-lac.jpg"
+    },
+    {
+      "sort_order": 12,
+      "title": "Le gréement échoué",
+      "category": "marines",
+      "description": "",
+      "dimensions": "90 x 60 cm",
+      "medium": "Huile sur toile",
+      "price": 420,
+      "sold": false,
+      "image_file": "images/13-greement-echoue.jpg"
+    },
+    {
+      "sort_order": 13,
+      "title": "Mouillage d'hiver",
+      "category": "marines",
+      "description": "",
+      "dimensions": "73 x 50 cm",
+      "medium": "Huile sur toile",
+      "price": 360,
+      "sold": false,
+      "image_file": "images/14-mouillage-hiver.jpg"
+    },
+    {
+      "sort_order": 14,
       "title": "La porte du couchant",
       "category": "imaginaire",
       "description": "",
@@ -185,10 +163,10 @@
       "medium": "Huile sur toile",
       "price": 480,
       "sold": false,
-      "image_file": "images/17-porte-couchant.jpg"
+      "image_file": "images/15-porte-couchant.jpg"
     },
     {
-      "sort_order": 17,
+      "sort_order": 15,
       "title": "Éclaircie",
       "category": "paysages",
       "description": "",
@@ -196,10 +174,10 @@
       "medium": "Huile sur toile",
       "price": 340,
       "sold": false,
-      "image_file": "images/18-eclaircie.jpg"
+      "image_file": "images/16-eclaircie.jpg"
     },
     {
-      "sort_order": 18,
+      "sort_order": 16,
       "title": "Venise, à l'aube",
       "category": "paysages",
       "description": "",
@@ -207,7 +185,18 @@
       "medium": "Huile sur toile",
       "price": 420,
       "sold": false,
-      "image_file": "images/19-venise-aube.jpg"
+      "image_file": "images/17-venise-aube.jpg"
+    },
+    {
+      "sort_order": 17,
+      "title": "Le miroir des cimes",
+      "category": "paysages",
+      "description": "",
+      "dimensions": "80 x 60 cm",
+      "medium": "Huile sur toile",
+      "price": 420,
+      "sold": false,
+      "image_file": "images/18-miroir-cimes.jpg"
     }
   ]
 }
