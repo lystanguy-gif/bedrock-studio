@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Espace privé — LKS ART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="admin-body">
+
+<!-- ====================== ÉCRAN DE CONNEXION ====================== -->
+<div class="login" id="loginScreen">
+  <form class="login__box" id="loginForm">
+    <div class="login__brand"><b>LKS</b> <span class="g">ART</span></div>
+    <p class="login__sub">Espace privé de Léa</p>
+    <div class="field"><label for="loginEmail">Adresse e-mail</label><input id="loginEmail" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="loginPass">Mot de passe</label><input id="loginPass" type="password" autocomplete="current-password" required></div>
+    <button type="submit" class="btn btn-gold btn-block" id="loginBtn">Se connecter</button>
+    <div class="login__err" id="loginErr"></div>
+  </form>
+</div>
+
+<!-- ====================== TABLEAU DE BORD ====================== -->
+<div id="dash" style="display:none; flex-direction:column; flex:1">
+  <div class="admin-top">
+    <a href="index.html" class="brand"><b>LKS</b> <span class="g">ART</span></a>
+    <div class="admin-top__user">
+      <span id="whoami"></span>
+      <a href="index.html" class="icon-btn" target="_blank">Voir le site</a>
+      <button class="icon-btn" id="logoutBtn">Se déconnecter</button>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="active" data-tab="oeuvres">Mes peintures</button>
+    <button data-tab="annonces">Mes annonces</button>
+    <button data-tab="presse">Presse &amp; médias</button>
+  </div>
+
+  <main class="admin-main">
+
+    <!-- PANNEAU ŒUVRES -->
+    <section class="admin-panel active" id="panel-oeuvres">
+      <div class="admin-panel__head">
+        <h2>Mes peintures</h2>
+        <button class="btn btn-gold" id="addPainting">＋ Ajouter une peinture</button>
+      </div>
+      <div class="adm-list" id="paintingsList"></div>
+      <div class="adm-loading" id="paintingsLoading"><div class="spinner"></div></div>
+    </section>
+
+    <!-- PANNEAU ANNONCES -->
+    <section class="admin-panel" id="panel-annonces">
+      <div class="admin-panel__head">
+        <h2>Mes annonces</h2>
+        <button class="btn btn-gold" id="addAnnonce">＋ Ajouter une annonce</button>
+      </div>
+      <div class="adm-list" id="annoncesList"></div>
+      <div class="adm-loading" id="annoncesLoading" style="display:none"><div class="spinner"></div></div>
+    </section>
+
+    <!-- PANNEAU PRESSE -->
+    <section class="admin-panel" id="panel-presse">
+      <div class="admin-panel__head">
+        <h2>Presse &amp; médias</h2>
+        <button class="btn btn-gold" id="addPresse">＋ Ajouter une parution</button>
+      </div>
+      <div class="adm-list" id="presseList"></div>
+      <div class="adm-loading" id="presseLoading" style="display:none"><div class="spinner"></div></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ====================== AVERTISSEMENT CONFIG ====================== -->
+<div class="config-warn" id="configWarn" style="display:none">
+  <h3>Le site n'est pas encore connecté</h3>
+  <p>Pour activer votre espace privé, les clés de connexion doivent être renseignées dans le fichier
+     <code>assets/config.js</code> (adresse <code>SUPABASE_URL</code> et clé <code>SUPABASE_ANON_KEY</code>).</p>
+  <p>Cette étape de mise en place est réalisée une seule fois par votre développeur. Une fois faite,
+     vous pourrez vous connecter ici avec votre e-mail et votre mot de passe.</p>
+</div>
+
+<!-- ====================== MODALE FORMULAIRE ŒUVRE ====================== -->
+<div class="modal" id="paintingModal">
+  <div class="modal__box">
+    <button class="modal__x" id="closePaintingModal">✕</button>
+    <h3 id="paintingModalTitle">Ajouter une peinture</h3>
+    <form id="paintingForm">
+      <input type="hidden" id="pId">
+      <div class="form-grid">
+        <div class="full">
+          <label class="uploader" id="uploader" for="pFile">
+            <img id="pPreview" style="display:none" alt="Aperçu">
+            <span class="hint" id="uploaderHint">📷 Choisir une photo de la toile (depuis votre téléphone ou ordinateur)</span>
+          </label>
+          <input type="file" id="pFile" accept="image/*" style="display:none">
+        </div>
+        <div class="full field"><label for="pTitle">Titre de l'œuvre</label><input id="pTitle" type="text" required></div>
+        <div class="field"><label for="pCategory">Catégorie</label>
+          <select id="pCategory">
+            <option value="paysages">Paysages</option>
+            <option value="marines">Marines</option>
+            <option value="imaginaire">Imaginaire</option>
+          </select>
+        </div>
+        <div class="field"><label for="pDimensions">Dimensions (ex. 73 x 54 cm)</label><input id="pDimensions" type="text"></div>
+        <div class="field"><label for="pMedium">Technique</label><input id="pMedium" type="text" value="Huile sur toile"></div>
+        <div class="field"><label for="pPrice">Prix en euros (laisser vide = aucun prix affiché)</label><input id="pPrice" type="number" min="0" step="1" inputmode="numeric"></div>
+        <div class="full field"><label for="pDescription">Description (texte libre, facultatif)</label><textarea id="pDescription"></textarea></div>
+        <div class="full">
+          <label class="checkline"><input type="checkbox" id="pSold"> Marquer cette œuvre comme vendue</label>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="cancelPainting">Annuler</button>
+        <button type="submit" class="btn btn-gold" id="savePainting">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====================== MODALE FORMULAIRE ANNONCE ====================== -->
+<div class="modal" id="annonceModal">
+  <div class="modal__box">
+    <button class="modal__x" id="closeAnnonceModal">✕</button>
+    <h3 id="annonceModalTitle">Ajouter une annonce</h3>
+    <form id="annonceForm">
+      <input type="hidden" id="aId">
+      <div class="field"><label for="aTitle">Titre de l'annonce</label><input id="aTitle" type="text" required></div>
+      <div class="field"><label for="aBody">Texte de l'annonce</label><textarea id="aBody"></textarea></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="cancelAnnonce">Annuler</button>
+        <button type="submit" class="btn btn-gold">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====================== MODALE FORMULAIRE PRESSE ====================== -->
+<div class="modal" id="presseModal">
+  <div class="modal__box">
+    <button class="modal__x" id="closePresseModal">✕</button>
+    <h3 id="presseModalTitle">Ajouter une parution</h3>
+    <form id="presseForm">
+      <input type="hidden" id="prId">
+      <div class="field"><label for="prMedia">Média (radio, journal, site…)</label><input id="prMedia" type="text" required></div>
+      <div class="field"><label for="prTitle">Titre de l'article / de l'émission</label><input id="prTitle" type="text"></div>
+      <div class="field"><label for="prUrl">Lien (facultatif)</label><input id="prUrl" type="url" placeholder="https://…"></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="cancelPresse">Annuler</button>
+        <button type="submit" class="btn btn-gold">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ====================== MODALE CONFIRMATION ====================== -->
+<div class="modal" id="confirmModal">
+  <div class="modal__box small">
+    <h3 id="confirmTitle">Confirmer</h3>
+    <p id="confirmText"></p>
+    <div class="form-actions" style="justify-content:center">
+      <button class="btn btn-ghost" id="confirmCancel">Annuler</button>
+      <button class="btn btn-danger" id="confirmOk">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/config.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>

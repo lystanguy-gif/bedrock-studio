@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LKS ART — Léa Kalck, peintures à l'huile</title>
+<meta name="description" content="LKS ART — peintures à l'huile de Léa Kalck. Paysages alpins, marines et scènes oniriques. Galerie en ligne, acquisition d'œuvres, Hautes-Alpes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <a href="#top" class="brand"><b>LKS</b> <span class="g">ART</span></a>
+  <div class="nav__links" id="navlinks">
+    <a href="#galerie">Galerie</a>
+    <a href="#artiste">L'artiste</a>
+    <a href="#annonces">Annonces</a>
+    <a href="#presse">Presse</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <button class="nav__toggle" id="navtoggle" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero__img" id="heroImg"></div>
+  <div class="hero__veil"></div>
+  <div class="hero__inner">
+    <span class="eyebrow hero__kicker">Léa Kalck · Peintre · Hautes-Alpes</span>
+    <h1>LKS&nbsp;<span class="g">ART</span></h1>
+    <p class="hero__sub">Peintures à l'huile, entre paysages alpins, marines et imaginaire. Là où la lumière perce l'obscurité.</p>
+    <div class="hero__cta">
+      <a href="#galerie" class="btn btn-gold">Voir la galerie</a>
+      <a href="#contact" class="btn btn-ghost">Me contacter</a>
+    </div>
+  </div>
+  <a href="#artiste" class="hero__scroll">Découvrir<i></i></a>
+</header>
+
+<!-- ====================== L'ARTISTE ====================== -->
+<section class="section about" id="artiste">
+  <div class="container">
+    <span class="eyebrow">L'artiste</span>
+    <h2 class="title">Léa Kalck</h2>
+    <div class="about__grid">
+      <div class="portrait reveal">
+        <span class="sig">LK</span>
+        <span class="mono">Portrait — à venir</span>
+        <!-- Pour ajouter le portrait : déposer une image et remplacer ce bloc par
+             <img src="images/portrait-lea.jpg" alt="Léa Kalck"> -->
+      </div>
+      <div class="about__body reveal">
+        <p class="first">Léa Kalck peint à l'huile, installée dans les Hautes-Alpes, à deux pas du lac de Serre-Ponçon. Elle puise dans la lumière changeante de la montagne, ses brumes, ses orages et ses clairs de lune, et la prolonge dans un imaginaire peuplé de cerfs, de loups et de paysages oniriques.</p>
+        <p>Chaque toile cherche le même point de bascule : l'instant précis où la clarté traverse l'ombre. Paysages, marines et scènes oniriques s'y répondent, travaillés au couteau, en glacis et en transparences.</p>
+        <p><span class="ph">[Quelques mots de Léa sur sa démarche et son parcours — à compléter.]</span></p>
+        <div class="about__meta">
+          <div><span class="k">Médium</span><span class="v">Huile sur toile</span></div>
+          <div><span class="k">Atelier</span><span class="v">Hautes-Alpes</span></div>
+          <div><span class="k">Exposée à</span><span class="v">Gap · 2026</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== GALERIE ====================== -->
+<section class="section gallery" id="galerie">
+  <div class="container">
+    <div class="gallery__head">
+      <div>
+        <span class="eyebrow">Les œuvres</span>
+        <h2 class="title">Galerie</h2>
+      </div>
+      <div class="filters" id="filters">
+        <button class="active" data-f="all">Tout</button>
+        <button data-f="paysages">Paysages</button>
+        <button data-f="marines">Marines</button>
+        <button data-f="imaginaire">Imaginaire</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="gallery__state" id="galleryState"><div class="spinner"></div></div>
+  </div>
+</section>
+
+<!-- ====================== ANNONCES ====================== -->
+<section class="section events" id="annonces">
+  <div class="container">
+    <span class="eyebrow">Actualités</span>
+    <h2 class="title">Annonces &amp; événements</h2>
+    <div class="timeline" id="timeline">
+      <!-- Repli affiché tant qu'aucune annonce n'est publiée depuis l'espace privé -->
+      <div class="tl reveal">
+        <div class="when">Mai 2026</div>
+        <div class="what">Exposition — Mairie de Gap</div>
+        <div class="where">Présentation d'une sélection de toiles récentes, Gap (05).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== PRESSE & MÉDIAS ====================== -->
+<section class="section press" id="presse">
+  <div class="container">
+    <span class="eyebrow">Ils en parlent</span>
+    <h2 class="title">Presse &amp; médias</h2>
+    <div class="press__list" id="pressList"></div>
+    <p class="press__state" id="pressState">Les articles et passages radio seront annoncés ici prochainement.</p>
+  </div>
+</section>
+
+<!-- ====================== CONTACT ====================== -->
+<section class="section contact" id="contact">
+  <div class="container">
+    <span class="eyebrow">Contact</span>
+    <h2 class="title">Une toile vous parle&nbsp;?</h2>
+    <p class="lede">Pour acquérir une œuvre, commander une pièce sur mesure ou simplement échanger autour de la peinture, écrivez à Léa.</p>
+    <div class="contact__grid">
+      <form class="reveal" id="contactForm" novalidate>
+        <div class="field"><label for="n">Nom</label><input id="n" name="n" type="text" required></div>
+        <div class="field"><label for="e">Adresse e-mail</label><input id="e" name="e" type="email" required></div>
+        <div class="field"><label for="m">Votre message</label><textarea id="m" name="m" required></textarea></div>
+        <button type="submit" class="btn btn-gold" id="contactSubmit">Envoyer le message</button>
+      </form>
+      <aside class="contact__aside reveal">
+        <div class="line"><div class="k">E-mail</div><div class="v"><a id="contactEmail" href="mailto:lksartpeinturekalck@gmail.com">lksartpeinturekalck@gmail.com</a></div></div>
+        <div class="line"><div class="k">Horaires</div><div class="v" id="contactHours">de 10h à 19h</div></div>
+        <div class="line"><div class="k">Réseaux</div><div class="v"><a href="#" id="fbLink">Facebook — Léa Kalck</a></div></div>
+        <div class="line"><div class="k">Atelier</div><div class="v">Hautes-Alpes · Serre-Ponçon</div></div>
+        <div class="line"><div class="k">Acquisition</div><div class="v">Paiement sécurisé via PayPal</div></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a href="#top" class="brand"><b>LKS</b> <span class="g">ART</span></a>
+        <p>Peintures à l'huile de Léa Kalck. Œuvres originales, paysages des Hautes-Alpes et imaginaire.</p>
+      </div>
+      <div class="footer__nav">
+        <div class="col"><h4>Naviguer</h4>
+          <a href="#galerie">Galerie</a><a href="#artiste">L'artiste</a>
+          <a href="#annonces">Annonces</a><a href="#presse">Presse</a><a href="#contact">Contact</a>
+        </div>
+        <div class="col"><h4>Acquérir</h4>
+          <a href="#galerie">Œuvres disponibles</a><a href="#contact">Commande sur mesure</a>
+          <a href="#contact">Paiement PayPal</a>
+        </div>
+        <div class="col"><h4>Espace</h4>
+          <a href="admin.html">Espace privé de Léa</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 LKS ART · Léa Kalck — Tous droits réservés</span>
+      <span>
+        <button id="openLegal">Mentions légales</button>
+        &nbsp;·&nbsp; Réalisation : Tanguy Lys
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" aria-modal="true" role="dialog">
+  <button class="lb__x" id="lbClose" aria-label="Fermer">✕</button>
+  <button class="lb__arrow prev" id="lbPrev" aria-label="Précédent">‹</button>
+  <button class="lb__arrow next" id="lbNext" aria-label="Suivant">›</button>
+  <div class="lb__stage">
+    <div class="lb__imgwrap"><img id="lbImg" src="" alt=""></div>
+    <div class="lb__panel">
+      <span class="lb__cat" id="lbCat"></span>
+      <h3 class="lb__title" id="lbTitle"></h3>
+      <p class="lb__desc" id="lbDesc"></p>
+      <div class="lb__spec">
+        <div class="row"><span>Technique</span><b id="lbMedium"></b></div>
+        <div class="row"><span>Dimensions</span><b id="lbDims"></b></div>
+        <div class="row"><span>Original</span><b>Pièce unique</b></div>
+      </div>
+      <div class="lb__price" id="lbPrice"></div>
+      <div class="lb__soldtag" id="lbSold" style="display:none">Œuvre vendue</div>
+      <button class="paypal" id="lbBuy"><span class="pp">Pay<i>Pal</i></span></button>
+      <div id="lbPaypalSdk"></div>
+      <p class="lb__note" id="lbNote">Démonstration. Le paiement s'effectuera via le compte PayPal Business de LKS ART une fois le site mis en ligne.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PURCHASE DEMO MODAL -->
+<div class="modal" id="buyModal">
+  <div class="modal__box small">
+    <button class="modal__x" data-close-buy>✕</button>
+    <h3>Acquisition</h3>
+    <p id="buyWork" style="color:var(--cream)"></p>
+    <div class="pp-amount" id="buyPrice"></div>
+    <p>Vous seriez maintenant redirigé vers le paiement sécurisé <b style="color:#fff">PayPal</b>.</p>
+    <p class="ph">Intégration à activer avec l'identifiant PayPal Business de Léa (renseigner <code>PAYPAL_CLIENT_ID</code> dans <code>assets/config.js</code>).</p>
+  </div>
+</div>
+
+<!-- LEGAL MODAL -->
+<div class="modal" id="legalModal">
+  <div class="modal__box">
+    <button class="modal__x" data-close-legal>✕</button>
+    <h3>Mentions légales</h3>
+    <h4>Éditeur du site</h4>
+    <p>LKS ART — Léa Kalck, entreprise individuelle. <span class="ph">[Adresse]</span> · lksartpeinturekalck@gmail.com · <span class="ph">[Téléphone]</span>. SIRET : <span class="ph">[n°]</span>. <span class="ph">[TVA non applicable, art. 293 B du CGI — le cas échéant.]</span></p>
+    <h4>Directrice de la publication</h4>
+    <p>Léa Kalck.</p>
+    <h4>Hébergeur</h4>
+    <p><span class="ph">[Nom de l'hébergeur, ex. Netlify / Vercel / Cloudflare Pages / OVHcloud]</span> — <span class="ph">[adresse de l'hébergeur]</span>.</p>
+    <h4>Propriété intellectuelle</h4>
+    <p>L'ensemble des œuvres, images, textes et éléments de ce site est la propriété exclusive de Léa Kalck. Toute reproduction, représentation ou diffusion, totale ou partielle, sans autorisation écrite préalable, est interdite (art. L.122-4 du Code de la propriété intellectuelle).</p>
+    <h4>Données personnelles (RGPD)</h4>
+    <p>Les informations transmises via le formulaire de contact servent uniquement à répondre à votre demande et ne sont jamais cédées à des tiers. Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données en écrivant à lksartpeinturekalck@gmail.com.</p>
+    <h4>Cookies</h4>
+    <p>Ce site n'utilise pas de cookies de suivi publicitaire. Seules les données techniques strictement nécessaires à l'affichage de la galerie sont utilisées.</p>
+    <h4>Vente en ligne (extrait des conditions de vente)</h4>
+    <p>Prix indiqués en euros TTC. Paiement sécurisé via PayPal. Frais et délais de livraison communiqués avant la validation de la commande. Droit de rétractation de 14 jours (art. L.221-18 du Code de la consommation) ; les œuvres réalisées sur mesure peuvent en être exclues (art. L.221-28). <span class="ph">[Conditions générales de vente complètes à établir.]</span></p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Supabase JS (CDN) puis configuration et logique du site -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

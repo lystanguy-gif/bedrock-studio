@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Import des 19 toiles — LKS ART</title>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="admin-body">
+<div class="config-warn" style="max-width:760px">
+  <h3>Import du contenu initial (les 19 toiles)</h3>
+  <p>Outil de mise en place réservé au développeur. Il importe une seule fois les 19 toiles
+     fournies (images + métadonnées de <code>contenu-initial.json</code>) dans Supabase :
+     chaque image est envoyée dans le stockage, puis l'œuvre est créée dans la base.</p>
+  <p>Pré-requis : <code>assets/config.js</code> renseigné, schéma SQL exécuté, bucket
+     <code>paintings</code> créé, et utilisateur de Léa créé. Connectez-vous ci-dessous.</p>
+
+  <div id="loginZone">
+    <div class="field"><label for="email">E-mail</label><input id="email" type="email"></div>
+    <div class="field"><label for="pass">Mot de passe</label><input id="pass" type="password"></div>
+    <button class="btn btn-gold" id="loginBtn">Se connecter</button>
+  </div>
+
+  <div id="runZone" style="display:none">
+    <p id="status" style="color:var(--cream)"></p>
+    <button class="btn btn-gold" id="runBtn">Importer les 19 toiles</button>
+    <pre id="log" style="margin-top:18px; max-height:300px; overflow:auto; color:var(--muted); font-size:.85rem; white-space:pre-wrap"></pre>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/config.js"></script>
+<script>
+(function () {
+  var CFG = window.LKS_CONFIG || {};
+  var BUCKET = CFG.STORAGE_BUCKET || 'paintings';
+  function $(id){return document.getElementById(id);}
+  function log(m){ $('log').textContent += m + '\n'; $('log').scrollTop = $('log').scrollHeight; }
+
+  if (!CFG.SUPABASE_URL || CFG.SUPABASE_URL.indexOf('VOTRE') !== -1) {
+    $('status') && ($('status').textContent = '');
+    document.querySelector('.config-warn').innerHTML += '<p style="color:var(--red)">⚠️ assets/config.js n\'est pas encore renseigné.</p>';
+    return;
+  }
+  var sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+
+  function showRun(){ $('loginZone').style.display='none'; $('runZone').style.display='block'; }
+  sb.auth.getSession().then(function(r){ if(r.data && r.data.session) showRun(); });
+
+  $('loginBtn').addEventListener('click', function(){
+    sb.auth.signInWithPassword({ email:$('email').value.trim(), password:$('pass').value })
+      .then(function(r){ if(r.error){ alert('Connexion échouée : ' + r.error.message); } else { showRun(); } });
+  });
+
+  $('runBtn').addEventListener('click', function(){
+    $('runBtn').disabled = true;
+    $('status').textContent = 'Import en cours…';
+    fetch('contenu-initial.json').then(function(r){return r.json();}).then(function(data){
+      var works = data.paintings || [];
+      // récupère les titres déjà présents pour éviter les doublons
+      return sb.from('paintings').select('title').then(function(res){
+        var existing = {};
+        (res.data||[]).forEach(function(p){ existing[p.title] = true; });
+        return works.reduce(function(chain, w){
+          return chain.then(function(){
+            if (existing[w.title]) { log('↷ déjà présent : ' + w.title); return; }
+            log('→ ' + w.title);
+            return fetch(w.image_file).then(function(r){return r.blob();}).then(function(blob){
+              var ext = (w.image_file.split('.').pop()||'jpg');
+              var name = (w.sort_order!=null?String(w.sort_order).padStart(2,'0'):Date.now()) + '-' + Math.random().toString(36).slice(2,7) + '.' + ext;
+              return sb.storage.from(BUCKET).upload(name, blob, { contentType: blob.type || 'image/jpeg' }).then(function(up){
+                if (up.error) throw up.error;
+                var url = sb.storage.from(BUCKET).getPublicUrl(name).data.publicUrl;
+                return sb.from('paintings').insert({
+                  sort_order: w.sort_order, title: w.title, category: w.category,
+                  description: w.description || '', dimensions: w.dimensions || '',
+                  medium: w.medium || 'Huile sur toile',
+                  price: (w.price==null?null:w.price), sold: !!w.sold, image_url: url
+                }).then(function(ins){ if(ins.error) throw ins.error; log('   ✓ importée'); });
+              });
+            }).catch(function(err){ log('   ✗ erreur : ' + (err.message||err)); });
+          });
+        }, Promise.resolve());
+      });
+    }).then(function(){
+      $('status').textContent = 'Terminé. Vous pouvez vérifier la galerie sur le site.';
+      log('--- Import terminé ---');
+    }).catch(function(err){
+      $('status').textContent = 'Erreur : ' + (err.message||err);
+      $('runBtn').disabled = false;
+    });
+  });
+})();
+</script>
+</body>
+</html>
