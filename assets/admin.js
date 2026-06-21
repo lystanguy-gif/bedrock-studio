@@ -58,6 +58,7 @@
     loadPaintings();
     loadAnnonces();
     loadPresse();
+    loadSite();
   }
 
   sb.auth.getSession().then(function (res) {
@@ -443,6 +444,86 @@
       if (r.error) { toast("L'enregistrement a échoué.", true); return; }
       toast(id ? 'Parution mise à jour.' : 'Parution ajoutée.');
       closeModal('presseModal'); loadPresse();
+    });
+  });
+
+  /* ====================================================================
+     MON SITE — textes & photos de personnalisation (table site_content)
+     ==================================================================== */
+  var siteData = {};
+  var heroFile = null, portraitFile = null;
+
+  // Correspondance clé Supabase ↔ champ du formulaire
+  var SITE_FIELDS = {
+    hero_kicker: 'sHeroKicker',
+    hero_sub: 'sHeroSub',
+    about_body: 'sAboutBody',
+    about_medium: 'sAboutMedium',
+    about_atelier: 'sAboutAtelier',
+    about_expose: 'sAboutExpose',
+    contact_email: 'sContactEmail',
+    contact_hours: 'sContactHours',
+    facebook_url: 'sFacebook'
+  };
+
+  function loadSite() {
+    $('siteLoading').style.display = '';
+    sb.from('site_content').select('*')
+      .then(function (res) {
+        $('siteLoading').style.display = 'none';
+        if (res.error) return; // table optionnelle
+        siteData = {};
+        (res.data || []).forEach(function (r) { siteData[r.key] = r.value; });
+        // remplir le formulaire
+        Object.keys(SITE_FIELDS).forEach(function (key) {
+          var el = $(SITE_FIELDS[key]); if (el) el.value = siteData[key] || '';
+        });
+        if (siteData.hero_image) { $('heroPreview').src = siteData.hero_image; $('heroPreview').style.display = 'block'; }
+        if (siteData.portrait_image) { $('portraitPreview').src = siteData.portrait_image; $('portraitPreview').style.display = 'block'; }
+      });
+  }
+
+  function previewInto(file, imgId) {
+    var reader = new FileReader();
+    reader.onload = function (ev) { $(imgId).src = ev.target.result; $(imgId).style.display = 'block'; };
+    reader.readAsDataURL(file);
+  }
+  $('heroFile').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    heroFile = f; previewInto(f, 'heroPreview'); $('heroHint').textContent = f.name;
+  });
+  $('portraitFile').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    portraitFile = f; previewInto(f, 'portraitPreview'); $('portraitHint').textContent = f.name;
+  });
+
+  $('siteForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = $('saveSite'); btn.disabled = true; btn.textContent = 'Mise à jour…';
+
+    // récupère les valeurs des champs texte
+    Object.keys(SITE_FIELDS).forEach(function (key) {
+      var el = $(SITE_FIELDS[key]); if (el) siteData[key] = el.value.trim();
+    });
+
+    // envoie les images choisies, puis enregistre tout
+    var uploads = [];
+    if (heroFile) uploads.push(uploadImage(heroFile).then(function (url) { siteData.hero_image = url; }));
+    if (portraitFile) uploads.push(uploadImage(portraitFile).then(function (url) { siteData.portrait_image = url; }));
+
+    Promise.all(uploads).then(function () {
+      var rows = Object.keys(siteData).map(function (key) {
+        return { key: key, value: siteData[key] || '', updated_at: new Date().toISOString() };
+      });
+      return sb.from('site_content').upsert(rows, { onConflict: 'key' });
+    }).then(function (res) {
+      if (res && res.error) throw res.error;
+      heroFile = null; portraitFile = null;
+      toast('Votre site est à jour. Les visiteurs voient déjà les changements.');
+    }).catch(function (err) {
+      toast("La mise à jour a échoué. " + (err && err.message ? err.message : ''), true);
+    }).finally(function () {
+      btn.disabled = false; btn.textContent = 'Mettre à jour le site';
     });
   });
 

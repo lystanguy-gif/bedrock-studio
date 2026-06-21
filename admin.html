@@ -39,6 +39,7 @@
     <button class="active" data-tab="oeuvres">Mes peintures</button>
     <button data-tab="annonces">Mes annonces</button>
     <button data-tab="presse">Presse &amp; médias</button>
+    <button data-tab="site">Mon site</button>
   </div>
 
   <main class="admin-main">
@@ -71,6 +72,56 @@
       </div>
       <div class="adm-list" id="presseList"></div>
       <div class="adm-loading" id="presseLoading" style="display:none"><div class="spinner"></div></div>
+    </section>
+
+    <!-- PANNEAU MON SITE (textes & photos de personnalisation) -->
+    <section class="admin-panel" id="panel-site">
+      <div class="admin-panel__head">
+        <h2>Mon site</h2>
+      </div>
+      <p style="color:var(--muted); margin:-8px 0 26px; max-width:640px">
+        Modifiez ici les textes et les photos de votre site. Cliquez sur « Mettre à jour le site » :
+        vos visiteurs voient les changements aussitôt.
+      </p>
+      <form id="siteForm">
+        <div class="form-grid">
+
+          <div class="full"><h4 style="color:var(--gold); letter-spacing:.18em; text-transform:uppercase; font-size:.74rem; margin:6px 0 0">Page d'accueil</h4></div>
+          <div class="full">
+            <label class="uploader" id="heroUploader" for="heroFile">
+              <img id="heroPreview" style="display:none" alt="Aperçu de la photo d'accueil">
+              <span class="hint" id="heroHint">📷 Photo d'accueil (la grande image en haut du site)</span>
+            </label>
+            <input type="file" id="heroFile" accept="image/*" style="display:none">
+          </div>
+          <div class="full field"><label for="sHeroKicker">Petite phrase au-dessus du titre</label><input id="sHeroKicker" type="text"></div>
+          <div class="full field"><label for="sHeroSub">Accroche d'accueil</label><textarea id="sHeroSub"></textarea></div>
+
+          <div class="full"><h4 style="color:var(--gold); letter-spacing:.18em; text-transform:uppercase; font-size:.74rem; margin:18px 0 0">L'artiste</h4></div>
+          <div class="full">
+            <label class="uploader" id="portraitUploader" for="portraitFile">
+              <img id="portraitPreview" style="display:none" alt="Aperçu du portrait">
+              <span class="hint" id="portraitHint">📷 Votre portrait</span>
+            </label>
+            <input type="file" id="portraitFile" accept="image/*" style="display:none">
+          </div>
+          <div class="full field"><label for="sAboutBody">Texte de présentation (laissez une ligne vide entre deux paragraphes)</label><textarea id="sAboutBody" style="min-height:200px"></textarea></div>
+          <div class="field"><label for="sAboutMedium">Médium</label><input id="sAboutMedium" type="text" placeholder="Huile sur toile"></div>
+          <div class="field"><label for="sAboutAtelier">Atelier</label><input id="sAboutAtelier" type="text" placeholder="Hautes-Alpes"></div>
+          <div class="field"><label for="sAboutExpose">Exposée à</label><input id="sAboutExpose" type="text" placeholder="Gap · 2026"></div>
+
+          <div class="full"><h4 style="color:var(--gold); letter-spacing:.18em; text-transform:uppercase; font-size:.74rem; margin:18px 0 0">Contact</h4></div>
+          <div class="field"><label for="sContactEmail">Adresse e-mail affichée</label><input id="sContactEmail" type="email" placeholder="lksartpeinturekalck@gmail.com"></div>
+          <div class="field"><label for="sContactHours">Horaires</label><input id="sContactHours" type="text" placeholder="de 10h à 19h"></div>
+          <div class="full field"><label for="sFacebook">Lien Facebook</label><input id="sFacebook" type="url" placeholder="https://facebook.com/…"></div>
+
+        </div>
+        <div class="form-actions" style="justify-content:flex-start">
+          <button type="submit" class="btn btn-gold" id="saveSite">Mettre à jour le site</button>
+          <a href="index.html" target="_blank" class="btn btn-ghost">Voir le résultat</a>
+        </div>
+      </form>
+      <div class="adm-loading" id="siteLoading"><div class="spinner"></div></div>
     </section>
 
   </main>

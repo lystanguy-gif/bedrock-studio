@@ -117,14 +117,70 @@
     applyFilter(currentFilter);
   }
 
-  /* set hero image from first available work */
+  /* set hero image : priorité au contenu personnalisé par Léa, sinon 1re toile */
   function setHero() {
     var hero = $('heroImg');
     if (!hero) return;
-    if (WORKS.length) {
+    if (SITE.hero_image) {
+      hero.style.backgroundImage = "url('" + SITE.hero_image + "')";
+    } else if (WORKS.length) {
       hero.style.backgroundImage = "url('" + WORKS[0].image + "')";
     } else {
       hero.style.backgroundImage = "url('images/01-serre-poncon.jpg')";
+    }
+  }
+
+  /* ---------- contenu personnalisé (édité par Léa depuis l'espace privé) ---------- */
+  var SITE = {};
+  function setText(id, val) { var el = $(id); if (el && val) el.textContent = val; }
+  function loadSiteContent() {
+    if (!sb) return Promise.resolve();
+    return sb.from('site_content').select('*')
+      .then(function (res) {
+        if (res.error || !res.data) return;
+        res.data.forEach(function (r) { if (r.value) SITE[r.key] = r.value; });
+        applySiteContent();
+      })
+      .catch(function () { /* on garde les textes par défaut */ });
+  }
+  function applySiteContent() {
+    setText('heroKicker', SITE.hero_kicker);
+    setText('heroSub', SITE.hero_sub);
+    setText('aboutTitle', SITE.about_title);
+    setText('aboutMedium', SITE.about_medium);
+    setText('aboutAtelier', SITE.about_atelier);
+    setText('aboutExpose', SITE.about_expose);
+    // bio : on reconstruit les paragraphes (séparés par des lignes vides)
+    if (SITE.about_body) {
+      var box = $('aboutBody');
+      if (box) {
+        box.innerHTML = '';
+        SITE.about_body.split(/\n\s*\n/).forEach(function (para, i) {
+          if (!para.trim()) return;
+          var p = document.createElement('p');
+          if (i === 0) p.className = 'first';
+          p.textContent = para.trim();
+          box.appendChild(p);
+        });
+      }
+    }
+    // portrait : si une image est fournie, on l'affiche dans le cadre
+    if (SITE.portrait_image) {
+      var portrait = $('portrait');
+      if (portrait) {
+        portrait.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = SITE.portrait_image; img.alt = SITE.about_title || 'Léa Kalck';
+        portrait.appendChild(img);
+      }
+    }
+    // coordonnées de contact (priorité au contenu édité par Léa sur le config.js)
+    if (SITE.contact_email) {
+      var em = $('contactEmail'); if (em) { em.textContent = SITE.contact_email; em.href = 'mailto:' + SITE.contact_email; }
+    }
+    if (SITE.contact_hours) setText('contactHours', SITE.contact_hours);
+    if (SITE.facebook_url) {
+      var fb = $('fbLink'); if (fb) { fb.href = SITE.facebook_url; fb.target = '_blank'; fb.rel = 'noopener'; fb.dataset.set = '1'; }
     }
   }
 
@@ -350,10 +406,13 @@
     if (CFG.CONTACT_HOURS) $('contactHours').textContent = CFG.CONTACT_HOURS;
     var fb = $('fbLink');
     if (CFG.FACEBOOK_URL) {
-      fb.href = CFG.FACEBOOK_URL; fb.target = '_blank'; fb.rel = 'noopener';
-    } else {
-      fb.addEventListener('click', function (e) { e.preventDefault(); showToast('Lien Facebook à renseigner.'); });
+      fb.href = CFG.FACEBOOK_URL; fb.target = '_blank'; fb.rel = 'noopener'; fb.dataset.set = '1';
     }
+    // Garde : tant qu'aucun lien réel n'est défini (ni config, ni « Mon site »),
+    // un clic affiche un message au lieu de naviguer vers « # ».
+    fb.addEventListener('click', function (e) {
+      if (!fb.dataset.set) { e.preventDefault(); showToast('Lien Facebook à renseigner.'); }
+    });
     // Chargement optionnel du SDK PayPal si l'identifiant est fourni.
     if (CFG.PAYPAL_CLIENT_ID) {
       var s = document.createElement('script');
@@ -413,8 +472,9 @@
   setupReveal();
   loadAnnonces();
   loadPresse();
-  loadWorks().then(function (works) {
-    WORKS = works;
+  // On charge le contenu personnalisé et les œuvres, puis on affiche.
+  Promise.all([loadSiteContent(), loadWorks()]).then(function (results) {
+    WORKS = results[1] || [];
     setHero();
     renderGallery();
   });

@@ -28,9 +28,9 @@
   <div class="hero__img" id="heroImg"></div>
   <div class="hero__veil"></div>
   <div class="hero__inner">
-    <span class="eyebrow hero__kicker">Léa Kalck · Peintre · Hautes-Alpes</span>
+    <span class="eyebrow hero__kicker" id="heroKicker">Léa Kalck · Peintre · Hautes-Alpes</span>
     <h1>LKS&nbsp;<span class="g">ART</span></h1>
-    <p class="hero__sub">Peintures à l'huile, entre paysages alpins, marines et imaginaire. Là où la lumière perce l'obscurité.</p>
+    <p class="hero__sub" id="heroSub">Peintures à l'huile, entre paysages alpins, marines et imaginaire. Là où la lumière perce l'obscurité.</p>
     <div class="hero__cta">
       <a href="#galerie" class="btn btn-gold">Voir la galerie</a>
       <a href="#contact" class="btn btn-ghost">Me contacter</a>
@@ -43,22 +43,21 @@
 <section class="section about" id="artiste">
   <div class="container">
     <span class="eyebrow">L'artiste</span>
-    <h2 class="title">Léa Kalck</h2>
+    <h2 class="title" id="aboutTitle">Léa Kalck</h2>
     <div class="about__grid">
-      <div class="portrait reveal">
+      <div class="portrait reveal" id="portrait">
         <span class="sig">LK</span>
         <span class="mono">Portrait — à venir</span>
-        <!-- Pour ajouter le portrait : déposer une image et remplacer ce bloc par
-             <img src="images/portrait-lea.jpg" alt="Léa Kalck"> -->
       </div>
       <div class="about__body reveal">
-        <p class="first">Léa Kalck peint à l'huile, installée dans les Hautes-Alpes, à deux pas du lac de Serre-Ponçon. Elle puise dans la lumière changeante de la montagne, ses brumes, ses orages et ses clairs de lune, et la prolonge dans un imaginaire peuplé de cerfs, de loups et de paysages oniriques.</p>
-        <p>Chaque toile cherche le même point de bascule : l'instant précis où la clarté traverse l'ombre. Paysages, marines et scènes oniriques s'y répondent, travaillés au couteau, en glacis et en transparences.</p>
-        <p><span class="ph">[Quelques mots de Léa sur sa démarche et son parcours — à compléter.]</span></p>
+        <div id="aboutBody">
+          <p class="first">Léa Kalck peint à l'huile, installée dans les Hautes-Alpes, à deux pas du lac de Serre-Ponçon. Elle puise dans la lumière changeante de la montagne, ses brumes, ses orages et ses clairs de lune, et la prolonge dans un imaginaire peuplé de cerfs, de loups et de paysages oniriques.</p>
+          <p>Chaque toile cherche le même point de bascule : l'instant précis où la clarté traverse l'ombre. Paysages, marines et scènes oniriques s'y répondent, travaillés au couteau, en glacis et en transparences.</p>
+        </div>
         <div class="about__meta">
-          <div><span class="k">Médium</span><span class="v">Huile sur toile</span></div>
-          <div><span class="k">Atelier</span><span class="v">Hautes-Alpes</span></div>
-          <div><span class="k">Exposée à</span><span class="v">Gap · 2026</span></div>
+          <div><span class="k">Médium</span><span class="v" id="aboutMedium">Huile sur toile</span></div>
+          <div><span class="k">Atelier</span><span class="v" id="aboutAtelier">Hautes-Alpes</span></div>
+          <div><span class="k">Exposée à</span><span class="v" id="aboutExpose">Gap · 2026</span></div>
         </div>
       </div>
     </div>

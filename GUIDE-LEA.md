@@ -51,6 +51,23 @@ un petit texte (une expo, une nouveauté…). Elle apparaît dans la rubrique
 Onglet **« Presse & médias »** → **« ＋ Ajouter une parution »**. Indiquez le
 média, le titre et, si vous l'avez, le lien.
 
+## Modifier les textes et les photos du site (onglet « Mon site »)
+
+C'est ici que vous personnalisez votre site **sans avoir besoin de personne** :
+
+- **Photo d'accueil** (la grande image en haut) et **votre portrait** : cliquez
+  sur la zone photo et choisissez une image.
+- **Accroche d'accueil**, **texte de présentation** (votre bio), **médium /
+  atelier / lieu d'exposition**.
+- **Vos infos de contact** : e-mail affiché, horaires, lien Facebook.
+
+Quand tout vous convient, cliquez sur **« Mettre à jour le site »**. Vos
+visiteurs voient les changements **tout de suite**. (Astuce : le bouton « Voir le
+résultat » ouvre votre site dans un nouvel onglet.)
+
+> 💡 Vous n'avez **jamais** à aller ailleurs que sur votre site : tout se fait
+> depuis cet espace.
+
 ## Se déconnecter
 
 Bouton **« Se déconnecter »** en haut à droite. Pensez à le faire si vous êtes

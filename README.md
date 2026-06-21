@@ -100,9 +100,19 @@ connectée, Léa peut, en quelques clics et sans aucun terme technique :
 - **supprimer** une œuvre ;
 - **marquer une œuvre comme vendue** ;
 - **réordonner** les œuvres (flèches ▲ / ▼) ;
-- gérer ses **annonces** et sa **revue de presse**.
+- gérer ses **annonces** et sa **revue de presse** ;
+- **personnaliser le site** (onglet « Mon site ») : photo d'accueil, portrait,
+  accroche, bio, médium/atelier/expo et coordonnées de contact.
 
 Si le prix est laissé vide, **aucun prix n'est affiché** sur le site public.
+
+> **Léa ne touche jamais à Supabase.** Tout se fait depuis `admin.html`. Quand
+> elle clique sur « Enregistrer » / « Mettre à jour le site », le site écrit dans
+> Supabase en arrière-plan et les visiteurs voient le changement **en direct**,
+> sans actualisation manuelle. Toi (Tanguy) n'interviens dans Supabase qu'une
+> seule fois, à la mise en place. Les textes/photos de personnalisation vivent
+> dans la table `site_content` ; les valeurs de `config.js` ne servent que de
+> contenu par défaut, remplacé dès que Léa édite depuis « Mon site ».
 
 Voir `GUIDE-LEA.md` pour le mode d'emploi destiné à Léa.
 

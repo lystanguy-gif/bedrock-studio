@@ -96,3 +96,17 @@ create table if not exists public.presse (
 alter table public.presse enable row level security;
 create policy "Lecture publique presse" on public.presse for select using (true);
 create policy "Ecriture presse connectes" on public.presse for all to authenticated using (true) with check (true);
+
+-- 8. Contenu personnalisable du site (textes et images modifiables par Lea)
+-- Table cle/valeur : chaque ligne est un reglage edite depuis l'espace prive.
+-- Exemples de cles : hero_kicker, hero_sub, about_body, about_medium,
+--   about_atelier, about_expose, contact_email, contact_hours,
+--   facebook_url, hero_image, portrait_image.
+create table if not exists public.site_content (
+  key         text primary key,
+  value       text default '',
+  updated_at  timestamptz not null default now()
+);
+alter table public.site_content enable row level security;
+create policy "Lecture publique du contenu" on public.site_content for select using (true);
+create policy "Ecriture contenu connectes" on public.site_content for all to authenticated using (true) with check (true);
