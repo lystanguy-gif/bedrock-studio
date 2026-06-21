@@ -98,36 +98,57 @@
 
     WORKS.forEach(function (w, i) {
       var card = document.createElement('article');
-      card.className = 'card reveal in';
+      card.className = 'card';
       card.setAttribute('data-cat', w.category);
       card.setAttribute('data-index', i);
       card.setAttribute('tabindex', '0');
       card.setAttribute('role', 'button');
       card.setAttribute('aria-label', 'Voir ' + w.title);
 
+      var price = formatPrice(w.price);
+      var priceLine = w.sold ? 'Vendue' : (price ? price : 'Prix sur demande');
+
       var html = '';
       if (w.sold) html += '<span class="card__sold">Vendu</span>';
       html += '<span class="card__wm">LKS ART</span>';
       html += '<img src="' + esc(w.image) + '" alt="' + esc(w.title) + '" loading="lazy">';
-      html += '<div class="card__cap"><span class="card__title">' + esc(w.title) +
-              '</span><span class="card__see">Voir</span></div>';
+      html += '<div class="card__cap"><span class="card__capL">' +
+                '<span class="card__cat">' + esc(capitalize(w.category)) + '</span>' +
+                '<span class="card__title">' + esc(w.title) + '</span>' +
+                '<span class="card__price">' + esc(priceLine) + '</span>' +
+              '</span><span class="card__see">Voir ›</span></div>';
       card.innerHTML = html;
       grid.appendChild(card);
     });
     applyFilter(currentFilter);
+    revealCards();
   }
 
-  /* set hero image : priorité au contenu personnalisé par Léa, sinon 1re toile */
+  /* apparition en fondu décalée des toiles */
+  function revealCards() {
+    var cards = document.querySelectorAll('#grid .card');
+    if (reduce) { cards.forEach(function (c) { c.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          var c = en.target;
+          // léger décalage pour un effet en cascade
+          c.style.transitionDelay = ((+c.getAttribute('data-index') % 3) * 90) + 'ms';
+          c.classList.add('in');
+          io.unobserve(c);
+        }
+      });
+    }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+    cards.forEach(function (c) { io.observe(c); });
+  }
+
+  /* set hero : contenu personnalisé par Léa > image d'accueil par défaut */
+  var DEFAULT_HERO = 'images/17-venise-aube.jpg';
   function setHero() {
     var hero = $('heroImg');
     if (!hero) return;
-    if (SITE.hero_image) {
-      hero.style.backgroundImage = "url('" + SITE.hero_image + "')";
-    } else if (WORKS.length) {
-      hero.style.backgroundImage = "url('" + WORKS[0].image + "')";
-    } else {
-      hero.style.backgroundImage = "url('images/01-serre-poncon.jpg')";
-    }
+    var src = SITE.hero_image || DEFAULT_HERO;
+    hero.style.backgroundImage = "url('" + src + "')";
   }
 
   /* ---------- contenu personnalisé (édité par Léa depuis l'espace privé) ---------- */
@@ -220,28 +241,34 @@
     $('lbDims').textContent = w.dimensions || '—';
 
     var price = formatPrice(w.price);
-    var priceEl = $('lbPrice'), soldEl = $('lbSold'), buyBtn = $('lbBuy'),
-        sdkEl = $('lbPaypalSdk'), noteEl = $('lbNote');
+    var priceEl = $('lbPrice'), priceSub = $('lbPriceSub'), soldEl = $('lbSold'),
+        buyBtn = $('lbBuy'), askBtn = $('lbAsk'), sdkEl = $('lbPaypalSdk'),
+        noteEl = $('lbNote'), buyHead = $('lbBuyHead');
     sdkEl.innerHTML = '';
+    buyBtn.style.display = 'none';
+    askBtn.style.display = 'none';
 
     if (w.sold) {
-      priceEl.textContent = price || '';
-      priceEl.style.display = price ? '' : 'none';
+      buyHead.textContent = 'Œuvre vendue';
+      priceEl.style.display = 'none';
+      priceSub.style.display = 'none';
       soldEl.style.display = '';
-      buyBtn.style.display = 'none';
       noteEl.textContent = "Cette œuvre a trouvé preneur. Écrivez à Léa pour une pièce similaire ou une commande sur mesure.";
     } else if (price) {
-      priceEl.textContent = price;
-      priceEl.style.display = '';
+      // Prix affiché : achat possible.
+      buyHead.textContent = 'Acquérir cette œuvre';
+      priceEl.textContent = price; priceEl.style.display = '';
+      priceSub.textContent = 'Œuvre originale · pièce unique'; priceSub.style.display = '';
       soldEl.style.display = 'none';
       setupPurchase(w, price);
     } else {
-      // Prix optionnel : aucune valeur => aucun prix affiché, on oriente vers le contact.
-      priceEl.textContent = 'Prix sur demande';
-      priceEl.style.display = '';
+      // Pas de prix : « Prix sur demande / à négocier », on oriente vers le contact.
+      buyHead.textContent = 'Acquérir cette œuvre';
+      priceEl.textContent = 'Prix sur demande'; priceEl.style.display = '';
+      priceSub.textContent = 'Œuvre originale · pièce unique · prix à convenir avec Léa'; priceSub.style.display = '';
       soldEl.style.display = 'none';
-      buyBtn.style.display = 'none';
-      noteEl.textContent = "Le prix de cette œuvre est communiqué sur demande. Contactez Léa pour toute information.";
+      askBtn.style.display = '';
+      noteEl.textContent = "Pour cette œuvre, le prix se définit directement avec Léa. Cliquez sur « Demander le prix ».";
     }
 
     lb.classList.add('open');
@@ -319,6 +346,18 @@
   });
   document.querySelector('[data-close-buy]').addEventListener('click', function () { buyModal.classList.remove('open'); });
   buyModal.addEventListener('click', function (e) { if (e.target === buyModal) buyModal.classList.remove('open'); });
+
+  /* « Demander le prix » : pré-remplit le message de contact et y conduit */
+  $('lbAsk').addEventListener('click', function () {
+    var w = WORKS[curIndex]; if (!w) return;
+    closeLB();
+    var m = $('m');
+    if (m) m.value = 'Bonjour Léa,\n\nJe souhaite connaître le prix de l\'œuvre « ' + w.title +
+      ' » (' + w.medium + (w.dimensions ? ', ' + w.dimensions : '') + ').\n\nMerci !';
+    var contact = document.querySelector('#contact');
+    if (contact) contact.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    setTimeout(function () { if (m) m.focus(); }, reduce ? 0 : 600);
+  });
 
   /* ---------- annonces ---------- */
   function loadAnnonces() {

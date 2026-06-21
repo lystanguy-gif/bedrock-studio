@@ -233,6 +233,7 @@
       $('pDimensions').value = p.dimensions || '';
       $('pMedium').value = p.medium || 'Huile sur toile';
       $('pPrice').value = (p.price == null ? '' : p.price);
+      $('pOnRequest').checked = (p.price == null);
       $('pDescription').value = p.description || '';
       $('pSold').checked = !!p.sold;
       if (p.image_url) { $('pPreview').src = p.image_url; $('pPreview').style.display = 'block'; }
@@ -242,8 +243,19 @@
       $('pMedium').value = 'Huile sur toile';
       $('pCategory').value = 'paysages';
     }
+    syncOnRequest();
     openModal('paintingModal');
   }
+
+  // « Prix sur demande » : désactive et vide le champ prix quand c'est coché
+  function syncOnRequest() {
+    var on = $('pOnRequest').checked;
+    var pr = $('pPrice');
+    pr.disabled = on;
+    pr.style.opacity = on ? '.45' : '';
+    if (on) pr.value = '';
+  }
+  $('pOnRequest').addEventListener('change', syncOnRequest);
 
   $('addPainting').addEventListener('click', function () { openPaintingForm(null); });
   $('closePaintingModal').addEventListener('click', function () { closeModal('paintingModal'); });
@@ -277,13 +289,15 @@
     if (!id && !pendingFile) { toast('Merci de choisir une photo de la toile.', true); return; }
 
     var priceVal = $('pPrice').value.trim();
+    var onRequest = $('pOnRequest').checked;
     var record = {
       title: title,
       category: $('pCategory').value,
       dimensions: $('pDimensions').value.trim(),
       medium: $('pMedium').value.trim() || 'Huile sur toile',
       description: $('pDescription').value.trim(),
-      price: priceVal === '' ? null : Number(priceVal),
+      // « Prix sur demande » coché => aucun montant (null) ; sinon le montant saisi.
+      price: (onRequest || priceVal === '') ? null : Number(priceVal),
       sold: $('pSold').checked
     };
 

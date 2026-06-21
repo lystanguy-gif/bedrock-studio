@@ -161,8 +161,11 @@
         </div>
         <div class="field"><label for="pDimensions">Dimensions (ex. 73 x 54 cm)</label><input id="pDimensions" type="text"></div>
         <div class="field"><label for="pMedium">Technique</label><input id="pMedium" type="text" value="Huile sur toile"></div>
-        <div class="field"><label for="pPrice">Prix en euros (laisser vide = aucun prix affiché)</label><input id="pPrice" type="number" min="0" step="1" inputmode="numeric"></div>
+        <div class="field"><label for="pPrice">Prix en euros</label><input id="pPrice" type="number" min="0" step="1" inputmode="numeric"></div>
         <div class="full field"><label for="pDescription">Description (texte libre, facultatif)</label><textarea id="pDescription"></textarea></div>
+        <div class="full">
+          <label class="checkline"><input type="checkbox" id="pOnRequest"> Prix sur demande (à négocier) — n'affiche aucun montant sur le site</label>
+        </div>
         <div class="full">
           <label class="checkline"><input type="checkbox" id="pSold"> Marquer cette œuvre comme vendue</label>
         </div>
