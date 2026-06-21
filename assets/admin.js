@@ -6,9 +6,6 @@
 (function () {
   "use strict";
 
-  var CFG = window.LKS_CONFIG || {};
-  var BUCKET = CFG.STORAGE_BUCKET || 'paintings';
-
   function $(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? '' : s)
@@ -30,19 +27,9 @@
     clearTimeout(tt); tt = setTimeout(function () { t.classList.remove('show'); }, 3800);
   }
 
-  /* ---------- vérification de la configuration ---------- */
-  function configured() {
-    return CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY &&
-           CFG.SUPABASE_URL.indexOf('VOTRE') === -1 &&
-           CFG.SUPABASE_ANON_KEY.indexOf('VOTRE') === -1;
-  }
-  if (!configured() || !window.supabase) {
-    $('loginScreen').style.display = 'none';
-    $('configWarn').style.display = 'block';
-    return;
-  }
-
-  var sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+  /* ---------- couche de données (Supabase réel, ou démo locale) ---------- */
+  var store = window.LKS_STORE;
+  var DEMO = store.mode === 'demo';
 
   /* ====================================================================
      AUTHENTIFICATION
@@ -55,15 +42,16 @@
     $('loginScreen').style.display = 'none';
     $('dash').style.display = 'flex';
     $('whoami').textContent = user && user.email ? user.email : '';
+    if (DEMO) $('demoBanner').style.display = 'block';
     loadPaintings();
     loadAnnonces();
     loadPresse();
     loadSite();
   }
 
-  sb.auth.getSession().then(function (res) {
-    var session = res.data && res.data.session;
-    if (session) showDash(session.user); else showLogin();
+  // En mode démo, l'utilisateur est connecté d'office (pour essayer l'interface).
+  store.auth.getUser().then(function (user) {
+    if (user) showDash(user); else showLogin();
   });
 
   $('loginForm').addEventListener('submit', function (e) {
@@ -71,7 +59,7 @@
     var btn = $('loginBtn'); var err = $('loginErr');
     err.textContent = '';
     btn.disabled = true; btn.textContent = 'Connexion…';
-    sb.auth.signInWithPassword({ email: $('loginEmail').value.trim(), password: $('loginPass').value })
+    store.auth.signIn($('loginEmail').value.trim(), $('loginPass').value)
       .then(function (res) {
         if (res.error) {
           err.textContent = 'E-mail ou mot de passe incorrect.';
@@ -84,7 +72,7 @@
   });
 
   $('logoutBtn').addEventListener('click', function () {
-    sb.auth.signOut().then(function () { showLogin(); });
+    store.auth.signOut().then(function () { showLogin(); });
   });
 
   /* ====================================================================
@@ -128,13 +116,13 @@
 
   function loadPaintings() {
     $('paintingsLoading').style.display = '';
-    sb.from('paintings').select('*').order('sort_order', { ascending: true })
-      .then(function (res) {
+    store.paintings.list()
+      .then(function (rows) {
         $('paintingsLoading').style.display = 'none';
-        if (res.error) { toast('Impossible de charger les peintures.', true); return; }
-        paintings = res.data || [];
+        paintings = rows || [];
         renderPaintings();
-      });
+      })
+      .catch(function () { $('paintingsLoading').style.display = 'none'; toast('Impossible de charger les peintures.', true); });
   }
 
   function renderPaintings() {
@@ -179,7 +167,7 @@
   });
 
   function toggleSold(p) {
-    sb.from('paintings').update({ sold: !p.sold }).eq('id', p.id).then(function (res) {
+    store.paintings.update(p.id, { sold: !p.sold }).then(function (res) {
       if (res.error) { toast('La mise à jour a échoué.', true); return; }
       p.sold = !p.sold; renderPaintings();
       toast(p.sold ? 'Œuvre marquée comme vendue.' : 'Œuvre remise en vente.');
@@ -193,28 +181,20 @@
     var ao = a.sort_order, bo = b.sort_order;
     if (ao === bo) { ao = i; bo = j; } // sécurité si valeurs identiques
     Promise.all([
-      sb.from('paintings').update({ sort_order: bo }).eq('id', a.id),
-      sb.from('paintings').update({ sort_order: ao }).eq('id', b.id)
+      store.paintings.update(a.id, { sort_order: bo }),
+      store.paintings.update(b.id, { sort_order: ao })
     ]).then(function () { loadPaintings(); })
       .catch(function () { toast('Le réordonnancement a échoué.', true); });
   }
 
   function deletePainting(p) {
-    sb.from('paintings').delete().eq('id', p.id).then(function (res) {
+    store.paintings.remove(p.id).then(function (res) {
       if (res.error) { toast('La suppression a échoué.', true); return; }
-      // on tente aussi de retirer l'image du stockage (best effort)
-      var path = storagePathFromUrl(p.image_url);
-      if (path) sb.storage.from(BUCKET).remove([path]);
+      // on tente aussi de retirer l'image du stockage (best effort, mode Supabase)
+      store.removeStorage(store.storagePathFromUrl(p.image_url));
       toast('Œuvre supprimée.');
       loadPaintings();
     });
-  }
-
-  function storagePathFromUrl(url) {
-    if (!url) return null;
-    var marker = '/object/public/' + BUCKET + '/';
-    var idx = url.indexOf(marker);
-    return idx === -1 ? null : url.slice(idx + marker.length);
   }
 
   /* ---------- formulaire peinture (ajout / modification) ---------- */
@@ -271,16 +251,6 @@
     $('uploaderHint').textContent = f.name;
   });
 
-  function uploadImage(file) {
-    var ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-    var name = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
-    return sb.storage.from(BUCKET).upload(name, file, { cacheControl: '3600', upsert: false })
-      .then(function (res) {
-        if (res.error) throw res.error;
-        return sb.storage.from(BUCKET).getPublicUrl(name).data.publicUrl;
-      });
-  }
-
   $('paintingForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var id = $('pId').value;
@@ -303,15 +273,15 @@
 
     var btn = $('savePainting'); btn.disabled = true; btn.textContent = 'Enregistrement…';
 
-    var prep = pendingFile ? uploadImage(pendingFile) : Promise.resolve(null);
+    var prep = pendingFile ? store.uploadImage(pendingFile) : Promise.resolve(null);
     prep.then(function (url) {
       if (url) record.image_url = url;
       if (id) {
-        return sb.from('paintings').update(record).eq('id', id);
+        return store.paintings.update(id, record);
       } else {
         var maxOrder = paintings.reduce(function (m, p) { return Math.max(m, p.sort_order || 0); }, -1);
         record.sort_order = maxOrder + 1;
-        return sb.from('paintings').insert(record);
+        return store.paintings.insert(record);
       }
     }).then(function (res) {
       if (res && res.error) throw res.error;
@@ -331,12 +301,7 @@
   var annonces = [];
 
   function loadAnnonces() {
-    sb.from('annonces').select('*').order('created_at', { ascending: false })
-      .then(function (res) {
-        if (res.error) return; // table optionnelle
-        annonces = res.data || [];
-        renderAnnonces();
-      });
+    store.annonces.list().then(function (rows) { annonces = rows || []; renderAnnonces(); });
   }
   function renderAnnonces() {
     var list = $('annoncesList');
@@ -366,7 +331,7 @@
     var b = e.target.closest('button'); if (!b) return;
     if (b.dataset.aedit != null) openAnnonceForm(annonces[+b.dataset.aedit]);
     else if (b.dataset.adel != null) { var a = annonces[+b.dataset.adel]; askConfirm('Supprimer l\'annonce « ' + a.title + ' » ?', function () {
-      sb.from('annonces').delete().eq('id', a.id).then(function (r) {
+      store.annonces.remove(a.id).then(function (r) {
         if (r.error) { toast('La suppression a échoué.', true); return; }
         toast('Annonce supprimée.'); loadAnnonces();
       });
@@ -386,7 +351,7 @@
     var id = $('aId').value;
     var rec = { title: $('aTitle').value.trim(), body: $('aBody').value.trim() };
     if (!rec.title) { toast('Le titre est obligatoire.', true); return; }
-    var op = id ? sb.from('annonces').update(rec).eq('id', id) : sb.from('annonces').insert(rec);
+    var op = id ? store.annonces.update(id, rec) : store.annonces.insert(rec);
     op.then(function (r) {
       if (r.error) { toast("L'enregistrement a échoué.", true); return; }
       toast(id ? 'Annonce mise à jour.' : 'Annonce publiée.');
@@ -400,12 +365,7 @@
   var presse = [];
 
   function loadPresse() {
-    sb.from('presse').select('*').order('created_at', { ascending: false })
-      .then(function (res) {
-        if (res.error) return; // table optionnelle
-        presse = res.data || [];
-        renderPresse();
-      });
+    store.presse.list().then(function (rows) { presse = rows || []; renderPresse(); });
   }
   function renderPresse() {
     var list = $('presseList');
@@ -433,7 +393,7 @@
     var b = e.target.closest('button'); if (!b) return;
     if (b.dataset.predit != null) openPresseForm(presse[+b.dataset.predit]);
     else if (b.dataset.prdel != null) { var p = presse[+b.dataset.prdel]; askConfirm('Supprimer cette parution ?', function () {
-      sb.from('presse').delete().eq('id', p.id).then(function (r) {
+      store.presse.remove(p.id).then(function (r) {
         if (r.error) { toast('La suppression a échoué.', true); return; }
         toast('Parution supprimée.'); loadPresse();
       });
@@ -453,7 +413,7 @@
     var id = $('prId').value;
     var rec = { media: $('prMedia').value.trim(), title: $('prTitle').value.trim(), url: $('prUrl').value.trim() };
     if (!rec.media) { toast('Le nom du média est obligatoire.', true); return; }
-    var op = id ? sb.from('presse').update(rec).eq('id', id) : sb.from('presse').insert(rec);
+    var op = id ? store.presse.update(id, rec) : store.presse.insert(rec);
     op.then(function (r) {
       if (r.error) { toast("L'enregistrement a échoué.", true); return; }
       toast(id ? 'Parution mise à jour.' : 'Parution ajoutée.');
@@ -482,12 +442,10 @@
 
   function loadSite() {
     $('siteLoading').style.display = '';
-    sb.from('site_content').select('*')
-      .then(function (res) {
+    store.site.get()
+      .then(function (map) {
         $('siteLoading').style.display = 'none';
-        if (res.error) return; // table optionnelle
-        siteData = {};
-        (res.data || []).forEach(function (r) { siteData[r.key] = r.value; });
+        siteData = map || {};
         // remplir le formulaire
         Object.keys(SITE_FIELDS).forEach(function (key) {
           var el = $(SITE_FIELDS[key]); if (el) el.value = siteData[key] || '';
@@ -522,18 +480,15 @@
 
     // envoie les images choisies, puis enregistre tout
     var uploads = [];
-    if (heroFile) uploads.push(uploadImage(heroFile).then(function (url) { siteData.hero_image = url; }));
-    if (portraitFile) uploads.push(uploadImage(portraitFile).then(function (url) { siteData.portrait_image = url; }));
+    if (heroFile) uploads.push(store.uploadImage(heroFile).then(function (url) { siteData.hero_image = url; }));
+    if (portraitFile) uploads.push(store.uploadImage(portraitFile).then(function (url) { siteData.portrait_image = url; }));
 
     Promise.all(uploads).then(function () {
-      var rows = Object.keys(siteData).map(function (key) {
-        return { key: key, value: siteData[key] || '', updated_at: new Date().toISOString() };
-      });
-      return sb.from('site_content').upsert(rows, { onConflict: 'key' });
+      return store.site.setMany(siteData);
     }).then(function (res) {
       if (res && res.error) throw res.error;
       heroFile = null; portraitFile = null;
-      toast('Votre site est à jour. Les visiteurs voient déjà les changements.');
+      toast(DEMO ? 'Aperçu mis à jour sur cet appareil.' : 'Votre site est à jour. Les visiteurs voient déjà les changements.');
     }).catch(function (err) {
       toast("La mise à jour a échoué. " + (err && err.message ? err.message : ''), true);
     }).finally(function () {

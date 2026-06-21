@@ -12,17 +12,8 @@
   var CFG = window.LKS_CONFIG || {};
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- client Supabase (si configuré) ---------- */
-  var sb = null;
-  function configured() {
-    return CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY &&
-           CFG.SUPABASE_URL.indexOf('VOTRE') === -1 &&
-           CFG.SUPABASE_ANON_KEY.indexOf('VOTRE') === -1;
-  }
-  if (configured() && window.supabase) {
-    try { sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY); }
-    catch (e) { sb = null; }
-  }
+  /* ---------- couche de données (Supabase réel, ou démo locale) ---------- */
+  var store = window.LKS_STORE;
 
   /* ---------- état ---------- */
   var WORKS = [];           // œuvres normalisées affichées
@@ -76,11 +67,10 @@
   }
 
   function loadWorks() {
-    if (!sb) return loadFallback();
-    return sb.from('paintings').select('*').order('sort_order', { ascending: true })
-      .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return loadFallback();
-        return res.data.map(function (r) { return normalize(r, false); });
+    return store.paintings.list()
+      .then(function (rows) {
+        if (!rows || !rows.length) return loadFallback();
+        return rows.map(function (r) { return normalize(r, false); });
       })
       .catch(function () { return loadFallback(); });
   }
@@ -155,11 +145,10 @@
   var SITE = {};
   function setText(id, val) { var el = $(id); if (el && val) el.textContent = val; }
   function loadSiteContent() {
-    if (!sb) return Promise.resolve();
-    return sb.from('site_content').select('*')
-      .then(function (res) {
-        if (res.error || !res.data) return;
-        res.data.forEach(function (r) { if (r.value) SITE[r.key] = r.value; });
+    return store.site.get()
+      .then(function (map) {
+        if (!map) return;
+        Object.keys(map).forEach(function (k) { if (map[k]) SITE[k] = map[k]; });
         applySiteContent();
       })
       .catch(function () { /* on garde les textes par défaut */ });
@@ -361,13 +350,12 @@
 
   /* ---------- annonces ---------- */
   function loadAnnonces() {
-    if (!sb) return;
-    sb.from('annonces').select('*').order('created_at', { ascending: false })
-      .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return;
+    store.annonces.list()
+      .then(function (rows) {
+        if (!rows || !rows.length) return;
         var tl = $('timeline');
         tl.innerHTML = '';
-        res.data.forEach(function (a) {
+        rows.forEach(function (a) {
           var d = a.created_at ? new Date(a.created_at) : null;
           var when = d ? d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : '';
           var el = document.createElement('div');
@@ -383,13 +371,12 @@
 
   /* ---------- presse ---------- */
   function loadPresse() {
-    if (!sb) return;
-    sb.from('presse').select('*').order('created_at', { ascending: false })
-      .then(function (res) {
-        if (res.error || !res.data || !res.data.length) return;
+    store.presse.list()
+      .then(function (rows) {
+        if (!rows || !rows.length) return;
         var list = $('pressList'), state = $('pressState');
         list.innerHTML = '';
-        res.data.forEach(function (p) {
+        rows.forEach(function (p) {
           var el = document.createElement('div');
           el.className = 'press__item reveal in';
           var inner = '<div class="press__media">' + esc(p.media) + '</div>' +
