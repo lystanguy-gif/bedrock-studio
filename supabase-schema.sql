@@ -46,8 +46,11 @@ create policy "Suppression reservee aux connectes"
   using (true);
 
 -- 5. Stockage des images
--- Creer un bucket PUBLIC nomme "paintings" dans Storage (via l'interface Supabase),
--- puis appliquer les policies ci-dessous.
+-- Le bucket public "paintings" est cree automatiquement ci-dessous
+-- (plus besoin de le creer a la main dans l'interface).
+insert into storage.buckets (id, name, public)
+values ('paintings', 'paintings', true)
+on conflict (id) do update set public = true;
 
 -- Lecture publique des images
 create policy "Lecture publique des images"

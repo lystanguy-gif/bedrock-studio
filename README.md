@@ -59,11 +59,9 @@ python3 -m http.server 8000
 
 1. **Créer un projet Supabase** sur https://supabase.com.
 2. **Exécuter `supabase-schema.sql`** dans l'éditeur SQL de Supabase
-   (crée la table `paintings`, les tables optionnelles `annonces` et `presse`,
-   et les règles de sécurité RLS).
-3. **Créer le bucket de stockage public `paintings`** dans Storage, puis
-   appliquer les policies de stockage incluses dans le schéma SQL.
-4. **Créer l'utilisateur de Léa** dans *Authentication → Users* (e-mail + mot de passe).
+   (crée la table `paintings`, les tables `annonces`, `presse` et `site_content`,
+   les règles de sécurité RLS, **et le bucket de stockage public `paintings`**).
+3. **Créer l'utilisateur de Léa** dans *Authentication → Users* (e-mail + mot de passe).
 5. **Remplir `assets/config.js`** à partir de `config.example.js` :
    - `SUPABASE_URL` et `SUPABASE_ANON_KEY` (*Project Settings → API*),
    - `CONTACT_FORM_ENDPOINT` (voir ci-dessous),
