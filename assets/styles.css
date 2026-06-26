@@ -182,6 +182,9 @@ h2.title{
 .tl .what{font-family:var(--display); font-size:1.5rem; color:var(--cream); margin:.2em 0 .25em}
 .tl .where{color:var(--muted)}
 .tl.up::before{background:transparent; border:1px solid var(--gold)}
+.tl__poster{display:inline-block; margin-top:16px; max-width:300px; border:1px solid var(--line); transition:transform .4s, box-shadow .4s}
+.tl__poster img{width:100%; height:auto; display:block}
+.tl__poster:hover{transform:translateY(-3px); box-shadow:0 20px 40px -22px rgba(0,0,0,.9)}
 
 /* ---------- PRESSE ---------- */
 .press{background:linear-gradient(180deg,#100d0a,var(--ink))}
