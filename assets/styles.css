@@ -102,13 +102,16 @@ h2.title{
 .about{background:var(--ink)}
 .about__grid{display:grid; grid-template-columns:.85fr 1.15fr; gap:64px; align-items:center; margin-top:54px}
 .portrait{
-  position:relative; width:100%; aspect-ratio:4/5; border:1px solid var(--line);
+  position:relative; width:100%; max-width:300px; margin:0 auto; aspect-ratio:4/5;
   background:linear-gradient(160deg,var(--ink-2),var(--ink-3));
+  border:1px solid var(--gold); padding:9px;
+  box-shadow:0 16px 46px -22px rgba(0,0,0,.85);
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; color:var(--muted-2);
   overflow:hidden;
 }
-.portrait img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-.portrait::after{content:""; position:absolute; inset:12px; border:1px solid var(--line-soft)}
+.portrait img{position:absolute; inset:9px; width:calc(100% - 18px); height:calc(100% - 18px); object-fit:cover}
+/* fin liseré or autour de la photo, dans nos couleurs */
+.portrait::after{content:""; position:absolute; inset:9px; border:1px solid rgba(227,193,132,.55); pointer-events:none; z-index:1}
 .portrait .mono{font-size:.74rem; letter-spacing:.24em; text-transform:uppercase}
 .portrait .sig{font-family:var(--display); font-size:2.4rem; color:var(--gold); opacity:.55}
 .about__body p{margin:0 0 1.15em; color:var(--cream); opacity:.92}
@@ -434,7 +437,7 @@ h2.title{
   .section{padding:88px 0}
   .grid{columns:2}
   .about__grid, .contact__grid{grid-template-columns:1fr; gap:44px}
-  .portrait{max-width:340px; margin:0 auto}
+  .portrait{max-width:250px; margin:0 auto}
   .lb__stage{grid-template-columns:1fr; max-height:none; overflow-y:auto}
   .lb__imgwrap img{max-height:60vh}
   .nav__links{
