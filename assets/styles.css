@@ -136,7 +136,7 @@ h2.title{
   position:relative; break-inside:avoid; margin:0 0 22px; cursor:pointer; overflow:hidden;
   border:1px solid var(--line-soft); background:#000; transition:transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s;
 }
-.card img{width:100%; height:auto; transition:transform .8s cubic-bezier(.2,.7,.2,1), filter .5s; filter:brightness(.92) saturate(1.02); -webkit-user-drag:none; user-select:none}
+.card img{width:100%; height:auto; transition:transform .8s cubic-bezier(.2,.7,.2,1), filter .5s; filter:brightness(.92) saturate(1.02); -webkit-user-drag:none; user-select:none; -webkit-touch-callout:none; pointer-events:none}
 .card:hover{transform:translateY(-5px); box-shadow:0 26px 50px -22px rgba(0,0,0,.9)}
 .card:hover img, .card:focus-visible img{transform:scale(1.05); filter:brightness(1) saturate(1.05)}
 .card__cap{
@@ -252,7 +252,7 @@ h2.title{
 .lb.open{display:flex; opacity:1}
 .lb__stage{margin:auto; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(280px,.9fr); gap:0; max-width:1180px; width:92%; max-height:90vh; background:var(--ink-2); border:1px solid var(--line)}
 .lb__imgwrap{background:#000; display:flex; align-items:center; justify-content:center; overflow:hidden; min-height:0; position:relative}
-.lb__imgwrap img{max-width:100%; max-height:90vh; object-fit:contain; width:auto; -webkit-user-drag:none}
+.lb__imgwrap img{max-width:100%; max-height:90vh; object-fit:contain; width:auto; -webkit-user-drag:none; -webkit-touch-callout:none; user-select:none}
 .lb__panel{padding:44px 40px; display:flex; flex-direction:column; justify-content:center; gap:6px; position:relative}
 .lb__cat{font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--gold)}
 .lb__title{font-family:var(--display); font-size:2.1rem; line-height:1.05; color:#f6efe2; margin:.2em 0 0}
@@ -410,6 +410,17 @@ h2.title{
 }
 .config-warn h3{font-family:var(--display); color:var(--gold-bright); margin-top:0}
 .config-warn code{background:var(--ink-3); padding:2px 6px; color:var(--gold-bright); font-size:.85em}
+
+/* ---------- GUIDE (espace privé) ---------- */
+.guide-doc{max-width:760px; color:var(--cream); line-height:1.7}
+.guide-doc .lead{color:var(--muted); font-size:1.02rem; margin:0 0 26px}
+.guide-doc h3{font-family:var(--display); font-weight:400; color:var(--gold-bright); font-size:1.3rem; margin:30px 0 8px; padding-top:22px; border-top:1px solid var(--line-soft)}
+.guide-doc h3:first-of-type{border-top:0; padding-top:0}
+.guide-doc p{margin:0 0 12px; color:var(--cream); opacity:.95}
+.guide-doc ol, .guide-doc ul{margin:0 0 14px; padding-left:22px; color:var(--cream)}
+.guide-doc li{margin:0 0 8px}
+.guide-doc b{color:var(--gold-bright); font-weight:600}
+.guide-doc .tip{background:rgba(201,162,94,.09); border:1px solid var(--line); padding:14px 18px; margin:14px 0; font-size:.94rem}
 
 /* ---------- RESPONSIVE ---------- */
 @media(max-width:1000px){

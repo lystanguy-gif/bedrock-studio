@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Espace privé — LKS ART</title>
+<title>Espace privé · LKS ART</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -40,10 +40,11 @@
     <button data-tab="annonces">Mes annonces</button>
     <button data-tab="presse">Presse &amp; médias</button>
     <button data-tab="site">Mon site</button>
+    <button data-tab="guide">Guide</button>
   </div>
 
   <div class="demo-banner" id="demoBanner" style="display:none">
-    <b>Mode démonstration</b> — vous pouvez tout essayer (ajouter, modifier, supprimer, personnaliser).
+    <b>Mode démonstration</b>. Vous pouvez tout essayer (ajouter, modifier, supprimer, personnaliser).
     Vos changements s'affichent sur le site <u>sur cet appareil uniquement</u>.
     Une fois la connexion Supabase mise en place, ces mêmes changements seront en ligne <b>pour tout le monde</b>, en direct.
   </div>
@@ -130,6 +131,87 @@
       <div class="adm-loading" id="siteLoading"><div class="spinner"></div></div>
     </section>
 
+    <!-- PANNEAU GUIDE (mode d'emploi pour Léa) -->
+    <section class="admin-panel" id="panel-guide">
+      <div class="admin-panel__head">
+        <h2>Guide</h2>
+      </div>
+      <div class="guide-doc">
+        <p class="lead">Bonjour Léa. Voici votre mode d'emploi. Pas besoin de connaître l'informatique :
+          vous utilisez de jolis boutons, et tout se met à jour sur votre site automatiquement.
+          Prenez votre temps, lisez les rubriques qui vous intéressent.</p>
+
+        <h3>1. Comment ça marche, en deux mots</h3>
+        <p>Votre site a deux côtés. Le <b>côté visiteurs</b> (la jolie page que tout le monde voit) et
+          votre <b>espace privé</b> (cette page-ci, protégée par votre mot de passe). Quand vous modifiez
+          quelque chose ici et que vous cliquez sur <b>Enregistrer</b>, le changement apparaît
+          <b>tout de suite</b> sur votre site, pour tous les visiteurs. Un peu comme publier sur Facebook.</p>
+        <div class="tip">Vous n'avez jamais besoin d'aller ailleurs que sur votre site. Tout se fait ici.</div>
+
+        <h3>2. Se connecter et se déconnecter</h3>
+        <p>Vous arrivez sur votre espace avec votre <b>adresse e-mail</b> et votre <b>mot de passe</b>.
+          Quand vous avez fini, surtout sur un ordinateur partagé, cliquez sur <b>Se déconnecter</b>
+          (en haut à droite).</p>
+
+        <h3>3. Ajouter une peinture</h3>
+        <ol>
+          <li>Onglet <b>Mes peintures</b>, puis bouton <b>＋ Ajouter une peinture</b>.</li>
+          <li>Cliquez sur la zone photo et <b>choisissez une image</b> depuis votre téléphone ou votre ordinateur.</li>
+          <li>Remplissez le <b>titre</b>, la <b>catégorie</b> (Paysages, Marines ou Imaginaire),
+            les <b>dimensions</b> (ex. 73 x 54 cm) et, si vous voulez, un <b>prix</b> et une <b>description</b>.</li>
+          <li>Cliquez sur <b>Enregistrer</b>. La toile apparaît aussitôt sur votre site.</li>
+        </ol>
+        <div class="tip">Conseil photo : prenez la toile bien de face, à plat, avec une bonne lumière,
+          sans le mur ni d'objets autour. Plus la photo est nette, plus la toile est belle sur le site.</div>
+
+        <h3>4. Le prix (3 possibilités)</h3>
+        <ul>
+          <li><b>Un prix affiché</b> : vous écrivez le montant en euros. Un bouton d'achat PayPal apparaît sur la fiche.</li>
+          <li><b>Prix sur demande</b> : cochez la case « Prix sur demande (à négocier) ». Aucun montant
+            n'est affiché, et le visiteur peut vous écrire pour le connaître.</li>
+          <li><b>Vendue</b> : cliquez sur <b>Marquer vendue</b>. Un petit badge « Vendu » s'affiche sur la toile.</li>
+        </ul>
+
+        <h3>5. Modifier, supprimer, réordonner</h3>
+        <ul>
+          <li><b>Modifier</b> : sur la ligne de la toile, cliquez sur <b>Modifier</b>, changez ce que vous
+            voulez (même la photo), puis <b>Enregistrer</b>.</li>
+          <li><b>Supprimer</b> : cliquez sur <b>Supprimer</b> puis confirmez. Attention, c'est définitif.</li>
+          <li><b>Changer l'ordre</b> : avec les petites flèches <b>▲</b> (monter) et <b>▼</b> (descendre)
+            à gauche de chaque toile.</li>
+        </ul>
+
+        <h3>6. Mes annonces</h3>
+        <p>Onglet <b>Mes annonces</b>, bouton <b>＋ Ajouter une annonce</b>. Écrivez un titre et un petit
+          texte (une exposition, un atelier, une nouveauté). L'annonce apparaît dans la rubrique
+          « Annonces &amp; événements » du site.</p>
+
+        <h3>7. Presse, médias et radio</h3>
+        <p>Onglet <b>Presse &amp; médias</b>, bouton <b>＋ Ajouter une parution</b>. Indiquez le <b>média</b>
+          (le nom de la radio, du journal, du site), le <b>titre</b> de l'article ou de l'émission, et le
+          <b>lien</b> si vous en avez un. Pour un passage radio, mettez par exemple le nom de la radio et la date.</p>
+
+        <h3>8. Personnaliser mon site (textes et photos)</h3>
+        <p>Onglet <b>Mon site</b>. C'est ici que vous changez vous-même, sans personne :</p>
+        <ul>
+          <li>la <b>photo d'accueil</b> (la grande image en haut) et votre <b>portrait</b> ;</li>
+          <li>l'<b>accroche</b> d'accueil, votre <b>texte de présentation</b> (votre bio) ;</li>
+          <li>vos <b>coordonnées</b> : e-mail affiché, horaires, lien Facebook.</li>
+        </ul>
+        <p>Quand tout vous convient, cliquez sur <b>Mettre à jour le site</b>. Le bouton
+          <b>Voir le résultat</b> ouvre votre site dans un nouvel onglet pour vérifier.</p>
+
+        <h3>9. Vos œuvres sont protégées</h3>
+        <p>Sur le site, le clic droit et l'enregistrement des images sont bloqués, une signature discrète
+          « LKS ART » est posée sur les photos, et une clause interdit toute reproduction. Vos toiles
+          restent les vôtres.</p>
+
+        <h3>Une question&nbsp;?</h3>
+        <p>En cas de doute, contactez Tanguy. Et n'ayez pas peur de cliquer : rien n'est cassable,
+          tout se corrige. Bonne création&nbsp;! ✨</p>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -170,7 +252,7 @@
         <div class="field"><label for="pPrice">Prix en euros</label><input id="pPrice" type="number" min="0" step="1" inputmode="numeric"></div>
         <div class="full field"><label for="pDescription">Description (texte libre, facultatif)</label><textarea id="pDescription"></textarea></div>
         <div class="full">
-          <label class="checkline"><input type="checkbox" id="pOnRequest"> Prix sur demande (à négocier) — n'affiche aucun montant sur le site</label>
+          <label class="checkline"><input type="checkbox" id="pOnRequest"> Prix sur demande (à négocier), n'affiche aucun montant sur le site</label>
         </div>
         <div class="full">
           <label class="checkline"><input type="checkbox" id="pSold"> Marquer cette œuvre comme vendue</label>

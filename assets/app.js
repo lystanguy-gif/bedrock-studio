@@ -227,7 +227,7 @@
     $('lbDesc').textContent = w.description || '';
     $('lbDesc').style.display = w.description ? '' : 'none';
     $('lbMedium').textContent = w.medium;
-    $('lbDims').textContent = w.dimensions || '—';
+    $('lbDims').textContent = w.dimensions || 'Non précisées';
 
     var price = formatPrice(w.price);
     var priceEl = $('lbPrice'), priceSub = $('lbPriceSub'), soldEl = $('lbSold'),
@@ -276,7 +276,7 @@
           createOrder: function (data, actions) {
             return actions.order.create({
               purchase_units: [{
-                description: w.title + ' — ' + w.medium,
+                description: w.title + ', ' + w.medium,
                 amount: { value: String(Number(w.price).toFixed(2)), currency_code: CFG.PAYPAL_CURRENCY || 'EUR' }
               }]
             });
@@ -329,7 +329,7 @@
   var buyModal = $('buyModal');
   $('lbBuy').addEventListener('click', function () {
     var w = WORKS[curIndex]; if (!w) return;
-    $('buyWork').textContent = '« ' + w.title + ' » — ' + w.medium + (w.dimensions ? ', ' + w.dimensions : '');
+    $('buyWork').textContent = '« ' + w.title + ' », ' + w.medium + (w.dimensions ? ', ' + w.dimensions : '');
     $('buyPrice').textContent = formatPrice(w.price) || '';
     buyModal.classList.add('open');
   });
@@ -400,8 +400,8 @@
     var endpoint = CFG.CONTACT_FORM_ENDPOINT;
     if (!endpoint) {
       // Pas de service email configuré : repli sur le client mail du visiteur.
-      var subject = encodeURIComponent('Message depuis le site LKS ART — ' + f.n.value);
-      var body = encodeURIComponent(f.m.value + '\n\n— ' + f.n.value + ' (' + f.e.value + ')');
+      var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
+      var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
       window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lksartpeinturekalck@gmail.com') +
         '?subject=' + subject + '&body=' + body;
       showToast('Votre messagerie va s\'ouvrir pour finaliser l\'envoi.');
@@ -414,7 +414,7 @@
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: f.n.value, email: f.e.value, message: f.m.value })
     }).then(function (r) {
-      if (r.ok) { showToast('Message envoyé — Léa vous répondra bientôt.'); f.reset(); }
+      if (r.ok) { showToast('Message envoyé. Léa vous répondra bientôt.'); f.reset(); }
       else { showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true); }
     }).catch(function () {
       showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true);
