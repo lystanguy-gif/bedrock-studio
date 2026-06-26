@@ -188,6 +188,7 @@
     if (SITE.contact_email) {
       var em = $('contactEmail'); if (em) { em.textContent = SITE.contact_email; em.href = 'mailto:' + SITE.contact_email; }
     }
+    if (SITE.contact_phone) showPhone(SITE.contact_phone);
     if (SITE.contact_hours) setText('contactHours', SITE.contact_hours);
     if (SITE.facebook_url) {
       var fb = $('fbLink'); if (fb) { fb.href = SITE.facebook_url; fb.target = '_blank'; fb.rel = 'noopener'; fb.dataset.set = '1'; }
@@ -424,12 +425,22 @@
   });
 
   /* ---------- réglages issus de config.js ---------- */
+  // Affiche la ligne téléphone (masquée par défaut) dès qu'un numéro est fourni.
+  function showPhone(num) {
+    var line = $('contactPhoneLine'), a = $('contactPhone');
+    if (!line || !a || !num) return;
+    a.textContent = num;
+    a.href = 'tel:' + num.replace(/[^0-9+]/g, '');
+    line.style.display = '';
+  }
+
   function applyConfig() {
     if (CFG.CONTACT_EMAIL) {
       var em = $('contactEmail');
       em.textContent = CFG.CONTACT_EMAIL; em.href = 'mailto:' + CFG.CONTACT_EMAIL;
     }
     if (CFG.CONTACT_HOURS) $('contactHours').textContent = CFG.CONTACT_HOURS;
+    if (CFG.CONTACT_PHONE) showPhone(CFG.CONTACT_PHONE);
     var fb = $('fbLink');
     if (CFG.FACEBOOK_URL) {
       fb.href = CFG.FACEBOOK_URL; fb.target = '_blank'; fb.rel = 'noopener'; fb.dataset.set = '1';

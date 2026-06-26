@@ -33,6 +33,10 @@ window.LKS_CONFIG = {
   CONTACT_FORM_ENDPOINT: "",
   CONTACT_EMAIL: "lksartpeinturekalck@gmail.com",
 
+  // Telephone : laisser vide pour ne PAS l'afficher. Des qu'on met un numero
+  // ici (ou depuis l'espace prive de Lea), une ligne "Telephone" apparait.
+  CONTACT_PHONE: "",
+
   // --- Divers ---
   CONTACT_HOURS: "de 10h à 19h",
   FACEBOOK_URL: "",            // à renseigner

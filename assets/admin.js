@@ -436,6 +436,7 @@
     about_atelier: 'sAboutAtelier',
     about_expose: 'sAboutExpose',
     contact_email: 'sContactEmail',
+    contact_phone: 'sContactPhone',
     contact_hours: 'sContactHours',
     facebook_url: 'sFacebook'
   };
