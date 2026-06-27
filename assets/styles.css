@@ -448,8 +448,11 @@ h2.title{
   .grid{columns:2}
   .about__grid, .contact__grid{grid-template-columns:1fr; gap:44px}
   .portrait{max-width:250px; margin:0 auto}
-  .lb__stage{grid-template-columns:1fr; max-height:none; overflow-y:auto}
-  .lb__imgwrap img{max-height:60vh}
+  /* fiche en plein écran défilable sur mobile/tablette (sinon le bas est coupé) */
+  .lb.open{display:block; overflow-y:auto; -webkit-overflow-scrolling:touch}
+  .lb__stage{grid-template-columns:1fr; max-height:none; width:100%; max-width:none; margin:0; min-height:100%; border:0}
+  .lb__imgwrap img{max-height:64vh}
+  .lb__panel{padding:30px 24px 100px}
   .nav__links{
     position:fixed; inset:0 0 0 auto; width:78%; max-width:320px; background:var(--ink-2);
     flex-direction:column; justify-content:center; gap:30px; padding:40px; transform:translateX(100%);
