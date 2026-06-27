@@ -13,7 +13,8 @@ create table if not exists public.paintings (
   medium      text default 'Huile sur toile',
   price       numeric,            -- peut etre NULL, alors aucun prix affiche
   image_url   text,
-  sold        boolean not null default false
+  sold        boolean not null default false,
+  availability text not null default 'sale'  -- 'sale' | 'request' | 'exhibition'
 );
 
 -- 2. Activer la securite au niveau des lignes

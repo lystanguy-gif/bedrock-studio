@@ -175,6 +175,16 @@ h2.title{
 
 .gallery__state{margin-top:48px; color:var(--muted); font-size:1rem; text-align:center; padding:40px 0}
 
+/* pagination de la galerie */
+.pager{display:flex; justify-content:center; align-items:center; gap:8px; flex-wrap:wrap; margin-top:46px}
+.pager__btn{
+  min-width:42px; height:42px; padding:0 12px; background:transparent; border:1px solid var(--line);
+  color:var(--muted); font-family:var(--body); font-size:.9rem; letter-spacing:.04em; cursor:pointer; transition:.25s;
+}
+.pager__btn:hover:not(:disabled){color:var(--cream); border-color:rgba(201,162,94,.5)}
+.pager__btn.active{background:var(--gold); color:#1a1409; border-color:var(--gold); font-weight:600}
+.pager__btn:disabled{opacity:.35; cursor:not-allowed}
+
 /* ---------- ANNONCES / EVENTS ---------- */
 .events{background:#100d0a}
 .timeline{margin-top:54px; border-left:1px solid var(--line); max-width:760px}

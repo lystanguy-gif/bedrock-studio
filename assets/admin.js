@@ -136,6 +136,11 @@
       var row = document.createElement('div');
       row.className = 'adm-row';
       var price = formatPrice(p.price);
+      var avail = availabilityOf(p);
+      var statusLine = (avail === 'exhibition')
+        ? 'Exposition uniquement'
+        : (avail === 'sale' && price ? price : 'Prix sur demande');
+      var statusClass = (avail === 'sale' && price) ? 'adm-row__price' : 'adm-row__meta';
       row.innerHTML =
         '<div class="adm-reorder">' +
           '<button data-up="' + i + '" title="Monter"' + (i === 0 ? ' disabled' : '') + '>▲</button>' +
@@ -145,7 +150,7 @@
         '<div class="adm-row__info">' +
           '<div class="adm-row__title">' + esc(p.title) + '</div>' +
           '<div class="adm-row__meta">' + esc(capitalize(p.category || '')) + (p.dimensions ? ' · ' + esc(p.dimensions) : '') + '</div>' +
-          (price ? '<div class="adm-row__price">' + price + '</div>' : '<div class="adm-row__meta">Aucun prix affiché</div>') +
+          '<div class="' + statusClass + '">' + esc(statusLine) + '</div>' +
           (p.sold ? '<div class="adm-row__sold">● Vendue</div>' : '') +
         '</div>' +
         '<div class="adm-row__actions">' +
@@ -213,7 +218,7 @@
       $('pDimensions').value = p.dimensions || '';
       $('pMedium').value = p.medium || 'Huile sur toile';
       $('pPrice').value = (p.price == null ? '' : p.price);
-      $('pOnRequest').checked = (p.price == null);
+      $('pAvailability').value = availabilityOf(p);
       $('pDescription').value = p.description || '';
       $('pSold').checked = !!p.sold;
       if (p.image_url) { $('pPreview').src = p.image_url; $('pPreview').style.display = 'block'; }
@@ -222,20 +227,27 @@
       $('pId').value = '';
       $('pMedium').value = 'Huile sur toile';
       $('pCategory').value = 'paysages';
+      $('pAvailability').value = 'sale';
     }
-    syncOnRequest();
+    syncAvailability();
     openModal('paintingModal');
   }
 
-  // « Prix sur demande » : désactive et vide le champ prix quand c'est coché
-  function syncOnRequest() {
-    var on = $('pOnRequest').checked;
+  // déduit la disponibilité d'une œuvre existante
+  function availabilityOf(p) {
+    var a = (p.availability || '').toLowerCase();
+    if (a === 'sale' || a === 'request' || a === 'exhibition') return a;
+    return (p.price == null) ? 'request' : 'sale';
+  }
+  // le champ prix n'est utile que pour « À vendre »
+  function syncAvailability() {
+    var on = $('pAvailability').value !== 'sale';
     var pr = $('pPrice');
     pr.disabled = on;
     pr.style.opacity = on ? '.45' : '';
     if (on) pr.value = '';
   }
-  $('pOnRequest').addEventListener('change', syncOnRequest);
+  $('pAvailability').addEventListener('change', syncAvailability);
 
   $('addPainting').addEventListener('click', function () { openPaintingForm(null); });
   $('closePaintingModal').addEventListener('click', function () { closeModal('paintingModal'); });
@@ -259,15 +271,16 @@
     if (!id && !pendingFile) { toast('Merci de choisir une photo de la toile.', true); return; }
 
     var priceVal = $('pPrice').value.trim();
-    var onRequest = $('pOnRequest').checked;
+    var availability = $('pAvailability').value; // sale | request | exhibition
     var record = {
       title: title,
       category: $('pCategory').value,
       dimensions: $('pDimensions').value.trim(),
       medium: $('pMedium').value.trim() || 'Huile sur toile',
       description: $('pDescription').value.trim(),
-      // « Prix sur demande » coché => aucun montant (null) ; sinon le montant saisi.
-      price: (onRequest || priceVal === '') ? null : Number(priceVal),
+      availability: availability,
+      // Le prix n'est conservé que pour « À vendre » ; sinon aucun montant.
+      price: (availability === 'sale' && priceVal !== '') ? Number(priceVal) : null,
       sold: $('pSold').checked
     };
 

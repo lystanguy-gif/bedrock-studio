@@ -52,9 +52,23 @@
       medium: row.medium || 'Huile sur toile',
       price: (row.price === undefined ? null : row.price),
       sold: !!row.sold,
+      // disponibilité : 'sale' (à vendre), 'request' (prix sur demande), 'exhibition' (exposition seule)
+      availability: (function () {
+        var a = (row.availability || '').toLowerCase();
+        if (a === 'sale' || a === 'request' || a === 'exhibition') return a;
+        return (row.price === undefined || row.price === null || row.price === '') ? 'request' : 'sale';
+      })(),
       // Supabase fournit image_url ; le repli local fournit image_file.
       image: fromFallback ? (row.image_file || row.image_url) : (row.image_url || row.image_file)
     };
+  }
+
+  // libellé court affiché sous chaque toile dans la galerie
+  function statusLabel(w) {
+    if (w.sold) return 'Vendue';
+    if (w.availability === 'exhibition') return 'Exposition';
+    if (w.availability === 'sale' && formatPrice(w.price)) return formatPrice(w.price);
+    return 'Prix sur demande';
   }
 
   function loadFallback() {
@@ -75,43 +89,88 @@
       .catch(function () { return loadFallback(); });
   }
 
-  /* ---------- rendu de la galerie ---------- */
-  function renderGallery() {
+  /* ---------- rendu de la galerie (avec pagination) ---------- */
+  var PER_PAGE = 6;
+  var currentPage = 1;
+
+  // indices (dans WORKS) des œuvres correspondant au filtre courant
+  function filteredIndexes() {
+    var out = [];
+    WORKS.forEach(function (w, i) {
+      if (currentFilter === 'all' || w.category === currentFilter) out.push(i);
+    });
+    return out;
+  }
+
+  function renderGallery() { currentPage = 1; renderPage(); }
+
+  function renderPage() {
     var grid = $('grid'), state = $('galleryState');
     grid.innerHTML = '';
+    var idxs = filteredIndexes();
     if (!WORKS.length) {
       state.innerHTML = "La galerie sera bientôt enrichie de nouvelles toiles.";
       state.style.display = '';
+      renderPager(0);
       return;
     }
     state.style.display = 'none';
 
-    WORKS.forEach(function (w, i) {
+    var pages = Math.max(1, Math.ceil(idxs.length / PER_PAGE));
+    if (currentPage > pages) currentPage = pages;
+    var slice = idxs.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+
+    slice.forEach(function (i, pos) {
+      var w = WORKS[i];
       var card = document.createElement('article');
       card.className = 'card';
       card.setAttribute('data-cat', w.category);
       card.setAttribute('data-index', i);
+      card.setAttribute('data-pos', pos);
       card.setAttribute('tabindex', '0');
       card.setAttribute('role', 'button');
       card.setAttribute('aria-label', 'Voir ' + w.title);
 
-      var price = formatPrice(w.price);
-      var priceLine = w.sold ? 'Vendue' : (price ? price : 'Prix sur demande');
-
       var html = '';
       if (w.sold) html += '<span class="card__sold">Vendu</span>';
+      else if (w.availability === 'exhibition') html += '<span class="card__sold">Exposition</span>';
       html += '<span class="card__wm">LKS ART</span>';
       html += '<img src="' + esc(w.image) + '" alt="' + esc(w.title) + '" loading="lazy">';
       html += '<div class="card__cap"><span class="card__capL">' +
                 '<span class="card__cat">' + esc(capitalize(w.category)) + '</span>' +
                 '<span class="card__title">' + esc(w.title) + '</span>' +
-                '<span class="card__price">' + esc(priceLine) + '</span>' +
+                '<span class="card__price">' + esc(statusLabel(w)) + '</span>' +
               '</span><span class="card__see">Voir ›</span></div>';
       card.innerHTML = html;
       grid.appendChild(card);
     });
-    applyFilter(currentFilter);
+    renderPager(pages);
     revealCards();
+  }
+
+  function renderPager(pages) {
+    var pager = $('pager');
+    if (!pager) return;
+    pager.innerHTML = '';
+    if (pages <= 1) return;
+    function btn(label, page, opts) {
+      var b = document.createElement('button');
+      b.className = 'pager__btn' + (opts && opts.active ? ' active' : '');
+      b.textContent = label;
+      if (opts && opts.disabled) b.disabled = true;
+      else b.addEventListener('click', function () { goToPage(page); });
+      pager.appendChild(b);
+    }
+    btn('‹', currentPage - 1, { disabled: currentPage === 1 });
+    for (var p = 1; p <= pages; p++) btn(String(p), p, { active: p === currentPage });
+    btn('›', currentPage + 1, { disabled: currentPage === pages });
+  }
+
+  function goToPage(p) {
+    currentPage = p;
+    renderPage();
+    var sec = document.querySelector('#galerie');
+    if (sec) sec.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
   }
 
   /* apparition en fondu décalée des toiles */
@@ -197,27 +256,17 @@
 
   /* ---------- filtres ---------- */
   var currentFilter = 'all';
-  function applyFilter(f) {
-    currentFilter = f;
-    document.querySelectorAll('#grid .card').forEach(function (c) {
-      c.style.display = (f === 'all' || c.getAttribute('data-cat') === f) ? '' : 'none';
-    });
-  }
   $('filters').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
     document.querySelectorAll('#filters button').forEach(function (x) { x.classList.remove('active'); });
     b.classList.add('active');
-    applyFilter(b.dataset.f);
+    currentFilter = b.dataset.f;
+    currentPage = 1;
+    renderPage();
   });
 
   /* ---------- lightbox / fiche détaillée ---------- */
   var lb = $('lb'), lbImg = $('lbImg');
-
-  function visibleIndexes() {
-    return Array.prototype.slice.call(document.querySelectorAll('#grid .card'))
-      .filter(function (c) { return c.style.display !== 'none'; })
-      .map(function (c) { return +c.getAttribute('data-index'); });
-  }
 
   function openLB(index) {
     curIndex = index;
@@ -244,7 +293,14 @@
       priceSub.style.display = 'none';
       soldEl.style.display = '';
       noteEl.textContent = "Cette œuvre a trouvé preneur. Écrivez à Léa pour une pièce similaire ou une commande sur mesure.";
-    } else if (price) {
+    } else if (w.availability === 'exhibition') {
+      // Exposition uniquement : pas à vendre.
+      buyHead.textContent = 'Œuvre en exposition';
+      priceEl.textContent = 'Exposition uniquement'; priceEl.style.display = '';
+      priceSub.textContent = 'Œuvre présentée en exposition, non proposée à la vente.'; priceSub.style.display = '';
+      soldEl.style.display = 'none';
+      noteEl.textContent = "Cette œuvre n'est pas à vendre. Vous pouvez écrire à Léa pour en savoir plus.";
+    } else if (w.availability === 'sale' && price) {
       // Prix affiché : achat possible.
       buyHead.textContent = 'Acquérir cette œuvre';
       priceEl.textContent = price; priceEl.style.display = '';
@@ -252,7 +308,7 @@
       soldEl.style.display = 'none';
       setupPurchase(w, price);
     } else {
-      // Pas de prix : « Prix sur demande / à négocier », on oriente vers le contact.
+      // Prix sur demande / à négocier : on oriente vers le contact.
       buyHead.textContent = 'Acquérir cette œuvre';
       priceEl.textContent = 'Prix sur demande'; priceEl.style.display = '';
       priceSub.textContent = 'Œuvre originale · pièce unique · prix à convenir avec Léa'; priceSub.style.display = '';
@@ -300,11 +356,15 @@
   }
 
   function stepLB(d) {
-    var vis = visibleIndexes(); if (!vis.length) return;
+    var vis = filteredIndexes(); if (!vis.length) return;
     var pos = vis.indexOf(curIndex);
     if (pos === -1) pos = 0;
     pos = (pos + d + vis.length) % vis.length;
-    openLB(vis[pos]);
+    var newIdx = vis[pos];
+    // garde la galerie en phase : on se place sur la page de l'œuvre affichée
+    var targetPage = Math.floor(pos / PER_PAGE) + 1;
+    if (targetPage !== currentPage) { currentPage = targetPage; renderPage(); }
+    openLB(newIdx);
   }
   function closeLB() { lb.classList.remove('open'); document.body.style.overflow = ''; }
 

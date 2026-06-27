@@ -127,6 +127,7 @@
               title: p.title, category: p.category, description: p.description || '',
               dimensions: p.dimensions || '', medium: p.medium || 'Huile sur toile',
               price: (p.price == null ? null : p.price), sold: !!p.sold,
+              availability: p.availability || (p.price == null ? 'request' : 'sale'),
               image_url: p.image_file || p.image_url, created_at: new Date().toISOString()
             };
           });

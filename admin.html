@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=9">
+<link rel="stylesheet" href="assets/styles.css?v=10">
 </head>
 <body class="admin-body">
 
@@ -250,11 +250,15 @@
         </div>
         <div class="field"><label for="pDimensions">Dimensions (ex. 73 x 54 cm)</label><input id="pDimensions" type="text"></div>
         <div class="field"><label for="pMedium">Technique</label><input id="pMedium" type="text" value="Huile sur toile"></div>
+        <div class="field"><label for="pAvailability">Disponibilité</label>
+          <select id="pAvailability">
+            <option value="sale">À vendre (prix affiché)</option>
+            <option value="request">Prix sur demande (à négocier)</option>
+            <option value="exhibition">Exposition uniquement (pas à vendre)</option>
+          </select>
+        </div>
         <div class="field"><label for="pPrice">Prix en euros</label><input id="pPrice" type="number" min="0" step="1" inputmode="numeric"></div>
         <div class="full field"><label for="pDescription">Description (texte libre, facultatif)</label><textarea id="pDescription"></textarea></div>
-        <div class="full">
-          <label class="checkline"><input type="checkbox" id="pOnRequest"> Prix sur demande (à négocier), n'affiche aucun montant sur le site</label>
-        </div>
         <div class="full">
           <label class="checkline"><input type="checkbox" id="pSold"> Marquer cette œuvre comme vendue</label>
         </div>
@@ -318,7 +322,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/config.js"></script>
-<script src="assets/store.js?v=9"></script>
-<script src="assets/admin.js?v=9"></script>
+<script src="assets/store.js?v=10"></script>
+<script src="assets/admin.js?v=10"></script>
 </body>
 </html>
