@@ -26,11 +26,17 @@ window.LKS_CONFIG = {
   PAYPAL_CLIENT_ID: "",
   PAYPAL_CURRENCY: "EUR",
 
-  // --- Formulaire de contact vers email ---
-  // Endpoint du service email (Formspree, EmailJS, ou Edge Function).
-  // Exemple Formspree : "https://formspree.io/f/xxxxxx"
-  // Tant que vide, le formulaire ouvre la messagerie du visiteur (mailto).
-  CONTACT_FORM_ENDPOINT: "https://formspree.io/f/mvzjrwde",
+  // --- Formulaire de contact vers email (EmailJS) ---
+  // Le formulaire envoie un e-mail directement depuis la boîte Gmail de Lea,
+  // sans aucune mention d'un service tiers dans la reponse au visiteur.
+  // Valeurs depuis le tableau de bord EmailJS (toutes publiques par conception).
+  EMAILJS_SERVICE_ID: "service_8bc2woc",
+  EMAILJS_TEMPLATE_ID: "template_aona3se",
+  EMAILJS_PUBLIC_KEY: "Y-RHN0SJretB8rtMy",
+
+  // Repli optionnel : ancien endpoint HTTP (Formspree, Edge Function...).
+  // Utilise uniquement si EmailJS n'est pas configure. Laisser vide sinon.
+  CONTACT_FORM_ENDPOINT: "",
   CONTACT_EMAIL: "lks.kalck.artpeinture@gmail.com",
 
   // Telephone : laisser vide pour ne PAS l'afficher. Des qu'on met un numero

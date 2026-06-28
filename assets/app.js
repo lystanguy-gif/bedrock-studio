@@ -458,33 +458,53 @@
     if (!f.n.value.trim() || !f.e.value.trim() || !f.m.value.trim()) {
       showToast('Merci de remplir tous les champs.', true); return;
     }
-    var endpoint = CFG.CONTACT_FORM_ENDPOINT;
-    if (!endpoint) {
-      // Pas de service email configuré : repli sur le client mail du visiteur.
-      var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
-      var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
-      window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lks.kalck.artpeinture@gmail.com') +
-        '?subject=' + subject + '&body=' + body;
-      showToast('Votre messagerie va s\'ouvrir pour finaliser l\'envoi.');
+    var btn = $('contactSubmit');
+    var ok = function () { showToast('Message envoyé. Léa vous répondra bientôt.'); f.reset(); };
+    var fail = function () { showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true); };
+    var done = function () { btn.disabled = false; btn.textContent = 'Envoyer le message'; };
+
+    // Variables envoyées au modèle. On fournit plusieurs alias pour rester
+    // compatible quel que soit le nommage du modèle EmailJS.
+    var vars = {
+      name: f.n.value, from_name: f.n.value,
+      email: f.e.value, reply_to: f.e.value, from_email: f.e.value,
+      message: f.m.value,
+      title: 'Nouveau message depuis le site LKS ART',
+      to_email: CFG.CONTACT_EMAIL || 'lks.kalck.artpeinture@gmail.com'
+    };
+
+    // 1) EmailJS (envoie depuis la boîte de Léa, sans mention de tiers).
+    if (typeof emailjs !== 'undefined' && CFG.EMAILJS_SERVICE_ID && CFG.EMAILJS_TEMPLATE_ID && CFG.EMAILJS_PUBLIC_KEY) {
+      btn.disabled = true; btn.textContent = 'Envoi…';
+      emailjs.send(CFG.EMAILJS_SERVICE_ID, CFG.EMAILJS_TEMPLATE_ID, vars, { publicKey: CFG.EMAILJS_PUBLIC_KEY })
+        .then(function () { ok(); })
+        .catch(function () { fail(); })
+        .finally(done);
       return;
     }
 
-    var btn = $('contactSubmit'); btn.disabled = true; btn.textContent = 'Envoi…';
-    fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: f.n.value, email: f.e.value, message: f.m.value,
-        _subject: 'Nouveau message depuis le site LKS ART'
-      })
-    }).then(function (r) {
-      if (r.ok) { showToast('Message envoyé. Léa vous répondra bientôt.'); f.reset(); }
-      else { showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true); }
-    }).catch(function () {
-      showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true);
-    }).finally(function () {
-      btn.disabled = false; btn.textContent = 'Envoyer le message';
-    });
+    // 2) Repli : ancien endpoint HTTP (Formspree, Edge Function...).
+    var endpoint = CFG.CONTACT_FORM_ENDPOINT;
+    if (endpoint) {
+      btn.disabled = true; btn.textContent = 'Envoi…';
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: f.n.value, email: f.e.value, message: f.m.value,
+          _subject: 'Nouveau message depuis le site LKS ART'
+        })
+      }).then(function (r) { r.ok ? ok() : fail(); })
+        .catch(fail).finally(done);
+      return;
+    }
+
+    // 3) Dernier repli : ouverture de la messagerie du visiteur.
+    var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
+    var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
+    window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lks.kalck.artpeinture@gmail.com') +
+      '?subject=' + subject + '&body=' + body;
+    showToast('Votre messagerie va s\'ouvrir pour finaliser l\'envoi.');
   });
 
   /* ---------- réglages issus de config.js ---------- */
