@@ -473,7 +473,10 @@
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: f.n.value, email: f.e.value, message: f.m.value })
+      body: JSON.stringify({
+        name: f.n.value, email: f.e.value, message: f.m.value,
+        _subject: 'Nouveau message depuis le site LKS ART'
+      })
     }).then(function (r) {
       if (r.ok) { showToast('Message envoyé. Léa vous répondra bientôt.'); f.reset(); }
       else { showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true); }
