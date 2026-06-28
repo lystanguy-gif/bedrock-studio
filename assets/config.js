@@ -30,7 +30,7 @@ window.LKS_CONFIG = {
   // Endpoint du service email (Formspree, EmailJS, ou Edge Function).
   // Exemple Formspree : "https://formspree.io/f/xxxxxx"
   // Tant que vide, le formulaire ouvre la messagerie du visiteur (mailto).
-  CONTACT_FORM_ENDPOINT: "",
+  CONTACT_FORM_ENDPOINT: "https://formspree.io/f/mvzjrwde",
   CONTACT_EMAIL: "lks.kalck.artpeinture@gmail.com",
 
   // Telephone : laisser vide pour ne PAS l'afficher. Des qu'on met un numero
