@@ -7,9 +7,10 @@
       "description": "",
       "dimensions": "120 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 590,
+      "price": null,
       "sold": false,
-      "image_file": "images/01-serre-poncon-arc-en-ciel.jpg"
+      "image_file": "images/01-serre-poncon-arc-en-ciel.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 1,
@@ -18,9 +19,10 @@
       "description": "",
       "dimensions": "120 x 60 cm",
       "medium": "Huile sur toile",
-      "price": 650,
+      "price": null,
       "sold": false,
-      "image_file": "images/02-harde-orage.jpg"
+      "image_file": "images/02-harde-orage.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 2,
@@ -29,9 +31,10 @@
       "description": "",
       "dimensions": "120 x 60 cm",
       "medium": "Huile sur toile",
-      "price": 680,
+      "price": null,
       "sold": false,
-      "image_file": "images/03-renaissance.jpg"
+      "image_file": "images/03-renaissance.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 3,
@@ -40,9 +43,10 @@
       "description": "",
       "dimensions": "100 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 620,
+      "price": null,
       "sold": false,
-      "image_file": "images/04-appel.jpg"
+      "image_file": "images/04-appel.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 4,
@@ -51,9 +55,10 @@
       "description": "",
       "dimensions": "120 x 60 cm",
       "medium": "Huile sur toile",
-      "price": 590,
+      "price": null,
       "sold": false,
-      "image_file": "images/05-aube-lac.jpg"
+      "image_file": "images/05-aube-lac.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 5,
@@ -62,9 +67,10 @@
       "description": "",
       "dimensions": "100 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 520,
+      "price": null,
       "sold": false,
-      "image_file": "images/06-ile-suspendue.jpg"
+      "image_file": "images/06-ile-suspendue.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 6,
@@ -73,9 +79,10 @@
       "description": "",
       "dimensions": "73 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 380,
+      "price": null,
       "sold": false,
-      "image_file": "images/07-clair-de-lune.jpg"
+      "image_file": "images/07-clair-de-lune.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 7,
@@ -84,9 +91,10 @@
       "description": "",
       "dimensions": "100 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 460,
+      "price": null,
       "sold": false,
-      "image_file": "images/08-chalet-altitude.jpg"
+      "image_file": "images/08-chalet-altitude.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 8,
@@ -95,9 +103,10 @@
       "description": "",
       "dimensions": "73 x 54 cm",
       "medium": "Huile sur toile",
-      "price": 360,
+      "price": null,
       "sold": false,
-      "image_file": "images/09-silence-hiver.jpg"
+      "image_file": "images/09-silence-hiver.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 9,
@@ -106,9 +115,10 @@
       "description": "",
       "dimensions": "70 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 340,
+      "price": null,
       "sold": false,
-      "image_file": "images/10-maison-lumiere.jpg"
+      "image_file": "images/10-maison-lumiere.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 10,
@@ -117,86 +127,70 @@
       "description": "",
       "dimensions": "100 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 480,
+      "price": null,
       "sold": false,
-      "image_file": "images/11-passage.jpg"
+      "image_file": "images/11-passage.jpg",
+      "availability": "request"
     },
     {
       "sort_order": 11,
-      "title": "Cerisier sur le lac",
-      "category": "marines",
-      "description": "Étude sur petite toile, librement inspirée du peintre Aziz Sulaimanov. Forme un duo avec « Venise, à l'aube » ; chaque toile reste disponible séparément.",
-      "dimensions": "73 x 50 cm",
-      "medium": "Huile sur toile",
-      "price": 360,
-      "sold": false,
-      "image_file": "images/12-cerisier-lac.jpg"
-    },
-    {
-      "sort_order": 12,
       "title": "Le gréement échoué",
       "category": "marines",
       "description": "",
       "dimensions": "90 x 60 cm",
       "medium": "Huile sur toile",
-      "price": 420,
+      "price": null,
       "sold": false,
-      "image_file": "images/13-greement-echoue.jpg"
+      "image_file": "images/13-greement-echoue.jpg",
+      "availability": "request"
     },
     {
-      "sort_order": 13,
+      "sort_order": 12,
       "title": "Mouillage d'hiver",
       "category": "marines",
       "description": "",
       "dimensions": "73 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 360,
+      "price": null,
       "sold": false,
-      "image_file": "images/14-mouillage-hiver.jpg"
+      "image_file": "images/14-mouillage-hiver.jpg",
+      "availability": "request"
     },
     {
-      "sort_order": 14,
+      "sort_order": 13,
       "title": "La porte du couchant",
       "category": "imaginaire",
       "description": "",
       "dimensions": "100 x 50 cm",
       "medium": "Huile sur toile",
-      "price": 480,
+      "price": null,
       "sold": false,
-      "image_file": "images/15-porte-couchant.jpg"
+      "image_file": "images/15-porte-couchant.jpg",
+      "availability": "request"
     },
     {
-      "sort_order": 15,
+      "sort_order": 14,
       "title": "Éclaircie",
       "category": "paysages",
       "description": "",
       "dimensions": "90 x 45 cm",
       "medium": "Huile sur toile",
-      "price": 340,
+      "price": null,
       "sold": false,
-      "image_file": "images/16-eclaircie.jpg"
+      "image_file": "images/16-eclaircie.jpg",
+      "availability": "request"
     },
     {
-      "sort_order": 16,
-      "title": "Venise, à l'aube",
-      "category": "paysages",
-      "description": "Étude sur petite toile, librement inspirée du peintre Aziz Sulaimanov. Forme un duo avec « Cerisier sur le lac » ; chaque toile reste disponible séparément.",
-      "dimensions": "80 x 60 cm",
-      "medium": "Huile sur toile",
-      "price": 420,
-      "sold": false,
-      "image_file": "images/17-venise-aube.jpg"
-    },
-    {
-      "sort_order": 17,
+      "sort_order": 15,
       "title": "Le miroir des cimes",
       "category": "paysages",
       "description": "",
       "dimensions": "80 x 60 cm",
       "medium": "Huile sur toile",
-      "price": 420,
+      "price": null,
       "sold": false,
-      "image_file": "images/18-miroir-cimes.jpg"
+      "image_file": "images/18-miroir-cimes.jpg",
+      "availability": "request"
     }
   ]
 }

@@ -192,7 +192,7 @@
   }
 
   /* set hero : contenu personnalisé par Léa > image d'accueil par défaut */
-  var DEFAULT_HERO = 'images/17-venise-aube.jpg';
+  var DEFAULT_HERO = 'images/02-harde-orage.jpg';
   function setHero() {
     var hero = $('heroImg');
     if (!hero) return;

@@ -113,6 +113,8 @@
      ==================================================================== */
   function demoStore() {
     var K = { p: 'lks_demo_paintings', a: 'lks_demo_annonces', r: 'lks_demo_presse', s: 'lks_demo_site' };
+    // À incrémenter quand le contenu de départ change : force la démo à se recharger sur l'appareil.
+    var SEED_VERSION = '3';
     function read(k, def) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
     function write(k, val) { try { localStorage.setItem(k, JSON.stringify(val)); return true; } catch (e) { return false; } }
     var FULL = { error: { message: 'Mémoire de démonstration pleine. Supprimez un élément, ou connectez Supabase pour un stockage illimité.' } };
@@ -137,8 +139,12 @@
     }
     function listP() {
       var v = read(K.p, null);
-      if (v) return Promise.resolve(v.slice().sort(function (a, b) { return (a.sort_order || 0) - (b.sort_order || 0); }));
-      return seedPaintings();
+      var sv = read('lks_demo_seedv', null);
+      // Si jamais semé, ou si le contenu de départ a changé, on (re)sème.
+      if (v && sv === SEED_VERSION) {
+        return Promise.resolve(v.slice().sort(function (a, b) { return (a.sort_order || 0) - (b.sort_order || 0); }));
+      }
+      return seedPaintings().then(function (arr) { write('lks_demo_seedv', SEED_VERSION); return arr; });
     }
     function tableOps(key) {
       return {
