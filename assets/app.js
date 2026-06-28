@@ -463,7 +463,7 @@
       // Pas de service email configuré : repli sur le client mail du visiteur.
       var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
       var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
-      window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lksartpeinturekalck@gmail.com') +
+      window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lks.kalck.artpeinture@gmail.com') +
         '?subject=' + subject + '&body=' + body;
       showToast('Votre messagerie va s\'ouvrir pour finaliser l\'envoi.');
       return;
