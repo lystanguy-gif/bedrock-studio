@@ -32,7 +32,7 @@ window.LKS_CONFIG = {
   // Valeurs depuis le tableau de bord EmailJS (toutes publiques par conception).
   EMAILJS_SERVICE_ID: "service_8bc2woc",
   EMAILJS_TEMPLATE_ID: "template_aona3se",
-  EMAILJS_PUBLIC_KEY: "Y-RHN0SJretB8rtMy",
+  EMAILJS_PUBLIC_KEY: "cxCdjy41NFY2Kp8Jm",
 
   // Repli optionnel : ancien endpoint HTTP (Formspree, Edge Function...).
   // Utilise uniquement si EmailJS n'est pas configure. Laisser vide sinon.
