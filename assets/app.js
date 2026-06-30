@@ -470,7 +470,7 @@
       email: f.e.value, reply_to: f.e.value, from_email: f.e.value,
       message: f.m.value,
       title: 'Nouveau message depuis le site LKS ART',
-      to_email: CFG.CONTACT_EMAIL || 'lks.kalck.artpeinture@gmail.com'
+      to_email: CFG.CONTACT_EMAIL || 'lksartpeintures@gmail.com'
     };
 
     // 1) EmailJS (envoie depuis la boîte de Léa, sans mention de tiers).
@@ -502,7 +502,7 @@
     // 3) Dernier repli : ouverture de la messagerie du visiteur.
     var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
     var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
-    window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lks.kalck.artpeinture@gmail.com') +
+    window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lksartpeintures@gmail.com') +
       '?subject=' + subject + '&body=' + body;
     showToast('Votre messagerie va s\'ouvrir pour finaliser l\'envoi.');
   });

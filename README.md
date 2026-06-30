@@ -68,7 +68,7 @@ python3 -m http.server 8000
    - `PAYPAL_CLIENT_ID` (plus tard, quand Léa aura son compte PayPal Business),
    - `FACEBOOK_URL`, `DOMAIN`.
 6. **Service e-mail du formulaire de contact** : créer un formulaire
-   [Formspree](https://formspree.io) pointant vers `lks.kalck.artpeinture@gmail.com`
+   [Formspree](https://formspree.io) pointant vers `lksartpeintures@gmail.com`
    et coller l'URL d'endpoint dans `CONTACT_FORM_ENDPOINT`. (EmailJS ou une Edge
    Function Supabase + Resend conviennent aussi.) Tant que ce champ est vide, le
    formulaire bascule sur l'ouverture de la messagerie du visiteur (`mailto`).

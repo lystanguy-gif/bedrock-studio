@@ -23,7 +23,7 @@ window.LKS_CONFIG = {
   // Endpoint du service email (Formspree, EmailJS, ou Edge Function).
   // Exemple Formspree, "https://formspree.io/f/xxxxxx"
   CONTACT_FORM_ENDPOINT: "",
-  CONTACT_EMAIL: "lks.kalck.artpeinture@gmail.com",
+  CONTACT_EMAIL: "lksartpeintures@gmail.com",
 
   // --- Divers ---
   CONTACT_HOURS: "de 10h a 19h",
