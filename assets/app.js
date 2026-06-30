@@ -313,6 +313,7 @@
       priceEl.textContent = 'Prix sur demande'; priceEl.style.display = '';
       priceSub.textContent = 'Œuvre originale · pièce unique · prix à convenir avec Léa'; priceSub.style.display = '';
       soldEl.style.display = 'none';
+      askBtn.textContent = 'Demander le prix';
       askBtn.style.display = '';
       noteEl.textContent = "Pour cette œuvre, le prix se définit directement avec Léa. Cliquez sur « Demander le prix ».";
     }
@@ -349,9 +350,13 @@
         buyBtn.style.display = '';
       }
     } else {
-      // Mode démonstration tant que l'identifiant PayPal n'est pas renseigné.
-      buyBtn.style.display = '';
-      noteEl.textContent = "Démonstration. Le paiement s'effectuera via le compte PayPal Business de LKS ART une fois l'identifiant renseigné.";
+      // Paiement en ligne pas encore actif : aucun bouton de paiement.
+      // On indique que c'est pour bientot et on oriente vers le contact.
+      buyBtn.style.display = 'none';
+      var ask = $('lbAsk');
+      ask.textContent = 'Contacter Léa';
+      ask.style.display = '';
+      noteEl.textContent = "Le paiement en ligne sécurisé sera bientôt disponible. En attendant, écrivez à Léa pour acquérir cette œuvre.";
     }
   }
 
