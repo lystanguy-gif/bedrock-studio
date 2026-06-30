@@ -45,6 +45,6 @@ window.LKS_CONFIG = {
 
   // --- Divers ---
   CONTACT_HOURS: "Sur rendez-vous",
-  FACEBOOK_URL: "",            // à renseigner
+  FACEBOOK_URL: "https://www.facebook.com/lea.kalck",
   DOMAIN: ""                   // domaine en .fr une fois enregistré
 };
