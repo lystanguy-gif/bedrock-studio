@@ -77,7 +77,8 @@ h2.title{
     linear-gradient(180deg, rgba(20,17,13,.5) 0%, rgba(20,17,13,.08) 30%, rgba(20,17,13,.4) 70%, rgba(20,17,13,.82) 100%);
 }
 .hero__inner{position:relative; z-index:2; width:100%; max-width:var(--maxw); margin:0 auto; padding:0 28px 9vh}
-.hero__kicker{opacity:0; transform:translateY(14px)}
+.hero__kicker{opacity:0; transform:translateY(14px); color:var(--gold-bright); text-shadow:0 2px 16px rgba(0,0,0,.92), 0 0 4px rgba(0,0,0,.85)}
+.hero__kicker::before{background:linear-gradient(90deg,transparent,var(--gold-bright)); box-shadow:0 0 6px rgba(0,0,0,.8)}
 .hero h1{
   font-family:var(--display); font-weight:400; margin:.18em 0 0;
   font-size:clamp(3.2rem,11vw,8.2rem); line-height:.92; letter-spacing:.04em;
@@ -134,7 +135,7 @@ h2.title{
 }
 .filters button:hover{color:var(--cream); border-color:rgba(201,162,94,.5)}
 .filters button.active{background:var(--gold); color:#1a1409; border-color:var(--gold); font-weight:500}
-.grid{columns:3; column-gap:22px; margin-top:48px}
+.grid{columns:2; column-gap:26px; margin-top:48px}
 .card{
   position:relative; break-inside:avoid; margin:0 0 22px; cursor:pointer; overflow:hidden;
   border:1px solid var(--line-soft); background:#000; transition:transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s;
