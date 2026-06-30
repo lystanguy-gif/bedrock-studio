@@ -44,7 +44,7 @@ window.LKS_CONFIG = {
   CONTACT_PHONE: "",
 
   // --- Divers ---
-  CONTACT_HOURS: "de 10h à 19h",
+  CONTACT_HOURS: "Sur rendez-vous",
   FACEBOOK_URL: "",            // à renseigner
   DOMAIN: ""                   // domaine en .fr une fois enregistré
 };
