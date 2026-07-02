@@ -904,8 +904,93 @@ function help(k){ const h=helpTxt[k]||{title:'Aide',body:''}; document.getElemen
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
 
 // ── Init ──
+// ── Sauvegarde automatique du projet (localStorage) ────────────────────────
+const SAVE_KEY='bedrock_studio_project_v1';
+let lastSaved='';
+function serializeProject(){
+  return JSON.stringify({
+    v:1, project:projName(), ns:document.getElementById('proj-ns').value,
+    creatures:state.creatures, items:state.items, furniture:state.furniture,
+  }, (k,v)=> (k && k[0]==='_') ? undefined : v);
+}
+function relink(inst,type){
+  const list=type==='creature'?T.CREATURES:type==='item'?T.ITEMS_3D:T.FURNITURE;
+  const tpl=list.find(t=>t.key===inst.tplKey);
+  if(!tpl)return false;
+  inst._tpl=tpl; return true;
+}
+function loadProjectData(d){
+  if(!d||(!d.creatures&&!d.items&&!d.furniture)) return false;
+  document.getElementById('proj-name').value=d.project||'Mon Add-on';
+  document.getElementById('proj-ns').value=d.ns||'monaddon';
+  state.creatures=(d.creatures||[]).filter(i=>relink(i,'creature'));
+  state.items=(d.items||[]).filter(i=>i.mode==='2d'||relink(i,'item'));
+  state.furniture=(d.furniture||[]).filter(i=>relink(i,'furniture'));
+  state.cur={creature:null,item:null,furniture:null};
+  state.creatures.forEach(resolveCreature);
+  state.items.forEach(i=>{ if(i.mode==='3d')resolveItem(i); });
+  state.furniture.forEach(resolveFurniture);
+  renderLists();
+  return true;
+}
+function restoreProject(){
+  let raw=null;
+  try{ raw=localStorage.getItem(SAVE_KEY); }catch(e){ return false; }
+  if(!raw) return false;
+  try{
+    const ok=loadProjectData(JSON.parse(raw));
+    if(ok){ lastSaved=serializeProject(); }
+    return ok && (state.creatures.length+state.items.length+state.furniture.length)>0;
+  }catch(e){ console.warn('Restauration impossible :',e); return false; }
+}
+function doSave(){
+  try{
+    const s=serializeProject();
+    if(s===lastSaved) return;
+    localStorage.setItem(SAVE_KEY,s); lastSaved=s;
+    const el=document.getElementById('save-ind');
+    if(el){ const d=new Date();
+      el.textContent='💾 '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),600); }
+  }catch(e){ /* quota plein : on n'écrase pas la dernière bonne sauvegarde */ }
+}
+function exportProject(){
+  const blob=new Blob([serializeProject()],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=slug(projName())+'_projet.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},800);
+  toast('✓ Projet téléchargé (garde ce fichier en secours)');
+}
+function importProject(input){
+  const f=input.files&&input.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      if(!loadProjectData(JSON.parse(r.result))) throw new Error('format');
+      doSave(); showPage('gallery');
+      toast('✓ Projet importé — '+(state.creatures.length+state.items.length+state.furniture.length)+' création(s)');
+    }catch(e){ toast('⚠ Fichier de projet invalide'); }
+    input.value='';
+  };
+  r.readAsText(f);
+}
+function resetProject(){
+  if(!confirm('Tout effacer et repartir de zéro ? (les créations non exportées seront perdues)'))return;
+  state.creatures=[];state.items=[];state.furniture=[];
+  state.cur={creature:null,item:null,furniture:null};
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  lastSaved='';
+  renderLists(); showPage('gallery'); toast('Projet réinitialisé');
+}
+
 function init(){
+  const restored=restoreProject();
   renderGallery(); renderLists();
+  if(restored) toast('✓ Projet restauré automatiquement');
+  setInterval(doSave,2500);
+  window.addEventListener('beforeunload',doSave);
   bindDrag('viewCanvas',view,'creature'); bindDrag('itemViewCanvas',itemView,'item'); bindDrag('furnViewCanvas',furnView,'furniture');
   renderSelPanel('creature'); renderSelPanel('item'); renderSelPanel('furniture');
   requestAnimationFrame(frame);
@@ -917,6 +1002,7 @@ global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, op
   geoToggle, geoBoneName, geoBone, geoCube, geoCubeColor, geoAddCube, geoDupCube, geoDelCube, geoAddBone, geoDelBone,
   selNudge, selInflate, selColor, selDup, selDel,
   togglePaint, paintColor, paintSize, paintErase, paintClear,
+  exportProject, importProject, resetProject,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
