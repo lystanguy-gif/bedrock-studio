@@ -1,0 +1,470 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   BEDROCK STUDIO — Moteur 3D & Géométrie Bedrock
+   -----------------------------------------------------------------------
+   - Modèle de géométrie (bones / cubes) au format Minecraft Bedrock
+   - Rendu 3D logiciel interactif sur <canvas> (projection + faces triées)
+   - Générateur de texture par disposition UV "boîte" Bedrock
+   - Système d'échelle avec Steve comme référence de taille
+   - Export geometry.json + animations
+   ═══════════════════════════════════════════════════════════════════════ */
+(function (global) {
+'use strict';
+
+// ── Maths affines (rotation 3x3 + translation) ────────────────────────────
+const D2R = Math.PI / 180;
+
+function rotMat(rx, ry, rz) {
+  const cx = Math.cos(rx * D2R), sx = Math.sin(rx * D2R);
+  const cy = Math.cos(ry * D2R), sy = Math.sin(ry * D2R);
+  const cz = Math.cos(rz * D2R), sz = Math.sin(rz * D2R);
+  // R = Rz * Ry * Rx  (X appliqué en premier)
+  const Rx = [1,0,0, 0,cx,-sx, 0,sx,cx];
+  const Ry = [cy,0,sy, 0,1,0, -sy,0,cy];
+  const Rz = [cz,-sz,0, sz,cz,0, 0,0,1];
+  return mul3(Rz, mul3(Ry, Rx));
+}
+function mul3(a, b) {
+  const r = new Array(9);
+  for (let i=0;i<3;i++) for (let j=0;j<3;j++)
+    r[i*3+j] = a[i*3]*b[j] + a[i*3+1]*b[3+j] + a[i*3+2]*b[6+j];
+  return r;
+}
+function apply3(m, v) {
+  return [ m[0]*v[0]+m[1]*v[1]+m[2]*v[2],
+           m[3]*v[0]+m[4]*v[1]+m[5]*v[2],
+           m[6]*v[0]+m[7]*v[1]+m[8]*v[2] ];
+}
+// Affine : { r:mat3, t:vec3 }  →  p' = r·p + t
+function affine(r, t){ return { r, t }; }
+function identity(){ return affine([1,0,0,0,1,0,0,0,1],[0,0,0]); }
+function composeA(a, b){ // applique a APRÈS b : p → a(b(p))
+  const r = mul3(a.r, b.r);
+  const t = [ a.r[0]*b.t[0]+a.r[1]*b.t[1]+a.r[2]*b.t[2]+a.t[0],
+              a.r[3]*b.t[0]+a.r[4]*b.t[1]+a.r[5]*b.t[2]+a.t[1],
+              a.r[6]*b.t[0]+a.r[7]*b.t[1]+a.r[8]*b.t[2]+a.t[2] ];
+  return affine(r, t);
+}
+function applyA(a, p){
+  return [ a.r[0]*p[0]+a.r[1]*p[1]+a.r[2]*p[2]+a.t[0],
+           a.r[3]*p[0]+a.r[4]*p[1]+a.r[5]*p[2]+a.t[1],
+           a.r[6]*p[0]+a.r[7]*p[1]+a.r[8]*p[2]+a.t[2] ];
+}
+// Rotation autour d'un pivot en espace modèle
+function pivotRot(pivot, rot){
+  const R = rotMat(rot[0], rot[1], rot[2]);
+  const Rp = apply3(R, pivot);
+  return affine(R, [ pivot[0]-Rp[0], pivot[1]-Rp[1], pivot[2]-Rp[2] ]);
+}
+
+// ── Transformations hiérarchiques des os ──────────────────────────────────
+// Calcule la matrice monde de chaque os (en tenant compte des parents + pose)
+function computeBoneWorld(bones, pose){
+  const byName = {}; bones.forEach(b => byName[b.name] = b);
+  const cache = {};
+  function world(name){
+    if (cache[name]) return cache[name];
+    const b = byName[name];
+    if (!b) return identity();
+    const baseRot = b.rotation || [0,0,0];
+    const p = (pose && pose[name]) || [0,0,0];
+    const rot = [ baseRot[0]+p[0], baseRot[1]+p[1], baseRot[2]+p[2] ];
+    let local = (rot[0]||rot[1]||rot[2]) ? pivotRot(b.pivot||[0,0,0], rot) : identity();
+    // décalage de position optionnel (animations de translation)
+    const off = (pose && pose['@'+name]) ;
+    if (off) local = composeA(affine([1,0,0,0,1,0,0,0,1], off), local);
+    const parent = b.parent ? world(b.parent) : identity();
+    cache[name] = composeA(parent, local);
+    return cache[name];
+  }
+  bones.forEach(b => world(b.name));
+  return cache;
+}
+
+// ── Rendu 3D logiciel ─────────────────────────────────────────────────────
+// faces d'un cube : [ [idx corners], normal, faceKey ]
+const CUBE_FACES = [
+  [[0,1,2,3], [0,0,-1], 'north'],
+  [[5,4,7,6], [0,0, 1], 'south'],
+  [[4,0,3,7], [-1,0,0], 'west'],
+  [[1,5,6,2], [1,0,0],  'east'],
+  [[4,5,1,0], [0,-1,0], 'up'],
+  [[3,2,6,7], [0,1,0],  'down'],
+];
+
+function cubeCorners(origin, size, inflate){
+  const inf = inflate || 0;
+  const x0 = origin[0]-inf, y0 = origin[1]-inf, z0 = origin[2]-inf;
+  const x1 = origin[0]+size[0]+inf, y1 = origin[1]+size[1]+inf, z1 = origin[2]+size[2]+inf;
+  return [
+    [x0,y1,z0],[x1,y1,z0],[x1,y0,z0],[x0,y0,z0], // 0-3 arrière (z0)
+    [x0,y1,z1],[x1,y1,z1],[x1,y0,z1],[x0,y0,z1], // 4-7 avant  (z1)
+  ];
+}
+
+function shade(color, f){
+  // f : facteur de luminosité 0..1.4
+  const c = hexToRgb(color);
+  const r = Math.max(0, Math.min(255, Math.round(c.r*f)));
+  const g = Math.max(0, Math.min(255, Math.round(c.g*f)));
+  const b = Math.max(0, Math.min(255, Math.round(c.b*f)));
+  return `rgb(${r},${g},${b})`;
+}
+function hexToRgb(hex){
+  hex = (hex||'#888888').replace('#','');
+  if (hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  return { r:parseInt(hex.slice(0,2),16), g:parseInt(hex.slice(2,4),16), b:parseInt(hex.slice(4,6),16) };
+}
+
+// Rendu principal
+function renderModel(canvas, model, opts){
+  opts = opts || {};
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const bones = model.bones || [];
+  const world = computeBoneWorld(bones, opts.pose);
+
+  // Rotation caméra
+  const camR = mul3(rotMat(opts.rotX||0, 0, 0), rotMat(0, opts.rotY||0, 0));
+
+  // Collecte des faces
+  const faces = [];
+  const lightDir = normalize([-0.4, -0.9, -0.5]);
+  let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9,minZ=1e9,maxZ=-1e9;
+  const projected = []; // stocke pour bbox
+
+  function collectFaces(cubes, boneWorld, defColor){
+    (cubes||[]).forEach(cube => {
+      if (cube.hidden) return;
+      const corners = cubeCorners(cube.origin, cube.size, cube.inflate);
+      // en monde puis caméra
+      const cam = corners.map(p => {
+        const w = applyA(boneWorld, p);
+        const c = apply3(camR, w);
+        minX=Math.min(minX,c[0]);maxX=Math.max(maxX,c[0]);
+        minY=Math.min(minY,c[1]);maxY=Math.max(maxY,c[1]);
+        minZ=Math.min(minZ,c[2]);maxZ=Math.max(maxZ,c[2]);
+        return c;
+      });
+      CUBE_FACES.forEach(([idx, n, key]) => {
+        const nc = apply3(camR, apply3(boneWorld.r, n));
+        // culling arrière léger : on garde tout mais on trie par profondeur
+        const pts = idx.map(i => cam[i]);
+        const depth = (pts[0][2]+pts[1][2]+pts[2][2]+pts[3][2])/4;
+        const light = 0.55 + 0.75 * Math.max(0, -dot(normalize(nc), lightDir));
+        const col = (cube.faceColors && cube.faceColors[key]) || cube.color || defColor || '#9aa8b8';
+        faces.push({ pts, depth, col, light, alpha: cube.alpha });
+      });
+    });
+  }
+
+  bones.forEach(b => collectFaces(b.cubes, world[b.name], b.color));
+
+  // échelle & centrage
+  const spanX = maxX-minX, spanY = maxY-minY;
+  const pad = 0.86;
+  const scale = Math.min(W/(spanX||1), H/(spanY||1)) * pad * (opts.zoom||1);
+  const cx = (minX+maxX)/2, cy = (minY+maxY)/2;
+  const ox = W/2, oy = H/2;
+  function project(p){ return [ ox + (p[0]-cx)*scale, oy - (p[1]-cy)*scale ]; }
+
+  // sol / ombre
+  if (opts.ground !== false){
+    const gy = oy - (minY - cy)*scale;
+    const gx = ox;
+    ctx.save();
+    ctx.globalAlpha = 0.20;
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.ellipse(gx, gy, spanX*scale*0.42, spanX*scale*0.14, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Steve de référence
+  if (opts.steve){
+    drawSteve(ctx, camR, project, scale, model._steveOffsetX || (spanX*0.62), opts);
+  }
+
+  faces.sort((a,b)=> a.depth - b.depth);
+  faces.forEach(f => {
+    const p = f.pts.map(project);
+    ctx.beginPath();
+    ctx.moveTo(p[0][0],p[0][1]);
+    for (let i=1;i<4;i++) ctx.lineTo(p[i][0],p[i][1]);
+    ctx.closePath();
+    ctx.globalAlpha = (f.alpha!=null?f.alpha:1);
+    ctx.fillStyle = shade(f.col, f.light);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 0.6;
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+    ctx.stroke();
+  });
+}
+
+// Steve de référence (humanoïde gris translucide) à côté du modèle
+function drawSteve(ctx, camR, project, scale, offX, opts){
+  const parts = STEVE_PARTS;
+  const faces = [];
+  parts.forEach(part => {
+    const corners = cubeCorners([part.o[0]+offX, part.o[1], part.o[2]], part.s, 0);
+    const cam = corners.map(p => apply3(camR, p));
+    CUBE_FACES.forEach(([idx, n]) => {
+      const nc = apply3(camR, n);
+      const pts = idx.map(i => cam[i]);
+      const depth = (pts[0][2]+pts[1][2]+pts[2][2]+pts[3][2])/4;
+      const light = 0.5 + 0.6*Math.max(0, -dot(normalize(nc), normalize([-0.4,-0.9,-0.5])));
+      faces.push({ pts, depth, light });
+    });
+  });
+  faces.sort((a,b)=>a.depth-b.depth);
+  ctx.save();
+  faces.forEach(f => {
+    const p = f.pts.map(project);
+    ctx.beginPath(); ctx.moveTo(p[0][0],p[0][1]);
+    for (let i=1;i<4;i++) ctx.lineTo(p[i][0],p[i][1]);
+    ctx.closePath();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = shade('#5b7fa6', f.light);
+    ctx.fill();
+    ctx.globalAlpha = 0.6;
+    ctx.lineWidth = 0.5; ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
+  });
+  ctx.restore();
+}
+// Steve ≈ 32 unités de haut = 1.8 bloc de référence
+const STEVE_PARTS = [
+  { o:[-4,24,-2], s:[8,8,8] },   // tête
+  { o:[-4,12,-2], s:[8,12,4] },  // torse
+  { o:[-6,12,-2], s:[2,12,4] },  // bras g (approché)
+  { o:[4,12,-2],  s:[2,12,4] },  // bras d
+  { o:[-4,0,-2],  s:[3,12,4] },  // jambe g
+  { o:[1,0,-2],   s:[3,12,4] },  // jambe d
+];
+
+function dot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function normalize(v){ const l=Math.hypot(v[0],v[1],v[2])||1; return [v[0]/l,v[1]/l,v[2]/l]; }
+
+// ── Générateur de texture (atlas UV boîte Bedrock) ────────────────────────
+function faceRect(uv, size){
+  const [u,v]=uv, [w,h,d]=size;
+  return {
+    up:    [u+d,     v,     w, d],
+    down:  [u+d+w,   v,     w, d],
+    west:  [u,       v+d,   d, h],
+    north: [u+d,     v+d,   w, h],
+    east:  [u+d+w,   v+d,   d, h],
+    south: [u+d+w+d, v+d,   w, h],
+  };
+}
+// Génère un PNG (dataURL base64) depuis les couleurs des cubes
+function generateTexture(model){
+  const tw = (model.texture_size && model.texture_size[0]) || 64;
+  const th = (model.texture_size && model.texture_size[1]) || 64;
+  const c = document.createElement('canvas');
+  c.width = tw; c.height = th;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const shadeF = { up:1.18, down:0.72, north:1.0, south:0.9, west:0.82, east:0.95 };
+  (model.bones||[]).forEach(b => (b.cubes||[]).forEach(cube => {
+    if (!cube.uv || cube.mirrorSkip) return;
+    const rects = faceRect(cube.uv, cube.size);
+    Object.keys(rects).forEach(face => {
+      const [x,y,w,h] = rects[face];
+      if (w<=0||h<=0) return;
+      const base = (cube.faceColors && cube.faceColors[face]) || cube.color || b.color || '#9aa8b8';
+      ctx.fillStyle = shade(base, shadeF[face]);
+      ctx.fillRect(x, y, w, h);
+      // légère variation "pixel" pour un rendu moins plat
+      if (cube.noise !== false){
+        const rgb = hexToRgb(base);
+        for (let py=0;py<h;py++) for (let px=0;px<w;px++){
+          if (((px*7+py*13)%5)===0){
+            const d = ((px+py)%2? -12:10);
+            ctx.fillStyle = `rgba(${clamp(rgb.r*shadeF[face]+d)},${clamp(rgb.g*shadeF[face]+d)},${clamp(rgb.b*shadeF[face]+d)},1)`;
+            ctx.fillRect(x+px, y+py, 1, 1);
+          }
+        }
+      }
+    });
+    // détails custom (yeux, motifs) dessinés par-dessus
+    if (cube.decals) cube.decals.forEach(dc => {
+      ctx.fillStyle = dc.color;
+      ctx.fillRect(dc.x, dc.y, dc.w, dc.h);
+    });
+  }));
+  return c.toDataURL('image/png').split(',')[1];
+}
+function clamp(n){ return Math.max(0,Math.min(255,Math.round(n))); }
+
+// ── Export geometry.json Bedrock ──────────────────────────────────────────
+function toGeometryJSON(model, identifier){
+  const bones = (model.bones||[]).map(b => {
+    const out = { name: b.name, pivot: b.pivot || [0,0,0] };
+    if (b.parent) out.parent = b.parent;
+    if (b.rotation && (b.rotation[0]||b.rotation[1]||b.rotation[2])) out.rotation = b.rotation;
+    if (b.mirror) out.mirror = true;
+    if (b.cubes && b.cubes.length){
+      out.cubes = b.cubes.filter(cu=>!cu.previewOnly).map(cu => {
+        const cube = { origin: cu.origin, size: cu.size, uv: cu.uv || [0,0] };
+        if (cu.inflate) cube.inflate = cu.inflate;
+        if (cu.mirror) cube.mirror = true;
+        return cube;
+      });
+    }
+    return out;
+  });
+  const th = model.texture_size ? model.texture_size[1] : 64;
+  const tw = model.texture_size ? model.texture_size[0] : 64;
+  return {
+    format_version: '1.16.0',
+    'minecraft:geometry': [{
+      description: {
+        identifier: identifier,
+        texture_width: tw,
+        texture_height: th,
+        visible_bounds_width: 4,
+        visible_bounds_height: 4,
+        visible_bounds_offset: [0, 1, 0],
+      },
+      bones,
+    }],
+  };
+}
+
+// ── Export animations Bedrock ─────────────────────────────────────────────
+// anims : { idle:{...}, walk:{...}, attack:{...} } (déjà au format Bedrock bones)
+function toAnimationJSON(namespace, id, anims){
+  const out = {};
+  Object.keys(anims||{}).forEach(name => {
+    const a = anims[name];
+    out[`animation.${id}.${name}`] = a;
+  });
+  return { format_version: '1.8.0', animations: out };
+}
+
+// hauteur du modèle en blocs (pour l'échelle vs Steve)
+function modelHeightBlocks(model, sizeScale){
+  let maxY = 0;
+  (model.bones||[]).forEach(b => (b.cubes||[]).forEach(cu => {
+    maxY = Math.max(maxY, cu.origin[1] + cu.size[1]);
+  }));
+  return (maxY / 16) * (sizeScale||1);
+}
+
+// clonage profond d'un modèle template
+function cloneModel(m){ return JSON.parse(JSON.stringify(m)); }
+
+// ── Packer UV automatique ─────────────────────────────────────────────────
+// Assigne un uv non-chevauchant à chaque cube et ajuste texture_size
+function autoUV(model){
+  const cubes = [];
+  (model.bones||[]).forEach(b => (b.cubes||[]).forEach(cu => { if(!cu.previewOnly) cubes.push(cu); }));
+  // largeur/hauteur occupée par le patron "boîte" de chaque cube
+  const boxes = cubes.map(cu => {
+    const [w,h,d] = cu.size;
+    return { cu, bw: 2*d + 2*w, bh: d + h };
+  });
+  // trie par hauteur décroissante pour un packing simple par rangées
+  boxes.sort((a,b)=> b.bh - a.bh);
+  let atlasW = 64;
+  // estime une largeur d'atlas correcte
+  const totalArea = boxes.reduce((s,b)=> s + b.bw*b.bh, 0);
+  atlasW = Math.max(64, nextPow2(Math.ceil(Math.sqrt(totalArea*1.6))));
+  let x=0, y=0, rowH=0, maxY=0;
+  boxes.forEach(b => {
+    if (x + b.bw > atlasW){ x=0; y += rowH + 1; rowH=0; }
+    b.cu.uv = [x, y];
+    x += b.bw + 1;
+    rowH = Math.max(rowH, b.bh);
+    maxY = Math.max(maxY, y + b.bh);
+  });
+  model.texture_size = [ atlasW, nextPow2(maxY) ];
+  return model;
+}
+function nextPow2(n){ let p=16; while(p<n) p*=2; return p; }
+
+// ── Animations génériques (selon la convention de nommage des os) ──────────
+function classifyBone(name){
+  const n = name.toLowerCase();
+  if (n.includes('wing')) return 'wing';
+  if (n.includes('tail')) return 'tail';
+  if (n.includes('head') || n.includes('jaw')) return 'head';
+  if (n.includes('leg') || n.includes('arm') || n.includes('limb')) return 'limb';
+  return 'body';
+}
+function limbSide(name){ // gauche/droite pour alterner
+  const n = name.toLowerCase();
+  if (/(_?r$|right|_fr|_br|arm_r|leg_r|1$|3$|5$|7$)/.test(n)) return 1;
+  return -1;
+}
+
+// pose de prévisualisation (retourne { boneName:[rx,ry,rz] })
+function poseAt(model, anim, t){
+  const pose = {};
+  if (anim === 'none') return pose;
+  const bones = model.bones||[];
+  bones.forEach(b => {
+    const kind = classifyBone(b.name);
+    const side = limbSide(b.name);
+    if (anim === 'idle'){
+      if (kind==='wing') pose[b.name] = [0,0, Math.sin(t*2.2)*18*side ];
+      else if (kind==='tail') pose[b.name] = [0, Math.sin(t*1.6)*8, 0];
+      else if (kind==='head') pose[b.name] = [Math.sin(t*1.2)*4, Math.sin(t*0.9)*5, 0];
+      else if (kind==='body') pose[b.name] = ['@'+b.name] && [0,0,0];
+    } else if (anim === 'walk'){
+      if (kind==='limb') pose[b.name] = [ Math.sin(t*4)*32*side, 0, 0 ];
+      else if (kind==='wing') pose[b.name] = [0,0, Math.sin(t*3)*20*side ];
+      else if (kind==='tail') pose[b.name] = [0, Math.sin(t*4)*14, 0];
+      else if (kind==='head') pose[b.name] = [Math.sin(t*4)*3,0,0];
+    } else if (anim === 'attack'){
+      const p = (Math.sin(t*5)+1)/2;
+      if (kind==='head') pose[b.name] = [ -28*p, 0, 0 ];
+      else if (kind==='limb' && side>0) pose[b.name] = [ -55*p, 0, 0 ];
+      else if (kind==='wing') pose[b.name] = [0,0, (40+Math.sin(t*6)*15)*side ];
+      else if (kind==='tail') pose[b.name] = [0, Math.sin(t*6)*20, 0];
+    } else if (anim === 'fly'){
+      if (kind==='wing') pose[b.name] = [0,0, Math.sin(t*4.5)*45*side ];
+      else if (kind==='tail') pose[b.name] = [Math.sin(t*3)*10,0,0];
+      else if (kind==='limb') pose[b.name] = [ 35, 0, 0 ];
+    }
+  });
+  // léger flottement vertical pour les créatures volantes/magiques
+  return pose;
+}
+
+// construit des animations Bedrock exportables à partir des os
+function buildAnimations(model){
+  const bones = model.bones||[];
+  const idle = { loop:true, animation_length:2.0, bones:{} };
+  const walk = { loop:true, animation_length:1.0, bones:{} };
+  const attack = { loop:false, animation_length:0.6, bones:{} };
+  bones.forEach(b => {
+    const kind = classifyBone(b.name);
+    const side = limbSide(b.name);
+    if (kind==='wing'){
+      idle.bones[b.name] = { rotation: { '0.0':[0,0,0], '1.0':[0,0,18*side], '2.0':[0,0,0] } };
+      walk.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.5':[0,0,22*side], '1.0':[0,0,0] } };
+    } else if (kind==='tail'){
+      idle.bones[b.name] = { rotation: { '0.0':[0,0,0], '1.0':[0,8,0], '2.0':[0,0,0] } };
+      walk.bones[b.name] = { rotation: { '0.0':[0,-12,0], '0.5':[0,12,0], '1.0':[0,-12,0] } };
+    } else if (kind==='limb'){
+      walk.bones[b.name] = { rotation: { '0.0':[30*side,0,0], '0.5':[-30*side,0,0], '1.0':[30*side,0,0] } };
+      if (side>0) attack.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.2':[-60,0,0], '0.6':[0,0,0] } };
+    } else if (kind==='head'){
+      idle.bones[b.name] = { rotation: { '0.0':[0,0,0], '1.0':[3,4,0], '2.0':[0,0,0] } };
+      attack.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.2':[-25,0,0], '0.6':[0,0,0] } };
+    }
+  });
+  return { idle, walk, attack };
+}
+
+global.BSEngine = {
+  renderModel, generateTexture, toGeometryJSON, toAnimationJSON,
+  modelHeightBlocks, cloneModel, hexToRgb, shade,
+  autoUV, poseAt, buildAnimations, faceRect,
+};
+
+})(window);
