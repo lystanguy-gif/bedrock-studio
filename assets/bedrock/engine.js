@@ -357,10 +357,14 @@ function faceRect(uv, size){
 function generateTexture(model){
   const tw = (model.texture_size && model.texture_size[0]) || 64;
   const th = (model.texture_size && model.texture_size[1]) || 64;
+  // densité 4 : le PNG fait 4 px par unité de texture (Bedrock mappe les UV
+  // proportionnellement) — les yeux, liserés et rivets < 1 unité restent nets
+  const D = 4;
   const c = document.createElement('canvas');
-  c.width = tw; c.height = th;
+  c.width = tw*D; c.height = th*D;
   const ctx = c.getContext('2d');
   ctx.imageSmoothingEnabled = false;
+  ctx.scale(D, D);
   const shadeF = { up:1.18, down:0.72, north:1.0, south:0.9, west:0.82, east:0.95 };
   (model.bones||[]).forEach(b => (b.cubes||[]).forEach(cube => {
     if (!cube.uv || cube.mirrorSkip) return;
@@ -495,7 +499,8 @@ function autoUV(model){
   // largeur/hauteur occupée par le patron "boîte" de chaque cube
   const boxes = cubes.map(cu => {
     const [w,h,d] = cu.size;
-    return { cu, bw: 2*d + 2*w, bh: d + h };
+    // arrondi à l'entier supérieur : chaque patron occupe des pixels entiers
+    return { cu, bw: Math.ceil(2*d + 2*w), bh: Math.ceil(d + h) };
   });
   // trie par hauteur décroissante pour un packing simple par rangées
   boxes.sort((a,b)=> b.bh - a.bh);
