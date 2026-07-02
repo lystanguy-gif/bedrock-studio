@@ -354,7 +354,7 @@ function dropsHtml(inst){
 }
 function buildAnimTools(){
   const inst=curCreature(); if(!inst)return;
-  const anims=[['none','⏸ Statique'],['idle','🌬 Repos'],['walk','🚶 Marche'],['attack','⚔ Attaque']];
+  const anims=[['none','⏸ Statique'],['idle','🌬 Repos'],['walk','🚶 Marche'],['run','🏃 Course'],['attack','⚔ Attaque'],['roar','🦁 Rugir'],['sleep','😴 Sommeil']];
   if(inst._tpl.flying) anims.push(['fly','🕊 Vol']);
   document.getElementById('anim-tools').innerHTML=anims.map(a=>`<button class="vbtn ${view.anim===a[0]?'active':''}" onclick="BS.setAnim('${a[0]}')">${a[1]}</button>`).join('');
 }
@@ -752,8 +752,10 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
     animation_controllers:{ ['controller.animation.'+NS+'_'+id+'.general']:{
       initial_state:'idle',
       states:{
-        idle:{ animations:['idle'], transitions:[{ move:'q.modified_move_speed > 0.1' },{ attack:'q.has_target' }] },
-        move:{ animations:['walk'], blend_transition:0.2, transitions:[{ idle:'q.modified_move_speed <= 0.1' },{ attack:'q.has_target' }] },
+        idle:{ animations:['idle'], transitions:[{ move:'q.modified_move_speed > 0.1' },{ roar:'q.has_target' }] },
+        move:{ animations:['walk'], blend_transition:0.2, transitions:[{ run:'q.modified_move_speed > 0.5' },{ idle:'q.modified_move_speed <= 0.1' },{ attack:'q.has_target' }] },
+        run:{ animations:['run'], blend_transition:0.15, transitions:[{ move:'q.modified_move_speed <= 0.5' },{ attack:'q.has_target' }] },
+        roar:{ animations:['roar'], blend_transition:0.1, transitions:[{ attack:'q.all_animations_finished' },{ idle:'!q.has_target' }] },
         attack:{ animations:['attack'], blend_transition:0.1, transitions:[{ idle:'!q.has_target' }] },
       } } }
   }));
@@ -771,7 +773,9 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
       materials:{ default:'entity_alphatest' },
       textures:{ default:'textures/entity/'+id+'/'+id },
       geometry:{ default:geoId },
-      animations:{ idle:'animation.'+id+'.idle', walk:'animation.'+id+'.walk', attack:'animation.'+id+'.attack', general:'controller.animation.'+NS+'_'+id+'.general' },
+      animations:{ idle:'animation.'+id+'.idle', walk:'animation.'+id+'.walk', attack:'animation.'+id+'.attack',
+        run:'animation.'+id+'.run', roar:'animation.'+id+'.roar', sleep:'animation.'+id+'.sleep',
+        general:'controller.animation.'+NS+'_'+id+'.general' },
       scripts:{ animate:['general'] },
       render_controllers:['controller.render.'+NS+'_'+id],
       spawn_egg:{ base_color:rgbHex(eng), overlay_color:'#e8c878' },

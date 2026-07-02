@@ -523,6 +523,28 @@ function poseAt(model, anim, t){
       if (kind==='wing') pose[b.name] = [0,0, Math.sin(t*4.5)*45*side ];
       else if (kind==='tail') pose[b.name] = [Math.sin(t*3)*10,0,0];
       else if (kind==='limb') pose[b.name] = [ 35, 0, 0 ];
+    } else if (anim === 'run'){
+      if (kind==='limb') pose[b.name] = [ Math.sin(t*7)*52*side, 0, 0 ];
+      else if (kind==='wing') pose[b.name] = [0,0, (25+Math.sin(t*7)*10)*side ];
+      else if (kind==='tail') pose[b.name] = [ 12+Math.sin(t*7)*5, Math.sin(t*3.5)*8, 0 ];
+      else if (kind==='head') pose[b.name] = [ 8+Math.sin(t*7)*2, 0, 0 ];
+      else if (kind==='body') pose['@'+b.name] = [0, Math.abs(Math.sin(t*7))*0.9, 0];
+    } else if (anim === 'roar'){
+      const ph = (t%2.4)/2.4;
+      const up = ph<0.2 ? ph/0.2 : ph>0.8 ? (1-ph)/0.2 : 1;   // monte, tient, redescend
+      const shake = (ph>0.25&&ph<0.75) ? Math.sin(t*30)*4 : 0;
+      if (kind==='head') pose[b.name] = [ -38*up, shake, 0 ];
+      else if (kind==='wing') pose[b.name] = [0,0, 55*up*side ];
+      else if (kind==='tail') pose[b.name] = [ 15*up, Math.sin(t*10)*12*up, 0 ];
+      else if (kind==='limb' && side>0) pose[b.name] = [ -25*up, 0, 0 ];
+      else if (kind==='body') pose[b.name] = [ -8*up, 0, 0 ];
+    } else if (anim === 'sleep'){
+      const br = Math.sin(t*1.1); // respiration lente
+      if (kind==='head') pose[b.name] = [ 26+br*2, 12, 8 ];
+      else if (kind==='wing') pose[b.name] = [0,0, -6*side ];
+      else if (kind==='tail') pose[b.name] = [ 0, 30, 0 ];
+      else if (kind==='limb') pose[b.name] = [ 12*side, 0, 0 ];
+      else if (kind==='body'){ pose[b.name]=[0,0,br*1.2]; pose['@'+b.name]=[0,-1+br*0.15,0]; }
     }
   });
   // léger flottement vertical pour les créatures volantes/magiques
@@ -535,24 +557,43 @@ function buildAnimations(model){
   const idle = { loop:true, animation_length:2.0, bones:{} };
   const walk = { loop:true, animation_length:1.0, bones:{} };
   const attack = { loop:false, animation_length:0.6, bones:{} };
+  const run = { loop:true, animation_length:0.6, bones:{} };
+  const roar = { loop:false, animation_length:1.6, bones:{} };
+  const sleep = { loop:true, animation_length:4.0, bones:{} };
   bones.forEach(b => {
     const kind = classifyBone(b.name);
     const side = limbSide(b.name);
     if (kind==='wing'){
       idle.bones[b.name] = { rotation: { '0.0':[0,0,0], '1.0':[0,0,18*side], '2.0':[0,0,0] } };
       walk.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.5':[0,0,22*side], '1.0':[0,0,0] } };
+      run.bones[b.name]  = { rotation: { '0.0':[0,0,25*side], '0.3':[0,0,40*side], '0.6':[0,0,25*side] } };
+      roar.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.4':[0,0,55*side], '1.2':[0,0,55*side], '1.6':[0,0,0] } };
+      sleep.bones[b.name]= { rotation: { '0.0':[0,0,-6*side], '4.0':[0,0,-6*side] } };
     } else if (kind==='tail'){
       idle.bones[b.name] = { rotation: { '0.0':[0,0,0], '1.0':[0,8,0], '2.0':[0,0,0] } };
       walk.bones[b.name] = { rotation: { '0.0':[0,-12,0], '0.5':[0,12,0], '1.0':[0,-12,0] } };
+      run.bones[b.name]  = { rotation: { '0.0':[12,-10,0], '0.3':[16,10,0], '0.6':[12,-10,0] } };
+      roar.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.4':[15,12,0], '0.8':[15,-12,0], '1.2':[15,12,0], '1.6':[0,0,0] } };
+      sleep.bones[b.name]= { rotation: { '0.0':[0,30,0], '2.0':[0,34,0], '4.0':[0,30,0] } };
     } else if (kind==='limb'){
       walk.bones[b.name] = { rotation: { '0.0':[30*side,0,0], '0.5':[-30*side,0,0], '1.0':[30*side,0,0] } };
-      if (side>0) attack.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.2':[-60,0,0], '0.6':[0,0,0] } };
+      run.bones[b.name]  = { rotation: { '0.0':[50*side,0,0], '0.3':[-50*side,0,0], '0.6':[50*side,0,0] } };
+      sleep.bones[b.name]= { rotation: { '0.0':[12*side,0,0], '4.0':[12*side,0,0] } };
+      if (side>0){
+        attack.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.2':[-60,0,0], '0.6':[0,0,0] } };
+        roar.bones[b.name]   = { rotation: { '0.0':[0,0,0], '0.4':[-25,0,0], '1.2':[-25,0,0], '1.6':[0,0,0] } };
+      }
     } else if (kind==='head'){
       idle.bones[b.name] = { rotation: { '0.0':[0,0,0], '1.0':[3,4,0], '2.0':[0,0,0] } };
       attack.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.2':[-25,0,0], '0.6':[0,0,0] } };
+      run.bones[b.name]  = { rotation: { '0.0':[8,0,0], '0.3':[10,0,0], '0.6':[8,0,0] } };
+      roar.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.4':[-38,4,0], '0.6':[-38,-4,0], '0.8':[-38,4,0], '1.0':[-38,-4,0], '1.2':[-38,0,0], '1.6':[0,0,0] } };
+      sleep.bones[b.name]= { rotation: { '0.0':[26,12,8], '2.0':[28,12,8], '4.0':[26,12,8] } };
+    } else if (kind==='body' && b.name==='body'){
+      roar.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.4':[-8,0,0], '1.2':[-8,0,0], '1.6':[0,0,0] } };
     }
   });
-  return { idle, walk, attack };
+  return { idle, walk, attack, run, roar, sleep };
 }
 
 global.BSEngine = {
