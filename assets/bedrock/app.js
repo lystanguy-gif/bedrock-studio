@@ -908,6 +908,108 @@ function help(k){ const h=helpTxt[k]||{title:'Aide',body:''}; document.getElemen
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
 
 // ── Init ──
+// ── Studio IA : création depuis une spécification générée ─────────────────
+function createFromSpec(spec){
+  if(spec.kind==='item2d'){
+    const inst={ id:uid('i_'), mode:'2d', name:spec.name, itemId:slug(spec.name)+'_'+state.items.length,
+      gridSize:16, pixels:spec.pixels,
+      palette:['#f2f4f6','#cdd4da','#9aa8b8','#6c7880','#454e58','#c8a55a','#c0392b','#27ae60','#2980b9','#8e44ad','#000000','#ffffff'],
+      itemType:'misc', stats:{damage:1,durability:0}, options:{glint:false,stack:64} };
+    state.items.push(inst); state.cur.item=inst.id;
+    renderLists(); showPage('item'); renderItemEditor();
+    return inst;
+  }
+  if(spec.kind==='item3d'){
+    const tpl={ key:'ai_item', name:spec.name, emoji:spec.emoji, category:'Création IA',
+      desc:'Objet reconstruit par IA', itemType:'weapon', defaultScale:1,
+      stats:{ damage:spec.stats.damage||6, durability:800, speed:1.4 },
+      colorSlots:spec.colorSlots, bones:spec.bones };
+    const colors={}; tpl.colorSlots.forEach(s=>colors[s.key]=s.def);
+    const inst={ id:uid('i_'), _tpl:tpl, customTpl:tpl, tplKey:'ai_item', mode:'3d', name:spec.name,
+      itemId:slug(spec.name)+'_'+state.items.length, colors, scale:1, itemType:'weapon',
+      stats:Object.assign({},tpl.stats), options:{glint:false,stack:1},
+      geo:BSEngine.cloneModel({bones:tpl.bones}) };
+    resolveItem(inst); state.items.push(inst); state.cur.item=inst.id;
+    renderLists(); showPage('item'); renderItemEditor();
+    return inst;
+  }
+  if(spec.kind==='furniture'){
+    const tpl={ key:'ai_furniture', name:spec.name, emoji:spec.emoji, category:'Création IA',
+      desc:'Meuble reconstruit par IA', light:0,
+      colorSlots:spec.colorSlots, bones:spec.bones };
+    const colors={}; tpl.colorSlots.forEach(s=>colors[s.key]=s.def);
+    const inst={ id:uid('f_'), _tpl:tpl, customTpl:tpl, tplKey:'ai_furniture', name:spec.name,
+      blockId:slug(spec.name)+'_'+state.furniture.length, colors, options:{light:0},
+      geo:BSEngine.cloneModel({bones:tpl.bones}) };
+    resolveFurniture(inst); state.furniture.push(inst); state.cur.furniture=inst.id;
+    renderLists(); showPage('furniture'); renderFurnitureEditor();
+    return inst;
+  }
+  // créature (défaut)
+  const tpl={ key:'ai_creature', name:spec.name, emoji:spec.emoji, category:'Création IA',
+    desc:'Créature reconstruite par IA depuis une image', defaultScale:spec.scale, flying:spec.flying,
+    stats:Object.assign({knockback:0.2},spec.stats),
+    sounds:{ ambient:'mob.ravager.ambient', hurt:'mob.ravager.hurt', death:'mob.ravager.death' },
+    colorSlots:spec.colorSlots, bones:spec.bones, eyes:{style:'none'} };
+  const colors={}; tpl.colorSlots.forEach(s=>colors[s.key]=s.def);
+  const inst={ id:uid('c_'), _tpl:tpl, customTpl:tpl, tplKey:'ai_creature', name:spec.name,
+    mobId:slug(spec.name)+'_'+state.creatures.length, colors,
+    parts:{hair:null,eyes:null}, scale:spec.scale,
+    stats:Object.assign({},tpl.stats), sounds:Object.assign({},tpl.sounds),
+    options:{ fireImmune:false, spawnEgg:true, boss:spec.stats.hp>=150, summonable:true, flying:spec.flying },
+    drops:[], geo:BSEngine.cloneModel({bones:tpl.bones}) };
+  resolveCreature(inst); state.creatures.push(inst); state.cur.creature=inst.id;
+  renderLists(); showPage('creature'); renderCreatureEditor();
+  return inst;
+}
+
+// ── Page IA : interactions ─────────────────────────────────────────────────
+const AI_KEY_STORE='bedrock_studio_api_key';
+let aiFile=null, aiBusy=false;
+function aiKey(){ try{ return localStorage.getItem(AI_KEY_STORE)||''; }catch(e){ return ''; } }
+function aiSaveKey(v){ try{ if(v)localStorage.setItem(AI_KEY_STORE,v.trim()); else localStorage.removeItem(AI_KEY_STORE); }catch(e){} }
+function aiSetFile(fileList){
+  const f=fileList&&fileList[0]; if(!f)return;
+  if(!/^image\//.test(f.type)){ toast('⚠ Choisis une image (PNG, JPG…)'); return; }
+  aiFile=f;
+  const img=document.getElementById('ai-preview-img');
+  img.src=URL.createObjectURL(f); img.style.display='block';
+  document.getElementById('ai-drop-hint').style.display='none';
+  aiStatus('Image prête. Clique sur « Reconstruire en 3D ».');
+}
+function aiStatus(msg,cls){ const el=document.getElementById('ai-status'); if(el){ el.textContent=msg; el.className='ai-status '+(cls||''); } }
+async function aiGenerate(){
+  if(aiBusy)return;
+  const key=document.getElementById('ai-key').value.trim();
+  if(!key){ aiStatus('⚠ Colle ta clé API Anthropic (sk-ant-…) ci-dessus.','err'); return; }
+  if(!aiFile){ aiStatus('⚠ Dépose d\'abord une image.','err'); return; }
+  aiSaveKey(key);
+  const kind=document.getElementById('ai-kind').value;
+  const notes=document.getElementById('ai-notes').value;
+  aiBusy=true;
+  const btn=document.getElementById('ai-go'); btn.disabled=true; btn.textContent='⏳ Reconstruction en cours…';
+  const t0=Date.now();
+  const timer=setInterval(()=>{ const s=Math.round((Date.now()-t0)/1000);
+    const st=document.getElementById('ai-status'); if(st&&st.dataset.wait==='1') st.textContent=st.dataset.base+' — '+s+'s'; },1000);
+  try{
+    const spec=await BSAI.generate(key,aiFile,{kind,notes},m=>{
+      const st=document.getElementById('ai-status');
+      if(st){ st.dataset.base=m; st.dataset.wait=m.includes('analyse')?'1':'0'; st.textContent=m; st.className='ai-status'; }
+    });
+    const st=document.getElementById('ai-status'); if(st)st.dataset.wait='0';
+    const nCubes=spec.bones.reduce((n,b)=>n+b.cubes.length,0);
+    createFromSpec(spec);
+    doSave();
+    toast('✨ « '+spec.name+' » reconstruit ('+(nCubes||'pixel-art')+' cubes) !');
+    aiStatus('✓ « '+spec.name+' » ajouté au projet — tu es maintenant dans son éditeur.','ok');
+  }catch(e){
+    aiStatus('✗ '+(e&&e.message||e),'err');
+  }finally{
+    clearInterval(timer);
+    aiBusy=false; btn.disabled=false; btn.textContent='🪄 Reconstruire en 3D';
+  }
+}
+
 // ── Sauvegarde automatique du projet (localStorage) ────────────────────────
 const SAVE_KEY='bedrock_studio_project_v1';
 let lastSaved='';
@@ -918,6 +1020,7 @@ function serializeProject(){
   }, (k,v)=> (k && k[0]==='_') ? undefined : v);
 }
 function relink(inst,type){
+  if(inst.customTpl){ inst._tpl=inst.customTpl; return true; }
   const list=type==='creature'?T.CREATURES:type==='item'?T.ITEMS_3D:T.FURNITURE;
   const tpl=list.find(t=>t.key===inst.tplKey);
   if(!tpl)return false;
@@ -997,6 +1100,7 @@ function init(){
   window.addEventListener('beforeunload',doSave);
   bindDrag('viewCanvas',view,'creature'); bindDrag('itemViewCanvas',itemView,'item'); bindDrag('furnViewCanvas',furnView,'furniture');
   renderSelPanel('creature'); renderSelPanel('item'); renderSelPanel('furniture');
+  const kEl=document.getElementById('ai-key'); if(kEl)kEl.value=aiKey();
   requestAnimationFrame(frame);
 }
 
@@ -1007,6 +1111,7 @@ global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, op
   selNudge, selInflate, selColor, selDup, selDel,
   togglePaint, paintColor, paintSize, paintErase, paintClear,
   exportProject, importProject, resetProject,
+  aiSetFile, aiGenerate, createFromSpec,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();

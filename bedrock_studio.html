@@ -18,6 +18,7 @@
     <button class="nav-tab" data-page="creature" onclick="BS.showPage('creature')">🐲 Créatures</button>
     <button class="nav-tab" data-page="item" onclick="BS.showPage('item')">⚔ Objets</button>
     <button class="nav-tab" data-page="furniture" onclick="BS.showPage('furniture')">🪑 Mobilier</button>
+    <button class="nav-tab" data-page="ai" onclick="BS.showPage('ai')">✨ IA</button>
   </nav>
   <div class="header-right">
     <div class="proj-field">Projet <input id="proj-name" type="text" value="Mon Add-on" title="Nom de l'add-on"></div>
@@ -125,6 +126,59 @@
         </div>
       </div>
     </div>
+
+    <!-- PAGE STUDIO IA -->
+    <div class="page" id="page-ai">
+      <div class="edit-panel" style="max-width:860px;margin:0 auto">
+        <div class="card">
+          <div class="card-title">✨ Studio IA — reconstruire une image en 3D</div>
+          <p style="font-size:13px;line-height:1.7;color:var(--text);margin-bottom:14px">
+            Envoie une <b>photo ou une image</b> (personnage, soldat, dragon, araignée, objet, meuble…) et
+            <b>Claude Opus 4.8</b> la reconstruit en modèle 3D fidèle directement dans le studio :
+            silhouette, proportions, couleurs réelles, armure, accessoires. Le résultat arrive dans l'éditeur,
+            prêt à animer, peindre et exporter en <code>.mcaddon</code>.
+          </p>
+          <div class="form-row full">
+            <div class="field">
+              <label class="lbl">🔑 Clé API Anthropic (stockée uniquement dans TON navigateur)</label>
+              <input type="password" id="ai-key" placeholder="sk-ant-…" autocomplete="off">
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">
+                Crée une clé sur <b>console.anthropic.com</b> → API Keys. Coût indicatif : ≈ 0,15–0,40 $ par reconstruction.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🖼 Image à reconstruire</div>
+          <div id="ai-drop" class="ai-drop"
+               ondragover="event.preventDefault();this.classList.add('over')"
+               ondragleave="this.classList.remove('over')"
+               ondrop="event.preventDefault();this.classList.remove('over');BS.aiSetFile(event.dataTransfer.files)"
+               onclick="document.getElementById('ai-file').click()">
+            <img id="ai-preview-img" style="display:none;max-width:100%;max-height:260px;image-rendering:auto">
+            <div id="ai-drop-hint">📷 Clique ou glisse une image ici<br><span style="font-size:11px;color:var(--muted)">PNG, JPG, WebP — photo, dessin, rendu IA…</span></div>
+            <input type="file" id="ai-file" accept="image/*" style="display:none" onchange="BS.aiSetFile(this.files)">
+          </div>
+          <div class="form-row" style="margin-top:12px">
+            <div class="field"><label class="lbl">Type de création</label>
+              <select id="ai-kind">
+                <option value="auto">🔮 Automatique (l'IA choisit)</option>
+                <option value="creature">🐲 Créature / Personnage</option>
+                <option value="item3d">⚔ Objet 3D (tenu en main)</option>
+                <option value="furniture">🪑 Meuble / Décor</option>
+                <option value="item2d">🖼 Pixel-art 2D (16×16)</option>
+              </select>
+            </div>
+            <div class="field"><label class="lbl">Instructions (optionnel)</label>
+              <input type="text" id="ai-notes" placeholder="ex : rends-le plus terrifiant, très grande échelle…">
+            </div>
+          </div>
+          <button class="export-btn eb-all" id="ai-go" style="margin-top:10px" onclick="BS.aiGenerate()">🪄 Reconstruire en 3D</button>
+          <div class="ai-status" id="ai-status">Dépose une image pour commencer.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -139,6 +193,7 @@
 
 <script src="assets/bedrock/engine.js"></script>
 <script src="assets/bedrock/templates.js"></script>
+<script src="assets/bedrock/ai.js"></script>
 <script src="assets/bedrock/app.js"></script>
 </body>
 </html>
