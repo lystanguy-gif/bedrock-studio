@@ -963,6 +963,16 @@ function createFromSpec(spec){
   return inst;
 }
 
+// rendu offscreen d'une spec (pour la boucle rendu↔critique)
+function renderSpecPreview(spec){
+  const slotColor={}; (spec.colorSlots||[]).forEach(s=>slotColor[s.key]=s.def);
+  const model={ bones: BSEngine.cloneModel({bones:spec.bones}).bones };
+  model.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{ if(cu.slot) cu.color=slotColor[cu.slot]||'#9aa8b8'; }));
+  const c=document.createElement('canvas'); c.width=512; c.height=460;
+  E.renderModel(c,model,{rotX:-12,rotY:32,zoom:1,ground:true});
+  return c.toDataURL('image/png').split(',')[1];
+}
+
 // ── Page IA : interactions ─────────────────────────────────────────────────
 const AI_KEY_STORE='bedrock_studio_api_key';
 let aiFile=null, aiBusy=false;
@@ -992,22 +1002,42 @@ async function aiGenerate(){
   const timer=setInterval(()=>{ const s=Math.round((Date.now()-t0)/1000);
     const st=document.getElementById('ai-status'); if(st&&st.dataset.wait==='1') st.textContent=st.dataset.base+' — '+s+'s'; },1000);
   try{
-    const spec=await BSAI.generate(key,aiFile,{kind,notes},m=>{
+    const refine=document.getElementById('ai-refine').checked;
+    const spec=await BSAI.generate(key,aiFile,{kind,notes,refine},m=>{
       const st=document.getElementById('ai-status');
-      if(st){ st.dataset.base=m; st.dataset.wait=m.includes('analyse')?'1':'0'; st.textContent=m; st.className='ai-status'; }
-    });
+      if(st){ st.dataset.base=m; st.dataset.wait=/analyse|critique/.test(m)?'1':'0'; st.textContent=m; st.className='ai-status'; }
+    },renderSpecPreview);
     const st=document.getElementById('ai-status'); if(st)st.dataset.wait='0';
     const nCubes=spec.bones.reduce((n,b)=>n+b.cubes.length,0);
     createFromSpec(spec);
     doSave();
     toast('✨ « '+spec.name+' » reconstruit ('+(nCubes||'pixel-art')+' cubes) !');
-    aiStatus('✓ « '+spec.name+' » ajouté au projet — tu es maintenant dans son éditeur.','ok');
+    let msg='✓ « '+spec.name+' » ajouté au projet — tu es maintenant dans son éditeur.';
+    if(spec.fidelity!=null) msg+=' Fidélité estimée : '+Math.round(spec.fidelity)+'/100.';
+    if(spec.changes&&spec.changes.length) msg+=' Corrections appliquées : '+spec.changes.slice(0,4).join(' · ');
+    aiStatus(msg,'ok');
   }catch(e){
-    aiStatus('✗ '+(e&&e.message||e),'err');
+    aiStatus('✗ '+(e&&e.message||e)+' — Astuce : l\'Extrusion 2.5D ci-dessous fonctionne sans IA.','err');
   }finally{
     clearInterval(timer);
     aiBusy=false; btn.disabled=false; btn.textContent='🪄 Reconstruire en 3D';
   }
+}
+
+async function aiExtrude(){
+  if(!aiFile){ aiStatus('⚠ Dépose d\'abord une image (en haut).','err'); return; }
+  try{
+    aiStatus('Extrusion 2.5D en cours…');
+    const spec=await BSAI.extrude(aiFile,{
+      resolution:+document.getElementById('ai-ext-res').value,
+      kind:document.getElementById('ai-ext-kind').value,
+      name:(aiFile.name||'Sprite').replace(/\.[^.]+$/,'').slice(0,30),
+    });
+    const n=spec.bones.reduce((x,b)=>x+b.cubes.length,0);
+    createFromSpec(spec); doSave();
+    toast('🖼 Sprite extrudé ('+n+' cubes) !');
+    aiStatus('✓ Sprite 2.5D ajouté au projet ('+n+' cubes).','ok');
+  }catch(e){ aiStatus('✗ '+(e&&e.message||e),'err'); }
 }
 
 // ── Sauvegarde automatique du projet (localStorage) ────────────────────────
@@ -1111,7 +1141,7 @@ global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, op
   selNudge, selInflate, selColor, selDup, selDel,
   togglePaint, paintColor, paintSize, paintErase, paintClear,
   exportProject, importProject, resetProject,
-  aiSetFile, aiGenerate, createFromSpec,
+  aiSetFile, aiGenerate, aiExtrude, createFromSpec,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();

@@ -174,8 +174,36 @@
               <input type="text" id="ai-notes" placeholder="ex : rends-le plus terrifiant, très grande échelle…">
             </div>
           </div>
+          <div class="trow" style="margin-top:4px"><span class="tlabel">🔁 Raffinement automatique — Claude compare son rendu à ton image et se corrige (+1 appel, fidélité nettement meilleure)</span>
+            <label class="toggle"><input type="checkbox" id="ai-refine" checked><span class="tslider"></span></label></div>
           <button class="export-btn eb-all" id="ai-go" style="margin-top:10px" onclick="BS.aiGenerate()">🪄 Reconstruire en 3D</button>
           <div class="ai-status" id="ai-status">Dépose une image pour commencer.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🧱 Extrusion 2.5D — sans IA, instantané et gratuit</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px">
+            Transforme directement les pixels de l'image en cubes plats (idéal pour les sprites, logos,
+            pixel-art et dessins à fond transparent). Fonctionne sans clé API — c'est aussi le plan B si l'IA échoue.
+          </p>
+          <div class="form-row">
+            <div class="field"><label class="lbl">Résolution</label>
+              <select id="ai-ext-res">
+                <option value="16">16 px (léger)</option>
+                <option value="24" selected>24 px (équilibré)</option>
+                <option value="32">32 px (détaillé)</option>
+                <option value="48">48 px (très détaillé)</option>
+              </select>
+            </div>
+            <div class="field"><label class="lbl">Créer comme</label>
+              <select id="ai-ext-kind">
+                <option value="item3d" selected>⚔ Objet 3D</option>
+                <option value="furniture">🪑 Meuble / Décor</option>
+                <option value="creature">🐲 Créature (façade)</option>
+              </select>
+            </div>
+          </div>
+          <button class="export-btn eb-rp" onclick="BS.aiExtrude()">🧱 Extruder l'image en 2.5D</button>
         </div>
       </div>
     </div>

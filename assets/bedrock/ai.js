@@ -109,6 +109,8 @@ const OUTPUT_SCHEMA = {
       type: 'array',
       items: { type: 'array', items: { type: 'string' } },
     },
+    fidelity: { type: 'number' },
+    changes: { type: 'array', items: { type: 'string' } },
   },
 };
 
@@ -134,7 +136,10 @@ function prepareImage(file, maxDim) {
 }
 
 // ── Appel API ──────────────────────────────────────────────────────────────
-async function callClaude(apiKey, imageB64, userText) {
+async function callClaude(apiKey, images, userText) {
+  const imageBlocks = (Array.isArray(images) ? images : [images]).map(b64 => (
+    { type: 'image', source: { type: 'base64', media_type: 'image/png', data: b64 } }
+  ));
   const body = {
     model: MODEL,
     max_tokens: 24000,
@@ -144,10 +149,7 @@ async function callClaude(apiKey, imageB64, userText) {
 
     messages: [{
       role: 'user',
-      content: [
-        { type: 'image', source: { type: 'base64', media_type: 'image/png', data: imageB64 } },
-        { type: 'text', text: userText },
-      ],
+      content: [ ...imageBlocks, { type: 'text', text: userText } ],
     }],
   };
   body.output_config = { effort: 'xhigh', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } };
@@ -270,12 +272,14 @@ function sanitize(spec) {
 
   const totalCubes = out.bones.reduce((n,b) => n + b.cubes.length, 0);
   if (!totalCubes) throw new Error('Le modèle généré ne contient aucun cube. Réessaie avec une image plus nette.');
+  if (isFinite(+spec.fidelity)) out.fidelity = num(spec.fidelity, 0, 0, 100);
+  if (Array.isArray(spec.changes)) out.changes = spec.changes.slice(0,12).map(c => String(c).slice(0,160));
   return out;
 }
 
 // ── Point d'entrée ─────────────────────────────────────────────────────────
 // options : { kind: 'auto'|'creature'|'item3d'|'furniture'|'item2d', notes: '...' }
-async function generate(apiKey, file, options, onStatus) {
+async function generate(apiKey, file, options, onStatus, renderFn) {
   options = options || {};
   if (!apiKey || !apiKey.trim()) throw new Error('Ajoute ta clé API Anthropic (sk-ant-…) pour utiliser l\'IA.');
   onStatus && onStatus('Préparation de l\'image…');
@@ -283,12 +287,106 @@ async function generate(apiKey, file, options, onStatus) {
   let userText = 'Reconstruis le sujet de cette image le plus fidèlement possible.';
   if (options.kind && options.kind !== 'auto') userText += ` Type imposé : "${options.kind}".`;
   if (options.notes && options.notes.trim()) userText += ` Instructions supplémentaires : ${options.notes.trim().slice(0,500)}`;
-  onStatus && onStatus('Claude analyse l\'image et reconstruit le modèle… (30 s à 3 min)');
-  const raw = await callClaude(apiKey.trim(), imageB64, userText);
+  onStatus && onStatus('Passe 1/2 : Claude analyse l\'image et reconstruit le modèle… (30 s à 3 min)');
+  let spec = sanitize(await callClaude(apiKey.trim(), imageB64, userText));
+
+  // Boucle rendu ↔ critique : on rend le modèle, Claude compare au réel et corrige
+  if (options.refine && renderFn && spec.kind !== 'item2d') {
+    try {
+      onStatus && onStatus('Rendu de contrôle du modèle…');
+      const renderB64 = renderFn(spec);
+      onStatus && onStatus('Passe 2/2 : critique visuelle — Claude compare le rendu à ton image et corrige…');
+      const critiqueText =
+        'IMAGE 1 = la référence originale. IMAGE 2 = le rendu 3D actuel du modèle voxel (vue de trois-quarts avant). ' +
+        'Compare-les minutieusement : silhouette, proportions, posture, couleurs, détails manquants ou en trop. ' +
+        'Liste les écarts constatés dans "changes" (phrases courtes), note la fidélité ACTUELLE du rendu dans "fidelity" (0-100), ' +
+        'puis renvoie la spécification COMPLÈTE CORRIGÉE qui comble ces écarts. ' +
+        'Pars de la spécification actuelle ci-dessous et améliore-la (ajuste, ajoute, supprime des cubes) sans repartir de zéro :\n' +
+        JSON.stringify(spec);
+      const revised = sanitize(await callClaude(apiKey.trim(), [imageB64, renderB64], critiqueText));
+      revised.name = revised.name || spec.name;
+      spec = revised;
+    } catch (e) {
+      // le raffinement ne doit jamais faire échouer la génération
+      console.warn('Raffinement ignoré :', e);
+      spec.changes = ['(raffinement ignoré : ' + (e && e.message || e) + ')'];
+    }
+  }
   onStatus && onStatus('Validation du modèle…');
-  return sanitize(raw);
+  return spec;
 }
 
-global.BSAI = { generate, MODEL };
+// ── Chemin B : extrusion pixel-art 2.5D (100 % locale, sans IA) ────────────
+// Convertit l'image en cubes plats par fusion gloutonne de rectangles.
+function extrude(file, options) {
+  options = options || {};
+  const res = Math.max(8, Math.min(48, options.resolution || 24));
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Impossible de lire l'image")); };
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const ar = img.naturalHeight / img.naturalWidth;
+      const W = ar > 1 ? Math.max(4, Math.round(res / ar)) : res;
+      const H = ar > 1 ? res : Math.max(4, Math.round(res * ar));
+      const c = document.createElement('canvas'); c.width = W; c.height = H;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(img, 0, 0, W, H);
+      const px = ctx.getImageData(0, 0, W, H).data;
+
+      // quantification progressive jusqu'à tenir le budget de cubes
+      for (const step of [24, 32, 48, 64]) {
+        const grid = [];
+        for (let y = 0; y < H; y++) { grid.push([]);
+          for (let x = 0; x < W; x++) {
+            const i = (y * W + x) * 4;
+            if (px[i + 3] < 110) { grid[y].push(null); continue; }
+            const q = v => Math.max(0, Math.min(255, Math.round(v / step) * step));
+            grid[y].push('#' + [q(px[i]), q(px[i+1]), q(px[i+2])].map(v => v.toString(16).padStart(2,'0')).join(''));
+          }
+        }
+        // fusion gloutonne en rectangles de couleur homogène
+        const used = Array.from({length:H}, () => Array(W).fill(false));
+        const rects = [];
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          if (used[y][x] || !grid[y][x]) continue;
+          const col = grid[y][x];
+          let w = 1; while (x + w < W && !used[y][x+w] && grid[y][x+w] === col) w++;
+          let h = 1;
+          outer: while (y + h < H) {
+            for (let k = 0; k < w; k++) if (used[y+h][x+k] || grid[y+h][x+k] !== col) break outer;
+            h++;
+          }
+          for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) used[y+dy][x+dx] = true;
+          rects.push({ x, y, w, h, col });
+        }
+        if (rects.length <= 380 || step === 64) {
+          if (!rects.length) return reject(new Error('Image vide ou entièrement transparente.'));
+          if (rects.length > 380) return reject(new Error('Image trop complexe (' + rects.length + ' cubes) — réduis la résolution.'));
+          const kind = ['creature','item3d','furniture'].includes(options.kind) ? options.kind : 'item3d';
+          const boneName = kind === 'creature' ? 'body' : 'root';
+          const depth = options.depth || 2;
+          const cubes = rects.map(r => ({
+            origin: [r.x - W/2, H - r.y - r.h, -depth/2],
+            size: [r.w, r.h, depth],
+            color: r.col,
+          }));
+          resolve(sanitize({
+            kind, name: options.name || 'Sprite 2.5D', emoji: '🖼', scale: 1, flying: false,
+            stats: { hp: 20, damage: 3, armor: 0, speed: 0.28 },
+            colorSlots: [],
+            bones: [{ name: boneName, pivot: [0,0,0], cubes }],
+          }));
+          return;
+        }
+      }
+    };
+    img.src = url;
+  });
+}
+
+global.BSAI = { generate, extrude, MODEL };
 
 })(window);
