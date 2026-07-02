@@ -17,6 +17,13 @@ const furnView = { rotX:-20, rotY:32, autorotate:true };
 // sélection au clic : { bone, ci } par type d'éditeur + polygones du dernier rendu
 const sel = { creature:null, item:null, furniture:null };
 const pickStores = { creature:[], item:[], furniture:[] };
+// mode peinture 3D par type d'éditeur
+const paint = {
+  creature:{ on:false, color:'#ffffff', erase:false, size:1 },
+  item:{ on:false, color:'#ffffff', erase:false, size:1 },
+  furniture:{ on:false, color:'#ffffff', erase:false, size:1 },
+};
+const PAINT_SWATCHES = ['#ffffff','#000000','#c0392b','#e67e22','#f1c40f','#27ae60','#1abc9c','#2980b9','#8e44ad','#e84393','#7f5539','#95a5a6'];
 
 const uid = (p)=> p + Math.random().toString(36).slice(2,9);
 function uuid(){ return (crypto.randomUUID ? crypto.randomUUID() :
@@ -250,7 +257,7 @@ function buildPreview(inst){
   const m=BSEngine.cloneModel(inst._resolved);
   const s=inst.scale||1;
   m.bones.forEach(b=>{ b.pivot=(b.pivot||[0,0,0]).map(v=>v*s);
-    (b.cubes||[]).forEach(cu=>{ cu.origin=cu.origin.map(v=>v*s); cu.size=cu.size.map(v=>v*s); if(cu.inflate)cu.inflate*=s; }); });
+    (b.cubes||[]).forEach(cu=>{ cu._uvSize=cu.size.slice(); cu.origin=cu.origin.map(v=>v*s); cu.size=cu.size.map(v=>v*s); if(cu.inflate)cu.inflate*=s; }); });
   if(view.steve){
     let maxX=-1e9; m.bones.forEach(b=>(b.cubes||[]).forEach(cu=>maxX=Math.max(maxX,cu.origin[0]+cu.size[0])));
     if(maxX<-1e8)maxX=8;
@@ -531,12 +538,14 @@ function drawPixelPreview(c,inst){ const ctx=c.getContext('2d'); ctx.clearRect(0
 function bindDrag(canvasId,vw,type){
   const c=document.getElementById(canvasId); if(!c)return;
   let dragging=false,lx=0,ly=0,moved=0;
-  const down=e=>{dragging=true;moved=0;const p=e.touches?e.touches[0]:e;lx=p.clientX;ly=p.clientY;c.parentElement.classList.add('dragging');};
+  const down=e=>{dragging=true;moved=0;const p=e.touches?e.touches[0]:e;lx=p.clientX;ly=p.clientY;c.parentElement.classList.add('dragging');
+    if(type&&paint[type].on){ paintAt(type,c,p.clientX,p.clientY); if(e.touches)e.preventDefault(); } };
   const move=e=>{ if(!dragging)return; const p=e.touches?e.touches[0]:e;
+    if(type&&paint[type].on){ paintAt(type,c,p.clientX,p.clientY); if(e.touches)e.preventDefault(); return; }
     const dx=p.clientX-lx, dy=p.clientY-ly; moved+=Math.abs(dx)+Math.abs(dy);
     if(moved>4){ vw.autorotate=false; const b=document.getElementById(canvasId==='viewCanvas'?'rot-btn':canvasId==='itemViewCanvas'?'item-rot-btn':'furn-rot-btn'); if(b)b.classList.remove('active'); }
     vw.rotY=(vw.rotY+dx*0.6)%360; vw.rotX=Math.max(-89,Math.min(89,vw.rotX-dy*0.5)); lx=p.clientX;ly=p.clientY; if(e.touches)e.preventDefault(); };
-  const up=e=>{ if(dragging&&moved<=4&&type){ const p=(e.changedTouches&&e.changedTouches[0])||e; pickAt(type,c,p.clientX,p.clientY); }
+  const up=e=>{ if(dragging&&moved<=4&&type&&!paint[type].on){ const p=(e.changedTouches&&e.changedTouches[0])||e; pickAt(type,c,p.clientX,p.clientY); }
     dragging=false;c.parentElement.classList.remove('dragging'); };
   c.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   c.addEventListener('touchstart',down,{passive:false});c.addEventListener('touchmove',move,{passive:false});c.addEventListener('touchend',up);
@@ -577,6 +586,77 @@ function renderSelPanel(type){
       <button class="px-btn" style="color:var(--red)" onclick="BS.selDel('${type}')">✕ Supprimer</button>
     </div>`;
 }
+// ── Peinture 3D ─────────────────────────────────────────────────────────
+function paintCubes(type,pick){
+  const inst=geoInst(type); if(!inst||!inst.geo)return [];
+  const out=[];
+  const sb=inst.geo.bones.find(b=>b.name===pick.bone);
+  if(sb&&sb.cubes&&sb.cubes[pick.ci]) out.push(sb.cubes[pick.ci]);
+  const rm=inst._resolved; if(rm){
+    const rb=rm.bones.find(b=>b.name===pick.bone);
+    if(rb&&rb.cubes&&rb.cubes[pick.ci]) out.push(rb.cubes[pick.ci]);
+  }
+  return out;
+}
+function paintAt(type,canvas,clientX,clientY){
+  const r=canvas.getBoundingClientRect();
+  const x=(clientX-r.left)*canvas.width/r.width, y=(clientY-r.top)*canvas.height/r.height;
+  const hit=E.paintHit(pickStores[type],x,y); if(!hit)return;
+  const pt=paint[type];
+  const [w,h]=hit.dims, cw=Math.ceil(w), ch=Math.ceil(h);
+  paintCubes(type,hit.pick).forEach(cu=>{
+    cu.paint=cu.paint||{}; const fp=cu.paint[hit.faceKey]=cu.paint[hit.faceKey]||{};
+    for(let dy=0;dy<pt.size;dy++)for(let dx=0;dx<pt.size;dx++){
+      const tx=hit.px+dx, ty=hit.py+dy;
+      if(tx>=cw||ty>=ch)continue;
+      if(pt.erase) delete fp[tx+','+ty]; else fp[tx+','+ty]=pt.color;
+    }
+    if(pt.erase&&!Object.keys(fp).length){ delete cu.paint[hit.faceKey]; if(!Object.keys(cu.paint).length)delete cu.paint; }
+  });
+
+}
+function togglePaint(type){
+  const pt=paint[type]; pt.on=!pt.on;
+  const btn=document.getElementById('paint-btn-'+type); if(btn)btn.classList.toggle('active',pt.on);
+  const cv=document.getElementById(type==='creature'?'viewCanvas':type==='item'?'itemViewCanvas':'furnViewCanvas');
+  if(cv)cv.parentElement.classList.toggle('painting',pt.on);
+  if(pt.on){
+    const vw=type==='creature'?view:type==='item'?itemView:furnView;
+    vw.autorotate=false;
+    const rb=document.getElementById(type==='creature'?'rot-btn':type==='item'?'item-rot-btn':'furn-rot-btn');
+    if(rb)rb.classList.remove('active');
+    renderPaintPanel(type);
+  } else renderSelPanel(type);
+}
+function renderPaintPanel(type){
+  const el=document.getElementById('sel-'+type); if(!el)return;
+  const pt=paint[type];
+  el.innerHTML=`<div class="sel-head">🖌 <b>Peinture 3D</b>
+      <span style="font-size:10px;color:var(--muted);margin-left:4px">glisse sur le modèle pour peindre</span>
+      <button class="px-btn" style="margin-left:auto" onclick="BS.togglePaint('${type}')">✕ Fermer</button></div>
+    <div class="paint-swatches">${PAINT_SWATCHES.map(c=>
+      `<div class="pswatch ${!pt.erase&&pt.color===c?'active':''}" style="background:${c}" onclick="BS.paintColor('${type}','${c}')"></div>`).join('')}
+      <input type="color" value="${pt.color}" style="width:24px;height:24px;background:none;border:1px solid var(--border);padding:1px;cursor:pointer" oninput="BS.paintColor('${type}',this.value)">
+    </div>
+    <div class="sel-row" style="border-top:none">
+      <span class="sel-lbl">Pinceau</span>
+      <button class="px-btn ${pt.size===1?'active':''}" onclick="BS.paintSize('${type}',1)">1px</button>
+      <button class="px-btn ${pt.size===2?'active':''}" onclick="BS.paintSize('${type}',2)">2px</button>
+      <button class="px-btn ${pt.size===3?'active':''}" onclick="BS.paintSize('${type}',3)">3px</button>
+      <span style="flex:1"></span>
+      <button class="px-btn ${pt.erase?'active':''}" onclick="BS.paintErase('${type}')">◻ Gomme</button>
+      <button class="px-btn" style="color:var(--red)" onclick="BS.paintClear('${type}')">🗑 Tout effacer</button>
+    </div>`;
+}
+function paintColor(type,c){ paint[type].color=c; paint[type].erase=false; renderPaintPanel(type); }
+function paintSize(type,s){ paint[type].size=s; renderPaintPanel(type); }
+function paintErase(type){ paint[type].erase=!paint[type].erase; renderPaintPanel(type); }
+function paintClear(type){
+  const inst=geoInst(type); if(!inst||!inst.geo)return;
+  [inst.geo,inst._resolved].forEach(m=>m&&m.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{delete cu.paint;})));
+  toast("Peinture effacée");
+}
+
 function selNudge(type,kind,axis,delta){ const f=selCube(type); if(!f)return;
   f.cu[kind][axis]=Math.round((f.cu[kind][axis]+delta)*2)/2;
   if(kind==='size') f.cu[kind][axis]=Math.max(0.5,f.cu[kind][axis]);
@@ -836,6 +916,7 @@ global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, op
   setTool, clearPx, addColor, setFColor, ffield, fopt, toggleFurnRotate, resetFurnView,
   geoToggle, geoBoneName, geoBone, geoCube, geoCubeColor, geoAddCube, geoDupCube, geoDelCube, geoAddBone, geoDelBone,
   selNudge, selInflate, selColor, selDup, selDel,
+  togglePaint, paintColor, paintSize, paintErase, paintClear,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();

@@ -67,6 +67,7 @@
           <div class="scale-sub">Steve ≈ 1.8 bloc (silhouette bleue)</div>
         </div>
         <div class="view-tools">
+          <button class="vbtn" id="paint-btn-creature" onclick="BS.togglePaint('creature')">🖌 Peindre</button>
           <button class="vbtn active" id="steve-btn" onclick="BS.toggleSteve()">👤 Steve</button>
           <button class="vbtn active" id="rot-btn" onclick="BS.toggleRotate()">🔄 Rotation</button>
           <button class="vbtn" onclick="BS.resetView()">⟲ Recentrer</button>
@@ -86,6 +87,7 @@
         <div class="viewer" id="item-viewer"><canvas id="itemViewCanvas" width="320" height="300"></canvas></div>
         <div class="sel-panel" id="sel-item"></div>
         <div class="view-tools" id="item-view-tools" style="display:none">
+          <button class="vbtn" id="paint-btn-item" onclick="BS.togglePaint('item')">🖌 Peindre</button>
           <button class="vbtn active" id="item-rot-btn" onclick="BS.toggleItemRotate()">🔄 Rotation</button>
           <button class="vbtn" onclick="BS.resetItemView()">⟲ Recentrer</button>
         </div>
@@ -109,6 +111,7 @@
         <div class="viewer"><canvas id="furnViewCanvas" width="320" height="300"></canvas></div>
         <div class="sel-panel" id="sel-furniture"></div>
         <div class="view-tools">
+          <button class="vbtn" id="paint-btn-furniture" onclick="BS.togglePaint('furniture')">🖌 Peindre</button>
           <button class="vbtn active" id="furn-rot-btn" onclick="BS.toggleFurnRotate()">🔄 Rotation</button>
           <button class="vbtn" onclick="BS.resetFurnView()">⟲ Recentrer</button>
         </div>

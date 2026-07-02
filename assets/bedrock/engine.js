@@ -90,6 +90,15 @@ const CUBE_FACES = [
   [[4,5,1,0], [0,-1,0], 'up'],
   [[3,2,6,7], [0,1,0],  'down'],
 ];
+// réordonne les coins d'une face en espace texture : [TL, TR, BR, BL]
+const FACE_TEX_ORDER = { north:[1,0,3,2], south:[1,0,3,2], west:[0,1,2,3], east:[0,1,2,3], up:[3,2,1,0], down:[3,2,1,0] };
+// dimensions texture (w,h) d'une face selon la taille du cube
+function faceTexDims(size, key){
+  const [sx,sy,sz] = size;
+  if (key==='north'||key==='south') return [sx,sy];
+  if (key==='west'||key==='east')   return [sz,sy];
+  return [sx,sz]; // up / down
+}
 
 function cubeCorners(origin, size, inflate){
   const inf = inflate || 0;
@@ -148,6 +157,7 @@ function renderModel(canvas, model, opts){
         return c;
       });
       const isSel = opts.sel && cube._pick && cube._pick.bone===opts.sel.bone && cube._pick.ci===opts.sel.ci;
+      const uvSize = cube._uvSize || cube.size;
       CUBE_FACES.forEach(([idx, n, key]) => {
         const nc = apply3(camR, apply3(boneWorld.r, n));
         // culling arrière léger : on garde tout mais on trie par profondeur
@@ -155,7 +165,9 @@ function renderModel(canvas, model, opts){
         const depth = (pts[0][2]+pts[1][2]+pts[2][2]+pts[3][2])/4;
         const light = 0.55 + 0.75 * Math.max(0, -dot(normalize(nc), lightDir));
         const col = (cube.faceColors && cube.faceColors[key]) || cube.color || defColor || '#9aa8b8';
-        faces.push({ pts, depth, col, light, alpha: cube.alpha, pick: cube._pick, isSel });
+        faces.push({ pts, depth, col, light, alpha: cube.alpha, pick: cube._pick, isSel,
+          faceKey: key, texDims: faceTexDims(uvSize, key),
+          paint: cube.paint && cube.paint[key] });
       });
     });
   }
@@ -200,6 +212,28 @@ function renderModel(canvas, model, opts){
     ctx.fillStyle = shade(f.col, f.light);
     ctx.fill();
     ctx.globalAlpha = 1;
+    // pixels peints : sous-quadrilatères interpolés sur la face (WYSIWYG avec la texture)
+    if (f.paint){
+      const ord = FACE_TEX_ORDER[f.faceKey];
+      const TL=p[ord[0]], TR=p[ord[1]], BL=p[ord[3]];
+      const ax=TR[0]-TL[0], ay=TR[1]-TL[1], bx=BL[0]-TL[0], by=BL[1]-TL[1];
+      const [w,h]=f.texDims;
+      ctx.globalAlpha = (f.alpha!=null?f.alpha:1);
+      for (const k in f.paint){
+        const ci=k.indexOf(','), px=+k.slice(0,ci), py=+k.slice(ci+1);
+        if (px>=Math.ceil(w)||py>=Math.ceil(h)) continue;
+        const u0=px/w, v0=py/h, u1=Math.min((px+1)/w,1), v1=Math.min((py+1)/h,1);
+        ctx.beginPath();
+        ctx.moveTo(TL[0]+u0*ax+v0*bx, TL[1]+u0*ay+v0*by);
+        ctx.lineTo(TL[0]+u1*ax+v0*bx, TL[1]+u1*ay+v0*by);
+        ctx.lineTo(TL[0]+u1*ax+v1*bx, TL[1]+u1*ay+v1*by);
+        ctx.lineTo(TL[0]+u0*ax+v1*bx, TL[1]+u0*ay+v1*by);
+        ctx.closePath();
+        ctx.fillStyle = shade(f.paint[k], f.light);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
     ctx.lineWidth = 0.6;
     ctx.strokeStyle = 'rgba(0,0,0,0.18)';
     ctx.stroke();
@@ -208,8 +242,29 @@ function renderModel(canvas, model, opts){
       ctx.strokeStyle = '#e8c878';
       ctx.stroke();
     }
-    if (opts.pickStore) opts.pickStore.push({ poly:p, pick:f.pick });
+    if (opts.pickStore) opts.pickStore.push({ poly:p, pick:f.pick, faceKey:f.faceKey, texDims:f.texDims });
   });
+}
+
+// localise le pixel de texture touché : { pick, faceKey, px, py, dims }
+function paintHit(pickStore, x, y){
+  for (let i = pickStore.length - 1; i >= 0; i--){
+    const f = pickStore[i];
+    if (!f.pick || !pointInPoly(f.poly, x, y)) continue;
+    const ord = FACE_TEX_ORDER[f.faceKey];
+    const TL=f.poly[ord[0]], TR=f.poly[ord[1]], BL=f.poly[ord[3]];
+    const ax=TR[0]-TL[0], ay=TR[1]-TL[1], bx=BL[0]-TL[0], by=BL[1]-TL[1];
+    const det = ax*by - ay*bx;
+    if (Math.abs(det) < 1e-6) return null;
+    const dx=x-TL[0], dy=y-TL[1];
+    const s=(dx*by - dy*bx)/det, t=(ax*dy - ay*dx)/det;
+    if (s<0||s>1||t<0||t>1) continue;
+    const [w,h]=f.texDims;
+    return { pick:f.pick, faceKey:f.faceKey, dims:[w,h],
+      px:Math.min(Math.ceil(w)-1, Math.floor(s*w)),
+      py:Math.min(Math.ceil(h)-1, Math.floor(t*h)) };
+  }
+  return null;
 }
 
 // test point-dans-polygone (pour le picking au clic)
@@ -319,6 +374,20 @@ function generateTexture(model){
       ctx.fillStyle = dc.color;
       ctx.fillRect(dc.x, dc.y, dc.w, dc.h);
     });
+    // pixels peints à la main (pinceau 3D)
+    if (cube.paint){
+      Object.keys(cube.paint).forEach(face => {
+        const [x,y,w,h] = rects[face] || [];
+        if (w==null) return;
+        const entries = cube.paint[face];
+        for (const k in entries){
+          const ci=k.indexOf(','), px=+k.slice(0,ci), py=+k.slice(ci+1);
+          if (px>=Math.ceil(w)||py>=Math.ceil(h)) continue;
+          ctx.fillStyle = entries[k];
+          ctx.fillRect(Math.floor(x)+px, Math.floor(y)+py, 1, 1);
+        }
+      });
+    }
   }));
   return c.toDataURL('image/png').split(',')[1];
 }
@@ -489,7 +558,7 @@ function buildAnimations(model){
 global.BSEngine = {
   renderModel, generateTexture, toGeometryJSON, toAnimationJSON,
   modelHeightBlocks, cloneModel, hexToRgb, shade,
-  autoUV, poseAt, buildAnimations, faceRect, pickAtPoint,
+  autoUV, poseAt, buildAnimations, faceRect, pickAtPoint, paintHit,
 };
 
 })(window);
