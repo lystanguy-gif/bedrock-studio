@@ -190,3 +190,4 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 .ai-status{font-size:12px;color:var(--muted);text-align:center;padding:8px 4px;min-height:20px;line-height:1.6}
 .ai-status.ok{color:var(--green)}
 .ai-status.err{color:#e07060}
+.hdr-icon.off{opacity:.35;pointer-events:none}

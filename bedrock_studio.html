@@ -23,6 +23,8 @@
   <div class="header-right">
     <div class="proj-field">Projet <input id="proj-name" type="text" value="Mon Add-on" title="Nom de l'add-on"></div>
     <div class="proj-field">NS <input id="proj-ns" type="text" value="monaddon" title="Namespace (préfixe unique)" style="width:90px"></div>
+    <button class="hdr-icon" id="undo-btn" title="Annuler (Ctrl+Z)" onclick="BS.undo()">↶</button>
+    <button class="hdr-icon" id="redo-btn" title="Rétablir (Ctrl+Shift+Z)" onclick="BS.redo()">↷</button>
     <span class="save-ind" id="save-ind" title="Sauvegarde automatique dans le navigateur">💾 auto</span>
     <button class="hdr-icon" title="Télécharger le projet (fichier de secours)" onclick="BS.exportProject()">⬇💾</button>
     <label class="hdr-icon" title="Ouvrir un fichier de projet">📂<input type="file" accept=".json,application/json" style="display:none" onchange="BS.importProject(this)"></label>

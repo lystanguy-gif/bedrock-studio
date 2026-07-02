@@ -159,8 +159,42 @@ function cubeColorOf(inst,cu){ return cu.color || slotColor(inst,cu.slot); }
 
 function geoEditorCard(type){
   return `<div class="card"><div class="card-title">🧊 Édition avancée des cubes
-    <button class="px-btn" style="margin-left:auto" onclick="BS.geoToggle('${type}')" id="geo-toggle-${type}">▾ Afficher</button></div>
-    <div id="geo-editor-${type}" style="display:none"></div></div>`;
+    <button class="px-btn" style="margin-left:auto" onclick="BS.geoJsonToggle('${type}')">⟨⟩ JSON expert</button>
+    <button class="px-btn" onclick="BS.geoToggle('${type}')" id="geo-toggle-${type}">▾ Afficher</button></div>
+    <div id="geo-editor-${type}" style="display:none"></div>
+    <div id="geo-json-${type}" style="display:none">
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 6px">Squelette complet (os + cubes) au format du studio — modifie puis applique. La validation est faite en direct.</p>
+      <textarea id="geo-json-ta-${type}" spellcheck="false" style="font-family:monospace;font-size:11px;min-height:220px;white-space:pre" oninput="BS.geoJsonCheck('${type}')"></textarea>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+        <button class="px-btn" onclick="BS.geoJsonApply('${type}')">✓ Appliquer</button>
+        <span id="geo-json-msg-${type}" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+    </div></div>`;
+}
+const geoJsonOpen={};
+function geoJsonToggle(type){
+  geoJsonOpen[type]=!geoJsonOpen[type];
+  const el=document.getElementById('geo-json-'+type); if(!el)return;
+  el.style.display=geoJsonOpen[type]?'block':'none';
+  if(geoJsonOpen[type]){
+    const inst=geoInst(type);
+    if(inst&&inst.geo) document.getElementById('geo-json-ta-'+type).value=JSON.stringify(inst.geo.bones,null,2);
+  }
+}
+function geoJsonCheck(type){
+  const msg=document.getElementById('geo-json-msg-'+type);
+  try{
+    const v=JSON.parse(document.getElementById('geo-json-ta-'+type).value);
+    if(!Array.isArray(v)) throw new Error('Le JSON doit être un tableau d\'os [ {name, pivot, cubes:[…]} ]');
+    msg.textContent='✓ JSON valide ('+v.length+' os)'; msg.style.color='var(--green)'; return v;
+  }catch(e){ msg.textContent='✗ '+e.message; msg.style.color='#e07060'; return null; }
+}
+function geoJsonApply(type){
+  const bones=geoJsonCheck(type); if(!bones)return;
+  const inst=geoInst(type); if(!inst||!inst.geo)return;
+  inst.geo.bones=bones; geoResolve(type); pushHistory();
+  if(geoOpen[type])renderGeoInner(type);
+  toast('✓ Squelette appliqué');
 }
 const geoOpen={};
 function geoToggle(type){ geoOpen[type]=!geoOpen[type];
@@ -546,6 +580,7 @@ function bindDrag(canvasId,vw,type){
     if(moved>4){ vw.autorotate=false; const b=document.getElementById(canvasId==='viewCanvas'?'rot-btn':canvasId==='itemViewCanvas'?'item-rot-btn':'furn-rot-btn'); if(b)b.classList.remove('active'); }
     vw.rotY=(vw.rotY+dx*0.6)%360; vw.rotX=Math.max(-89,Math.min(89,vw.rotX-dy*0.5)); lx=p.clientX;ly=p.clientY; if(e.touches)e.preventDefault(); };
   const up=e=>{ if(dragging&&moved<=4&&type&&!paint[type].on){ const p=(e.changedTouches&&e.changedTouches[0])||e; pickAt(type,c,p.clientX,p.clientY); }
+    if(dragging&&type&&paint[type].on) pushHistory();
     dragging=false;c.parentElement.classList.remove('dragging'); };
   c.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   c.addEventListener('touchstart',down,{passive:false});c.addEventListener('touchmove',move,{passive:false});c.addEventListener('touchend',up);
@@ -745,7 +780,13 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
   rp.file('textures/entity/'+id+'/'+id+'.png',b64toBlob(E.generateTexture(model)));
   // animations
   const anims=E.buildAnimations(model);
-  rp.file('animations/'+id+'.animation.json',J(E.toAnimationJSON(NS,id,anims)));
+  const headBone=model.bones.find(b=>/head/i.test(b.name));
+  const animJson=E.toAnimationJSON(NS,id,anims);
+  if(headBone){
+    animJson.animations['animation.'+id+'.look_at']={ loop:true,
+      bones:{ [headBone.name]:{ rotation:['query.target_x_rotation','query.target_y_rotation',0] } } };
+  }
+  rp.file('animations/'+id+'.animation.json',J(animJson));
   // animation controller (états idle/marche/combat)
   rp.file('animation_controllers/'+id+'.animation_controllers.json',J({
     format_version:'1.10.0',
@@ -773,10 +814,11 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
       materials:{ default:'entity_alphatest' },
       textures:{ default:'textures/entity/'+id+'/'+id },
       geometry:{ default:geoId },
-      animations:{ idle:'animation.'+id+'.idle', walk:'animation.'+id+'.walk', attack:'animation.'+id+'.attack',
+      animations:Object.assign({ idle:'animation.'+id+'.idle', walk:'animation.'+id+'.walk', attack:'animation.'+id+'.attack',
         run:'animation.'+id+'.run', roar:'animation.'+id+'.roar', sleep:'animation.'+id+'.sleep',
         general:'controller.animation.'+NS+'_'+id+'.general' },
-      scripts:{ animate:['general'] },
+        headBone?{ look_at:'animation.'+id+'.look_at' }:{}),
+      scripts:{ animate: headBone?['general','look_at']:['general'] },
       render_controllers:['controller.render.'+NS+'_'+id],
       spawn_egg:{ base_color:rgbHex(eng), overlay_color:'#e8c878' },
     } }
@@ -894,12 +936,69 @@ async function exportSet(assets,fname,statusId){
   }catch(err){ console.error(err); setStatus(statusId,'✗ Erreur : '+err.message,'err'); }
 }
 function empty(){ return { creatures:[], items:[], furniture:[] }; }
-function exportCreature(){ const i=curCreature(); if(!i)return; const a=empty(); a.creatures=[i]; exportSet(a,slug(i.name)+'.mcaddon','creature-status'); }
-function exportItem(){ const i=curItem(); if(!i)return; const a=empty(); a.items=[i]; exportSet(a,slug(i.name)+'.mcaddon','item-status'); }
-function exportFurniture(){ const i=curFurniture(); if(!i)return; const a=empty(); a.furniture=[i]; exportSet(a,slug(i.name)+'.mcaddon','furniture-status'); }
+function exportCreature(){ const i=curCreature(); if(!i)return; const a=empty(); a.creatures=[i]; guardedExport(a,slug(i.name)+'.mcaddon','creature-status'); }
+function exportItem(){ const i=curItem(); if(!i)return; const a=empty(); a.items=[i]; guardedExport(a,slug(i.name)+'.mcaddon','item-status'); }
+function exportFurniture(){ const i=curFurniture(); if(!i)return; const a=empty(); a.furniture=[i]; guardedExport(a,slug(i.name)+'.mcaddon','furniture-status'); }
 function exportAll(){
   if(!state.creatures.length&&!state.items.length&&!state.furniture.length){ toast('Crée au moins un élément d\'abord'); return; }
-  exportSet({ creatures:state.creatures, items:state.items, furniture:state.furniture }, slug(projName())+'.mcaddon','creature-status');
+  guardedExport({ creatures:state.creatures, items:state.items, furniture:state.furniture }, slug(projName())+'.mcaddon','creature-status');
+}
+
+// ── Garde-fous : validation en langage humain avant chaque export ─────────
+function validateAssets(a){
+  const errors=[], warns=[];
+  const ids=new Set();
+  const checkId=(id,what,name)=>{
+    if(!/^[a-z0-9_]+$/.test(id)) errors.push('« '+name+' » : l\'ID technique « '+id+' » contient des caractères interdits (utilise minuscules, chiffres, _).');
+    if(ids.has(id)) errors.push('Deux éléments partagent le même ID technique « '+id+' » — renomme l\'un des deux.');
+    ids.add(id);
+  };
+  if(!/^[a-z0-9_]+$/.test(ns())) errors.push('Le namespace « '+ns()+' » est invalide (minuscules, chiffres et _ uniquement).');
+  if(ns()==='minecraft') errors.push('Le namespace ne peut pas être « minecraft » (réservé au jeu).');
+  (a.creatures||[]).forEach(c=>{
+    if(!c.name.trim()) errors.push('Une créature n\'a pas de nom.');
+    checkId(c.mobId,'créature',c.name);
+    const n=(c._resolved?c._resolved.bones:c.geo.bones).reduce((x,b)=>x+(b.cubes||[]).length,0);
+    if(!n) errors.push('« '+c.name+' » n\'a aucun cube — elle serait invisible en jeu.');
+    if(n>250) warns.push('« '+c.name+' » a '+n+' cubes : ça peut ralentir le jeu sur mobile (conseillé : < 250).');
+    if(c.scale>6) warns.push('« '+c.name+' » est très grande (×'+c.scale+') — vérifie qu\'elle passe dans tes bâtiments.');
+    if(c.stats.hp>500) warns.push('« '+c.name+' » a '+c.stats.hp+' PV : presque impossible à tuer sans équipement spécial.');
+  });
+  (a.items||[]).forEach(it=>{
+    if(!it.name.trim()) errors.push('Un objet n\'a pas de nom.');
+    checkId(it.itemId,'objet',it.name);
+    if(it.mode==='2d'){
+      const filled=it.pixels.some(row=>row.some(p=>p));
+      if(!filled) errors.push('« '+it.name+' » (pixel-art) est entièrement vide — dessine au moins un pixel.');
+    } else {
+      const n=(it._resolved?it._resolved.bones:it.geo.bones).reduce((x,b)=>x+(b.cubes||[]).length,0);
+      if(!n) errors.push('« '+it.name+' » n\'a aucun cube.');
+      if(n>380) warns.push('« '+it.name+' » a '+n+' cubes : lourd pour un objet tenu en main.');
+    }
+  });
+  (a.furniture||[]).forEach(f=>{
+    if(!f.name.trim()) errors.push('Un meuble n\'a pas de nom.');
+    checkId(f.blockId,'meuble',f.name);
+    let outside=false;
+    (f._resolved?f._resolved.bones:f.geo.bones).forEach(b=>(b.cubes||[]).forEach(cu=>{
+      if(cu.origin[0]<-8.5||cu.origin[0]+cu.size[0]>8.5||cu.origin[2]<-8.5||cu.origin[2]+cu.size[2]>8.5||cu.origin[1]<-0.5||cu.origin[1]+cu.size[1]>16.5) outside=true;
+    }));
+    if(outside) warns.push('« '+f.name+' » dépasse du bloc 16×16×16 : en jeu, les parties qui dépassent peuvent traverser les murs voisins.');
+  });
+  return { errors, warns };
+}
+function guardedExport(a,fname,statusId){
+  const v=validateAssets(a);
+  if(!v.errors.length&&!v.warns.length){ exportSet(a,fname,statusId); return; }
+  const li=(arr,ico)=>arr.map(m=>'<li style="margin-bottom:6px">'+ico+' '+m+'</li>').join('');
+  document.getElementById('modal-title').innerHTML=v.errors.length?'🛑 Impossible d\'exporter':'⚠ Vérifie avant d\'exporter';
+  document.getElementById('modal-body').innerHTML=
+    '<ul style="list-style:none;font-size:13px;line-height:1.6">'+li(v.errors,'🛑')+li(v.warns,'⚠️')+'</ul>'+
+    (v.errors.length
+      ? '<p style="font-size:12px;color:var(--muted)">Corrige les points 🛑 puis réessaie — un addon invalide ne se chargerait pas dans Minecraft.</p>'
+      : '<button class="export-btn eb-all" onclick="BS.closeModal();BS._forceExport()">Exporter quand même</button>');
+  document.getElementById('modal-overlay').classList.add('show');
+  if(!v.errors.length) global.BS._forceExport=()=>exportSet(a,fname,statusId);
 }
 
 // ── Aide ──
@@ -908,6 +1007,46 @@ function help(k){ const h=helpTxt[k]||{title:'Aide',body:''}; document.getElemen
 function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
 
 // ── Init ──
+// ── Historique undo/redo (instantanés du projet complet) ──────────────────
+const history={ stack:[], idx:-1, max:80, muted:false, _t:null };
+function pushHistory(){
+  if(history.muted) return;
+  clearTimeout(history._t);
+  history._t=setTimeout(()=>{
+    let s; try{ s=serializeProject(); }catch(e){ return; }
+    if(history.stack[history.idx]===s) return;
+    history.stack.splice(history.idx+1);
+    history.stack.push(s);
+    if(history.stack.length>history.max) history.stack.shift();
+    history.idx=history.stack.length-1;
+    updateUndoButtons();
+  },250);
+}
+function undo(){ if(history.idx<=0){ toast('Rien à annuler'); return; } history.idx--; applyHistory(); toast('↶ Annulé'); }
+function redo(){ if(history.idx>=history.stack.length-1){ toast('Rien à rétablir'); return; } history.idx++; applyHistory(); toast('↷ Rétabli'); }
+function applyHistory(){
+  const s=history.stack[history.idx]; if(!s) return;
+  const cur=Object.assign({},state.cur);
+  history.muted=true;
+  try{
+    loadProjectData(JSON.parse(s));
+    [['creature',state.creatures],['item',state.items],['furniture',state.furniture]].forEach(([t,list])=>{
+      state.cur[t]=(cur[t]&&list.find(i=>i.id===cur[t]))?cur[t]:(list.length?list[list.length-1].id:null);
+    });
+    renderLists();
+    if(state.page==='creature'&&curCreature())renderCreatureEditor();
+    if(state.page==='item'&&curItem())renderItemEditor();
+    if(state.page==='furniture'&&curFurniture())renderFurnitureEditor();
+    ['creature','item','furniture'].forEach(t=>{ sel[t]=null; renderSelPanel(t); });
+  }finally{ history.muted=false; }
+  updateUndoButtons(); doSave();
+}
+function updateUndoButtons(){
+  const u=document.getElementById('undo-btn'), r=document.getElementById('redo-btn');
+  if(u)u.classList.toggle('off',history.idx<=0);
+  if(r)r.classList.toggle('off',history.idx>=history.stack.length-1);
+}
+
 // ── Studio IA : création depuis une spécification générée ─────────────────
 function createFromSpec(spec){
   if(spec.kind==='item2d'){
@@ -1084,6 +1223,7 @@ function doSave(){
   try{
     const s=serializeProject();
     if(s===lastSaved) return;
+    pushHistory();
     localStorage.setItem(SAVE_KEY,s); lastSaved=s;
     const el=document.getElementById('save-ind');
     if(el){ const d=new Date();
@@ -1131,6 +1271,14 @@ function init(){
   bindDrag('viewCanvas',view,'creature'); bindDrag('itemViewCanvas',itemView,'item'); bindDrag('furnViewCanvas',furnView,'furniture');
   renderSelPanel('creature'); renderSelPanel('item'); renderSelPanel('furniture');
   const kEl=document.getElementById('ai-key'); if(kEl)kEl.value=aiKey();
+  try{ history.stack=[serializeProject()]; history.idx=0; }catch(e){}
+  updateUndoButtons();
+  window.addEventListener('keydown',e=>{
+    const t=e.target&&e.target.tagName;
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT') return; // laisser l'undo natif des champs
+    if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'){ e.preventDefault(); undo(); }
+    else if(((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='z')||((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y')){ e.preventDefault(); redo(); }
+  });
   requestAnimationFrame(frame);
 }
 
@@ -1142,7 +1290,17 @@ global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, op
   togglePaint, paintColor, paintSize, paintErase, paintClear,
   exportProject, importProject, resetProject,
   aiSetFile, aiGenerate, aiExtrude, createFromSpec,
+  undo, redo, geoJsonToggle, geoJsonCheck, geoJsonApply,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
+
+// Chaque action de modification pousse un instantané dans l'historique (undo/redo)
+['create','remove','field','setColor','setPart','stat','opt','addDrop','drop','rmDrop',
+ 'setIColor','ifield','istat','iopt','clearPx','addColor','setFColor','ffield','fopt',
+ 'setScale','scale','setItemScale','iscale',
+ 'geoBoneName','geoBone','geoCube','geoCubeColor','geoAddCube','geoDupCube','geoDelCube','geoAddBone','geoDelBone',
+ 'selNudge','selInflate','selColor','selDup','selDel','paintClear','createFromSpec','aiExtrude']
+.forEach(k=>{ const f=global.BS[k]; if(typeof f==='function')
+  global.BS[k]=function(){ const r=f.apply(this,arguments); pushHistory(); return r; }; });
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 
