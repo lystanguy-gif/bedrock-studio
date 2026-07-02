@@ -14,6 +14,9 @@ const state = {
 const view = { rotX:-12, rotY:28, zoom:1, anim:'idle', steve:true, autorotate:true };
 const itemView = { rotX:-12, rotY:28, zoom:1, autorotate:true };
 const furnView = { rotX:-20, rotY:32, autorotate:true };
+// sélection au clic : { bone, ci } par type d'éditeur + polygones du dernier rendu
+const sel = { creature:null, item:null, furniture:null };
+const pickStores = { creature:[], item:[], furniture:[] };
 
 const uid = (p)=> p + Math.random().toString(36).slice(2,9);
 function uuid(){ return (crypto.randomUUID ? crypto.randomUUID() :
@@ -131,6 +134,8 @@ function baseModel(inst){
   model.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{ if(cu.slot&&inst.colors[cu.slot]) cu.color=inst.colors[cu.slot]; }));
   E.autoUV(model);
   applyEyes(model,inst);
+  // annotation pour la sélection au clic (nom d'os + index de cube)
+  model.bones.forEach(b=>(b.cubes||[]).forEach((cu,ci)=>{ cu._pick={ bone:b.name, ci }; }));
   return model;
 }
 function resolveCreature(inst){ inst._resolved=baseModel(inst); }
@@ -267,6 +272,7 @@ function renderLists(){
 }
 function select(type,id){
   state.cur[type]=id; renderLists(); showPage(type);
+  sel[type]=null; renderSelPanel(type);
   if(type==='creature') renderCreatureEditor();
   if(type==='item') renderItemEditor();
   if(type==='furniture') renderFurnitureEditor();
@@ -504,16 +510,16 @@ function frame(ts){
     const i=curCreature(); const c=document.getElementById('viewCanvas');
     if(i&&c){ if(view.autorotate)view.rotY=(view.rotY+0.5)%360;
       const m=buildPreview(i); const pose=E.poseAt(i._resolved,view.anim,t);
-      E.renderModel(c,m,{rotX:view.rotX,rotY:view.rotY,zoom:view.zoom,pose,ground:true}); }
+      E.renderModel(c,m,{rotX:view.rotX,rotY:view.rotY,zoom:view.zoom,pose,ground:true,pickStore:pickStores.creature,sel:sel.creature}); }
   } else if(state.page==='item'){
     const i=curItem(); const c=document.getElementById('itemViewCanvas');
     if(i&&c){ if(i.mode==='3d'&&i._resolved){ if(itemView.autorotate)itemView.rotY=(itemView.rotY+0.6)%360;
-        E.renderModel(c,i._resolved,{rotX:itemView.rotX,rotY:itemView.rotY,zoom:1,ground:false}); }
-      else if(i.mode==='2d'){ drawPixelPreview(c,i); } }
+        E.renderModel(c,i._resolved,{rotX:itemView.rotX,rotY:itemView.rotY,zoom:1,ground:false,pickStore:pickStores.item,sel:sel.item}); }
+      else if(i.mode==='2d'){ pickStores.item.length=0; drawPixelPreview(c,i); } }
   } else if(state.page==='furniture'){
     const i=curFurniture(); const c=document.getElementById('furnViewCanvas');
     if(i&&c&&i._resolved){ if(furnView.autorotate)furnView.rotY=(furnView.rotY+0.5)%360;
-      E.renderModel(c,i._resolved,{rotX:furnView.rotX,rotY:furnView.rotY,zoom:0.85,ground:true}); }
+      E.renderModel(c,i._resolved,{rotX:furnView.rotX,rotY:furnView.rotY,zoom:0.85,ground:true,pickStore:pickStores.furniture,sel:sel.furniture}); }
   }
 }
 function drawPixelPreview(c,inst){ const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
@@ -522,17 +528,71 @@ function drawPixelPreview(c,inst){ const ctx=c.getContext('2d'); ctx.clearRect(0
   for(let y=0;y<gs;y++)for(let x=0;x<gs;x++){ if(inst.pixels[y][x]){ctx.fillStyle=inst.pixels[y][x];ctx.fillRect(ox+x*s,oy+y*s,s,s);} } }
 
 // ── interactions souris (rotation) ──
-function bindDrag(canvasId,vw){
+function bindDrag(canvasId,vw,type){
   const c=document.getElementById(canvasId); if(!c)return;
-  let dragging=false,lx=0,ly=0;
-  const down=e=>{dragging=true;vw.autorotate=false;const p=e.touches?e.touches[0]:e;lx=p.clientX;ly=p.clientY;c.parentElement.classList.add('dragging');
-    const b=document.getElementById(canvasId==='viewCanvas'?'rot-btn':canvasId==='itemViewCanvas'?'item-rot-btn':'furn-rot-btn'); if(b)b.classList.remove('active'); };
-  const move=e=>{ if(!dragging)return; const p=e.touches?e.touches[0]:e; vw.rotY=(vw.rotY+(p.clientX-lx)*0.6)%360; vw.rotX=Math.max(-89,Math.min(89,vw.rotX-(p.clientY-ly)*0.5)); lx=p.clientX;ly=p.clientY; if(e.touches)e.preventDefault(); };
-  const up=()=>{dragging=false;c.parentElement.classList.remove('dragging');};
+  let dragging=false,lx=0,ly=0,moved=0;
+  const down=e=>{dragging=true;moved=0;const p=e.touches?e.touches[0]:e;lx=p.clientX;ly=p.clientY;c.parentElement.classList.add('dragging');};
+  const move=e=>{ if(!dragging)return; const p=e.touches?e.touches[0]:e;
+    const dx=p.clientX-lx, dy=p.clientY-ly; moved+=Math.abs(dx)+Math.abs(dy);
+    if(moved>4){ vw.autorotate=false; const b=document.getElementById(canvasId==='viewCanvas'?'rot-btn':canvasId==='itemViewCanvas'?'item-rot-btn':'furn-rot-btn'); if(b)b.classList.remove('active'); }
+    vw.rotY=(vw.rotY+dx*0.6)%360; vw.rotX=Math.max(-89,Math.min(89,vw.rotX-dy*0.5)); lx=p.clientX;ly=p.clientY; if(e.touches)e.preventDefault(); };
+  const up=e=>{ if(dragging&&moved<=4&&type){ const p=(e.changedTouches&&e.changedTouches[0])||e; pickAt(type,c,p.clientX,p.clientY); }
+    dragging=false;c.parentElement.classList.remove('dragging'); };
   c.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   c.addEventListener('touchstart',down,{passive:false});c.addEventListener('touchmove',move,{passive:false});c.addEventListener('touchend',up);
   c.addEventListener('wheel',e=>{e.preventDefault();vw.zoom=Math.max(0.4,Math.min(3,(vw.zoom||1)*(e.deltaY<0?1.1:0.9)));},{passive:false});
 }
+
+// ── Sélection au clic + panneau du cube sélectionné ────────────────────────
+function pickAt(type,canvas,clientX,clientY){
+  const r=canvas.getBoundingClientRect();
+  const x=(clientX-r.left)*canvas.width/r.width, y=(clientY-r.top)*canvas.height/r.height;
+  const hit=E.pickAtPoint(pickStores[type],x,y);
+  sel[type]=hit||null;
+  renderSelPanel(type);
+}
+function selCube(type){
+  const inst=geoInst(type); const s=sel[type]; if(!inst||!s||!inst.geo)return null;
+  const bi=inst.geo.bones.findIndex(b=>b.name===s.bone); if(bi<0)return null;
+  const cu=(inst.geo.bones[bi].cubes||[])[s.ci]; if(!cu)return null;
+  return { inst, bi, ci:s.ci, cu, bone:inst.geo.bones[bi] };
+}
+function renderSelPanel(type){
+  const el=document.getElementById('sel-'+type); if(!el)return;
+  const found=selCube(type);
+  if(!found){ el.innerHTML='<div class="sel-hint">🖱 Clique sur un cube du modèle pour le modifier ici</div>'; return; }
+  const {cu,bone}=found;
+  const ax=['X','Y','Z'];
+  const nrow=(label,kind)=>`<div class="sel-row"><span class="sel-lbl">${label}</span>${ax.map((a,i)=>
+    `<span class="sel-axis">${a}</span><button class="nudge" onclick="BS.selNudge('${type}','${kind}',${i},-1)">−</button><span class="sel-val">${cu[kind][i]}</span><button class="nudge" onclick="BS.selNudge('${type}','${kind}',${i},1)">+</button>`).join('')}</div>`;
+  el.innerHTML=`<div class="sel-head">🧊 <b>${bone.name}</b> · cube ${found.ci+1}
+      <input type="color" value="${cubeHex(found.inst,cu)}" style="width:26px;height:22px;margin-left:auto;background:none;border:1px solid var(--border)" oninput="BS.selColor('${type}',this.value)">
+    </div>
+    ${nrow('Position','origin')}
+    ${nrow('Taille','size')}
+    <div class="sel-row"><span class="sel-lbl">Relief</span>
+      <button class="nudge" onclick="BS.selInflate('${type}',-0.25)">−</button><span class="sel-val">${cu.inflate||0}</span><button class="nudge" onclick="BS.selInflate('${type}',0.25)">+</button>
+      <span style="flex:1"></span>
+      <button class="px-btn" onclick="BS.selDup('${type}')">⧉ Dupliquer</button>
+      <button class="px-btn" style="color:var(--red)" onclick="BS.selDel('${type}')">✕ Supprimer</button>
+    </div>`;
+}
+function selNudge(type,kind,axis,delta){ const f=selCube(type); if(!f)return;
+  f.cu[kind][axis]=Math.round((f.cu[kind][axis]+delta)*2)/2;
+  if(kind==='size') f.cu[kind][axis]=Math.max(0.5,f.cu[kind][axis]);
+  geoResolve(type); renderSelPanel(type); if(geoOpen[type])renderGeoInner(type); }
+function selInflate(type,delta){ const f=selCube(type); if(!f)return;
+  f.cu.inflate=Math.max(0,Math.round(((f.cu.inflate||0)+delta)*4)/4);
+  geoResolve(type); renderSelPanel(type); if(geoOpen[type])renderGeoInner(type); }
+function selColor(type,v){ const f=selCube(type); if(!f)return; f.cu.color=v; f.cu.slot=null;
+  geoResolve(type); if(geoOpen[type])renderGeoInner(type); }
+function selDup(type){ const f=selCube(type); if(!f)return;
+  const copy=JSON.parse(JSON.stringify(f.cu)); copy.origin=[copy.origin[0]+1,copy.origin[1]+1,copy.origin[2]];
+  f.bone.cubes.splice(f.ci+1,0,copy); sel[type]={bone:f.bone.name,ci:f.ci+1};
+  geoResolve(type); renderSelPanel(type); if(geoOpen[type])renderGeoInner(type); }
+function selDel(type){ const f=selCube(type); if(!f)return;
+  f.bone.cubes.splice(f.ci,1); sel[type]=null;
+  geoResolve(type); renderSelPanel(type); if(geoOpen[type])renderGeoInner(type); }
 
 // scale range
 document.addEventListener('input',e=>{
@@ -766,7 +826,8 @@ function closeModal(){ document.getElementById('modal-overlay').classList.remove
 // ── Init ──
 function init(){
   renderGallery(); renderLists();
-  bindDrag('viewCanvas',view); bindDrag('itemViewCanvas',itemView); bindDrag('furnViewCanvas',furnView);
+  bindDrag('viewCanvas',view,'creature'); bindDrag('itemViewCanvas',itemView,'item'); bindDrag('furnViewCanvas',furnView,'furniture');
+  renderSelPanel('creature'); renderSelPanel('item'); renderSelPanel('furniture');
   requestAnimationFrame(frame);
 }
 
@@ -774,6 +835,7 @@ global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, op
   setAnim, toggleSteve, toggleRotate, resetView, setIColor, ifield, istat, iopt, toggleItemRotate, resetItemView,
   setTool, clearPx, addColor, setFColor, ffield, fopt, toggleFurnRotate, resetFurnView,
   geoToggle, geoBoneName, geoBone, geoCube, geoCubeColor, geoAddCube, geoDupCube, geoDelCube, geoAddBone, geoDelBone,
+  selNudge, selInflate, selColor, selDup, selDel,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();

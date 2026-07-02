@@ -147,6 +147,7 @@ function renderModel(canvas, model, opts){
         minZ=Math.min(minZ,c[2]);maxZ=Math.max(maxZ,c[2]);
         return c;
       });
+      const isSel = opts.sel && cube._pick && cube._pick.bone===opts.sel.bone && cube._pick.ci===opts.sel.ci;
       CUBE_FACES.forEach(([idx, n, key]) => {
         const nc = apply3(camR, apply3(boneWorld.r, n));
         // culling arrière léger : on garde tout mais on trie par profondeur
@@ -154,7 +155,7 @@ function renderModel(canvas, model, opts){
         const depth = (pts[0][2]+pts[1][2]+pts[2][2]+pts[3][2])/4;
         const light = 0.55 + 0.75 * Math.max(0, -dot(normalize(nc), lightDir));
         const col = (cube.faceColors && cube.faceColors[key]) || cube.color || defColor || '#9aa8b8';
-        faces.push({ pts, depth, col, light, alpha: cube.alpha });
+        faces.push({ pts, depth, col, light, alpha: cube.alpha, pick: cube._pick, isSel });
       });
     });
   }
@@ -188,6 +189,7 @@ function renderModel(canvas, model, opts){
   }
 
   faces.sort((a,b)=> a.depth - b.depth);
+  if (opts.pickStore) opts.pickStore.length = 0;
   faces.forEach(f => {
     const p = f.pts.map(project);
     ctx.beginPath();
@@ -201,7 +203,30 @@ function renderModel(canvas, model, opts){
     ctx.lineWidth = 0.6;
     ctx.strokeStyle = 'rgba(0,0,0,0.18)';
     ctx.stroke();
+    if (f.isSel){
+      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = '#e8c878';
+      ctx.stroke();
+    }
+    if (opts.pickStore) opts.pickStore.push({ poly:p, pick:f.pick });
   });
+}
+
+// test point-dans-polygone (pour le picking au clic)
+function pickAtPoint(pickStore, x, y){
+  for (let i = pickStore.length - 1; i >= 0; i--){
+    const f = pickStore[i];
+    if (f.pick && pointInPoly(f.poly, x, y)) return f.pick;
+  }
+  return null;
+}
+function pointInPoly(poly, x, y){
+  let inside = false;
+  for (let i=0, j=poly.length-1; i<poly.length; j=i++){
+    const xi=poly[i][0], yi=poly[i][1], xj=poly[j][0], yj=poly[j][1];
+    if (((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) inside = !inside;
+  }
+  return inside;
 }
 
 // Steve de référence (humanoïde gris translucide) à côté du modèle
@@ -464,7 +489,7 @@ function buildAnimations(model){
 global.BSEngine = {
   renderModel, generateTexture, toGeometryJSON, toAnimationJSON,
   modelHeightBlocks, cloneModel, hexToRgb, shade,
-  autoUV, poseAt, buildAnimations, faceRect,
+  autoUV, poseAt, buildAnimations, faceRect, pickAtPoint,
 };
 
 })(window);

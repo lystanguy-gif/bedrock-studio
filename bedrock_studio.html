@@ -58,6 +58,7 @@
       <div class="preview-panel" id="creature-preview" style="display:none">
         <div class="card-title">Aperçu 3D</div>
         <div class="viewer"><canvas id="viewCanvas" width="320" height="300"></canvas></div>
+        <div class="sel-panel" id="sel-creature"></div>
         <div class="view-tools" id="anim-tools"></div>
         <div class="field">
           <label class="lbl">Taille (échelle vs Steve)</label>
@@ -83,6 +84,7 @@
       <div class="preview-panel" id="item-preview" style="display:none">
         <div class="card-title">Aperçu</div>
         <div class="viewer" id="item-viewer"><canvas id="itemViewCanvas" width="320" height="300"></canvas></div>
+        <div class="sel-panel" id="sel-item"></div>
         <div class="view-tools" id="item-view-tools" style="display:none">
           <button class="vbtn active" id="item-rot-btn" onclick="BS.toggleItemRotate()">🔄 Rotation</button>
           <button class="vbtn" onclick="BS.resetItemView()">⟲ Recentrer</button>
@@ -105,6 +107,7 @@
       <div class="preview-panel" id="furniture-preview" style="display:none">
         <div class="card-title">Aperçu 3D</div>
         <div class="viewer"><canvas id="furnViewCanvas" width="320" height="300"></canvas></div>
+        <div class="sel-panel" id="sel-furniture"></div>
         <div class="view-tools">
           <button class="vbtn active" id="furn-rot-btn" onclick="BS.toggleFurnRotate()">🔄 Rotation</button>
           <button class="vbtn" onclick="BS.resetFurnView()">⟲ Recentrer</button>

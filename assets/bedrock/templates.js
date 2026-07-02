@@ -117,25 +117,40 @@ const SPIDER = {
     { key:'leg',    label:'Pattes',    def:'#141210' },
   ],
   bones:[
-    bone('body',[0,7,2],[
-      c([-6,4,-4],[12,7,12],'body'),          // céphalothorax
-      c([-4,6,-10],[8,5,6],'body'),           // tête
+    bone('body',[0,8,2],[
+      c([-6,5,-4],[12,8,12],'body'),           // céphalothorax
+      c([-5,12,-3],[10,2,10],'abdomen'),       // plaque dorsale
+      c([-4,6,-10],[8,6,6],'body'),            // tête
+      c([-3,11,-9],[6,2,4],'abdomen'),         // front bombé
+      // poils dorsaux
+      c([-4,13,-1],[1,2,1],'leg'),c([3,13,-1],[1,2,1],'leg'),c([0,14,2],[1,2,1],'leg'),
     ],{ eyeHost:true }),
-    bone('abdomen',[0,9,10],[
-      c([-8,3,6],[16,13,16],'abdomen'),
-      c([-3,15,12],[6,3,8],'mark',{ decalMark:'hourglass' }),
-    ],{ parent:'body', rotation:[10,0,0] }),
-    bone('fang_l',[2,5,-10],[ c([1,2,-13],[2,4,4],'fang') ],{ parent:'body', rotation:[20,0,0] }),
-    bone('fang_r',[-2,5,-10],[ c([-3,2,-13],[2,4,4],'fang') ],{ parent:'body', rotation:[20,0,0] }),
-    // 8 pattes (4 par côté) écartées via rotation Z
-    bone('leg_r1',[6,8,-2],[ c([6,7,-3],[16,2,2],'leg') ],{ parent:'body', rotation:[0,-25,-58] }),
-    bone('leg_r2',[6,8,1],[  c([6,7,0],[17,2,2],'leg') ], { parent:'body', rotation:[0,-8,-50] }),
-    bone('leg_r3',[6,8,4],[  c([6,7,3],[17,2,2],'leg') ], { parent:'body', rotation:[0,10,-50] }),
-    bone('leg_r4',[6,8,7],[  c([6,7,6],[16,2,2],'leg') ], { parent:'body', rotation:[0,26,-58] }),
-    bone('leg_l1',[-6,8,-2],[ c([-22,7,-3],[16,2,2],'leg') ],{ parent:'body', rotation:[0,25,58] }),
-    bone('leg_l2',[-6,8,1],[  c([-23,7,0],[17,2,2],'leg') ], { parent:'body', rotation:[0,8,50] }),
-    bone('leg_l3',[-6,8,4],[  c([-23,7,3],[17,2,2],'leg') ], { parent:'body', rotation:[0,-10,50] }),
-    bone('leg_l4',[-6,8,7],[  c([-22,7,6],[16,2,2],'leg') ], { parent:'body', rotation:[0,-26,58] }),
+    bone('abdomen',[0,10,10],[
+      c([-8,3,6],[16,14,17],'abdomen'),        // masse principale
+      c([-6,15,8],[12,3,13],'abdomen'),        // bombé supérieur
+      c([-3,16,10],[6,3,9],'mark'),            // marque dorsale
+      c([-1,15,23],[2,2,3],'mark'),            // pointe de la marque
+      // filières
+      c([-2,4,22],[1,2,3],'fang'),c([1,4,22],[1,2,3],'fang'),
+      // poils abdomen
+      c([-8,10,10],[1,3,1],'leg'),c([7,10,10],[1,3,1],'leg'),
+      c([-7,12,16],[1,3,1],'leg'),c([6,12,16],[1,3,1],'leg'),
+    ],{ parent:'body', rotation:[12,0,0] }),
+    // chélicères + crochets courbés
+    bone('fang_l',[2.5,6,-10],[ c([1.5,3,-13],[2,4,3],'body'), c([2,1,-12.5],[1,3,2],'fang') ],{ parent:'body', rotation:[22,0,6] }),
+    bone('fang_r',[-2.5,6,-10],[ c([-3.5,3,-13],[2,4,3],'body'), c([-3,1,-12.5],[1,3,2],'fang') ],{ parent:'body', rotation:[22,0,-6] }),
+    // pédipalpes (petites pattes avant)
+    bone('palp_l',[3.5,7,-9],[ c([3,6,-15],[1.5,1.5,6],'leg') ],{ parent:'body', rotation:[-18,14,0] }),
+    bone('palp_r',[-3.5,7,-9],[ c([-4.5,6,-15],[1.5,1.5,6],'leg') ],{ parent:'body', rotation:[-18,-14,0] }),
+    // 8 pattes coudées : fémur montant + genou + tibia descendant
+    bone('leg_r1',[6,10,-2],[ c([5,9,-3.2],[10,2.5,2.5],'leg'), c([14,10,-3],[2.5,2.5,2.5],'body'), c([15,-2,-3],[2,13,2],'leg') ],{ parent:'body', rotation:[0,-28,-26] }),
+    bone('leg_r2',[6,10,1],[  c([5,9,0],[11,2.5,2.5],'leg'),  c([15,10,0.2],[2.5,2.5,2.5],'body'), c([16,-3,0.3],[2,14,2],'leg') ], { parent:'body', rotation:[0,-9,-22] }),
+    bone('leg_r3',[6,10,4],[  c([5,9,3.2],[11,2.5,2.5],'leg'), c([15,10,3.4],[2.5,2.5,2.5],'body'), c([16,-3,3.5],[2,14,2],'leg') ], { parent:'body', rotation:[0,9,-22] }),
+    bone('leg_r4',[6,10,7],[  c([5,9,6.4],[10,2.5,2.5],'leg'), c([14,10,6.6],[2.5,2.5,2.5],'body'), c([15,-2,6.7],[2,13,2],'leg') ], { parent:'body', rotation:[0,28,-26] }),
+    bone('leg_l1',[-6,10,-2],[ c([-15,9,-3.2],[10,2.5,2.5],'leg'), c([-16.5,10,-3],[2.5,2.5,2.5],'body'), c([-17,-2,-3],[2,13,2],'leg') ],{ parent:'body', rotation:[0,28,26] }),
+    bone('leg_l2',[-6,10,1],[  c([-16,9,0],[11,2.5,2.5],'leg'),  c([-17.5,10,0.2],[2.5,2.5,2.5],'body'), c([-18,-3,0.3],[2,14,2],'leg') ], { parent:'body', rotation:[0,9,22] }),
+    bone('leg_l3',[-6,10,4],[  c([-16,9,3.2],[11,2.5,2.5],'leg'), c([-17.5,10,3.4],[2.5,2.5,2.5],'body'), c([-18,-3,3.5],[2,14,2],'leg') ], { parent:'body', rotation:[0,-9,22] }),
+    bone('leg_l4',[-6,10,7],[  c([-15,9,6.4],[10,2.5,2.5],'leg'), c([-16.5,10,6.6],[2.5,2.5,2.5],'body'), c([-17,-2,6.7],[2,13,2],'leg') ], { parent:'body', rotation:[0,-28,26] }),
   ],
   eyes:{ style:'cluster' },
 };
@@ -150,21 +165,58 @@ const GOLEM = {
     { key:'stone', label:'Pierre',  def:'#6b6b6e' },
     { key:'dark',  label:'Failles', def:'#3c3c40' },
     { key:'rune',  label:'Runes',   def:'#33d6ff' },
+    { key:'moss',  label:'Mousse',  def:'#4a6b2a' },
+    { key:'eye',   label:'Yeux',    def:'#33d6ff' },
   ],
   bones:[
     bone('body',[0,22,0],[
-      c([-9,20,-5],[18,14,10],'stone'),
-      c([-6,18,-4],[12,2,8],'dark'),
-      c([-3,24,-6],[6,6,1],'rune',{ glow:true }),
+      c([-9,20,-5],[18,15,10],'stone'),          // torse
+      c([-10,30,-6],[20,5,12],'stone'),          // épaules massives
+      c([-6,18,-4],[12,2,8],'dark'),             // ceinture sombre
+      c([-3,24,-6],[6,6,2],'rune',{ glow:true }),// gemme de cœur
+      c([-4,25,-6.5],[8,1,1],'dark'),c([-4,28,-6.5],[8,1,1],'dark'), // sertissage
+      // fissures runiques latérales
+      c([-9.5,22,-2],[1,8,1],'rune',{glow:true}), c([8.5,22,-2],[1,8,1],'rune',{glow:true}),
+      // mousse
+      c([-9,33,2],[4,2,4],'moss'), c([5,34,-3],[4,1,4],'moss'),
     ]),
-    bone('head',[0,34,0],[
-      c([-5,34,-5],[10,9,9],'stone'),
-      c([-6,36,-6],[2,3,3],'dark'),c([4,36,-6],[2,3,3],'dark'),
+    bone('head',[0,35,0],[
+      c([-5,35,-5],[10,9,9],'stone'),
+      c([-6,42,-6],[12,3,11],'stone'),           // couronne de pierre
+      c([-6,44,-5],[2,3,2],'stone'),c([4,44,-5],[2,3,2],'stone'),c([-1,45,-5],[2,3,2],'stone'),
+      c([-4,38,-5.5],[8,1,1],'rune',{glow:true}),// bandeau runique
+      c([-1,33,-5],[2,3,2],'dark'),              // bouche/grille
     ],{ parent:'body', eyeHost:true }),
-    bone('arm_r',[-10,32,0],[ c([-15,10,-4],[5,22,8],'stone'), c([-15,10,-4],[5,3,8],'rune',{glow:true}) ],{ parent:'body' }),
-    bone('arm_l',[10,32,0],[ c([10,10,-4],[5,22,8],'stone'), c([10,10,-4],[5,3,8],'rune',{glow:true}) ],{ parent:'body' }),
-    bone('leg_r',[-4,20,0],[ c([-8,0,-4],[7,20,8],'stone') ],{ parent:'body' }),
-    bone('leg_l',[4,20,0],[ c([1,0,-4],[7,20,8],'stone') ],{ parent:'body' }),
+    // bras : épaulière + biceps + avant-bras + poing à jointures
+    bone('arm_r',[-11,32,0],[
+      c([-17,26,-5],[6,8,10],'stone'),           // épaulière
+      c([-16,16,-4],[5,12,8],'stone'),           // biceps
+      c([-17,6,-4.5],[6,11,9],'stone'),          // avant-bras massif
+      c([-17,3,-4],[6,4,8],'dark'),              // poing
+      c([-17.5,4,-3],[1,2,2],'stone'),c([-17.5,4,0],[1,2,2],'stone'), // jointures
+      c([-16,12,-4.8],[4,1,1],'rune',{glow:true}),
+    ],{ parent:'body' }),
+    bone('arm_l',[11,32,0],[
+      c([11,26,-5],[6,8,10],'stone'),
+      c([11,16,-4],[5,12,8],'stone'),
+      c([11,6,-4.5],[6,11,9],'stone'),
+      c([11,3,-4],[6,4,8],'dark'),
+      c([16.5,4,-3],[1,2,2],'stone'),c([16.5,4,0],[1,2,2],'stone'),
+      c([12,12,-4.8],[4,1,1],'rune',{glow:true}),
+      c([12,25,4],[4,2,3],'moss'),
+    ],{ parent:'body' }),
+    // jambes : cuisse + tibia + orteils de pierre
+    bone('leg_r',[-4.5,20,0],[
+      c([-8,10,-4],[7,10,8],'stone'),
+      c([-8.5,0,-4.5],[8,10,9],'stone'),
+      c([-8.5,0,-6.5],[3,3,2],'dark'),c([-4.5,0,-6.5],[3,3,2],'dark'), // orteils
+    ],{ parent:'body' }),
+    bone('leg_l',[4.5,20,0],[
+      c([1,10,-4],[7,10,8],'stone'),
+      c([0.5,0,-4.5],[8,10,9],'stone'),
+      c([0.5,0,-6.5],[3,3,2],'dark'),c([4.5,0,-6.5],[3,3,2],'dark'),
+      c([1,8,4],[4,2,2],'moss'),
+    ],{ parent:'body' }),
   ],
   eyes:{ style:'glow' },
 };
@@ -183,12 +235,29 @@ const WISP = {
   bones:[
     bone('body',[0,22,0],[
       c([-3,19,-3],[6,6,6],'core',{ glow:true, alpha:0.95 }),
+      c([-2,18,-2],[4,8,4],'core',{ glow:true, alpha:0.55 }),   // noyau interne croisé
     ],{ rotation:[45,0,45], eyeHost:true }),
-    bone('crystal_1',[0,22,0],[ c([-1,26,-1],[2,5,2],'crystal',{ alpha:0.9, glow:true }) ],{ parent:'body' }),
-    bone('crystal_2',[0,22,0],[ c([6,20,0],[2,4,2],'crystal',{ alpha:0.9, glow:true }) ],{ parent:'body', rotation:[0,0,-30] }),
-    bone('crystal_3',[0,22,0],[ c([-8,20,0],[2,4,2],'crystal',{ alpha:0.9, glow:true }) ],{ parent:'body', rotation:[0,0,30] }),
-    bone('crystal_4',[0,22,0],[ c([0,20,6],[2,4,2],'crystal',{ alpha:0.9, glow:true }) ],{ parent:'body', rotation:[30,0,0] }),
-    bone('tail',[0,19,0],[ c([-1,13,-1],[2,6,2],'aura',{ alpha:0.6 }), c([-1,9,-1],[2,4,2],'aura',{ alpha:0.4 }) ],{ parent:'body' }),
+    // anneau orbital horizontal (4 segments)
+    bone('ring',[0,22,0],[
+      c([-7,21.5,-1],[3,1,2],'aura',{ alpha:0.75, glow:true }), c([4,21.5,-1],[3,1,2],'aura',{ alpha:0.75, glow:true }),
+      c([-1,21.5,-7],[2,1,3],'aura',{ alpha:0.75, glow:true }), c([-1,21.5,4],[2,1,3],'aura',{ alpha:0.75, glow:true }),
+    ],{ parent:'body', rotation:[0,0,12] }),
+    // couronne de cristaux flottants
+    bone('crystal_1',[0,22,0],[ c([-1,27,-1],[2,6,2],'crystal',{ alpha:0.92, glow:true }), c([-0.5,33,-0.5],[1,2,1],'crystal',{ alpha:0.8, glow:true }) ],{ parent:'body' }),
+    bone('crystal_2',[0,22,0],[ c([6,20,0],[2,5,2],'crystal',{ alpha:0.92, glow:true }), c([6.5,25,0.5],[1,2,1],'crystal',{ alpha:0.8, glow:true }) ],{ parent:'body', rotation:[0,0,-32] }),
+    bone('crystal_3',[0,22,0],[ c([-8,20,0],[2,5,2],'crystal',{ alpha:0.92, glow:true }), c([-7.5,25,0.5],[1,2,1],'crystal',{ alpha:0.8, glow:true }) ],{ parent:'body', rotation:[0,0,32] }),
+    bone('crystal_4',[0,22,0],[ c([0,20,6],[2,5,2],'crystal',{ alpha:0.92, glow:true }) ],{ parent:'body', rotation:[32,0,0] }),
+    bone('crystal_5',[0,22,0],[ c([0,20,-8],[2,5,2],'crystal',{ alpha:0.92, glow:true }) ],{ parent:'body', rotation:[-32,0,0] }),
+    // éclats satellites
+    bone('shard_1',[0,22,0],[ c([5,26,4],[1.5,1.5,1.5],'crystal',{ alpha:0.7, glow:true }) ],{ parent:'body' }),
+    bone('shard_2',[0,22,0],[ c([-6,25,-5],[1.5,1.5,1.5],'crystal',{ alpha:0.7, glow:true }) ],{ parent:'body' }),
+    bone('shard_3',[0,22,0],[ c([4,17,-6],[1.5,1.5,1.5],'crystal',{ alpha:0.7, glow:true }) ],{ parent:'body' }),
+    // traîne d'énergie dégradée
+    bone('tail',[0,19,0],[
+      c([-1.5,13,-1.5],[3,6,3],'aura',{ alpha:0.65 }),
+      c([-1,9,-1],[2,4,2],'aura',{ alpha:0.45 }),
+      c([-0.5,6,-0.5],[1,3,1],'aura',{ alpha:0.3 }),
+    ],{ parent:'body' }),
   ],
   eyes:{ style:'none' },
 };
@@ -211,18 +280,62 @@ const HUMANOID = {
   bones:[
     bone('body',[0,12,0],[
       c([-4,12,-2],[8,12,4],'shirt'),
+      c([-4.2,17,-2.2],[8.4,5,4.4],'shirt'),           // plastron
       c([-4,12,-2],[3,12,4],'accent',{ noise:false }), // liseré
+      c([-4.3,11.5,-2.3],[8.6,2,4.6],'accent'),        // ceinture
+      c([-1,11.5,-2.5],[2,2,1],'hair'),                // boucle de ceinture
+      c([-4.4,21,-2.4],[2.5,3,4.8],'accent'),c([1.9,21,-2.4],[2.5,3,4.8],'accent'), // épaulières
     ]),
-    bone('head',[0,24,0],[ c([-4,24,-4],[8,8,8],'skin') ],{ parent:'body', eyeHost:true }),
+    bone('head',[0,24,0],[
+      c([-4,24,-4],[8,8,8],'skin'),
+      c([-1,26.5,-4.5],[2,2,1],'skin'),                // nez
+    ],{ parent:'body', eyeHost:true }),
     // Coiffures (une seule visible ; gérées par les "parts")
-    bone('hair_short',[0,24,0],[ c([-4.3,29,-4.3],[8.6,4,8.6],'hair',{ inflate:0 }), c([-4.3,26,-4.3],[8.6,3,1.5],'hair') ],{ parent:'head', part:'hair', variant:'court' }),
-    bone('hair_long',[0,24,0],[ c([-4.3,29,-4.3],[8.6,4,8.6],'hair'), c([-4.4,17,3],[8.8,12,2],'hair') ],{ parent:'head', part:'hair', variant:'long' }),
-    bone('hair_spiky',[0,24,0],[ c([-4.3,31,-4.3],[8.6,3,8.6],'hair'), c([-2,34,-2],[1,3,1],'hair'),c([1,34,-2],[1,3,1],'hair'),c([-2,34,1],[1,3,1],'hair'),c([1,34,1],[1,3,1],'hair') ],{ parent:'head', part:'hair', variant:'piquant' }),
-    bone('hair_bun',[0,24,0],[ c([-4.3,29,-4.3],[8.6,4,8.6],'hair'), c([-2,32,2],[4,4,4],'hair') ],{ parent:'head', part:'hair', variant:'chignon' }),
-    bone('arm_r',[-5,22,0],[ c([-8,12,-2],[4,12,4],'skin'), c([-8.2,12,-2.2],[4.4,7,4.4],'shirt') ],{ parent:'body' }),
-    bone('arm_l',[5,22,0],[ c([4,12,-2],[4,12,4],'skin',{ mirror:true }), c([3.8,12,-2.2],[4.4,7,4.4],'shirt') ],{ parent:'body' }),
-    bone('leg_r',[-2,12,0],[ c([-4,0,-2],[4,12,4],'pants') ],{ parent:'body' }),
-    bone('leg_l',[2,12,0],[ c([0,0,-2],[4,12,4],'pants',{ mirror:true }) ],{ parent:'body' }),
+    bone('hair_short',[0,24,0],[
+      c([-4.3,29,-4.3],[8.6,4,8.6],'hair',{ inflate:0 }),
+      c([-4.3,26,-4.3],[8.6,3.4,1.6],'hair'),
+      c([-4.3,25,3],[8.6,5,1.4],'hair'),               // nuque
+      c([-4.4,26,-4.4],[1.4,4,8.8],'hair'),c([3,26,-4.4],[1.4,4,8.8],'hair'), // tempes
+    ],{ parent:'head', part:'hair', variant:'court' }),
+    bone('hair_long',[0,24,0],[
+      c([-4.3,29,-4.3],[8.6,4,8.6],'hair'),
+      c([-4.3,26.5,-4.4],[8.6,3,1.6],'hair'),          // frange
+      c([-4.4,15,3],[8.8,14,1.8],'hair'),              // chevelure dos
+      c([-4.5,20,-1],[1.5,10,5.4],'hair'),c([3,20,-1],[1.5,10,5.4],'hair'), // mèches côtés
+      c([-1.5,13.5,3.2],[3,2,1.6],'accent'),           // attache basse
+    ],{ parent:'head', part:'hair', variant:'long' }),
+    bone('hair_spiky',[0,24,0],[
+      c([-4.3,30,-4.3],[8.6,3,8.6],'hair'),
+      c([-3,33,-3],[1.5,3.5,1.5],'hair'),c([1.5,33,-2.5],[1.5,4,1.5],'hair'),
+      c([-1,33.5,0],[1.5,3,1.5],'hair'),c([-3,33,1.5],[1.5,3.5,1.5],'hair'),c([2,33,1.5],[1.5,3,1.5],'hair'),
+      c([-4.3,27,-4.4],[8.6,3,1.5],'hair'),
+    ],{ parent:'head', part:'hair', variant:'piquant' }),
+    bone('hair_bun',[0,24,0],[
+      c([-4.3,29,-4.3],[8.6,4,8.6],'hair'),
+      c([-2,31.5,2.5],[4,4,4],'hair'),
+      c([-1.5,35,3],[3,1,3],'accent'),                 // ruban
+      c([-4.3,26,-4.4],[8.6,3,1.5],'hair'),
+    ],{ parent:'head', part:'hair', variant:'chignon' }),
+    bone('arm_r',[-5,22,0],[
+      c([-8,12,-2],[4,12,4],'skin'),
+      c([-8.2,17,-2.2],[4.4,7,4.4],'shirt'),
+      c([-8.3,12,-2.3],[4.6,2.5,4.6],'accent'),        // manchette
+    ],{ parent:'body' }),
+    bone('arm_l',[5,22,0],[
+      c([4,12,-2],[4,12,4],'skin',{ mirror:true }),
+      c([3.8,17,-2.2],[4.4,7,4.4],'shirt'),
+      c([3.7,12,-2.3],[4.6,2.5,4.6],'accent'),
+    ],{ parent:'body' }),
+    bone('leg_r',[-2,12,0],[
+      c([-4,0,-2],[4,12,4],'pants'),
+      c([-4.2,0,-2.2],[4.4,4,4.4],'hair'),             // botte
+      c([-4.3,3.5,-2.3],[4.6,1,4.6],'accent'),         // revers de botte
+    ],{ parent:'body' }),
+    bone('leg_l',[2,12,0],[
+      c([0,0,-2],[4,12,4],'pants',{ mirror:true }),
+      c([-0.2,0,-2.2],[4.4,4,4.4],'hair'),
+      c([-0.3,3.5,-2.3],[4.6,1,4.6],'accent'),
+    ],{ parent:'body' }),
   ],
   parts:{
     hair:[
@@ -243,7 +356,105 @@ const HUMANOID = {
   eyes:{ style:'human' },
 };
 
-const CREATURES = [ DRAGON, SPIDER, GOLEM, WISP, HUMANOID ];
+const WOLF = {
+  key:'wolf', name:'Loup Sombre', emoji:'🐺', category:'Bête féroce',
+  desc:'Loup alpha au pelage hérissé, crocs découverts, échine dressée et regard braise.',
+  defaultScale:1.3, flying:false,
+  stats:{ hp:60, damage:8, armor:2, speed:0.38, knockback:0.3 },
+  sounds:{ ambient:'mob.wolf.growl', hurt:'mob.wolf.hurt', death:'mob.wolf.death' },
+  colorSlots:[
+    { key:'fur',   label:'Pelage',      def:'#2e2a28' },
+    { key:'mane',  label:'Crinière',    def:'#1a1716' },
+    { key:'belly', label:'Ventre',      def:'#57504a' },
+    { key:'claw',  label:'Griffes/crocs', def:'#d8cbb0' },
+    { key:'eye',   label:'Yeux',        def:'#ff7a1a' },
+  ],
+  bones:[
+    bone('body',[0,13,0],[
+      c([-4.5,9,-8],[9,9,10],'fur'),            // poitrail
+      c([-4,9,2],[8,8,10],'fur'),               // arrière-train
+      c([-3.5,8.4,-7],[7,2,16],'belly'),        // ventre
+      // échine hérissée
+      c([-1.5,17.5,-7],[3,2.5,4],'mane'),c([-1.5,17,-3],[3,2.5,5],'mane'),c([-1.5,16.5,2],[3,2,5],'mane'),
+    ]),
+    bone('head',[0,16,-8],[
+      c([-3.5,13,-15],[7,7,7],'fur'),           // crâne
+      c([-2,12.2,-21],[4,3.5,6],'fur'),         // museau
+      c([-2,11,-20.5],[4,1.5,5.5],'mane'),      // mâchoire inf
+      c([-2.5,15.5,-16],[5,2,3],'mane'),        // front
+      // crocs
+      c([-1.8,11.6,-20.8],[1,1.4,1],'claw'),c([0.8,11.6,-20.8],[1,1.4,1],'claw'),
+      c([-1.2,12.6,-21],[0.8,1,0.8],'claw'),c([0.6,12.6,-21],[0.8,1,0.8],'claw'),
+      c([-0.8,13.6,-21.4],[1.6,1.2,1.4],'mane'),// truffe
+    ],{ parent:'body', eyeHost:true }),
+    bone('ear_l',[2.5,20,-13],[ c([1.5,19,-14],[2,3.5,1.5],'fur'), c([2,19.5,-13.7],[1,2,1],'mane') ],{ parent:'head', rotation:[0,0,12] }),
+    bone('ear_r',[-2.5,20,-13],[ c([-3.5,19,-14],[2,3.5,1.5],'fur'), c([-3,19.5,-13.7],[1,2,1],'mane') ],{ parent:'head', rotation:[0,0,-12] }),
+    bone('tail',[0,15,11],[
+      c([-1.5,13,10],[3,3,7],'fur'), c([-1,11.5,16],[2,2.5,5],'mane'),
+    ],{ parent:'body', rotation:[-35,0,0] }),
+    // pattes : épaule + patte + coussinets à griffes
+    bone('leg_fr',[2.8,9,-6],[ c([1.6,4,-7],[3,6,3.5],'fur'), c([1.8,0,-6.8],[2.6,4.5,3],'fur'), c([1.6,0,-8],[3,1.5,1.5],'claw') ],{ parent:'body' }),
+    bone('leg_fl',[-2.8,9,-6],[ c([-4.6,4,-7],[3,6,3.5],'fur'), c([-4.4,0,-6.8],[2.6,4.5,3],'fur'), c([-4.6,0,-8],[3,1.5,1.5],'claw') ],{ parent:'body' }),
+    bone('leg_br',[2.6,9,6],[ c([1.4,4,5],[3.2,6,4],'fur'), c([1.7,0,5.4],[2.6,4.5,3],'fur'), c([1.5,0,4.2],[3,1.5,1.5],'claw') ],{ parent:'body' }),
+    bone('leg_bl',[-2.6,9,6],[ c([-4.6,4,5],[3.2,6,4],'fur'), c([-4.3,0,5.4],[2.6,4.5,3],'fur'), c([-4.5,0,4.2],[3,1.5,1.5],'claw') ],{ parent:'body' }),
+  ],
+  eyes:{ style:'reptile' },
+};
+
+const HYDRA = {
+  key:'hydra', name:'Hydre', emoji:'🐉', category:'Boss légendaire',
+  desc:'Hydre à trois têtes sur cous serpentins, corps massif cuirassé et double queue.',
+  defaultScale:2.4, flying:false,
+  stats:{ hp:400, damage:18, armor:14, speed:0.22, knockback:1 },
+  sounds:{ ambient:'mob.enderdragon.growl', hurt:'mob.ravager.hurt', death:'mob.enderdragon.death' },
+  colorSlots:[
+    { key:'body',  label:'Écailles',   def:'#2e4a2e' },
+    { key:'belly', label:'Plastron',   def:'#c9c39a' },
+    { key:'spine', label:'Crêtes',     def:'#8a2020' },
+    { key:'horn',  label:'Cornes',     def:'#d8cbb0' },
+    { key:'eye',   label:'Yeux',       def:'#ffd020' },
+  ],
+  bones:[
+    bone('body',[0,16,0],[
+      c([-9,10,-10],[18,16,22],'body'),          // masse principale
+      c([-7,9,-9],[14,4,20],'belly'),            // plastron
+      c([-10,22,-8],[20,5,18],'body'),           // dos bombé
+      // rangée de crêtes dorsales
+      c([-1.5,27,-8],[3,4,3],'spine'),c([-1.5,27,-3],[3,5,3],'spine'),c([-1.5,27,2],[3,5,3],'spine'),c([-1.5,27,7],[3,4,3],'spine'),
+    ]),
+    // 3 cous serpentins + têtes cornues
+    bone('neck_c',[0,26,-8],[ c([-3,24,-18],[6,8,12],'body'), c([-1,32,-14],[2,3,3],'spine') ],{ parent:'body', rotation:[-32,0,0] }),
+    bone('head_c',[0,30,-17],[
+      c([-4,27,-26],[8,8,10],'body'), c([-3,26,-32],[6,5,7],'body'), c([-3,24.5,-32],[6,2,8],'belly'),
+      c([-2.5,25,-31.8],[1,1.5,1],'horn'),c([1.5,25,-31.8],[1,1.5,1],'horn'),
+    ],{ parent:'neck_c', rotation:[26,0,0], eyeHost:true }),
+    bone('hornc_l',[3,34,-22],[ c([2.5,33.5,-23],[1.5,1.5,6],'horn') ],{ parent:'head_c', rotation:[-38,-10,0] }),
+    bone('hornc_r',[-3,34,-22],[ c([-4,33.5,-23],[1.5,1.5,6],'horn') ],{ parent:'head_c', rotation:[-38,10,0] }),
+    bone('neck_l',[6,24,-6],[ c([3,22,-16],[6,7,11],'body') ],{ parent:'body', rotation:[-24,-28,-14] }),
+    bone('head_l',[6,27,-14],[
+      c([2,24,-23],[8,7,9],'body'), c([3,23,-28],[6,4.5,6],'body'), c([3,21.8,-28],[6,1.6,7],'belly'),
+    ],{ parent:'neck_l', rotation:[22,0,0], eyeHost:true }),
+    bone('hornl_l',[9,30,-19],[ c([8.5,29.5,-20],[1.5,1.5,5],'horn') ],{ parent:'head_l', rotation:[-35,-12,0] }),
+    bone('neck_r',[-6,24,-6],[ c([-9,22,-16],[6,7,11],'body') ],{ parent:'body', rotation:[-24,28,14] }),
+    bone('head_r',[-6,27,-14],[
+      c([-10,24,-23],[8,7,9],'body'), c([-9,23,-28],[6,4.5,6],'body'), c([-9,21.8,-28],[6,1.6,7],'belly'),
+    ],{ parent:'neck_r', rotation:[22,0,0], eyeHost:true }),
+    bone('hornr_r',[-9,30,-19],[ c([-10,29.5,-20],[1.5,1.5,5],'horn') ],{ parent:'head_r', rotation:[-35,12,0] }),
+    // double queue
+    bone('tail_a1',[2,18,12],[ c([0,14,10],[7,8,12],'body'), c([2,22,12],[2,2.5,3],'spine') ],{ parent:'body', rotation:[8,14,0] }),
+    bone('tail_a2',[3,17,22],[ c([1.5,14,20],[5,6,12],'body'), c([2.5,14,31],[3,3,4],'spine') ],{ parent:'tail_a1', rotation:[8,10,0] }),
+    bone('tail_b1',[-2,18,12],[ c([-7,14,10],[7,8,12],'body') ],{ parent:'body', rotation:[8,-14,0] }),
+    bone('tail_b2',[-3,17,22],[ c([-6.5,14,20],[5,6,12],'body'), c([-5.5,14,31],[3,3,4],'spine') ],{ parent:'tail_b1', rotation:[8,-10,0] }),
+    // 4 pattes trapues griffues
+    bone('leg_fr',[7,12,-6],[ c([5,4,-8],[6,9,7],'body'), c([4.5,0,-8.5],[7,4,8],'body'), c([4.5,0,-10],[2,2,2.5],'horn'),c([7,0,-10],[2,2,2.5],'horn') ],{ parent:'body' }),
+    bone('leg_fl',[-7,12,-6],[ c([-11,4,-8],[6,9,7],'body'), c([-11.5,0,-8.5],[7,4,8],'body'), c([-11.5,0,-10],[2,2,2.5],'horn'),c([-9,0,-10],[2,2,2.5],'horn') ],{ parent:'body' }),
+    bone('leg_br',[7,12,8],[ c([5,4,6],[6,9,7],'body'), c([4.5,0,5.5],[7,4,8],'body'), c([4.5,0,4],[2,2,2.5],'horn'),c([7,0,4],[2,2,2.5],'horn') ],{ parent:'body' }),
+    bone('leg_bl',[-7,12,8],[ c([-11,4,6],[6,9,7],'body'), c([-11.5,0,5.5],[7,4,8],'body'), c([-11.5,0,4],[2,2,2.5],'horn'),c([-9,0,4],[2,2,2.5],'horn') ],{ parent:'body' }),
+  ],
+  eyes:{ style:'reptile' },
+};
+
+const CREATURES = [ DRAGON, HYDRA, SPIDER, WOLF, GOLEM, WISP, HUMANOID ];
 
 // ═══════════════════════ OBJETS 3D (modèles) ═══════════════════════
 // Objets "attachable" tenus en main. Géométrie simple à plat + reliefs.
