@@ -477,10 +477,23 @@ const LEGIONNAIRE = {
       c([-4.45,20.2,-2.55],[8.9,1.2,5.1],'steel'),            // bande haute
       c([-4.45,17.6,-2.55],[8.9,1.2,5.1],'steel'),
       c([-4.45,15,-2.55],[8.9,1.2,5.1],'steel'),
-      // plaques pectorales verticales claires + rivets d'or
-      c([-3.5,15.8,-2.9],[3,6,0.7],'steel'),
-      c([0.5,15.8,-2.9],[3,6,0.7],'steel'),
-      c([-0.6,15.2,-2.8],[1.2,7,0.5],'iron'),                  // gorge centrale sombre
+      // plaques pectorales verticales gris sombre + rivets d'or
+      c([-3.5,15.8,-2.9],[3,6,0.7],'iron'),
+      c([0.5,15.8,-2.9],[3,6,0.7],'iron'),
+      c([-0.6,15.2,-2.8],[1.2,7,0.5],'#31363e'),               // gorge centrale plus sombre
+      // plaques dorsales (la lorica couvre aussi le dos)
+      c([-3.5,15.8,2.2],[3,6,0.7],'iron'),
+      c([0.5,15.8,2.2],[3,6,0.7],'iron'),
+      // cerceaux d'épaule (couvrent les trapèzes jusqu'au cou)
+      c([-4.5,22.3,-2.5],[2.7,1.7,5],'iron'),
+      c([1.8,22.3,-2.5],[2.7,1.7,5],'iron'),
+      // focale : écharpe rouge qui protège le cou du frottement de la cuirasse
+      c([-3.2,22.9,-2.85],[6.4,1.5,1.1],'red'),
+      c([-3.4,22.9,-2.3],[1.1,1.7,4.4],'red'),
+      c([2.3,22.9,-2.3],[1.1,1.7,4.4],'red'),
+      // rivets d'or aux extrémités des bandes (flancs)
+      c([-4.75,20.5,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,20.5,-0.7],[0.5,0.9,1.4],'gold'),
+      c([-4.75,17.9,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,17.9,-0.7],[0.5,0.9,1.4],'gold'),
       c([-2.4,21,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,21,-2.95],[0.8,0.8,0.4],'gold'),
       c([-2.4,15.6,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,15.6,-2.95],[0.8,0.8,0.4],'gold'),
       // ceinture (cingulum) + boucle
@@ -493,9 +506,19 @@ const LEGIONNAIRE = {
       c([-4.9,7,-2],[1,4.8,4],'red'), c([3.9,7,-2],[1,4.8,4],'red'),   // pans latéraux
       c([-4,4.5,1.9],[8,7.5,1.2],'red'),                       // pan arrière long (cape courte)
       c([-3,3.8,2.2],[6,1,0.7],'gold'),                        // liseré bas de cape
-      // cingulum : lanières de cuir pendantes sous la jupe, embouts d'or
-      c([-2.9,4.6,-3.05],[1,2.4,0.5],'leather'), c([-0.5,4.6,-3.05],[1,2.4,0.5],'leather'), c([1.9,4.6,-3.05],[1,2.4,0.5],'leather'),
-      c([-2.9,3.9,-3.1],[1,0.8,0.55],'gold'), c([-0.5,3.9,-3.1],[1,0.8,0.55],'gold'), c([1.9,3.9,-3.1],[1,0.8,0.55],'gold'),
+      // cingulum : 5 longues lanières de cuir cloutées qui pendouillent
+      c([-3.7,3.4,-3.05],[1,3.6,0.5],'leather'), c([-2.1,3,-3.05],[1,4,0.5],'leather'),
+      c([-0.5,3.4,-3.05],[1,3.6,0.5],'leather'), c([1.1,3,-3.05],[1,4,0.5],'leather'),
+      c([2.7,3.4,-3.05],[1,3.6,0.5],'leather'),
+      c([-3.7,5.2,-3.15],[1,0.7,0.5],'gold'), c([-2.1,4.8,-3.15],[1,0.7,0.5],'gold'),
+      c([-0.5,5.2,-3.15],[1,0.7,0.5],'gold'), c([1.1,4.8,-3.15],[1,0.7,0.5],'gold'),
+      c([2.7,5.2,-3.15],[1,0.7,0.5],'gold'),
+      c([-3.7,2.7,-3.1],[1,0.8,0.55],'gold'), c([-2.1,2.3,-3.1],[1,0.8,0.55],'gold'),
+      c([-0.5,2.7,-3.1],[1,0.8,0.55],'gold'), c([1.1,2.3,-3.1],[1,0.8,0.55],'gold'),
+      c([2.7,2.7,-3.1],[1,0.8,0.55],'gold'),
+      // ourlet de cuir en bas de la jupe + bandes de cuir latérales
+      c([-4.05,6.2,-3.02],[8.1,1,1.05],'leather'),
+      c([-5.05,6.4,-1.6],[1,2.8,3.2],'leather'), c([4.05,6.4,-1.6],[1,2.8,3.2],'leather'),
     ]),
     bone('head',[0,24,0],[
       c([-4,24,-4],[8,8,8],'skin'),
@@ -508,7 +531,8 @@ const LEGIONNAIRE = {
       c([3.35,23.8,-4.5],[1.5,4.7,4.8],'steel'),               // joue droite (avant)
       c([-3.6,23.6,-4.45],[0.9,1.2,0.6],'gold'), c([2.7,23.6,-4.45],[0.9,1.2,0.6],'gold'), // rivets de joues
       c([-4.95,23.2,2.8],[9.9,3,2.9],'steel'),                 // couvre-nuque évasé
-      // grand cimier rouge (crête longitudinale) + retombée arrière
+      // socle doré du cimier puis grand cimier rouge + retombée arrière
+      c([-1.4,31.9,-4.8],[2.8,0.9,9.6],'gold'),
       c([-1.1,32.3,-5.4],[2.2,2.4,10.8],'red'),
       c([-1.1,34.5,-4.4],[2.2,2.6,9],'red'),
       c([-1.1,36.9,-2.8],[2.2,2,6],'red'),                     // sommet de l'arc
@@ -548,11 +572,15 @@ const LEGIONNAIRE = {
       c([-4,0,-2],[4,12,4],'skin'),
       c([-4.2,0,-2.2],[4.4,4.6,4.4],'leather'),                // bottes (caligae)
       c([-4.3,4.4,-2.3],[4.6,0.9,4.6],'iron'),                 // sangle
+      c([-4.35,5.1,-2.55],[4.7,6.2,1.2],'steel'),              // cnémide (jambière avant)
+      c([-3.2,10.6,-2.7],[2.4,0.8,0.6],'gold'),                // liseré haut de cnémide
     ],{ parent:'body' }),
     bone('leg_l',[2,12,0],[
       c([0,0,-2],[4,12,4],'skin',{ mirror:true }),
       c([-0.2,0,-2.2],[4.4,4.6,4.4],'leather'),
       c([-0.3,4.4,-2.3],[4.6,0.9,4.6],'iron'),
+      c([-0.35,5.1,-2.55],[4.7,6.2,1.2],'steel'),
+      c([0.8,10.6,-2.7],[2.4,0.8,0.6],'gold'),
     ],{ parent:'body' }),
   ],
   eyes:{ style:'none' },

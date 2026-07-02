@@ -215,11 +215,11 @@ function renderModel(canvas, model, opts){
       const x0=Math.min.apply(null,xs), y0=Math.min.apply(null,ys);
       const x1=Math.max.apply(null,xs), y1=Math.max.apply(null,ys);
       const g=ctx.createLinearGradient(x0,y0,x0+(x1-x0)*0.35,y1);
-      g.addColorStop(0,   shade(f.col, Math.min(1.7, f.light*1.55+0.22)));
-      g.addColorStop(0.38, shade(f.col, f.light*1.05));
-      g.addColorStop(0.72, shade(f.col, f.light*0.62));
-      g.addColorStop(0.92, shade(f.col, f.light*0.9));
-      g.addColorStop(1,   shade(f.col, Math.min(1.5, f.light*1.25)));
+      g.addColorStop(0,   shade(f.col, Math.min(1.45, f.light*1.28+0.12)));
+      g.addColorStop(0.38, shade(f.col, f.light*1.0));
+      g.addColorStop(0.72, shade(f.col, f.light*0.7));
+      g.addColorStop(0.92, shade(f.col, f.light*0.88));
+      g.addColorStop(1,   shade(f.col, Math.min(1.35, f.light*1.12)));
       ctx.fillStyle=g;
     } else {
       ctx.fillStyle = shade(f.col, f.light);
