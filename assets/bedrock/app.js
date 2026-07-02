@@ -87,7 +87,7 @@ function create(kind,key){
       colors, parts:{ hair:tpl.parts?tpl.parts.hair[0].key:null, eyes:tpl.parts?tpl.parts.eyes[0].key:null },
       scale:tpl.defaultScale||1, stats:Object.assign({},tpl.stats), sounds:Object.assign({},tpl.sounds),
       options:{ fireImmune:false, spawnEgg:true, boss:tpl.stats.hp>=150, summonable:true },
-      drops:[] };
+      drops:[], geo:BSEngine.cloneModel({bones:tpl.bones}) };
     resolveCreature(inst); state.creatures.push(inst); state.cur.creature=inst.id;
     renderLists(); showPage('creature'); renderCreatureEditor(); toast('✓ '+tpl.name+' créé');
   } else if(kind==='item3d'){
@@ -95,7 +95,7 @@ function create(kind,key){
     const colors={}; tpl.colorSlots.forEach(s=>colors[s.key]=s.def);
     const inst={ id:uid('i_'), _tpl:tpl, tplKey:key, mode:'3d', name:tpl.name, itemId:slug(tpl.name)+'_'+state.items.length,
       colors, scale:tpl.defaultScale||1, itemType:tpl.itemType, stats:Object.assign({},tpl.stats),
-      options:{ glint:false, stack:tpl.itemType==='potion'?16:1 } };
+      options:{ glint:false, stack:tpl.itemType==='potion'?16:1 }, geo:BSEngine.cloneModel({bones:tpl.bones}) };
     resolveItem(inst); state.items.push(inst); state.cur.item=inst.id;
     renderLists(); showPage('item'); renderItemEditor();
   } else if(kind==='item2d'){
@@ -112,7 +112,7 @@ function create(kind,key){
     const tpl=T.FURNITURE.find(t=>t.key===key);
     const colors={}; tpl.colorSlots.forEach(s=>colors[s.key]=s.def);
     const inst={ id:uid('f_'), _tpl:tpl, tplKey:key, name:tpl.name, blockId:slug(tpl.name)+'_'+state.furniture.length,
-      colors, options:{ light:tpl.light||0 } };
+      colors, options:{ light:tpl.light||0 }, geo:BSEngine.cloneModel({bones:tpl.bones}) };
     resolveFurniture(inst); state.furniture.push(inst); state.cur.furniture=inst.id;
     renderLists(); showPage('furniture'); renderFurnitureEditor();
   }
@@ -121,7 +121,7 @@ function create(kind,key){
 // ── Résolution des modèles (couleurs, yeux, parties) ──────────────────────
 function baseModel(inst){
   const tpl=inst._tpl;
-  const model=BSEngine.cloneModel({bones:tpl.bones});
+  const model=BSEngine.cloneModel({bones:(inst.geo&&inst.geo.bones)||tpl.bones});
   // parties (cheveux) : ne garder que la variante choisie
   if(tpl.parts&&tpl.parts.hair){
     const sel=inst.parts.hair;
@@ -136,6 +136,71 @@ function baseModel(inst){
 function resolveCreature(inst){ inst._resolved=baseModel(inst); }
 function resolveItem(inst){ if(inst.mode==='3d') inst._resolved=baseModel(inst); }
 function resolveFurniture(inst){ inst._resolved=baseModel(inst); }
+
+// ═══════════════════════ ÉDITEUR DE CUBES (édition libre) ═══════════════════════
+function geoInst(type){ return type==='creature'?curCreature():type==='item'?curItem():curFurniture(); }
+function geoResolve(type){ const i=geoInst(type); if(!i)return;
+  if(type==='creature')resolveCreature(i); else if(type==='item')resolveItem(i); else resolveFurniture(i);
+  const h=document.getElementById('geo-height-'+type); if(h&&type==='creature'){ updateScaleReadout(); } }
+function slotColor(inst,slot){ const s=(inst._tpl.colorSlots||[]).find(x=>x.key===slot); return (slot&&inst.colors[slot])||(s&&s.def)||'#9aa8b8'; }
+function cubeColorOf(inst,cu){ return cu.color || slotColor(inst,cu.slot); }
+
+function geoEditorCard(type){
+  return `<div class="card"><div class="card-title">🧊 Édition avancée des cubes
+    <button class="px-btn" style="margin-left:auto" onclick="BS.geoToggle('${type}')" id="geo-toggle-${type}">▾ Afficher</button></div>
+    <div id="geo-editor-${type}" style="display:none"></div></div>`;
+}
+const geoOpen={};
+function geoToggle(type){ geoOpen[type]=!geoOpen[type];
+  const el=document.getElementById('geo-editor-'+type); const btn=document.getElementById('geo-toggle-'+type);
+  if(!el)return; el.style.display=geoOpen[type]?'block':'none'; btn.textContent=geoOpen[type]?'▴ Masquer':'▾ Afficher';
+  if(geoOpen[type]) renderGeoInner(type); }
+function renderGeoInner(type){
+  const inst=geoInst(type); const el=document.getElementById('geo-editor-'+type); if(!inst||!el)return;
+  const bones=inst.geo.bones;
+  const n3=(v,cb)=>`<input type="number" step="0.5" value="${v}" style="width:52px;padding:4px 5px" oninput="${cb}">`;
+  let count=0; bones.forEach(b=>count+=(b.cubes||[]).length);
+  el.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:10px">${bones.length} os · ${count} cubes — modifie chaque valeur, l'aperçu se met à jour en direct. <b>origin</b> = coin (x,y,z), <b>size</b> = dimensions.</div>`
+    + bones.map((b,bi)=>`
+    <div style="border:1px solid var(--border);margin-bottom:8px;background:var(--bg1)">
+      <div style="display:flex;align-items:center;gap:6px;padding:7px 9px;background:var(--bg3);flex-wrap:wrap">
+        <input type="text" value="${b.name}" style="width:110px;font-size:12px;color:var(--gold);padding:3px 5px" oninput="BS.geoBoneName('${type}',${bi},this.value)">
+        <span style="font-size:10px;color:var(--muted)">pivot</span>${['0','1','2'].map(a=>n3((b.pivot||[0,0,0])[a],`BS.geoBone('${type}',${bi},'pivot',${a},+this.value)`)).join('')}
+        <span style="font-size:10px;color:var(--muted)">rot</span>${['0','1','2'].map(a=>n3((b.rotation||[0,0,0])[a],`BS.geoBone('${type}',${bi},'rotation',${a},+this.value)`)).join('')}
+        <button class="px-btn" onclick="BS.geoAddCube('${type}',${bi})">+ cube</button>
+        <button class="px-btn" style="color:var(--red);border-color:#3a2020" onclick="BS.geoDelBone('${type}',${bi})">🗑 os</button>
+      </div>
+      <div style="padding:6px 9px">
+      ${(b.cubes||[]).map((cu,ci)=>`
+        <div style="display:flex;align-items:center;gap:5px;padding:4px 0;flex-wrap:wrap;border-bottom:1px solid #14181f">
+          <span style="font-size:10px;color:var(--muted);width:36px">org</span>${['0','1','2'].map(a=>n3(cu.origin[a],`BS.geoCube('${type}',${bi},${ci},'origin',${a},+this.value)`)).join('')}
+          <span style="font-size:10px;color:var(--muted);width:30px">size</span>${['0','1','2'].map(a=>n3(cu.size[a],`BS.geoCube('${type}',${bi},${ci},'size',${a},+this.value)`)).join('')}
+          <span style="font-size:10px;color:var(--muted)">infl</span><input type="number" step="0.1" value="${cu.inflate||0}" style="width:44px;padding:4px 5px" oninput="BS.geoCube('${type}',${bi},${ci},'inflate',0,+this.value)">
+          <input type="color" value="${E.hexToRgb?cubeHex(inst,cu):'#888'}" style="width:28px;height:26px;background:none;border:1px solid var(--border)" oninput="BS.geoCubeColor('${type}',${bi},${ci},this.value)">
+          <button class="px-btn" title="Dupliquer" onclick="BS.geoDupCube('${type}',${bi},${ci})">⧉</button>
+          <button class="px-btn" style="color:var(--red)" onclick="BS.geoDelCube('${type}',${bi},${ci})">✕</button>
+        </div>`).join('')}
+      </div>
+    </div>`).join('')
+    + `<button class="add-mini" onclick="BS.geoAddBone('${type}')">+ Ajouter un os</button>
+       <div style="font-size:11px;color:var(--muted);margin-top:6px">💡 Astuce : ajoute de petits cubes (size 1–2) pour les détails fins (écailles, boutons, rivets…).</div>`;
+}
+function cubeHex(inst,cu){ const col=cubeColorOf(inst,cu); return /^#/.test(col)?col:'#888888'; }
+
+function geoBoneName(type,bi,v){ const i=geoInst(type); i.geo.bones[bi].name=v; geoResolve(type); }
+function geoBone(type,bi,field,axis,v){ const i=geoInst(type); const b=i.geo.bones[bi];
+  b[field]=b[field]||[0,0,0]; b[field][axis]=v; geoResolve(type); }
+function geoCube(type,bi,ci,field,axis,v){ const i=geoInst(type); const cu=i.geo.bones[bi].cubes[ci];
+  if(field==='inflate'){ cu.inflate=v; } else { cu[field][axis]=v; } geoResolve(type); }
+function geoCubeColor(type,bi,ci,v){ const i=geoInst(type); const cu=i.geo.bones[bi].cubes[ci]; cu.color=v; cu.slot=null; geoResolve(type); }
+function geoAddCube(type,bi){ const i=geoInst(type); const b=i.geo.bones[bi];
+  const p=b.pivot||[0,0,0]; b.cubes=b.cubes||[]; b.cubes.push({ origin:[p[0]-2,p[1],p[2]-2], size:[4,4,4], color:'#c8a55a' });
+  geoResolve(type); renderGeoInner(type); }
+function geoDupCube(type,bi,ci){ const i=geoInst(type); const b=i.geo.bones[bi]; const cu=JSON.parse(JSON.stringify(b.cubes[ci]));
+  cu.origin=[cu.origin[0]+2,cu.origin[1],cu.origin[2]]; b.cubes.splice(ci+1,0,cu); geoResolve(type); renderGeoInner(type); }
+function geoDelCube(type,bi,ci){ const i=geoInst(type); i.geo.bones[bi].cubes.splice(ci,1); geoResolve(type); renderGeoInner(type); }
+function geoAddBone(type){ const i=geoInst(type); i.geo.bones.push({ name:'os_'+i.geo.bones.length, pivot:[0,12,0], parent:i.geo.bones[0]?i.geo.bones[0].name:undefined, cubes:[{ origin:[-2,12,-2], size:[4,4,4], color:'#c8a55a' }] }); geoResolve(type); renderGeoInner(type); }
+function geoDelBone(type,bi){ const i=geoInst(type); if(i.geo.bones.length<=1)return; i.geo.bones.splice(bi,1); geoResolve(type); renderGeoInner(type); }
 
 function applyEyes(model,inst){
   const tpl=inst._tpl; const style=(tpl.eyes&&tpl.eyes.style)||'none';
@@ -262,7 +327,8 @@ function renderCreatureEditor(){
       <div class="trow"><span class="tlabel">✨ Peut voler</span><label class="toggle"><input type="checkbox" ${tpl.flying?'checked':''} onchange="BS.opt('flying',this.checked)"><span class="tslider"></span></label></div>
     </div></div>
     <div class="card"><div class="card-title">🎁 Butins (drops)</div><div id="drops">${dropsHtml(inst)}</div>
-      <button class="add-mini" onclick="BS.addDrop()">+ Ajouter un butin</button></div>`;
+      <button class="add-mini" onclick="BS.addDrop()">+ Ajouter un butin</button></div>
+    ${geoEditorCard('creature')}`;
   buildAnimTools();
   updateScaleReadout();
 }
@@ -329,7 +395,8 @@ function renderItem3DEditor(inst){
     </div>
     <div class="toggles-grid">
       <div class="trow"><span class="tlabel">💎 Brillance d'enchantement</span><label class="toggle"><input type="checkbox" ${inst.options.glint?'checked':''} onchange="BS.iopt('glint',this.checked)"><span class="tslider"></span></label></div>
-    </div></div>`;
+    </div></div>
+    ${geoEditorCard('item')}`;
 }
 function renderItem2DEditor(inst){
   document.getElementById('item-editor').innerHTML=`
@@ -420,7 +487,8 @@ function renderFurnitureEditor(){
     <div class="card"><div class="card-title">🎨 Couleurs & matériaux</div><div class="slot-grid">${slotHtml}</div></div>
     <div class="card"><div class="card-title">💡 Options</div>
       <div class="field"><label class="lbl">Émission de lumière (0–15)</label><input type="number" min="0" max="15" value="${inst.options.light||0}" oninput="BS.fopt('light',+this.value)"></div>
-    </div>`;
+    </div>
+    ${geoEditorCard('furniture')}`;
 }
 function setFColor(s,v){ const i=curFurniture(); if(!i)return; i.colors[s]=v; resolveFurniture(i); }
 function ffield(k,v){ const i=curFurniture(); if(!i)return; i[k]=v; if(k==='name')renderLists(); }
@@ -705,6 +773,7 @@ function init(){
 global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, opt, addDrop, drop, rmDrop,
   setAnim, toggleSteve, toggleRotate, resetView, setIColor, ifield, istat, iopt, toggleItemRotate, resetItemView,
   setTool, clearPx, addColor, setFColor, ffield, fopt, toggleFurnRotate, resetFurnView,
+  geoToggle, geoBoneName, geoBone, geoCube, geoCubeColor, geoAddCube, geoDupCube, geoDelCube, geoAddBone, geoDelBone,
   exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
