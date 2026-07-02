@@ -705,7 +705,7 @@ function init(){
 global.BS={ showPage, create, select, remove, field, setColor, setPart, stat, opt, addDrop, drop, rmDrop,
   setAnim, toggleSteve, toggleRotate, resetView, setIColor, ifield, istat, iopt, toggleItemRotate, resetItemView,
   setTool, clearPx, addColor, setFColor, ffield, fopt, toggleFurnRotate, resetFurnView,
-  exportCreature, exportItem, exportFurniture, exportAll, help, closeModal };
+  exportCreature, exportItem, exportFurniture, exportAll, help, closeModal, _state:()=>state };
 
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 

@@ -31,38 +31,73 @@ const DRAGON = {
   ],
   bones:[
     bone('body',[0,20,0],[
-      c([-8,16,-14],[16,15,10],'body'),      // poitrail
-      c([-7,16,-6],[14,13,22],'body'),       // corps
-      c([-6,15,-6],[12,3,22],'belly'),       // ventre
+      c([-8,17,-16],[16,16,12],'body'),      // poitrail large
+      c([-7,16,-6],[14,15,20],'body'),       // corps
+      c([-6,15,-4],[12,3,18],'belly'),       // ventre clair
+      c([-8,16,10],[16,15,11],'body'),       // hanches
+      // épines dorsales
+      c([-1,33,-8],[2,4,3],'horn'),c([-1,32,-3],[2,5,3],'horn'),c([-1,32,2],[2,5,3],'horn'),
+      c([-1,32,7],[2,4,3],'horn'),c([-1,32,12],[2,3,3],'horn'),
     ]),
-    bone('neck',[0,28,-12],[
-      c([-4,24,-22],[8,10,12],'body'),
-    ],{ parent:'body', rotation:[-28,0,0] }),
-    bone('head',[0,30,-20],[
-      c([-5,26,-32],[10,10,14],'body'),
-      c([-4,25,-40],[8,6,10],'body'),        // museau
-      c([-4,23,-40],[8,3,12],'belly'),       // mâchoire
-    ],{ parent:'neck', rotation:[20,0,0], eyeHost:true }),
-    bone('horn_l',[4,34,-26],[ c([3,33,-26],[2,2,10],'horn') ],{ parent:'head', rotation:[-40,0,10] }),
-    bone('horn_r',[-4,34,-26],[ c([-5,33,-26],[2,2,10],'horn') ],{ parent:'head', rotation:[-40,0,-10] }),
-    bone('wing_l',[7,29,-4],[
-      c([7,28,-8],[3,3,22],'horn'),          // bras d'aile
-      c([9,27,-6],[28,1,20],'wing'),         // membrane
-    ],{ parent:'body', rotation:[0,0,-8] }),
-    bone('wing_r',[-7,29,-4],[
-      c([-10,28,-8],[3,3,22],'horn'),
-      c([-37,27,-6],[28,1,20],'wing'),
-    ],{ parent:'body', rotation:[0,0,8] }),
-    bone('tail1',[0,22,14],[ c([-5,18,12],[10,10,14],'body') ],{ parent:'body', rotation:[6,0,0] }),
-    bone('tail2',[0,22,26],[ c([-4,19,24],[8,8,14],'body') ],{ parent:'tail1', rotation:[6,0,0] }),
-    bone('tail3',[0,22,38],[
-      c([-3,20,36],[6,6,16],'belly'),
-      c([-1,26,48],[2,6,6],'horn'),          // pointe
-    ],{ parent:'tail2', rotation:[8,0,0] }),
-    bone('leg_fr',[5,14,-6],[ c([4,0,-8],[5,15,6],'body'), c([3,0,-11],[7,3,7],'horn') ],{ parent:'body' }),
-    bone('leg_fl',[-5,14,-6],[ c([-9,0,-8],[5,15,6],'body'), c([-10,0,-11],[7,3,7],'horn') ],{ parent:'body' }),
-    bone('leg_br',[6,14,12],[ c([5,0,10],[6,15,7],'body'), c([4,0,7],[8,3,8],'horn') ],{ parent:'body' }),
-    bone('leg_bl',[-6,14,12],[ c([-11,0,10],[6,15,7],'body'), c([-12,0,7],[8,3,8],'horn') ],{ parent:'body' }),
+    bone('neck1',[0,29,-14],[
+      c([-5,25,-24],[10,12,12],'body'),
+      c([-1,36,-20],[2,4,3],'horn'),c([-1,35,-15],[2,3,3],'horn'),
+    ],{ parent:'body', rotation:[-38,0,0] }),
+    bone('neck2',[0,33,-22],[
+      c([-4,30,-33],[8,10,11],'body'),
+    ],{ parent:'neck1', rotation:[-18,0,0] }),
+    bone('head',[0,35,-31],[
+      c([-5,31,-43],[10,10,12],'body'),        // crâne
+      c([-6,39,-41],[12,3,7],'horn'),          // arcade / front
+      c([-4,29,-52],[8,7,11],'body'),          // museau
+      c([-4,26,-52],[8,3,14],'belly'),         // mâchoire
+      // crocs
+      c([-3,29,-52],[1,2,2],'horn'),c([2,29,-52],[1,2,2],'horn'),
+      c([-3,26,-52],[1,2,2],'horn'),c([2,26,-52],[1,2,2],'horn'),
+    ],{ parent:'neck2', rotation:[28,0,0], eyeHost:true }),
+    bone('horn_l',[5,41,-36],[ c([4,40,-36],[2,2,8],'horn'), c([4,39,-29],[2,2,7],'horn') ],{ parent:'head', rotation:[-45,-12,12] }),
+    bone('horn_r',[-5,41,-36],[ c([-6,40,-36],[2,2,8],'horn'), c([-6,39,-29],[2,2,7],'horn') ],{ parent:'head', rotation:[-45,12,-12] }),
+    bone('frill_l',[5,36,-34],[ c([5,33,-34],[1,5,7],'wing') ],{ parent:'head', rotation:[0,0,35] }),
+    bone('frill_r',[-5,36,-34],[ c([-6,33,-34],[1,5,7],'wing') ],{ parent:'head', rotation:[0,0,-35] }),
+    // Ailes : humérus + avant-bras + doigts + membranes
+    bone('wing_l',[7,31,-6],[
+      c([7,29,-9],[4,4,10],'horn'),            // humérus
+      c([9,29,0],[3,3,20],'horn'),             // avant-bras vers l'extérieur
+      c([11,28,-2],[24,1,16],'wing'),          // membrane haute
+      c([11,28,14],[20,1,12],'wing'),          // membrane basse
+      c([33,27,-2],[2,2,10],'horn'),           // doigt/pointe
+    ],{ parent:'body', rotation:[-8,-22,-46] }),
+    bone('wing_r',[-7,31,-6],[
+      c([-11,29,-9],[4,4,10],'horn'),
+      c([-12,29,0],[3,3,20],'horn'),
+      c([-35,28,-2],[24,1,16],'wing'),
+      c([-31,28,14],[20,1,12],'wing'),
+      c([-35,27,-2],[2,2,10],'horn'),
+    ],{ parent:'body', rotation:[-8,22,46] }),
+    bone('tail1',[0,22,16],[ c([-5,17,14],[10,11,14],'body'), c([-1,28,16],[2,3,3],'horn'),c([-1,28,21],[2,3,3],'horn') ],{ parent:'body', rotation:[8,0,0] }),
+    bone('tail2',[0,21,28],[ c([-4,17,26],[8,9,14],'body'), c([-1,26,28],[2,3,3],'horn') ],{ parent:'tail1', rotation:[8,0,0] }),
+    bone('tail3',[0,20,40],[ c([-3,17,38],[6,7,14],'belly') ],{ parent:'tail2', rotation:[9,0,0] }),
+    bone('tail4',[0,19,52],[
+      c([-2,17,50],[4,5,12],'belly'),
+      c([-3,17,60],[6,9,3],'horn'),            // dard en pointe de flèche
+    ],{ parent:'tail3', rotation:[10,0,0] }),
+    // Pattes : cuisse + tibia + pied griffu
+    bone('leg_fr',[6,15,-8],[
+      c([4,5,-11],[6,12,8],'body'), c([5,0,-12],[4,6,7],'body'),
+      c([3,0,-16],[8,3,7],'body'), c([3,0,-18],[2,2,3],'horn'),c([5.5,0,-18],[2,2,3],'horn'),c([8,0,-18],[2,2,3],'horn'),
+    ],{ parent:'body' }),
+    bone('leg_fl',[-6,15,-8],[
+      c([-10,5,-11],[6,12,8],'body'), c([-9,0,-12],[4,6,7],'body'),
+      c([-11,0,-16],[8,3,7],'body'), c([-11,0,-18],[2,2,3],'horn'),c([-7.5,0,-18],[2,2,3],'horn'),c([-5,0,-18],[2,2,3],'horn'),
+    ],{ parent:'body' }),
+    bone('leg_br',[7,15,12],[
+      c([5,4,9],[7,13,9],'body'), c([6,0,10],[5,6,8],'body'),
+      c([4,0,6],[9,3,8],'body'), c([4,0,4],[2,2,3],'horn'),c([7,0,4],[2,2,3],'horn'),c([10,0,4],[2,2,3],'horn'),
+    ],{ parent:'body' }),
+    bone('leg_bl',[-7,15,12],[
+      c([-12,4,9],[7,13,9],'body'), c([-11,0,10],[5,6,8],'body'),
+      c([-13,0,6],[9,3,8],'body'), c([-13,0,4],[2,2,3],'horn'),c([-10,0,4],[2,2,3],'horn'),c([-7,0,4],[2,2,3],'horn'),
+    ],{ parent:'body' }),
   ],
   eyes:{ style:'reptile' },
 };
