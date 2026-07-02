@@ -442,9 +442,18 @@ function toGeometryJSON(model, identifier){
     if (b.mirror) out.mirror = true;
     if (b.cubes && b.cubes.length){
       out.cubes = b.cubes.filter(cu=>!cu.previewOnly).map(cu => {
-        const cube = { origin: cu.origin, size: cu.size, uv: cu.uv || [0,0] };
+        // UV PAR FACE : chaque face déclare exactement son rectangle de
+        // texture (aucun arrondi Bedrock, tailles fractionnaires fidèles).
+        // Les rectangles sont ceux que generateTexture peint → couverture
+        // garantie à 100 %, en jeu comme dans l'aperçu.
+        const rects = faceRect(cu.uv || [0,0], cu.size);
+        const uv = {};
+        Object.keys(rects).forEach(f => {
+          const [u,v,w,h] = rects[f];
+          uv[f] = { uv: [u, v], uv_size: [w, h] };
+        });
+        const cube = { origin: cu.origin, size: cu.size, uv };
         if (cu.inflate) cube.inflate = cu.inflate;
-        if (cu.mirror) cube.mirror = true;
         return cube;
       });
     }
