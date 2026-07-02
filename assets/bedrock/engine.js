@@ -166,7 +166,7 @@ function renderModel(canvas, model, opts){
         const light = 0.55 + 0.75 * Math.max(0, -dot(normalize(nc), lightDir));
         const col = (cube.faceColors && cube.faceColors[key]) || cube.color || defColor || '#9aa8b8';
         faces.push({ pts, depth, col, light, alpha: cube.alpha, pick: cube._pick, isSel,
-          faceKey: key, texDims: faceTexDims(uvSize, key),
+          faceKey: key, texDims: faceTexDims(uvSize, key), mat: cube.mat,
           paint: cube.paint && cube.paint[key] });
       });
     });
@@ -209,7 +209,21 @@ function renderModel(canvas, model, opts){
     for (let i=1;i<4;i++) ctx.lineTo(p[i][0],p[i][1]);
     ctx.closePath();
     ctx.globalAlpha = (f.alpha!=null?f.alpha:1);
-    ctx.fillStyle = shade(f.col, f.light);
+    if (f.mat === 'metal'){
+      // dégradé métallique : reflet en haut, creux sombre, liseré brillant en bas
+      const xs=p.map(q=>q[0]), ys=p.map(q=>q[1]);
+      const x0=Math.min.apply(null,xs), y0=Math.min.apply(null,ys);
+      const x1=Math.max.apply(null,xs), y1=Math.max.apply(null,ys);
+      const g=ctx.createLinearGradient(x0,y0,x0+(x1-x0)*0.35,y1);
+      g.addColorStop(0,   shade(f.col, Math.min(1.7, f.light*1.55+0.22)));
+      g.addColorStop(0.38, shade(f.col, f.light*1.05));
+      g.addColorStop(0.72, shade(f.col, f.light*0.62));
+      g.addColorStop(0.92, shade(f.col, f.light*0.9));
+      g.addColorStop(1,   shade(f.col, Math.min(1.5, f.light*1.25)));
+      ctx.fillStyle=g;
+    } else {
+      ctx.fillStyle = shade(f.col, f.light);
+    }
     ctx.fill();
     ctx.globalAlpha = 1;
     // pixels peints : sous-quadrilatères interpolés sur la face (WYSIWYG avec la texture)
@@ -355,10 +369,32 @@ function generateTexture(model){
       const [x,y,w,h] = rects[face];
       if (w<=0||h<=0) return;
       const base = (cube.faceColors && cube.faceColors[face]) || cube.color || b.color || '#9aa8b8';
-      ctx.fillStyle = shade(base, shadeF[face]);
-      ctx.fillRect(x, y, w, h);
+      if (cube.mat === 'metal'){
+        // métal : dégradé vertical (reflet haut, creux, liseré bas) + brossage
+        const hh = Math.max(1, Math.round(h));
+        for (let py=0; py<hh; py++){
+          const t = hh<2 ? 0.3 : py/(hh-1);
+          let f2 = 1.32 - t*0.72;
+          if (py===0) f2 = 1.55;
+          else if (hh>3 && py===1) f2 = 1.4;
+          else if (py===hh-1) f2 = 1.1;      // liseré de bord
+          else if (hh>3 && py===hh-2) f2 = 0.5;
+          ctx.fillStyle = shade(base, shadeF[face]*f2);
+          ctx.fillRect(x, y+py, w, 1);
+        }
+        // stries de brossage discrètes
+        const ww = Math.max(1, Math.round(w));
+        for (let px=0; px<ww; px+=3){
+          ctx.fillStyle = 'rgba(255,255,255,0.07)';
+          ctx.fillRect(x+px, y, 1, hh);
+        }
+        ctx.fillStyle='rgba(0,0,0,0)';
+      } else {
+        ctx.fillStyle = shade(base, shadeF[face]);
+        ctx.fillRect(x, y, w, h);
+      }
       // légère variation "pixel" pour un rendu moins plat
-      if (cube.noise !== false){
+      if (cube.mat !== 'metal' && cube.noise !== false){
         const rgb = hexToRgb(base);
         for (let py=0;py<h;py++) for (let px=0;px<w;px++){
           if (((px*7+py*13)%5)===0){

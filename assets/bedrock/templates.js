@@ -462,9 +462,9 @@ const LEGIONNAIRE = {
   stats:{ hp:60, damage:8, armor:15, speed:0.3, knockback:0.2 },
   sounds:{ ambient:'mob.villager.idle', hurt:'mob.villager.hurt', death:'mob.villager.death' },
   colorSlots:[
-    { key:'steel', label:'Acier du casque',  def:'#b9bec6' },
-    { key:'iron',  label:'Cuirasse',         def:'#4a4f57' },
-    { key:'gold',  label:'Or / rivets',      def:'#e0b23c' },
+    { key:'steel', label:'Acier du casque',  def:'#c6ccd6', mat:'metal' },
+    { key:'iron',  label:'Cuirasse',         def:'#565d68', mat:'metal' },
+    { key:'gold',  label:'Or / rivets',      def:'#e8b93c', mat:'metal' },
     { key:'red',   label:'Cimier & tissu',   def:'#c8362b' },
     { key:'leather', label:'Cuir / tunique', def:'#7a5a38' },
     { key:'skin',  label:'Peau',             def:'#d8a878' },
@@ -570,8 +570,8 @@ const ITEMS_3D = [
     key:'sword', name:'Épée médiévale', emoji:'⚔️', category:'Arme',
     itemType:'sword', defaultScale:1.0,
     colorSlots:[
-      { key:'blade', label:'Lame',    def:'#c7ccd4' },
-      { key:'guard', label:'Garde',   def:'#c8a55a' },
+      { key:'blade', label:'Lame',    def:'#c7ccd4', mat:'metal' },
+      { key:'guard', label:'Garde',   def:'#c8a55a', mat:'metal' },
       { key:'grip',  label:'Poignée', def:'#5a3a1a' },
     ],
     bones: itemBone([
@@ -587,7 +587,7 @@ const ITEMS_3D = [
     key:'axe', name:'Hache de guerre', emoji:'🪓', category:'Arme',
     itemType:'axe', defaultScale:1.0,
     colorSlots:[
-      { key:'head',  label:'Fer',     def:'#9aa0a8' },
+      { key:'head',  label:'Fer',     def:'#9aa0a8', mat:'metal' },
       { key:'handle',label:'Manche',  def:'#5a3a1a' },
       { key:'bind',  label:'Ligature',def:'#c8a55a' },
     ],
@@ -605,8 +605,8 @@ const ITEMS_3D = [
     itemType:'shield', defaultScale:1.0,
     colorSlots:[
       { key:'face',  label:'Face',    def:'#7a1f1f' },
-      { key:'rim',   label:'Bordure', def:'#c8a55a' },
-      { key:'boss',  label:'Umbo',    def:'#c7ccd4' },
+      { key:'rim',   label:'Bordure', def:'#c8a55a', mat:'metal' },
+      { key:'boss',  label:'Umbo',    def:'#c7ccd4', mat:'metal' },
     ],
     bones: itemBone([
       c([-6,0,0],[12,16,2],'face'),
@@ -622,7 +622,7 @@ const ITEMS_3D = [
     colorSlots:[
       { key:'wood',   label:'Bois',     def:'#5a3a1a' },
       { key:'gem',    label:'Gemme',    def:'#8be9ff' },
-      { key:'binding',label:'Monture',  def:'#c8a55a' },
+      { key:'binding',label:'Monture',  def:'#c8a55a', mat:'metal' },
     ],
     bones: itemBone([
       c([-0.5,-6,-0.5],[1,20,1],'wood'),
@@ -705,7 +705,7 @@ const FURNITURE = [
   {
     key:'candelabra', name:'Chandelier', emoji:'🕯️', category:'Éclairage', light:12,
     defaultScale:1.0,
-    colorSlots:[ { key:'metal', label:'Métal', def:'#c8a55a' }, { key:'wax', label:'Bougie', def:'#e8e0c8' }, { key:'flame', label:'Flamme', def:'#ff9a2a' } ],
+    colorSlots:[ { key:'metal', label:'Métal', def:'#c8a55a', mat:'metal' }, { key:'wax', label:'Bougie', def:'#e8e0c8' }, { key:'flame', label:'Flamme', def:'#ff9a2a' } ],
     bones:[ bone('root',[8,0,8],[
       c([6,0,6],[4,2,4],'metal'),c([7,2,7],[2,10,2],'metal'),
       c([5,11,7],[6,1,2],'metal'),

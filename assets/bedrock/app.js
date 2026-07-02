@@ -138,7 +138,13 @@ function baseModel(inst){
     model.bones=model.bones.filter(b=> b.part!=='hair' || b.variant===sel);
   }
   // couleurs
-  model.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{ if(cu.slot&&inst.colors[cu.slot]) cu.color=inst.colors[cu.slot]; }));
+  const slotDefs={}; (tpl.colorSlots||[]).forEach(s=>slotDefs[s.key]=s);
+  model.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{
+    if(cu.slot){
+      if(inst.colors[cu.slot]) cu.color=inst.colors[cu.slot];
+      const sd=slotDefs[cu.slot]; if(sd&&sd.mat&&!cu.mat) cu.mat=sd.mat;
+    }
+  }));
   E.autoUV(model);
   applyEyes(model,inst);
   // annotation pour la sélection au clic (nom d'os + index de cube)
