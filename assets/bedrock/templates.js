@@ -454,7 +454,106 @@ const HYDRA = {
   eyes:{ style:'reptile' },
 };
 
-const CREATURES = [ DRAGON, HYDRA, SPIDER, WOLF, GOLEM, WISP, HUMANOID ];
+
+const LEGIONNAIRE = {
+  key:'legionnaire', name:'Légionnaire Romain', emoji:'🏛️', category:'Soldat en armure',
+  desc:'Soldat au gabarit Steve portant la panoplie complète : casque à cimier, lorica segmentata, ptéruges et scutum.',
+  defaultScale:1, flying:false,
+  stats:{ hp:60, damage:8, armor:15, speed:0.3, knockback:0.2 },
+  sounds:{ ambient:'mob.villager.idle', hurt:'mob.villager.hurt', death:'mob.villager.death' },
+  colorSlots:[
+    { key:'steel', label:'Acier du casque',  def:'#b9bec6' },
+    { key:'iron',  label:'Cuirasse',         def:'#4a4f57' },
+    { key:'gold',  label:'Or / rivets',      def:'#e0b23c' },
+    { key:'red',   label:'Cimier & tissu',   def:'#c8362b' },
+    { key:'leather', label:'Cuir / tunique', def:'#7a5a38' },
+    { key:'skin',  label:'Peau',             def:'#d8a878' },
+  ],
+  bones:[
+    bone('body',[0,12,0],[
+      c([-4,12,-2],[8,12,4],'leather'),                       // tunique
+      // lorica segmentata : cuirasse + bandes segmentées
+      c([-4.3,14.5,-2.4],[8.6,8,4.8],'iron'),
+      c([-4.45,20.2,-2.55],[8.9,1.2,5.1],'steel'),            // bande haute
+      c([-4.45,17.6,-2.55],[8.9,1.2,5.1],'steel'),
+      c([-4.45,15,-2.55],[8.9,1.2,5.1],'steel'),
+      // plaques pectorales + rivets d'or
+      c([-3.4,18.2,-2.9],[2.8,3.2,0.6],'iron'),
+      c([0.6,18.2,-2.9],[2.8,3.2,0.6],'iron'),
+      c([-2.4,21,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,21,-2.95],[0.8,0.8,0.4],'gold'),
+      c([-2.4,15.6,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,15.6,-2.95],[0.8,0.8,0.4],'gold'),
+      // ceinture (cingulum) + boucle
+      c([-4.4,11.6,-2.4],[8.8,1.8,4.8],'leather'),
+      c([-1,11.7,-2.7],[2,1.6,0.5],'gold'),
+      // ptéruges : jupe rouge à médaillons d'or et franges
+      c([-4,6.5,-2.9],[8,5.4,1.1],'red'),
+      c([-2.6,8.6,-3.2],[1.3,1.3,0.4],'gold'), c([-0.6,8.6,-3.2],[1.3,1.3,0.4],'gold'), c([1.4,8.6,-3.2],[1.3,1.3,0.4],'gold'),
+      c([-2.5,6.1,-3.1],[1,1,0.4],'gold'), c([0.9,6.1,-3.1],[1,1,0.4],'gold'),
+      c([-4.9,7,-2],[1,4.8,4],'red'), c([3.9,7,-2],[1,4.8,4],'red'),   // pans latéraux
+      c([-4,4.5,1.9],[8,7.5,1.2],'red'),                       // pan arrière long (cape courte)
+      c([-3,3.8,2.2],[6,1,0.7],'gold'),                        // liseré bas de cape
+    ]),
+    bone('head',[0,24,0],[
+      c([-4,24,-4],[8,8,8],'skin'),
+      // casque (galea) : dôme, visière, bandeau d'or, couvre-nuque, protège-joues avant
+      c([-4.6,28,-4.6],[9.2,4.4,9.2],'steel'),
+      c([-4.85,28.2,-5.2],[9.7,1.3,1.6],'steel'),              // visière frontale
+      c([-4.7,29.6,-4.85],[9.4,1.1,1.1],'gold'),               // bandeau d'or
+      c([-2.9,30.9,-4.9],[1.2,0.9,0.5],'gold'), c([1.7,30.9,-4.9],[1.2,0.9,0.5],'gold'),
+      c([-4.8,23.8,-4.3],[1.2,4.6,4.4],'steel'),               // joue gauche (avant)
+      c([3.6,23.8,-4.3],[1.2,4.6,4.4],'steel'),                // joue droite (avant)
+      c([-3.6,23.6,-4.45],[0.9,1.2,0.6],'gold'), c([2.7,23.6,-4.45],[0.9,1.2,0.6],'gold'), // rivets de joues
+      c([-4.95,23.2,2.8],[9.9,3,2.9],'steel'),                 // couvre-nuque évasé
+      // grand cimier rouge (crête longitudinale) + retombée arrière
+      c([-1.1,32.3,-5.4],[2.2,2.4,10.8],'red'),
+      c([-1.1,34.5,-4.4],[2.2,2.6,9],'red'),
+      c([-1.1,36.9,-2.8],[2.2,2,6],'red'),                     // sommet de l'arc
+      c([-1.1,30.4,-6.6],[2.2,3,1.6],'red'),                   // touffe avant
+      c([-1.1,29.4,4.9],[2.2,4.6,1.5],'red'),                  // retombée arrière
+      c([-1.1,26,5.4],[2.2,4,1.3],'red'),                      // queue basse
+      // visage
+      c([-2.4,27,-4.3],[1.6,1.4,0.4],'#ffffff'), c([0.8,27,-4.3],[1.6,1.4,0.4],'#ffffff'),
+      c([-1.7,27,-4.4],[0.8,1.2,0.4],'#3a2a1a'), c([1.4,27,-4.4],[0.8,1.2,0.4],'#3a2a1a'),
+    ],{ parent:'body' }),
+    bone('arm_r',[-5,22,0],[
+      c([-8,12,-2],[4,12,4],'skin'),
+      c([-8.2,17.5,-2.2],[4.4,5,4.4],'leather'),               // manche
+      c([-8.45,18.9,-2.45],[4.9,2.4,4.9],'red'),               // épaulette rouge
+      c([-8.75,20.7,-2.7],[5.1,3.5,5.4],'steel'),              // spallière d'acier
+      c([-8.2,21.2,-2.85],[4,0.8,0.6],'gold'),                 // liseré d'or
+      c([-8.35,12.8,-2.35],[4.7,2.8,4.7],'leather'),           // brassard
+    ],{ parent:'body' }),
+    bone('arm_l',[5,22,0],[
+      c([4,12,-2],[4,12,4],'skin',{ mirror:true }),
+      c([3.8,17.5,-2.2],[4.4,5,4.4],'leather'),
+      c([3.55,18.9,-2.45],[4.9,2.4,4.9],'red'),
+      c([3.65,20.7,-2.7],[5.1,3.5,5.4],'steel'),
+      c([4.2,21.2,-2.85],[4,0.8,0.6],'gold'),
+      c([3.65,12.8,-2.35],[4.7,2.8,4.7],'leather'),
+      // scutum : plateau rouge, bordure d'or, umbo d'acier, motif ailé
+      c([8.6,5,-5],[1.3,17.5,10],'red'),
+      c([8.5,21.6,-5.3],[1.5,1.1,10.6],'gold'), c([8.5,4.3,-5.3],[1.5,1.1,10.6],'gold'),
+      c([8.5,4.3,-5.5],[1.5,18.4,1],'gold'), c([8.5,4.3,4.5],[1.5,18.4,1],'gold'),
+      c([9.7,12,-1.6],[0.9,3.4,3.2],'steel'),                  // umbo central
+      c([9.8,15.6,-1],[0.6,5,2],'gold'),                       // hampe verticale
+      c([9.8,16.4,-3.9],[0.6,3.6,1.7],'gold'), c([9.8,16.4,2.2],[0.6,3.6,1.7],'gold'), // ailes
+      c([9.8,6.4,-3.4],[0.6,3.6,1.5],'gold'), c([9.8,6.4,1.9],[0.6,3.6,1.5],'gold'),   // foudres bas
+    ],{ parent:'body' }),
+    bone('leg_r',[-2,12,0],[
+      c([-4,0,-2],[4,12,4],'skin'),
+      c([-4.2,0,-2.2],[4.4,4.6,4.4],'leather'),                // bottes (caligae)
+      c([-4.3,4.4,-2.3],[4.6,0.9,4.6],'iron'),                 // sangle
+    ],{ parent:'body' }),
+    bone('leg_l',[2,12,0],[
+      c([0,0,-2],[4,12,4],'skin',{ mirror:true }),
+      c([-0.2,0,-2.2],[4.4,4.6,4.4],'leather'),
+      c([-0.3,4.4,-2.3],[4.6,0.9,4.6],'iron'),
+    ],{ parent:'body' }),
+  ],
+  eyes:{ style:'none' },
+};
+
+const CREATURES = [ DRAGON, HYDRA, SPIDER, WOLF, GOLEM, WISP, HUMANOID, LEGIONNAIRE ];
 
 // ═══════════════════════ OBJETS 3D (modèles) ═══════════════════════
 // Objets "attachable" tenus en main. Géométrie simple à plat + reliefs.
