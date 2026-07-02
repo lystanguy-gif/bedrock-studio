@@ -895,9 +895,24 @@ function addItem(inst,NS,rp,bp,langFR,langEN,itemTex){
   langEN.push('item.'+ident+'.name='+inst.name);
 }
 
+// la géométrie de bloc Bedrock est centrée sur le bloc : x/z ∈ [-8,8].
+// Les gabarits créés en 0..16 sont recentrés automatiquement à l'export.
+function normalizeBlockSpace(model){
+  const m=E.cloneModel(model);
+  let minX=1e9,maxX=-1e9,minZ=1e9,maxZ=-1e9;
+  m.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{
+    minX=Math.min(minX,cu.origin[0]); maxX=Math.max(maxX,cu.origin[0]+cu.size[0]);
+    minZ=Math.min(minZ,cu.origin[2]); maxZ=Math.max(maxZ,cu.origin[2]+cu.size[2]);
+  }));
+  if((minX+maxX)/2>4&&(minZ+maxZ)/2>4){
+    m.bones.forEach(b=>{ b.pivot=b.pivot||[0,0,0]; b.pivot[0]-=8; b.pivot[2]-=8;
+      (b.cubes||[]).forEach(cu=>{ cu.origin[0]-=8; cu.origin[2]-=8; }); });
+  }
+  return m;
+}
 function addFurniture(inst,NS,rp,bp,langFR,langEN,terrainTex){
   const id=slug(inst.blockId), ident=NS+':'+id, geoId='geometry.'+NS+'.'+id;
-  const model=inst._resolved;
+  const model=normalizeBlockSpace(inst._resolved);
   rp.file('models/entity/'+id+'.geo.json',J(E.toGeometryJSON(model,geoId)));
   rp.file('textures/blocks/'+id+'.png',b64toBlob(E.generateTexture(model)));
   terrainTex[id]={ textures:'textures/blocks/'+id };
@@ -980,10 +995,13 @@ function validateAssets(a){
     if(!f.name.trim()) errors.push('Un meuble n\'a pas de nom.');
     checkId(f.blockId,'meuble',f.name);
     let outside=false;
-    (f._resolved?f._resolved.bones:f.geo.bones).forEach(b=>(b.cubes||[]).forEach(cu=>{
-      if(cu.origin[0]<-8.5||cu.origin[0]+cu.size[0]>8.5||cu.origin[2]<-8.5||cu.origin[2]+cu.size[2]>8.5||cu.origin[1]<-0.5||cu.origin[1]+cu.size[1]>16.5) outside=true;
+    const nm=normalizeBlockSpace(f._resolved||{bones:f.geo.bones});
+    nm.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{
+      // seul le débordement LATÉRAL pose problème (traverse les murs voisins) ;
+      // dépasser en hauteur (dossier de chaise, lampadaire…) est normal
+      if(cu.origin[0]<-8.5||cu.origin[0]+cu.size[0]>8.5||cu.origin[2]<-8.5||cu.origin[2]+cu.size[2]>8.5||cu.origin[1]<-0.5||cu.origin[1]+cu.size[1]>34) outside=true;
     }));
-    if(outside) warns.push('« '+f.name+' » dépasse du bloc 16×16×16 : en jeu, les parties qui dépassent peuvent traverser les murs voisins.');
+    if(outside) warns.push('« '+f.name+' » déborde latéralement de son bloc : en jeu, les parties qui dépassent peuvent traverser les murs voisins.');
   });
   return { errors, warns };
 }
