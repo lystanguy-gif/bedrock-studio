@@ -647,8 +647,9 @@ function buildAnimations(model){
     }
     // os "blood" (sang sur la lame) : caché par défaut (scale 0) dans toutes les poses
     if (b.name==='blood'){
-      idle.bones[b.name]={ scale:0 }; walk.bones[b.name]={ scale:0 }; run.bones[b.name]={ scale:0 };
-      roar.bones[b.name]={ scale:0 }; sleep.bones[b.name]={ scale:0 }; attack.bones[b.name]={ scale:0 };
+      const z=[0,0,0];
+      idle.bones[b.name]={ scale:z }; walk.bones[b.name]={ scale:z }; run.bones[b.name]={ scale:z };
+      roar.bones[b.name]={ scale:z }; sleep.bones[b.name]={ scale:z }; attack.bones[b.name]={ scale:z };
     }
   });
   const anims = { idle, walk, attack, run, roar, sleep };
@@ -682,11 +683,15 @@ function buildAnimations(model){
     over.particle_effects['0.6']  = { effect:'blood', locator:'blade' };
     // sang qui apparaît sur la lame puis s'estompe
     if (hasBlood){
-      stab.bones.blood = { scale:{ '0.0':0, '0.28':1, '0.5':0.6, '0.7':0 } };
-      bash.bones.blood = { scale:0 };
-      over.bones.blood = { scale:{ '0.0':0, '0.44':1, '0.62':0.7, '0.8':0 } };
+      stab.bones.blood = { scale:{ '0.0':[0,0,0], '0.28':[1,1,1], '0.5':[0.6,0.6,0.6], '0.7':[0,0,0] } };
+      bash.bones.blood = { scale:[0,0,0] };
+      over.bones.blood = { scale:{ '0.0':[0,0,0], '0.44':[1,1,1], '0.62':[0.7,0.7,0.7], '0.8':[0,0,0] } };
     }
     anims.attack_stab = stab; anims.attack_bash = bash; anims.attack_over = over;
+    // idle vivant : respiration + léger balancement de l'arme (le soldat n'est jamais figé)
+    idle.bones.body = { rotation:{ '0.0':[0,0,0], '1.0':[1.6,0,0], '2.0':[0,0,0] } };
+    if (hasR) idle.bones.arm_r = { rotation:{ '0.0':[0,0,0], '1.0':[-4,0,2], '2.0':[0,0,0] } };
+    if (hasL) idle.bones.arm_l = { rotation:{ '0.0':[0,0,0], '1.0':[-3,0,-2], '2.0':[0,0,0] } };
   }
   return anims;
 }

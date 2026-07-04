@@ -890,8 +890,11 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
   if(inst.options.fireImmune) comp['minecraft:fire_immune']={};
   if(boss) comp['minecraft:boss']={ should_darken_sky:false, hud_range:55, name:inst.name };
   // IA
-  comp['minecraft:behavior.nearest_attackable_target']={ priority:2, must_see:true, entity_types:[{ filters:{ test:'is_family', subject:'other', value:'player' }, max_dist:24 }] };
-  comp['minecraft:behavior.melee_attack']={ priority:3, speed_multiplier:1.2, track_target:true };
+  comp['minecraft:behavior.hurt_by_target']={ priority:1 };
+  comp['minecraft:behavior.nearest_attackable_target']={ priority:2, must_see:true, reselect_targets:true, entity_types:[
+    { filters:{ test:'is_family', subject:'other', value:'player' }, max_dist:24 },
+    { filters:{ any_of:[{ test:'is_family', subject:'other', value:'villager' },{ test:'is_family', subject:'other', value:'irongolem' }] }, max_dist:20 } ] };
+  comp['minecraft:behavior.melee_attack']={ priority:3, speed_multiplier:1.25, track_target:true, reach_multiplier:1.6 };
   comp['minecraft:behavior.random_stroll']={ priority:6, speed_multiplier:1 };
   if(flying){ comp['minecraft:movement.fly']={}; comp['minecraft:navigation.fly']={ can_path_over_water:true }; comp['minecraft:behavior.float_wander']={ priority:5, xz_dist:8, y_dist:6 }; delete comp['minecraft:behavior.random_stroll']; }
   else { comp['minecraft:movement.basic']={}; comp['minecraft:navigation.walk']={ can_path_over_water:true, avoid_water:true }; comp['minecraft:jump.static']={}; comp['minecraft:behavior.random_stroll'].priority=6; }
