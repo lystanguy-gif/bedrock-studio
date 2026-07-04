@@ -664,6 +664,30 @@ const CENTURION = (function(){
     c([-1.3,24.15,-4.62],[2.6,0.5,0.28],'#15100c'),      // fente de bouche
     c([-3.8,23.8,-4.5],[0.45,4.6,0.5],'gold'), c([3.35,23.8,-4.5],[0.45,4.6,0.5],'gold'), // liserés du masque
   ];
+  // le centurion (officier) porte le GLADIUS au lieu de la hasta
+  const armR = base.bones.find(b=>b.name==='arm_r');
+  armR.cubes = [
+    c([-8,12,-2],[4,12,4],'skin'),
+    c([-8.2,17.5,-2.2],[4.4,5,4.4],'leather'),               // manche
+    c([-8.4,18.9,-2.4],[4.8,1.9,4.8],'red'),                 // épaulette rouge
+    c([-8.4,20.4,-2.4],[4.8,2.1,4.8],'steel'),               // spallière
+    c([-8.1,20.7,-2.5],[3.6,0.7,0.6],'gold'),                // liseré d'or
+    c([-8.35,12.8,-2.35],[4.7,2.8,4.7],'leather'),           // brassard
+    // gladius tenu dans la main droite (arme de l'officier)
+    c([-6.6,8.6,-3.3],[0.8,1.1,0.8],'gold'),                 // pommeau
+    c([-6.65,9.5,-3.25],[0.9,3.2,0.9],'leather'),            // poignée
+    c([-7.05,12.5,-3.45],[1.9,0.8,1.3],'gold'),              // garde
+    c([-6.65,13.2,-3.25],[1.2,9,0.6],'steel'),               // lame large
+    c([-6.35,22.0,-3.25],[0.6,1.8,0.6],'steel'),             // pointe
+  ];
+  armR.locators = { blade:[-6.35,22.5,-3.25] };
+  const bloodB = base.bones.find(b=>b.name==='blood');
+  bloodB.pivot = [-6.05,17,-3.35];
+  bloodB.cubes = [
+    c([-6.68,13.4,-3.42],[1.26,8,0.14],'#7c0f0f'),           // film de sang sur la lame
+    c([-6.42,11.4,-3.42],[0.36,2.4,0.13],'#7c0f0f'),         // goutte
+    c([-6.40,10.6,-3.42],[0.32,0.7,0.13],'#8a1414'),
+  ];
   return base;
 })();
 
