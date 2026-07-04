@@ -538,6 +538,11 @@ const LEGIONNAIRE = {
       c([4.0,24,-4],[0.7,4,8],'steel'),                        // flanc droit
       c([-4,24,4.0],[8,4,0.7],'steel'),                        // arrière (au-dessus du couvre-nuque)
       c([-4.95,23.2,2.8],[9.9,3,2.9],'steel'),                 // couvre-nuque évasé
+      // reliefs latéraux : couvre-oreilles bombés + rivet doré + nervure + liseré (des 2 côtés)
+      c([-5.05,24.8,-1.3],[0.65,2.8,2.8],'steel'), c([4.4,24.8,-1.3],[0.65,2.8,2.8],'steel'),   // couvre-oreilles
+      c([-5.25,25.9,-0.4],[0.4,1.0,1.0],'gold'),   c([4.85,25.9,-0.4],[0.4,1.0,1.0],'gold'),     // rivet d'oreillère
+      c([-4.82,27.2,-3.6],[0.42,0.7,7],'steel'),   c([4.4,27.2,-3.6],[0.42,0.7,7],'steel'),      // nervure haute
+      c([-4.82,24.3,-3.6],[0.42,0.6,6.5],'gold'),  c([4.4,24.3,-3.6],[0.42,0.6,6.5],'gold'),      // liseré doré bas
       // socle doré du cimier puis grand cimier rouge + retombée arrière
       c([-1.4,31.9,-4.8],[2.8,0.9,9.6],'gold'),
       c([-1.1,32.3,-5.4],[2.2,2.4,10.8],'red'),
@@ -623,6 +628,11 @@ const CENTURION = (function(){
     c([4.0,24,-4],[0.7,4,8],'steel'),
     c([-4,24,4.0],[8,4,0.7],'steel'),
     c([-4.95,23.2,2.8],[9.9,3,2.9],'steel'),
+    // reliefs latéraux : couvre-oreilles bombés + rivet doré + nervure + liseré (des 2 côtés)
+    c([-5.05,24.8,-1.3],[0.65,2.8,2.8],'steel'), c([4.4,24.8,-1.3],[0.65,2.8,2.8],'steel'),
+    c([-5.25,25.9,-0.4],[0.4,1.0,1.0],'gold'),   c([4.85,25.9,-0.4],[0.4,1.0,1.0],'gold'),
+    c([-4.82,27.2,-3.6],[0.42,0.7,7],'steel'),   c([4.4,27.2,-3.6],[0.42,0.7,7],'steel'),
+    c([-4.82,24.3,-3.6],[0.42,0.6,6.5],'gold'),  c([4.4,24.3,-3.6],[0.42,0.6,6.5],'gold'),
     // crête TRANSVERSALE : socle doré + arc rouge gauche→droite + retombées aux deux bouts
     c([-4.8,31.9,-1.4],[9.6,0.9,2.8],'gold'),
     c([-5.4,32.3,-1.1],[10.8,2.4,2.2],'red'),
