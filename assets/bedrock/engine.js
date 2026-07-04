@@ -661,25 +661,28 @@ function buildAnimations(model){
     // POSTURE ROMAINE : bouclier tenu EN AVANT (garde), arme prête à piquer.
     // Les attaques sont des ESTOCS COURTS vers l'avant, autour/par-dessus le bouclier,
     // pas des moulinets (technique du légionnaire : le scutum couvre, le glaive pique).
-    const GL = [-60,0,-8];      // bras gauche : bouclier levé devant
-    const GR = [-64,-14,0];     // bras droit : arme en garde, pointe en avant
-    // atk1 — estoc bas (piqué franc vers l'avant, autour du bouclier)
+    // NB : l'os item_r (arme) est déjà incliné de -45° vers l'avant. Le bras (arm_r)
+    // ne doit donc bouger que modérément, sinon les angles s'additionnent et la lance
+    // pointe vers le bas. Ici GR est quasi neutre : l'arme est portée en avant par item_r.
+    const GL = [-52,0,-6];      // bras gauche : bouclier levé devant (modéré)
+    const GR = [-8,-8,0];       // bras droit : garde (arme déjà en avant via item_r)
+    // atk1 — estoc bas (le bras pique en avant → arme ~ horizontale)
     const stab = { loop:false, animation_length:0.55, bones:{}, particle_effects:{} };
     if (hasL) stab.bones.arm_l = { rotation:{ '0.0':GL, '0.55':GL } };
-    if (hasR) stab.bones.arm_r = { rotation:{ '0.0':GR, '0.18':[-102,-18,0], '0.36':GR, '0.55':GR } };
-    stab.bones.body = { rotation:{ '0.0':[3,-5,0], '0.18':[7,-11,0], '0.55':[3,-5,0] } };
-    if (hasLegR) stab.bones.leg_r = { rotation:{ '0.0':[0,0,0], '0.18':[-16,0,0], '0.55':[0,0,0] } };
+    if (hasR) stab.bones.arm_r = { rotation:{ '0.0':GR, '0.2':[-48,-16,0], '0.38':GR, '0.55':GR } };
+    stab.bones.body = { rotation:{ '0.0':[3,-5,0], '0.2':[7,-11,0], '0.55':[3,-5,0] } };
+    if (hasLegR) stab.bones.leg_r = { rotation:{ '0.0':[0,0,0], '0.2':[-14,0,0], '0.55':[0,0,0] } };
     // atk2 — coup de bouclier (le scutum frappe en avant), arme gardée en garde
     const bash = { loop:false, animation_length:0.5, bones:{}, particle_effects:{} };
-    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':GL, '0.16':[-98,0,-16], '0.34':GL, '0.5':GL } };
+    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':GL, '0.16':[-84,0,-14], '0.34':GL, '0.5':GL } };
     if (hasR) bash.bones.arm_r = { rotation:{ '0.0':GR, '0.5':GR } };
     bash.bones.body = { rotation:{ '0.0':[3,-5,0], '0.16':[3,15,0], '0.5':[3,-5,0] } };
-    // atk3 — estoc haut (piqué descendant par-dessus le bouclier)
+    // atk3 — estoc haut (lève l'arme puis pique en avant, ligne haute)
     const over = { loop:false, animation_length:0.65, bones:{}, particle_effects:{} };
     if (hasL) over.bones.arm_l = { rotation:{ '0.0':GL, '0.65':GL } };
-    if (hasR) over.bones.arm_r = { rotation:{ '0.0':GR, '0.2':[-138,-8,0], '0.36':[-100,-6,0], '0.52':GR, '0.65':GR } };
-    over.bones.body = { rotation:{ '0.0':[3,-5,0], '0.2':[-5,0,0], '0.36':[11,-5,0], '0.65':[3,-5,0] } };
-    if (hasHead) over.bones.head = { rotation:{ '0.0':[0,0,0], '0.36':[9,0,0], '0.65':[0,0,0] } };
+    if (hasR) over.bones.arm_r = { rotation:{ '0.0':GR, '0.2':[12,-6,0], '0.4':[-52,-8,0], '0.55':GR, '0.65':GR } };
+    over.bones.body = { rotation:{ '0.0':[3,-5,0], '0.2':[-6,0,0], '0.4':[10,-5,0], '0.65':[3,-5,0] } };
+    if (hasHead) over.bones.head = { rotation:{ '0.0':[0,0,0], '0.4':[8,0,0], '0.65':[0,0,0] } };
     // sang qui gicle de la lame (locator "blade") aux impacts
     stab.particle_effects['0.2']  = { effect:'blood', locator:'blade' };
     over.particle_effects['0.38'] = { effect:'blood', locator:'blade' };
