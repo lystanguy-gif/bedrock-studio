@@ -1,0 +1,1222 @@
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
+--- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
++++ addon/SiegedTATB/manifest.json	2026-07-04 17:22:08.142002891 +0000
+@@ -4,7 +4,7 @@
+ 		"name": "Sieged TAT Behavior",
+ 		"description": "Medieval survival addon BP Update V1.7",
+ 		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
+-		"version": [1, 7, 1],
++		"version": [1, 7, 2],
+ 		"min_engine_version": [1, 26, 0]
+ 	},
+ 	"modules": [
+@@ -24,7 +24,7 @@
+ 	"dependencies": [
+ 		{
+ 			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
+-			"version": [1, 7, 1]
++			"version": [1, 7, 2]
+ 		},
+ 		{
+ 			"module_name": "@minecraft/server",
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/banner_guard_script.js addon/SiegedTATB/scripts/banner_guard_script.js
+--- addon_orig/SiegedTATB/scripts/banner_guard_script.js	2026-06-25 22:08:37.000000000 +0000
++++ addon/SiegedTATB/scripts/banner_guard_script.js	2026-07-04 17:19:57.777900187 +0000
+@@ -2234,6 +2234,59 @@
+     btn_ranged:       "Ranged",
+     btn_banner_guard: "Banner Guard §7(guard only)",
+   },
++  fr_FR: {
++    band_active:   (color, label, count) => `\n${color}[Compagnie ${label}] §7active — affichage de §f${count}§7 unité(s) assignée(s) uniquement`,
++    band_empty:    (color, label)        => `\n${color}[Compagnie ${label}] §7active — §caucune unité assignée pour l'instant`,
++    main_title:    (fl) => `§lGarde-bannière ${fl}`,
++    main_body:     (bl, w, t, s, f, c, xp, target, r) =>
++      `Troupes à proximité :${bl}\n§7Gardiens : §f${w}   §7Templiers : §f${t}   §7Sentinelles : §f${s}\n§7Fauconniers : §f${f}   §7Chevaliers : §f${c}\n\n§7Votre XP : §a${xp} niveaux\n\n§7Donnez un ordre à ${target}troupes dans un rayon de ${r} blocs :`,
++    cmd_target_all:  (fac) => `toutes les ${fac ? `§6${fac}§7 ` : ""}`,
++    cmd_target_band: (color, label) => `${color}la Compagnie ${label}§7 `,
++    btn_advanced:    "  Formations avancées ",
++    btn_charge:      " Charger",
++    btn_command_view:" Vue Commandant",
++    btn_follow:      " Suivre",
++    btn_march:       " Marche en formation",
++    btn_hold:        " Tenir la position",
++    btn_rally:       " Rallier au drapeau",
++    btn_falconers:   (xp) => ` Former des fauconniers §7(${xp} XP)`,
++    btn_arrow_rain:  " Pluie de flèches",
++    btn_unequip:     " Retirer toutes les armures",
++    btn_cover:       (n) => `  Protéger le commandant §7(Templiers : ${n})`,
++    adv_title:  "§lFormations avancées",
++    adv_body:   (w, xp) => `§7Gardiens à proximité : §f${w}   §7Votre XP : §a${xp} niveaux\n\n§7Choisissez une formation pour vos gardiens :`,
++    btn_phalanx:(xp) => ` Phalange §7(${xp} XP)\n§7Mur de boucliers, 3 rangs de profondeur`,
++    btn_turtle: (xp) => ` Tortue §7(${xp} XP)\n§7Défense circulaire, boucliers vers l'extérieur`,
++    warn_warders_title:   "§cPas assez de Gardiens",
++    warn_phalanx_warders: (min, cur) => `La phalange nécessite au moins ${min} gardiens à proximité.\nVous avez actuellement §c${cur}§r gardien(s) à portée.\n\nDonner un autre ordre ?`,
++    warn_turtle_warders:  (min, cur) => `La formation Tortue nécessite au moins ${min} gardiens à proximité.\nVous avez actuellement §c${cur}§r gardien(s) à portée.\n\nDonner un autre ordre ?`,
++    warn_xp_title:    "§cXP insuffisante",
++    warn_phalanx_xp:  (cost, cur) => `Il vous faut §a${cost} niveaux d'XP§r pour former une phalange.\nVous avez actuellement §c${cur}§r niveau(x).\n\nDonner un autre ordre ?`,
++    warn_turtle_xp:   (cost, cur) => `Il vous faut §a${cost} niveaux d'XP§r pour former une tortue.\nVous avez actuellement §c${cur}§r niveau(x).\n\nDonner un autre ordre ?`,
++    btn_back:   "§aRetour",
++    btn_cancel: "§cAnnuler",
++    warn_sentinels_title: "§cPas assez de Sentinelles",
++    warn_sentinels_body:  (min, cur, xp) => `Former des fauconniers nécessite au moins ${min} sentinelles à proximité.\nVous avez actuellement §c${cur}§r sentinelle(s) à portée.\n\n§72 sentinelles = 1 fauconnier\n§7Coût : ${xp} niveaux d'XP\n\nDonner un autre ordre ?`,
++    warn_falconer_xp_body:(cost, cur) => `Il vous faut §a${cost} niveaux d'XP§r pour former des fauconniers.\nVous avez actuellement §c${cur}§r niveau(x).\n\nDonner un autre ordre ?`,
++    confirm_falconers_title: "§6Former des fauconniers",
++    confirm_falconers_body:  (sc, fc, cost) => `§7Convertir §f${sc}§7 sentinelle(s) en §f${fc}§7 fauconnier(s) ?\n\n§7Coût : §c-${cost} niveaux d'XP\n§7Ratio : 2 sentinelles → 1 fauconnier\n\n§aLes fauconniers peuvent utiliser la pluie de flèches !`,
++    btn_train_confirm:       "§aFormer des fauconniers",
++    warn_no_falconers_title: "§cAucun fauconnier disponible",
++    warn_no_falconers_body:  "La Pluie de flèches nécessite au moins un fauconnier à proximité.\n\nFormez des fauconniers à partir de sentinelles avec le bouton §6Former des fauconniers§r.\n\nDonner un autre ordre ?",
++    info_arrow_rain_title:   "§6Système de pluie de flèches",
++    info_arrow_rain_body:    (n) => `§7Vous avez §f${n}§7 fauconnier(s) prêt(s).\n\n§aMode d'emploi :§r\n1. Cliquez sur « Donnez-moi un marqueur » ci-dessous pour recevoir un Marqueur de pluie de flèches\n2. Lancez le marqueur là où vous voulez faire pleuvoir les flèches\n3. Tous les fauconniers proches bombarderont cette zone !\n\n§7Les fauconniers ont besoin de munitions (elles se régénèrent avec le temps)`,
++    btn_give_marker: "§aDonnez-moi un marqueur",
++    btn_got_it:      "§7Compris",
++    warn_no_templars_title: "§cAucun Templier disponible",
++    warn_no_templars_body:  "« Protéger le commandant » nécessite au moins un templier à proximité.\n\nDonner un autre ordre ?",
++    follow_title:     "§lSuivez-moi",
++    follow_body:      "Quelles unités doivent vous suivre ?",
++    btn_all_units:    "Toutes les unités",
++    btn_infantry:     "Infanterie",
++    btn_cavalry:      "Cavalerie",
++    btn_ranged:       "Tireurs",
++    btn_banner_guard: "Garde-bannière §7(garde uniquement)",
++  },
+   pt_BR: {
+     band_active:   (color, label, count) => `\n${color}[Banda ${label}] §7ativa — mostrando §f${count}§7 unidade(s) atribuída(s) apenas`,
+     band_empty:    (color, label)        => `\n${color}[Banda ${label}] §7ativa — §cnenhuma unidade atribuída ainda`,
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/kingdom.js addon/SiegedTATB/scripts/kingdom.js
+--- addon_orig/SiegedTATB/scripts/kingdom.js	2026-06-30 13:40:06.000000000 +0000
++++ addon/SiegedTATB/scripts/kingdom.js	2026-07-04 17:18:26.277467285 +0000
+@@ -218,6 +218,218 @@
+     disband_btn1:  "§c§l Yes, Disband",
+     disband_btn2:  "§aCancel",
+   },
++  fr_FR: {
++    style_title:       "§d§l Changer le style du drapeau",
++    style_body:        "§8Choisissez un style pour votre bannière.",
++    style_btn_current: " §a",
++
++    crest_remove_title:    "§8 Retirer le blason ?",
++    crest_remove_body:     (name) => `§8Blason actuel : §e${name}\n\n§8Retire le blason de votre drapeau.\n§cLe Blason vierge sera consommé.`,
++    crest_remove_btn1:     "§c Retirer le blason",
++    crest_cancel:          "§8Annuler",
++    crest_apply_body_warn: "§cCe blason sera consommé et ne pourra pas être récupéré.",
++    crest_apply_btn:       (color) => `${color}§l Appliquer`,
++
++    pillager_title:    "§4 Avant-poste de pillards — Verrouillé",
++    pillager_body_sfx: `\n\n§c §4Détruisez tous les §cchâteaux proches pour assiéger ce drapeau.`,
++    btn_siege_castle:  "§c§l  Assiéger ce château",
++    btn_close:         "§8Fermer",
++    btn_okay:          "§aD'accord",
++    btn_claim_flag:    "§a§l  Revendiquer ce drapeau",
++    btn_destroy_flag:  "§c§l  Détruire le drapeau",
++    flag_body_tier:       (t, display) => `§8Niveau : §e${t} §8/ 5  —  §e${display}`,
++    flag_body_territory:  (r) => `§8Rayon du territoire : §e${r} §8blocs`,
++    flag_body_villagers:  (v) => `§8Population de villageois : §e${v}`,
++    flag_body_morale:     (bar) => `§8Moral : ${bar}`,
++    flag_body_siege:      (attacker) => `\n§c Assiégé par §e${attacker}§c !`,
++    flag_owner_pillager:  "§4Clan des Pillards",
++    flag_owner_unclaimed: "§8Sans propriétaire",
++
++    manage_btn_rally:           "§e§l  Rallier les troupes",
++    manage_btn_barracks:        (n) => `§6§l  Gérer la caserne  §8(${n} enrôlés)`,
++    manage_btn_barracks_locked: "§8  Caserne  §8(se débloque au niveau Ville)",
++    manage_btn_rally_villagers: "§6§l  Rallier les villageois",
++    manage_btn_wagoner:         (n) => `§8  Convoquer le Charretier  §8(${n} déjà sur le territoire)`,
++    manage_btn_wagoner_ok:      "§6§l  Convoquer le Charretier",
++    manage_btn_ft_disabled:     "§c§l  Voyage rapide : §cDÉSACTIVÉ §8(cliquez pour activer)",
++    manage_btn_ft_enabled:      "§a§l  Voyage rapide : §aACTIVÉ §8(cliquez pour désactiver)",
++    manage_btn_repair:          (n) => `§b§l  Réparer le château  §8(§e${n}§8 fer)`,
++    manage_btn_tax_ready:       (n) => `§a§l  Collecter l'impôt  (${n})`,
++    manage_btn_tax_wait:        (t) => `§8  Impôt  §8(prêt dans ${t})`,
++    manage_btn_border_on:       "§c§l  Frontière : §aVISIBLE §8(cliquez pour masquer)",
++    manage_btn_border_off:      "§b§l  Frontière : §cMASQUÉE §8(cliquez pour afficher)",
++    manage_btn_style:           "§d§l  Changer le style",
++    manage_btn_hud_on:          "§b  ATH d'intégrité : §aACTIVÉ",
++    manage_btn_hud_off:         "§b  ATH d'intégrité : §cDÉSACTIVÉ",
++    manage_btn_report:          "§b§l  Rapport du royaume",
++    manage_btn_war_list:        "§c§l  Liste des guerres",
++    manage_btn_war_list_n:      (n) => `§c§l  Liste des guerres (${n})`,
++    manage_btn_diplomacy:       "§d§l  Diplomatie",
++    manage_btn_my_kingdom:      "§6§l  Mon royaume",
++    manage_btn_tax_bank:        (n) => `§a§l  Collecter la banque d'impôts  §8(§e${n}§8 émeraudes)`,
++    manage_btn_rename:          "§d§l  Renommer le royaume",
++    manage_btn_disband:         "§4  Dissoudre le royaume",
++    manage_btn_members:         (n) => `§6§l  Membres du royaume  §8(${n})`,
++
++    manage_body_tier:         (t, name) => `§6Niveau §e${t}§6/5  —  §l${name}`,
++    manage_body_territory:    (r) => `§8Territoire : rayon de §e${r} §8blocs`,
++    manage_body_invasion:     (min, max) => `§8Portée d'invasion : §e${min}§8–§e${max} §8blocs`,
++    manage_body_villagers:    (v) => `§8Villageois : §e${v}`,
++    manage_body_morale:       (bar) => `§8Moral : \n${bar}`,
++    manage_body_integrity:    (bar) => `§8Intégrité du château : \n${bar}`,
++    manage_body_crest_none:   "§8Blason : §8Aucun  §8(clic droit avec un blason pour l'appliquer)",
++    manage_body_crest:        (color, name) => `§8Blason : ${color}${name}`,
++    manage_body_tax_ready:    (amt) => `§a§lImpôt prêt ! §r§8(§e${amt} §8émeraudes)`,
++    manage_body_tax_wait:     (amt, t) => `§8Impôt quotidien : §e${amt} ém §8— prêt dans §e${t}`,
++    manage_body_at_war_none:  "§8En guerre contre : §8Personne",
++    manage_body_at_war:       (enemies) => `§8En guerre contre : ${enemies}`,
++    manage_body_siege:        (bar) => `§c §lEN ÉTAT DE SIÈGE §r§c${bar}`,
++    manage_body_upgrade:      (name) => `§6── Amélioration vers ${name} ──`,
++    manage_body_have:         (have) => `§8(vous avez ${have})`,
++    manage_body_villager_req: (n, have, ok) => `  ${ok ? "§a" : "§c"}${n} villageois §8(vous avez ${have})`,
++    manage_body_new_radius:   (r) => `§8Nouveau rayon : §e${r} §8blocs`,
++    manage_body_max_tier:     "§6§l Niveau maximal du royaume atteint !",
++
++    roster_title:   "§6 Effectifs de la caserne",
++    roster_header:  "§6§l── Effectifs de la caserne du château ──",
++    roster_count:   (n) => `§8Total enrôlés : §e${n}`,
++
++    remove_soldiers_title: "§c§l Retirer des soldats",
++    remove_soldiers_body:  "§8Sélectionnez un type d'unité pour supprimer TOUTES les unités de ce type.\n§cCette action est irréversible.",
++    confirm_remove_title:  "§c Confirmer le retrait",
++    confirm_remove_body:   (n, name) => `§cSupprimer les §e${n} §c${name}(s) de ce château ?\n\n§8Cette action est irréversible.`,
++    confirm_remove_btn1:   "§c§l Oui, retirer",
++    btn_cancel:            "§8Annuler",
++
++    barracks_title:      "§6§l Gérer la caserne",
++    barracks_enrolled:   (n) => `§8Soldats enrôlés : §e${n}`,
++    barracks_desc_add:   (r) => `§7Ajouter des soldats §8— enrôle les unités apprivoisées dans un rayon de §e${r} §8blocs autour de vous.`,
++    barracks_desc_view:  "§7Voir les effectifs §8— affiche toutes les unités enrôlées par type.",
++    barracks_desc_remove:"§7Retirer des soldats §8— supprime un type d'unité de ce château.",
++    barracks_desc_cta:   (amt, cap, cost) => `§7Appel aux armes §8— convertit §e${amt}§8/§e${cap} §8villageois en soldats de fortune. §c−${cost} moral§8.`,
++    barracks_btn_add:    "§a§l  Ajouter des soldats",
++    barracks_btn_view:   "§e§l  Voir les effectifs",
++    barracks_btn_remove: "§c§l  Retirer des soldats",
++    barracks_btn_members:"§b§l  Gérer les membres",
++    barracks_btn_cta:    (amt, cap, cost) => `§6§l  Appel aux armes  §8(${amt}/${cap}, §c−${cost} moral§8)`,
++    barracks_btn_store:   (n) => `§b§l  Remiser les troupes  §8(${n} à proximité)`,
++    barracks_btn_deploy:  (n) => `§a§l  Déployer les troupes  §8(${n} remisées)`,
++    barracks_desc_store:  "§7Remiser les troupes §8— retire les unités apprivoisées proches et les garde en sécurité dans la caserne.",
++    barracks_desc_deploy: (n) => `§7Déployer les troupes §8— fait apparaître §e${n}§8 troupes remisées près de vous.`,
++    barracks_stored:      (n) => `§8Troupes remisées : §e${n}`,
++    btn_back:            "§8Retour",
++
++    members_title:        "§6§l Membres du royaume",
++    members_king:         (name) => `§6Roi : §e§l${name}`,
++    members_list_header:  (n) => `§8Membres (${n}) :`,
++    members_desc_invite:  "§7Inviter §8— ajoute un joueur en ligne (rejoint comme Paysan).",
++    members_desc_remove:  "§7Retirer §8— expulse un membre.",
++    members_desc_rank:    "§7Définir le rang §8— promeut ou rétrograde un membre.",
++    members_desc_transfer:"§7Transmettre la couronne §8— fait d'un membre le nouveau Roi.",
++    members_btn_invite:   "§a§l  Inviter un joueur",
++    members_btn_remove:   "§c§l  Retirer un membre",
++    members_btn_rank:     "§e§l  Définir le rang",
++    members_btn_transfer: "§6§l  Transmettre la couronne",
++
++    invite_title:        "§a Inviter un joueur",
++    invite_body:         "§8Sélectionnez un joueur à ajouter au royaume.\n§8Il sera ajouté à tous les drapeaux du royaume.",
++    remove_member_title: "§c Retirer un membre",
++    remove_member_body:  "§8Sélectionnez un membre à retirer du royaume.",
++
++    rank_pick_title: "§e Définir le rang",
++    rank_pick_body:  "§8Sélectionnez un membre à promouvoir ou rétrograder.",
++    rank_set_title:  (name) => `§e Rang : ${name}`,
++    rank_set_body:   (rank) => `§8Rang actuel : §e${rank}\n§8Sélectionnez le nouveau rang :`,
++    rank_noble:      "Noble",
++    rank_knight:     "Chevalier",
++    rank_peasant:    "Paysan",
++
++    transfer_title:         "§6 Transmettre la couronne",
++    transfer_body:          "§c§lAttention :§r§8 transmettre la couronne fait d'un autre joueur le Roi.\n§8Vous deviendrez Noble.\n\n§8Sélectionnez le nouveau Roi :",
++    confirm_transfer_title: "§6 Confirmer la transmission",
++    confirm_transfer_body:  (name) => `§cTransmettre la couronne à §e${name}§c ?\n§8Vous deviendrez Noble.`,
++    confirm_transfer_btn1:  "§6§l Oui, transmettre",
++
++    peasant_rank:         "§6Votre rang : §7§lPaysan",
++    peasant_kingdom:      (name) => `§8Royaume : §e${name}`,
++    peasant_king:         (name) => `§8Roi : §6${name}`,
++    peasant_desc_tax:     (n) => `§7Payer l'impôt §8— versez §e${n}§8 émeraudes au royaume.`,
++    peasant_desc_barracks:"§7Voir la caserne §8— consultez les soldats enrôlés (lecture seule).",
++    peasant_btn_tax_ok:   (n) => `§a§l  Payer l'impôt  §8(§e${n} ém§8)`,
++    peasant_btn_tax_insuf:"§a§l  Payer l'impôt  §8(§cInsuffisant§8)",
++    peasant_btn_barracks: "§e§l  Voir la caserne",
++    btn_leave:            "§c  Quitter le royaume",
++    btn_close_ok:         "§aFermer",
++    btn_cancel_ok:        "§aAnnuler",
++
++    knight_rank:                "§6Votre rang : §b§lChevalier",
++    knight_kingdom:             (name) => `§8Royaume : §e${name}`,
++    knight_enrolled:            (n) => `§8Troupes enrôlées : §e${n}`,
++    knight_desc_barracks_ok:    "§7Caserne §8— gérez les troupes enrôlées.",
++    knight_desc_barracks_locked:"§8Caserne §8— §cverrouillée jusqu'au niveau Ville.",
++    knight_desc_rally:          "§7Rallier §8— appelle les troupes enrôlées au drapeau.",
++    knight_desc_note:           "§8Les troupes sont ajoutées par le Roi via la caserne.",
++    knight_btn_barracks_ok:     "§a§l  Caserne",
++    knight_btn_barracks_locked: "§8  Caserne §8(Ville+)",
++    knight_btn_rally:           "§e§l  Rallier les troupes",
++
++    spawn_troop_title: "§b Recruter une unité",
++    spawn_troop_body:  (n) => `§8Sélectionnez une unité à recruter. Coût : §e${n}§8 niveaux d'XP.`,
++
++    noble_rank:              "§6Votre rang : §d§lNoble",
++    noble_desc_rally:        "§7Rallier §8— appelle les troupes du château.",
++    noble_desc_war:          "§7Liste des guerres §8— consultez les guerres en cours et déclarez-en via le Parchemin de guerre.",
++    noble_coup_main_flag:    "§8Fomenter un coup d'État §8— §7vous devez être sur le drapeau principal du roi.",
++    noble_coup_morale_high:  (m) => `§8Fomenter un coup d'État §8— §7moral du roi trop élevé (§e${m}§7/100, il faut <10).`,
++    noble_coup_ready:        (m) => `§c§lFomenter un coup d'État §8— renversez le roi ! §e(moral : ${m})`,
++    noble_btn_war_list:      "§c§l  Liste des guerres",
++    noble_btn_coup:          "§4§l  Fomenter un coup d'État",
++
++    noble_kingdom:        (owner) => `§8Royaume : §e${owner}`,
++    noble_king:           (king) => `§8Roi : §6${king}`,
++    noble_morale:         (bar) => `§8Moral du royaume : ${bar}`,
++    noble_integrity:      (bar) => `§8Intégrité du royaume : ${bar}`,
++    noble_at_war_none:    "§8En guerre contre : §8Personne",
++    noble_at_war:         (enemies) => `§8En guerre contre : ${enemies}`,
++    noble_barracks_ok:    "§7Caserne §8— gérez les troupes.",
++    noble_barracks_locked:"§8Caserne §8— §cverrouillée jusqu'au niveau Ville.",
++
++    my_kingdom_btn_grant:        "§6§l  Accorder ce drapeau à un Noble",
++    my_kingdom_btn_grant_locked: "§8  Accorder le drapeau §8(Ville+)",
++
++    grant_noble_title:  "§6 Accorder le drapeau à un Noble",
++    grant_noble_body:   "§8Ce drapeau sera accordé au Noble sélectionné.\n§8Il en devient le propriétaire. Vous restez Roi du royaume.\n§8Il le gérera comme un drapeau vassal.",
++    confirm_grant_title:"§6 Confirmer l'octroi",
++    confirm_grant_body: (name) => `§8Accorder ce drapeau à §d${name}§8 ?\n§8Il devient le propriétaire du drapeau.\n§8Vous conservez le royaume et restez roi.`,
++    confirm_grant_btn1: "§6§l Oui, accorder",
++
++    leave_title: "§c Quitter le royaume ?",
++    leave_body:  "§cÊtes-vous sûr de vouloir quitter ce royaume ?\n§8Vous perdrez votre rang et vos accès.\n§8Le roi pourra vous réinviter.",
++    leave_btn1:  "§c§l Oui, quitter",
++    leave_btn2:  "§aAnnuler",
++
++    war_list_title: "§c Liste des guerres",
++    war_list_empty: "§8Vous n'êtes actuellement en guerre contre aucun royaume.\n\n§8Pour déclarer la guerre : utilisez un §6Parchemin §8sur un §ePerroquet §8(ou déposez-le près de lui).\n§8Pour faire la paix : déposez un §6Parchemin §8près d'un §eCorbeau messager§8.",
++    war_list_btn1:  "§aD'accord",
++
++    diplomacy_title:        (owner) => `§d Diplomatie — ${owner}`,
++    diplomacy_propose_title:"§a Proposer une alliance",
++    diplomacy_propose_body: "§8Choisissez un royaume à qui envoyer une proposition d'alliance :",
++    diplomacy_trade_title:  "§6 Établir une route commerciale",
++    diplomacy_trade_body:   (n) => `§8Choisissez un allié avec qui ouvrir une route commerciale.\n§8Les deux royaumes gagnent §e${n} émeraudes/jour§8.`,
++    diplomacy_break_title:  "§c Rompre l'alliance",
++    diplomacy_break_body:   "§8Choisissez un allié avec qui rompre les relations.\n§cCela annule aussi toute route commerciale.",
++    diplomacy_btn_accept:   (name) => `§d§l  Accepter l'alliance — §e${name}`,
++    diplomacy_btn_decline:  (name) => `§c  Refuser l'alliance — §e${name}`,
++    diplomacy_btn_propose:  "§a§l  Proposer une alliance",
++    diplomacy_btn_trade:    "§6§l  Établir une route commerciale",
++    diplomacy_btn_break:    "§c  Rompre l'alliance",
++
++    disband_title: "§c§l Dissoudre le royaume ?",
++    disband_body:  "§cCeci dissoudra définitivement votre royaume.\n§8Le drapeau redevient sans propriétaire.\n§8Tout le progrès de niveau, le moral et les données d'impôt seront perdus.\n\n§eCette action est irréversible. Êtes-vous sûr ?",
++    disband_btn1:  "§c§l Oui, dissoudre",
++    disband_btn2:  "§aAnnuler",
++  },
+   pt_BR: {
+     style_title:       "§d§l Mudar Estilo da Bandeira",
+     style_body:        "§8Escolha um estilo para seu estandarte.",
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/lore_i18n.js addon/SiegedTATB/scripts/lore_i18n.js
+--- addon_orig/SiegedTATB/scripts/lore_i18n.js	2026-06-30 12:49:12.000000000 +0000
++++ addon/SiegedTATB/scripts/lore_i18n.js	2026-07-04 17:09:56.462083414 +0000
+@@ -2157,6 +2157,577 @@
+             ],
+         },
+     },
++
++    // ════════════════════════════════════════════════════════════════════════
++    // fr_FR — French
++    // ════════════════════════════════════════════════════════════════════════
++    fr_FR: {
++        // ── War Horn ──────────────────────────────────────────────────────────
++        "sieged:war_horn": {
++            name: "§6§lCor de guerre",
++            lore: [
++                "§8 §7Les échos de batailles désespérées résonnent",
++                "§8 §7dans cet instrument sacré",
++                "",
++                "§6 §eRallie toutes les troupes apprivoisées dans un rayon de §610 blocs",
++                "§8 §7Accorde §7Résistance I §8et §7Force I",
++                "§8 §7pendant 30 secondes",
++                "",
++                "§c §7Recharge : 1 minute",
++            ],
++        },
++        // ── Summoning Bell ────────────────────────────────────────────────────
++        "sieged:the_summoning_bell": {
++            name: "§5§lLa Cloche d'Invocation",
++            lore: [
++                "§8 §7Une résonance ancienne appelle des guerriers saints",
++                "§8 §7voués à servir les justes",
++                "",
++                "§5 §dInvoque §54 Templiers apprivoisés",
++                "§8 §7Liés à votre commandement",
++                "§8 §7Prêts au combat",
++                "",
++                "§c §7Recharge : 1 minute",
++            ],
++        },
++        // ── Fleet Drums ───────────────────────────────────────────────────────
++        "sieged:fleet_drums": {
++            name: "§6§lTambours de flotte",
++            lore: [
++                "§8 §7Coordonnez vos forces navales",
++                "",
++                "§e §l[Interagir] §r§7Alterner Halte / Avancer",
++                "§6 §l[Accroupi + Interagir] §r§7Tout le monde à terre !",
++                "§8 §7Fait débarquer toutes les unités des navires de la flotte",
++                "§b §l[Accroupi + Sauter] §r§7Tous à bord !",
++                "§8 §7Fait embarquer les soldats revendiqués à proximité sur les navires",
++            ],
++        },
++        // ── Crown of Domination ───────────────────────────────────────────────
++        "sieged:the_crown_of_domination": {
++            name: "§4§lCouronne de Domination",
++            lore: [
++                "§7Lourde est la couronne d'un monde conquis",
++                "",
++                "§4Vos ennemis §cplieront le genou... ou mourront",
++                "",
++                "§8  §cAccroupissez-vous §7pour marquer un ennemi à mort",
++                "§8 §7Affaiblit la cible marquée",
++                "§8 §7Votre prochain coup inflige §c+5 cœurs §7de dégâts",
++                "",
++                "§c §7Recharge : 40 secondes",
++            ],
++        },
++        // ── Crown of Dominion (dynamic name, static lore lines) ───────────────
++        "sieged:crown_of_dominion": {
++            name: "§6Couronne de Souveraineté",
++            lore: [
++                "§7Lourde est la tête qui porte la couronne",
++                "",
++                "§6Vous possédez désormais l'unique couronne du serveur",
++            ],
++        },
++        // ── Crests ────────────────────────────────────────────────────────────
++        "sieged:crest_of_morale": {
++            name: "§aBlason du Moral",
++            lore: ["§r§7 La détermination de votre peuple est de fer.", "§r§8Pertes de moral divisées par deux · Récupération quotidienne §a+20", "§r§8Les troupes §ane peuvent pas se rebeller§8, quel que soit le moral"],
++        },
++        "sieged:crest_of_fortitude": {
++            name: "§bBlason de Vigueur",
++            lore: ["§r§7 Les murs de pierre restent inébranlables.", "§r§8Explosions annulées dans le territoire"],
++        },
++        "sieged:crest_of_arms": {
++            name: "§cBlason des Armes",
++            lore: ["§r§7 Votre bannière appelle les guerriers au combat.", "§r§8Troupes quotidiennes invoquées · Renforts en cas de siège"],
++        },
++        "sieged:crest_of_architecture": {
++            name: "§6Blason d'Architecture",
++            lore: ["§r§7 Vos bâtisseurs travaillent sans relâche.", "§r§8Perte d'intégrité divisée par deux · Débloque « Rallier les villageois »"],
++        },
++        "sieged:crest_of_pursuit": {
++            name: "§eBlason de Poursuite",
++            lore: ["§r§7 Renforcez les fidèles, affaiblissez l'ennemi.", "§r§8Les unités apprivoisées gagnent §eForce §8et §eVitesse §8· Les ennemis subissent §eFaiblesse"],
++        },
++        "sieged:crest_of_war": {
++            name: "§4Blason de Guerre",
++            lore: ["§r§7 Le fer et le feu servent ceux qui s'y préparent.", "§r§8Accorde une machine de siège tous les §42 jours", "§r§8Être en guerre §cne pénalise plus §8le moral quotidien"],
++        },
++        "sieged:crest_of_wealth": {
++            name: "§2Blason de Richesse",
++            lore: ["§r§7 L'or afflue vers les prospères.", "§r§8Impôts §a+50 % §8· Les membres gagnent §aHéros du village"],
++        },
++        "sieged:crest_of_empty": {
++            name: "§8Blason vierge",
++            lore: ["§r§7 Échangez avec le Monarque pour recevoir le blason de votre royaume.", "§r§8Peut aussi servir à retirer un blason de votre drapeau"],
++        },
++        "sieged:crest_of_knowledge": {
++            name: "§3Blason du Savoir",
++            lore: ["§r§7 Les érudits emplissent vos salles de sagesse.", "§r§8Coût des recherches §3-25 % §8· Les érudits accordent §3+3 XP §8par jour"],
++        },
++        // ── Shields ───────────────────────────────────────────────────────────
++        "sieged:heater_shield": {
++            name: "§7Écu",
++            lore: [
++                "§8Petit. Rapide. Parfois suffisant.",
++                "",
++                "§b⚔ Garde instable",
++                "§750 % de chances de Résistance I en blocage",
++                "",
++                "§a Réduit les dégâts qui traversent le blocage",
++            ],
++        },
++        "sieged:kite_shield": {
++            name: "§7Bouclier en amande",
++            lore: [
++                "§8Né à cheval, éprouvé à pied.",
++                "",
++                "§e⚔ Parade",
++                "§7Ralentit l'attaquant pendant 2s au blocage",
++                "",
++                "§a Fait chanceler les attaquants à chaque blocage",
++                "§c Repousse le porteur à chaque blocage",
++            ],
++        },
++        "sieged:buckler_shield": {
++            name: "§7Rondache",
++            lore: [
++                "§8Petite et vive — la réponse du duelliste.",
++                "",
++                "§d⚔ Déviation agile",
++                "§7Vitesse I pendant 3s après avoir bloqué un coup",
++                "",
++                "§a Repositionnement rapide après un blocage",
++                "§c Fragile — moitié moins de durabilité",
++            ],
++        },
++        "sieged:large_round_shield": {
++            name: "§7Grand bouclier rond",
++            lore: [
++                "§8Conçu pour le mur de boucliers, pas pour le duel.",
++                "",
++                "§6⚔ Coup de bouclier",
++                "§7Projette l'attaquant en arrière au blocage",
++                "",
++                "§a Envoie valser les attaquants au blocage",
++                "§c Ralentit les déplacements une fois équipé",
++            ],
++        },
++        "sieged:round_shield": {
++            name: "§7Bouclier rond",
++            lore: [
++                "§8Un bouclier de guerrier, éprouvé en bataille rangée.",
++                "",
++                "§c⚔ Riposte",
++                "§7Renvoie 1 cœur de dégâts à l'attaquant au blocage",
++                "",
++                "§a Punit chaque coup bloqué",
++                "§c Faiblesse I pendant le blocage",
++            ],
++        },
++        "sieged:tower_shield": {
++            name: "§7Pavois",
++            lore: [
++                "§8Une forteresse que l'on porte.",
++                "",
++                "§6⚔ Rempart",
++                "§7Accroupi + saut pour le planter comme barrière physique",
++                "",
++                "§a Augmente les dégâts à distance des joueurs proches une fois posé",
++                "§c Épuise la faim tant qu'il est en main",
++            ],
++        },
++        // ── Weapons ───────────────────────────────────────────────────────────
++        "sieged:halberd": {
++            name: "§7Hallebarde",
++            lore: [
++                "§8Une arme d'hast à la portée redoutable.",
++                "",
++                "§c⚔ Brise-bouclier",
++                "§7Inflige des dégâts bonus aux ennemis qui bloquent",
++                "",
++                "§a Lourds dégâts contre les boucliers",
++                "§a Longue portée",
++                "§c Dégâts réduits contre les cibles sans armure",
++                "§c Déplacement ralenti",
++            ],
++        },
++        "sieged:wooden_pike": {
++            name: "§7Pique en bois",
++            lore: [
++                "§8Un pieu affûté en bois durci.",
++                "",
++                "§e⚔ Formation de pieux",
++                "§7Accroupi + clic droit au sol pour planter — jusqu'à 3 empilables",
++                "",
++                "§a Blesse les ennemis qui foncent dessus",
++                "§a Plus puissante avec plusieurs piques posées",
++                "§a Miner le bloc rend 1 pique",
++                "§c Faibles dégâts en tant qu'arme",
++                "§c En bois — inflammable",
++            ],
++        },
++        "sieged:pike": {
++            name: "§7Pique",
++            lore: [
++                "§8Une lance d'une longueur extraordinaire.",
++                "",
++                "§b⚔ Ligne perçante",
++                "§7Frappe tous les ennemis en ligne devant vous",
++                "",
++                "§a Touche plusieurs ennemis",
++                "§a Portée exceptionnelle",
++                "§a Anti-cavalerie — dégâts bonus aux montures et aux cavaliers",
++                "§c Vitesse d'attaque lente",
++                "§c Faible au corps à corps",
++            ],
++        },
++        "sieged:war_hammer": {
++            name: "§7Marteau de guerre",
++            lore: [
++                "§8Forgé pour broyer l'acier et les os.",
++                "",
++                "§6⚔ Broyeur d'armure",
++                "§7Inflige des dégâts bonus aux ennemis lourdement blindés",
++                "",
++                "§a Dévastateur contre les armures",
++                "§a Fort recul de base",
++                "§c Faibles dégâts contre les cibles sans armure",
++                "§c Coup très lent",
++            ],
++        },
++        "sieged:morningstar": {
++            name: "§7Étoile du matin",
++            lore: [
++                "§8Une boule à pointes d'une brutalité sanglante.",
++                "",
++                "§e⚔ Coup étourdissant",
++                "§7Inflige Lenteur et Faiblesse au contact",
++                "§8 Recharge de 10 secondes",
++                "",
++                "§a Perturbe les attaques ennemies",
++                "§a Efficace contre les combattants lourds",
++                "§c Capacité soumise à recharge",
++                "§c Portée courte",
++            ],
++        },
++        "sieged:longsword": {
++            name: "§7Épée longue",
++            lore: [
++                "§8Une lame équilibrée de noble facture.",
++                "",
++                "§6⚔ Exécution",
++                "§7Inflige des dégâts bonus aux ennemis affaiblis",
++                "",
++                "§a Dégâts bonus sous 30 % de vie",
++                "§a Polyvalente et rapide",
++                "§c Aucun bonus contre les ennemis blindés",
++                "§c Portée moyenne",
++            ],
++        },
++        "sieged:twoheadedaxe": {
++            name: "§7Hache à deux têtes",
++            lore: [
++                "§8Un fendoir brutal de fer et de furie.",
++                "",
++                "§c⚔ Frénésie sanglante",
++                "§7Fauche les ennemis proches et vole leur vie",
++                "",
++                "§a Fauchage de zone à chaque coup",
++                "§a Vol de vie par ennemi tué",
++                "§c Désactivée par les armures lourdes",
++                "§c Vitesse d'attaque lente",
++            ],
++        },
++        "sieged:zweihander": {
++            name: "§7Zweihander",
++            lore: [
++                "§8Une lame colossale qui domine le champ de bataille.",
++                "",
++                "§e⚔ Punisseur",
++                "§7Inflige des dégâts bonus aux ennemis sans bouclier",
++                "",
++                "§a +1 cœur contre les ennemis sans bouclier",
++                "§c Coup lent",
++                "§c Forte pénalité de déplacement",
++            ],
++        },
++        "sieged:lance": {
++            name: "§7Lance",
++            lore: [
++                "§8Une arme de cavalerie d'une puissance dévastatrice.",
++                "",
++                "§a⚔ Charge montée",
++                "§7Inflige des dégâts bonus à cheval",
++                "",
++                "§a Dégâts massifs en selle",
++                "§a Longue portée à cheval",
++                "§c Dégâts faibles à pied",
++                "§c Récupération d'attaque lente",
++            ],
++        },
++        "sieged:heavy_hammer": {
++            name: "§7Marteau lourd",
++            lore: [
++                "§8Son poids seul est une arme.",
++                "",
++                "§d⚔ Frappe de recul",
++                "§7Projette les ennemis au loin à chaque coup",
++                "",
++                "§a Recul massif",
++                "§a Interrompt les attaques ennemies",
++                "§c Vitesse d'attaque la plus lente",
++                "§c Forte pénalité de déplacement",
++            ],
++        },
++        "sieged:glaive": {
++            name: "§7Glaive",
++            lore: [
++                "§8Une lame fauchante sur un long manche.",
++                "",
++                "§e⚔ Arc fauchant",
++                "§7Touche tous les ennemis dans un large arc à chaque frappe",
++                "",
++                "§a Large fauchage de zone",
++                "§a Bonne portée",
++                "§c Pénalité de déplacement modérée",
++                "§c Lent contre une cible blindée isolée",
++            ],
++        },
++        "sieged:short_glaive": {
++            name: "§7Glaive court",
++            lore: [
++                "§8Un glaive agile conçu pour le corps à corps.",
++                "",
++                "§b⚔ Entaille sanglante",
++                "§7Empoisonne au contact, infligeant des dégâts sur la durée",
++                "",
++                "§a Vitesse d'attaque rapide",
++                "§a Dégâts sur la durée",
++                "§c Portée plus courte qu'un glaive complet",
++                "§c Faibles dégâts de base",
++            ],
++        },
++        "sieged:longbow": {
++            name: "§7Arc long",
++            lore: [
++                "§8Un arc de guerre à la tension redoutable.",
++                "",
++                "§a Ralentit les ennemis touchés à pleine tension",
++                "§c Ralentit les déplacements pendant la visée",
++            ],
++        },
++        "sieged:heavy_crossbow": {
++            name: "§7Arbalète lourde",
++            lore: [
++                "§8Une arbalète de siège d'une force dévastatrice.",
++                "",
++                "§6⚔ Carreau perforant",
++                "§7Fait chanceler la cible — inflige Faiblesse au contact",
++                "",
++                "§a Inflige Faiblesse au contact",
++                "§c Long rechargement entre les tirs",
++            ],
++        },
++        "sieged:javelin": {
++            name: "§7Javelot",
++            lore: [
++                "§8Une lourde lance de jet en fer.",
++                "",
++                "§3⚔ Lancer cloueur",
++                "§7Les lancers à pleine charge infligent +4 dégâts bonus",
++                "",
++                "§a Impact puissant à pleine charge",
++                "§c À récupérer après chaque lancer",
++            ],
++        },
++        "sieged:short_doubleheaded_axe": {
++            name: "§7Hache double courte",
++            lore: [
++                "§8Un fendoir compact à double lame.",
++                "",
++                "§3⚔ Lancer",
++                "§7Maintenez le clic droit pour charger, relâchez pour lancer",
++                "",
++                "§a Attaque à distance par lancer",
++                "§c Se brise à l'impact",
++            ],
++        },
++        "sieged:gladius": {
++            name: "§7Gladius",
++            lore: [
++                "§8Une lame courte taillée pour les duels rapides.",
++                "",
++                "§a Frappes ultra-rapides",
++                "§c Portée courte",
++            ],
++        },
++        "sieged:sabre": {
++            name: "§7Sabre",
++            lore: [
++                "§8Une lame courbe de précision et de vitesse.",
++                "",
++                "§6⚔ Riposte",
++                "§7Clic droit pour contrer les attaques entrantes",
++                "",
++                "§a Contre-attaque au clic droit",
++                "§c Dégâts de fauchage réduits",
++            ],
++        },
++        "sieged:throwing_dagger": {
++            name: "§7Dague de lancer",
++            lore: [
++                "§8Une lame équilibrée conçue pour être lancée.",
++                "",
++                "§3⚔ Lancer",
++                "§7Maintenez le clic droit pour charger, relâchez pour lancer",
++                "",
++                "§a Attaque à distance par lancer",
++                "§c Se brise à l'impact",
++            ],
++        },
++        "sieged:billhook": {
++            name: "§7Serpe de guerre",
++            lore: [
++                "§8Une arme d'hast à crochet du simple soldat.",
++                "",
++                "§e⚔ Croc-en-selle",
++                "§7Désarçonne instantanément tout cavalier touché",
++                "",
++                "§a Portée d'accroche étendue",
++                "§a Désarçonne les cavaliers instantanément",
++                "§c Coup lent",
++                "§c Plus faible contre les armures lourdes",
++            ],
++        },
++        "sieged:great_sword": {
++            name: "§7Grande épée",
++            lore: [
++                "§8Une lame à deux mains d'une puissance dévastatrice.",
++                "",
++                "§a Puissance à deux mains dévastatrice",
++                "§a Large portée de fauchage",
++                "§c Vitesse d'attaque très lente",
++                "§c Réduit fortement les déplacements",
++            ],
++        },
++        // ── Surrender Flag ────────────────────────────────────────────────────
++        "sieged:surrender_flag": {
++            name: "§f§lDrapeau de reddition",
++            lore: [
++                "§8Une bannière blanche — le prix de la défaite.",
++                "",
++                "§7À utiliser pour négocier une reddition :",
++                "§e  • §7Avec les joueurs contre qui vous êtes en guerre",
++                "§e  • §7Avec le clan illageois",
++                "",
++                "§c Impossible de se rendre pendant l'invasion du Tyran.",
++            ],
++        },
++        // ── Sieged Settings ───────────────────────────────────────────────────
++        "sieged:sieged_settings": {
++            name: "§6§lParamètres de Sieged",
++            lore: [
++                "§8Configurez les systèmes de l'add-on Sieged.",
++                "",
++                "§7Accroupi §8+ §7Interagir §8pour ouvrir.",
++            ],
++        },
++        // ── Commanding Horns (static lines only; dynamic lines built in code) ─
++        "sieged:commanding_horn_static": {
++            linked: [
++                "§7Un cor qui rappelle votre garde à l'ordre.",
++                "",
++                "",
++                "§8Accroupi + interagir avec un garde pour le relier.",
++            ],
++            unlinked: [
++                "§7Un cor qui rappelle votre garde à l'ordre.",
++                "",
++                "§cNon lié.",
++                "§8Accroupi + interagir avec un Garde-bannière",
++                "§8en le tenant pour le lier.",
++            ],
++        },
++        "sieged:forsaken_chestplate": { name: "§4§lPlastron du Déchu", lore: ["§8 §7Plaqué du fer maudit", "§8 §7d'une bande de guerre conquise", "", "§4 §c[Pacte du Déchu]", "§8 §7Portez-le avec le §4Heaume du Déchu", "§8 §7puis §cAccroupi + Saut §7pour invoquer", "§8 §7le pacte — jusqu'à §c4 §7illageois proches", "§8 §7plient sous votre volonté", "", "§c §7Recharge : 60 secondes"] },
++        "sieged:forsaken_helm": { name: "§4§lHeaume du Déchu", lore: ["§8 §7Forgé dans les restes de ceux", "§8 §7qui ont défié le Chevalier Déchu", "", "§4 §c[Pacte du Déchu]", "§8 §7Portez-le avec le §4Plastron du Déchu", "§8 §7puis §cAccroupi + Saut §7pour invoquer", "§8 §7le pacte — jusqu'à §c4 §7illageois proches", "§8 §7plient sous votre volonté", "", "§c §7Recharge : 60 secondes"] },
++        "sieged:flail": { name: "§6§lFléau du Ravageur de guerre", lore: ["§8 §7Arraché au harnais de guerre du Ravageur", "§8 §7à sa chute — sa chaîne encore chaude", "§8 §7de la furie de mille sièges.", "", "§6 §e[Élan]", "§8 §7Chaque coup chargé en moins de §65 secondes", "§8 §7ajoute §6+3 dégâts§7, cumulable jusqu'à", "§8 §73 fois pour §630 dégâts §7à pleine furie"] },
++        "sieged:repeating_crossbow": { name: "§4§lRépéteur du Tyran", lore: ["§8 §7Conçu dans l'arsenal du Tyran", "§8 §7pour briser les royaumes — une volée à la fois.", "", "§4 §c[Volée incessante]", "§8 §7Maintenez pour déchaîner un déluge continu de flèches.", "§8 §7Consomme les flèches de l'inventaire.", "", "§7Compatible : §eTir multiple§7, §eCharge rapide§7, §eSolidité"] },
++        // ── Quest Log (static UI labels) ──────────────────────────────────────
++        "sieged:quest_log_static": {
++            name: "§6§lJournal de quêtes",
++            complete_header: "§a§l★ QUÊTE TERMINÉE ★",
++            complete_claim:  "§7Tenez-le en main et faites un clic droit pour réclamer !",
++            collect_turnin:  "§eClic droit pour rendre la quête quand vous êtes prêt !",
++            progress_label:  "§7Progression :",
++            separator:       "§8─────────────────",
++        },
++        // ── Return Order Scroll ───────────────────────────────────────────────
++        "sieged:return_order_scroll": {
++            name: "§7Parchemin d'ordre de retour",
++            lore: [
++                "§8 §7Un décret de rappel portant votre sceau.",
++                "",
++                "§e §l[Interagir] §r§7avec une unité apprivoisée pour",
++                "§8 §7récupérer tout son équipement.",
++                "",
++                "§c §8Consommé à l'usage.",
++            ],
++        },
++        // ── Music Disc (generic author credit) ───────────────────────────────
++        "sieged:disc_generic": {
++            name: null,
++            lore: ["§7Créé par MangyNateDDog"],
++        },
++        // ── Mark of the Ravager ───────────────────────────────────────────────
++        "sieged:the_golden_horn": {
++            name: "§c§lMarque du Ravageur",
++            lore: [
++                "§8 §7Une bête comme nulle autre,",
++                "§8 §7dressée, élevée et née pour la guerre.",
++                "",
++                "§8 §7Incomprise ? Peut-être.",
++                "",
++                "§8 §7Mais c'est simplement l'effet du dressage.",
++                "§8 §7Persuadez un être assez longtemps,",
++                "§8 §7répétez-le assez de fois, et un jour...",
++                "",
++                "§8 §7il fera tout ce que vous direz.",
++            ],
++        },
++        // ── Mark of the Forsaken ──────────────────────────────────────────────
++        "sieged:the_golden_shield": {
++            name: "§7§lMarque du Déchu",
++            lore: [
++                "§8 §7Brisé. Incompris.",
++                "§8 §7Il défendait les faibles et promettait",
++                "§8 §7protection, mais il a flanché au",
++                "§8 §7moment le plus crucial.",
++                "",
++                "§8 §7Même l'orgueil finit par nous perdre.",
++                "",
++                "§8 §7Condamné par ses propres actes,",
++                "§8 §7il a choisi la solitude pour porter le poids",
++                "§8 §7du regret, détruisant tout ce qui",
++                "§8 §7lui rappelle le passé.",
++            ],
++        },
++        // ── Mark of the Tyrant ────────────────────────────────────────────────
++        "sieged:the_golden_crossbow": {
++            name: "§6§lMarque du Tyran",
++            lore: [
++                "§8 §7Un roi à jamais dans l'ombre de son frère,",
++                "§8 §7à qui l'on promit la couronne avec l'espoir",
++                "§8 §7de quelque chose de plus grand — non par soif",
++                "§8 §7de pouvoir, mais pour se défendre contre ce qui venait.",
++                "",
++                "§8 §7Hélas, personne ne l'a cru.",
++                "",
++                "§8 §7Alors on l'a nommé Tyran,",
++                "§8 §7non pour sa cruauté, mais pour avoir osé",
++                "§8 §7vouloir le changement.",
++            ],
++        },
++    },
+ };
+ 
+ /**
+@@ -2171,6 +2742,7 @@
+ function normLoreLocale(locale) {
+     const n = locale ? locale.replace('-', '_') : 'en_US';
+     if (LORE_DB[n]) return n;
++    if (n.startsWith('fr')) return 'fr_FR';
+     if (n.startsWith('es')) return 'es_MX';
+     if (n.startsWith('zh')) return 'zh_CN';
+     if (n.startsWith('pt')) return 'pt_BR';
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/settings.js addon/SiegedTATB/scripts/settings.js
+--- addon_orig/SiegedTATB/scripts/settings.js	2026-06-26 00:18:21.000000000 +0000
++++ addon/SiegedTATB/scripts/settings.js	2026-07-04 17:19:19.188876599 +0000
+@@ -11,8 +11,8 @@
+ // their toggle before running expensive logic.
+ // ════════════════════════════════════════════════════════════════
+ 
+-const LANG_OPTIONS = ['en_US', 'es_MX', 'zh_CN', 'pt_BR'];
+-const LANG_LABELS  = ['English', 'Español', '中文 (Chinese)', 'Português'];
++const LANG_OPTIONS = ['en_US', 'fr_FR', 'es_MX', 'zh_CN', 'pt_BR'];
++const LANG_LABELS  = ['English', 'Français', 'Español', '中文 (Chinese)', 'Português'];
+ const LANG_PROP    = 'sieged:lang';
+ 
+ function getLangIndex(player) {
+@@ -136,6 +136,59 @@
+     dev_arming_title:   "§l§6 Unit Arming",
+     dev_illager_title:  "§l§c Illager King Boss",
+   },
++  fr_FR: {
++    settings_title:           "§l§6 Paramètres de Sieged",
++    settings_mob:             "§eInvasion de monstres",
++    settings_field:           "§eBataille rangée",
++    settings_siege:           "§eSièges de châteaux",
++    settings_war:             "§eDéclarations de guerre",
++    settings_explosives:      "§eExplosifs des armes de siège",
++    settings_npc:             "§eRoyaumes de villageois (IA)",
++    settings_biome_gear:      "§eÉquipement selon le biome",
++    settings_ambush:          "§eSystème d'embuscades",
++    settings_ambush_opts:     ["§cDÉSACTIVÉ", "§725%", "§750%", "§775%", "§aPar défaut"],
++    settings_reset_gates:     "§c§lRéinitialiser les liens cor/porte de château\n§r§7Activez puis validez pour confirmer — action irréversible",
++    settings_reset_cameras:   "§c§lRéinitialiser les caméras des joueurs\n§r§7Activez puis validez pour effacer tous les effets de caméra actifs",
++    settings_reset_invasion:  "§c§lRéinitialiser l'état d'invasion\n§r§7Activez puis validez pour effacer toute progression d'invasion",
++    settings_reset_raid:      "§c§lRéinitialiser l'état de raid\n§r§7Activez puis validez pour réinitialiser le cycle éclaireurs/raid",
++    settings_lang:            "§b§lLangue des descriptions d'objets\n§r§7Traduit les noms et descriptions des objets",
++    settings_saved:           "§6§l[Paramètres de Sieged] §r§7Enregistré :",
++    settings_saved_invasion:  "§7  Invasion de monstres : ",
++    settings_saved_field:     "§7  Bataille rangée :      ",
++    settings_saved_siege:     "§7  Sièges de châteaux :   ",
++    settings_saved_war:       "§7  Déclarations de guerre : ",
++    settings_saved_explosives:"§7  Explosifs de siège :   ",
++    settings_saved_npc:       "§7  Royaumes IA :          ",
++    settings_saved_biome_gear:"§7  Équip. selon biome :   ",
++    settings_saved_ambush:    "§7  Embuscades :           ",
++    settings_saved_lang:      "§7  Langue des lores :     ",
++    settings_reset_gates_msg:     "§c  Liens cor/porte :    §eRéinitialisés",
++    settings_reset_cameras_msg:   "§c  Caméras joueurs :    §eEffacées",
++    settings_reset_invasion_msg:  "§c  État d'invasion :    §eRéinitialisé",
++    settings_reset_raid_msg:      "§c  État de raid :       §eRéinitialisé",
++
++    dev_title:          "§l§6 Outil dev Sieged",
++    dev_body:           "§7Sélectionnez un système à déboguer :",
++    dev_btn_invasion:   "§6Système d'invasion",
++    dev_btn_raid:       "§6Système raid / éclaireurs",
++    dev_btn_field:      "§6Bataille rangée",
++    dev_btn_ambush:     "§6Système d'embuscades",
++    dev_btn_kingdom:    "§6Infos royaume",
++    dev_btn_book:       "§6Améliorations du Registre",
++    dev_btn_arming:     "§6Armement des unités",
++    dev_btn_illager:    "§6Boss Roi Illageois",
++    dev_btn_quest:      "§6Donneur de quêtes",
++    dev_btn_back:       "§8<- Retour",
++
++    dev_invasion_title: "§l§c Système d'invasion",
++    dev_raid_title:     "§l§c Système raid / éclaireurs",
++    dev_field_title:    "§l§c Bataille rangée",
++    dev_ambush_title:   "§l§c Système d'embuscades",
++    dev_kingdom_title:  "§l§c Infos royaume",
++    dev_book_title:     "§l§c Améliorations du Registre",
++    dev_arming_title:   "§l§6 Armement des unités",
++    dev_illager_title:  "§l§c Boss Roi Illageois",
++  },
+   pt_BR: {
+     settings_title:           "§l§6 Configurações do Sieged",
+     settings_mob:             "§eInvasão de Monstros",
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/sieged_book.js addon/SiegedTATB/scripts/sieged_book.js
+--- addon_orig/SiegedTATB/scripts/sieged_book.js	2026-06-30 13:56:23.000000000 +0000
++++ addon/SiegedTATB/scripts/sieged_book.js	2026-07-04 17:20:42.195434723 +0000
+@@ -82,6 +82,7 @@
+     if (!locale || typeof locale !== 'string') return 'en_US';
+     const n = locale.replace('-', '_');
+     if (n === 'en_US' || n === 'es_MX' || n === 'zh_CN' || n === 'pt_BR') return n;
++    if (n.startsWith('fr')) return 'fr_FR';
+     if (n.startsWith('es')) return 'es_MX';
+     if (n.startsWith('zh')) return 'zh_CN';
+     if (n.startsWith('pt')) return 'pt_BR';
+@@ -90,6 +91,7 @@
+ 
+ const NAMES_I18N = {
+     en_US: { veteran_training:"Veteran Training", iron_discipline:"Iron Discipline", falconry:"Falconry", vanguard_arts:"Vanguard Arts", heavy_cavalry:"Heavy Cavalry", war_brotherhood:"War Brotherhood", transport:"Transport", brazier:"Brazier", battering_ram:"Battering Ram", ballista:"Ballista", catapult:"Catapult", siege_tower:"Siege Tower", trebuchet:"Trebuchet" },
++    fr_FR: { veteran_training:"Ent. vétéran", iron_discipline:"Discipline de fer", falconry:"Fauconnerie", vanguard_arts:"Arts d'avant-garde", heavy_cavalry:"Cavalerie lourde", war_brotherhood:"Fraternité de guerre", transport:"Transport", brazier:"Brasero", battering_ram:"Bélier", ballista:"Baliste", catapult:"Catapulte", siege_tower:"Tour de siège", trebuchet:"Trébuchet" },
+     es_MX: { veteran_training:"Ent. Veterano", iron_discipline:"Disc. de Hierro", falconry:"Cetrería", vanguard_arts:"Artes de Vanguardia", heavy_cavalry:"Cab. Pesada", war_brotherhood:"Herm. de Guerra", transport:"Transporte", brazier:"Brasero", battering_ram:"Ariete", ballista:"Balista", catapult:"Catapulta", siege_tower:"Torre de Asedio", trebuchet:"Trebuchet" },
+     zh_CN: { veteran_training:"老兵训练", iron_discipline:"铁血纪律", falconry:"猎鹰术", vanguard_arts:"先锋战术", heavy_cavalry:"重骑兵", war_brotherhood:"战争兄弟会", transport:"运输", brazier:"火盆", battering_ram:"攻城槌", ballista:"弩炮", catapult:"投石机", siege_tower:"攻城塔", trebuchet:"投石车" },
+     pt_BR: { veteran_training:"Trein. Veterano", iron_discipline:"Disc. de Ferro", falconry:"Falcoaria", vanguard_arts:"Artes de Vanguarda", heavy_cavalry:"Cav. Pesada", war_brotherhood:"Irm. de Guerra", transport:"Transporte", brazier:"Braseiro", battering_ram:"Aríete", ballista:"Balista", catapult:"Catapulta", siege_tower:"Torre de Cerco", trebuchet:"Trebuchet" },
+@@ -103,6 +105,7 @@
+ // ── Book locale tables ─────────────────────────────────────────────
+ const BOOK_START = {
+     en_US: ["§nGetting Started§r","§61. §7Monarchs Castle, Plains","§62. §7Talk to the Monarch","§63. §7Hire: give §eEmeralds §7to villagers","§64. §7Promote: §eWar Order Scrolls","§65. §7Unlock Army & Research tabs","§66. §7Sound §eWar Horn §7near castle","§67. §7Quest tab tracks bosses","§68. §7§eCastle Flag§7 to grow realm","§8 Troop Claim: Crouch+Named flag"],
++    fr_FR: ["§nPour bien commencer§r","§61. §7Château du Monarque, plaines","§62. §7Parlez au Monarque","§63. §7Recruter : donnez des §eémeraudes §7aux villageois","§64. §7Promouvoir : §eParchemins d'ordre de guerre","§65. §7Débloquez les onglets Armée et Recherche","§66. §7Sonnez le §eCor de guerre §7près du château","§67. §7L'onglet Quêtes suit les boss","§68. §7§eDrapeau de château§7 pour agrandir le royaume","§8 Revendiquer des troupes : Accroupi+bannière nommée"],
+     es_MX: ["§nIniciando§r","§61. §7Castillo del Monarca, Llanura","§62. §7Habla con el Monarca","§63. §7Contratar: da §eEsmeraldas §7a aldeanos","§64. §7Ascender: §eOrden de Pergaminos","§65. §7Desbloquea Ejército e Invest.","§66. §7Toca §eCuerno de Guerra §7al castillo","§67. §7Pestaña Misión rastrea jefes","§68. §7§eBandera de Castillo§7 para expandir","§8 Reclamar: Agachar+Bandera nombrada"],
+     zh_CN: ["§n新手指南§r","§61. §7君主城堡，平原","§62. §7与君主交谈","§63. §7雇佣：给村民§e绿宝石","§64. §7晋升：§e战令卷轴","§65. §7解锁军队与研究标签","§66. §7在城堡附近吹响§e战争号角","§67. §7任务标签追踪首领","§68. §7§e城堡旗帜§7扩展领地","§8 占领部队：潜行+命名旗帜"],
+     pt_BR: ["§nComeçando§r","§61. §7Castelo do Monarca, Planície","§62. §7Fale com o Monarca","§63. §7Contratar: dê §eEsmeraldas §7a aldeões","§64. §7Promover: §ePerganinhos de Ordem","§65. §7Desbloquear Exército/Pesquisa","§66. §7Toque o §eCorno de Guerra §7ao castelo","§67. §7Aba Missão rastreia chefes","§68. §7§eBandeira do Castelo§7 para crescer","§8 Reivindicar: Agachar+Bandeira nomeada"],
+@@ -117,6 +120,14 @@
+         ik_awake:"§c§l! Illager King Awakens!\n§8Prepare your realm.",
+         ik_wait:"§8[ Illager King ]\n§8Rises when both fall.",
+     },
++    fr_FR: {
++        rav_done:"§a Ravageur de guerre §7— Terrassé\n§8Cor + Bannière + Feu.\n\n\n\n",
++        rav_todo:"§c- Ravageur de guerre\n§7§mCor + Bannière + Feu§r\n\n\n\n",
++        fk_done:"§a Chevalier Déchu§7—Vaincu\n§8Forteresses anciennes.\n\n\n\n",
++        fk_todo:"§c- Chevalier Déchu\n§7§mCherchez le château déchu§r\n\n\n\n",
++        ik_awake:"§c§l! Le Roi Illageois s'éveille !\n§8Préparez votre royaume.",
++        ik_wait:"§8[ Roi Illageois ]\n§8Se lève quand les deux tombent.",
++    },
+     es_MX: {
+         rav_done:"§a Saqueador de Guerra §7— Eliminado\n§8Cuerno + Bandera + Fuego.\n\n\n\n",
+         rav_todo:"§c- Saqueador de Guerra\n§7§mCuerno + Bandera + Fuego§r\n\n\n\n",
+@@ -145,6 +156,7 @@
+ 
+ const BOOK_MIL = {
+     en_US: { header:"§nMilitary Upgrades§r", res:"§6Researching: §e", vt:"Vet Training §824+5", id:"Iron Disc. §832+10", fa:"Falconry §832+10", va:"Vanguard Arts §832+10", hc:"Heavy Cav. §848+15", wb:"War Brother §864+25" },
++    fr_FR: { header:"§nAméliorations militaires§r", res:"§6Recherche : §e", vt:"Ent. vétéran §824+5", id:"Disc. de fer §832+10", fa:"Fauconnerie §832+10", va:"Avant-garde §832+10", hc:"Cav. lourde §848+15", wb:"Fraternité §864+25" },
+     es_MX: { header:"§nMejoras Militares§r",  res:"§6Investigando: §e",  vt:"Ent. Veterano §824+5", id:"Disc. Hierro §832+10", fa:"Cetrería §832+10", va:"Artes Vanguardia §832+10", hc:"Cab. Pesada §848+15", wb:"Herm. Guerra §864+25" },
+     zh_CN: { header:"§n军事升级§r",            res:"§6研究中: §e",         vt:"老兵训练 §824+5",     id:"铁血纪律 §832+10",    fa:"猎鹰术 §832+10", va:"先锋战术 §832+10",   hc:"重骑兵 §848+15",     wb:"战争兄弟会 §864+25" },
+     pt_BR: { header:"§nMelhorias Militares§r", res:"§6Pesquisando: §e",   vt:"Trein. Vet. §824+5",  id:"Disc. Ferro §832+10", fa:"Falcoaria §832+10", va:"Artes Vanguarda §832+10", hc:"Cav. Pesada §848+15", wb:"Irm. Guerra §864+25" },
+@@ -152,6 +164,7 @@
+ 
+ const BOOK_BTNS = {
+     en_US: { researching:"§7Researching ", research:"§aResearch ", vt:"§aVeteran Training  §824+5", id:"§aIron Discipline   §832+10", fa:"§aFalconry          §832+10", va:"§aVanguard Arts    §832+10", hc:"§aHeavy Cavalry     §848+15", wb:"§aWar Brotherhood   §864+25" },
++    fr_FR: { researching:"§7Recherche ", research:"§aRechercher ", vt:"§aEnt. vétéran §824+5", id:"§aDiscipline de fer §832+10", fa:"§aFauconnerie §832+10", va:"§aArts d'avant-garde §832+10", hc:"§aCavalerie lourde §848+15", wb:"§aFraternité de guerre §864+25" },
+     es_MX: { researching:"§7Investigando ", research:"§aInvestigar ", vt:"§aEnt. Veterano §824+5", id:"§aDisc. de Hierro §832+10", fa:"§aCetrería §832+10", va:"§aArtes Vanguardia §832+10", hc:"§aCab. Pesada §848+15", wb:"§aHerm. de Guerra §864+25" },
+     zh_CN: { researching:"§7研究中 ",         research:"§a研究 ",         vt:"§a老兵训练 §824+5",    id:"§a铁血纪律 §832+10",    fa:"§a猎鹰术 §832+10", va:"§a先锋战术 §832+10",   hc:"§a重骑兵 §848+15",     wb:"§a战争兄弟会 §864+25" },
+     pt_BR: { researching:"§7Pesquisando ",    research:"§aPesquisar ",    vt:"§aTrein. Veterano §824+5", id:"§aDisc. de Ferro §832+10", fa:"§aFalcoaria §832+10", va:"§aArtes Vanguarda §832+10", hc:"§aCav. Pesada §848+15", wb:"§aIrm. de Guerra §864+25" },
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js addon/SiegedTATB/scripts/war_declaration.js
+--- addon_orig/SiegedTATB/scripts/war_declaration.js	2026-06-10 12:08:41.000000000 +0000
++++ addon/SiegedTATB/scripts/war_declaration.js	2026-07-04 17:14:35.212802226 +0000
+@@ -2,6 +2,7 @@
+ import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
+ import { sendToast } from "./helpers.js";
+ import { getSetting } from "./settings.js";
++import { getPlayerLocale } from "./lore_i18n.js";
+ 
+ // ============================================================
+ // CONSTANTS
+@@ -80,10 +81,10 @@
+             await new Promise(resolve => system.runTimeout(resolve, 40));
+ 
+             const form = new MessageFormData()
+-                .title("War Scroll")
++                .title({ translate: "sieged.hud.war_scroll_form_title" })
+                 .body({ rawtext: [{ translate: "sieged.hud.war_scroll_form_body", with: [declarerName] }] })
+-                .button1("§2§l Accept — Begin War")
+-                .button2("§c Decline");
++                .button1({ translate: "sieged.hud.war_form_accept" })
++                .button2({ translate: "sieged.hud.war_form_decline" });
+ 
+             let res;
+             try { res = await form.show(player); } catch { return; }
+@@ -154,14 +155,14 @@
+ 
+     const form = new ModalFormData()
+         .title("War Declaration")
+-        .dropdown("§7Declare war upon:", targets.map(p => p.name), { defaultValueIndex: 0 })
+-        .textField("§7State your reason for war:", "e.g. Theft, betrayal...");
++        .dropdown({ translate: "sieged.hud.war_form_dropdown_label" }, targets.map(p => p.name), { defaultValueIndex: 0 })
++        .textField({ translate: "sieged.hud.war_form_reason_label" }, { translate: "sieged.hud.war_form_reason_placeholder" });
+ 
+     const res = await form.show(declarer);
+     if (res.canceled || res.formValues === undefined) return;
+ 
+     const target = targets[res.formValues[0]];
+-    const reason = (res.formValues[1] || "").toString().trim() || "No reason given.";
++    const reason = (res.formValues[1] || "").toString().trim();
+ 
+     if (declarerCrow && declarerCrow.isValid) declarerCrow.kill();
+     system.run(() => spawnDeclarationScroll(declarer, target, reason));
+@@ -171,13 +172,22 @@
+ // SPAWN DECLARATION SCROLL AT TARGET'S FEET
+ // ============================================================
+ function spawnDeclarationScroll(declarer, target, reason) {
++    // Item name/lore only accept plain strings — localize using the target's locale.
++    const isFr = String(getPlayerLocale(target) || "").startsWith("fr");
++    const shownReason = reason || (isFr ? "Aucun motif donné." : "No reason given.");
+     const scroll = new ItemStack(SCROLL_ID, 1);
+-    scroll.nameTag = "§6Declaration of War";
+-    scroll.setLore([
+-        "§7From: §c" + declarer.name,
+-        "§7Reason: §e" + reason,
+-        "§8[Right-click to respond]"
+-    ]);
++    scroll.nameTag = isFr ? "§6Déclaration de guerre" : "§6Declaration of War";
++    scroll.setLore(isFr
++        ? [
++            "§7De : §c" + declarer.name,
++            "§7Motif : §e" + shownReason,
++            "§8[Clic droit pour répondre]"
++        ]
++        : [
++            "§7From: §c" + declarer.name,
++            "§7Reason: §e" + shownReason,
++            "§8[Right-click to respond]"
++        ]);
+ 
+     target.dimension.spawnItem(scroll, target.location);
+     target.addTag(HAS_DECLARATION_PFX + declarer.name);
+@@ -286,14 +296,16 @@
+     }
+ 
+     const form = new ActionFormData()
+-        .title("§a§lPropose Peace")
+-        .body("§7Select a player to offer peace to:");
++        .title({ translate: "sieged.hud.war_propose_form_title" })
++        .body({ translate: "sieged.hud.war_propose_form_body" });
+ 
+     for (const p of warPartners) {
+         const pending = p.hasTag(PEACE_PROPOSED_PFX + proposer.name);
+-        form.button(pending ? "§e" + p.name + " §7(pending...)" : "§f" + p.name);
++        form.button(pending
++            ? { rawtext: [{ text: "§e" + p.name + " " }, { translate: "sieged.hud.war_form_pending" }] }
++            : "§f" + p.name);
+     }
+-    form.button("§7Cancel");
++    form.button({ translate: "sieged.hud.war_form_cancel" });
+ 
+     const res = await form.show(proposer);
+     if (res.canceled || res.selection === warPartners.length) return;
+@@ -365,6 +377,52 @@
+ }, 20);
+ 
+ // ============================================================
++// SCROLL USED DIRECTLY ON A PARROT — INSTANT CROW CONVERSION
++// Interacting with a parrot while holding a scroll transforms it
++// into a messenger crow immediately, without having to throw the
++// scroll on the ground. The legacy thrown-scroll flow below still
++// works as a fallback.
++// ============================================================
++world.beforeEvents.playerInteractWithEntity.subscribe((ev) => {
++    const player = ev.player;
++    const target = ev.target;
++    const item   = ev.itemStack;
++    if (!item || item.typeId !== SCROLL_ID) return;
++    if (!target || target.typeId !== "minecraft:parrot") return;
++    // Responding to a declaration or proposing peace is handled by the
++    // scroll's itemUse flow — keep the same precedence as the crow scan.
++    if (player.getTags().some(t => t.startsWith(HAS_DECLARATION_PFX) || t.startsWith(AT_WAR_PFX))) return;
++
++    ev.cancel = true;
++    system.run(() => {
++        if (!target.isValid || !player.isValid) return;
++        const dim      = target.dimension;
++        const spawnLoc = { ...target.location };
++
++        // Consume one scroll from the main hand (parity with the thrown flow)
++        try {
++            const equip = player.getComponent("minecraft:equippable");
++            const held  = equip?.getEquipment("Mainhand");
++            if (held?.typeId === SCROLL_ID) {
++                if (held.amount > 1) {
++                    held.amount -= 1;
++                    equip.setEquipment("Mainhand", held);
++                } else {
++                    equip.setEquipment("Mainhand", undefined);
++                }
++            }
++        } catch (_) {}
++
++        target.remove();
++        const crow = dim.spawnEntity(CROW_ID, spawnLoc);
++        player.sendMessage({ rawtext: [{ text: "§6 " }, { translate: "sieged.hud.war_crow_summoned" }] });
++        player.sendMessage({ rawtext: [{ translate: "sieged.hud.war_declare_via_crow" }] });
++
++        system.run(() => openDeclarationPrompt(player, crow));
++    });
++});
++
++// ============================================================
+ // PARROT → CROW CONVERSION
+ // ============================================================
+ system.runInterval(() => {
+--- addon_orig/SiegedTATR/texts/en_US.lang	2026-06-24 22:22:47.000000000 +0000
++++ addon/SiegedTATR/texts/en_US.lang	2026-07-04 17:14:58.618413497 +0000
+@@ -1011,4 +1011,13 @@
+ item.sieged:the_golden_shield=§6§lMark of the Forsaken
+ item.sieged:the_golden_crossbow_trophy=§6§lMark of the Tyrant
+ item.sieged:the_golden_horn_trophy=§6§lMark of the Ravager
+-item.sieged:the_golden_shield_trophy=§6§lMark of the Forsaken
+\ No newline at end of file
++item.sieged:the_golden_shield_trophy=§6§lMark of the Forsaken
++## war_declaration.js — form labels (added for localization)
++sieged.hud.war_scroll_form_title=War Scroll
++sieged.hud.war_form_accept=§2§l Accept — Begin War
++sieged.hud.war_form_decline=§c Decline
++sieged.hud.war_form_dropdown_label=§7Declare war upon:
++sieged.hud.war_form_reason_label=§7State your reason for war:
++sieged.hud.war_form_reason_placeholder=e.g. Theft, betrayal...
++sieged.hud.war_form_pending=§7(pending...)
++sieged.hud.war_form_cancel=§7Cancel
+--- addon_orig/SiegedTATR/texts/languages.json	2026-05-01 13:26:45.000000000 +0000
++++ addon/SiegedTATR/texts/languages.json	2026-07-04 17:06:26.141974267 +0000
+@@ -1,6 +1,8 @@
+ [
+ 	"en_US",
+ 	"es_MX",
++	"fr_FR",
++	"fr_CA",
+ 	"pt_BR",
+ 	"zh_CN"
+ ]
+--- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
++++ addon/SiegedTATR/manifest.json	2026-07-04 17:22:08.142232419 +0000
+@@ -4,7 +4,7 @@
+ 		"name": "Sieged TAT Resource",
+ 		"description": "Medieval survival addon RP Update V1.7",
+ 		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
+-		"version": [1, 7, 1],
++		"version": [1, 7, 2],
+ 		"min_engine_version": [1, 26, 0]
+ 	},
+ 	"modules": [
+@@ -17,7 +17,7 @@
+ 	"dependencies": [
+ 		{
+ 			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
+-			"version": [1, 7, 1]
++			"version": [1, 7, 2]
+ 		}
+ 	],
+ 	"capabilities": ["pbr"],
