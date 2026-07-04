@@ -491,6 +491,9 @@ const LEGIONNAIRE = {
       c([-3.2,22.9,-2.85],[6.4,1.5,1.1],'red'),
       c([-3.4,22.9,-2.3],[1.1,1.7,4.4],'red'),
       c([2.3,22.9,-2.3],[1.1,1.7,4.4],'red'),
+      // gorgerin arrière : ferme la nuque en cuir entre la lorica et le casque + écharpe qui fait le tour
+      c([-4.3,20.4,1.9],[8.6,3.7,1.2],'steel'),
+      c([-3.3,22.8,2.0],[6.6,1.6,1.05],'red'),
       // rivets d'or : alignés au centre exact des 3 bandes (haute 20.8, milieu 18.2, basse 15.6)
       // 2 rivets frontaux + 2 rivets de flanc par bande, parfaitement symétriques
       c([-2.4,20.4,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,20.4,-2.95],[0.8,0.8,0.4],'gold'),
