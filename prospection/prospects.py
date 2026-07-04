@@ -13,9 +13,9 @@ Deux sources de données au choix (--source) :
 
 Exemples :
   export GOOGLE_MAPS_API_KEY="votre_clé"
-  python prospects.py --location "Annecy" --radius 5 --type restaurant --source google
-  python prospects.py --location 74000 --radius 10 --source osm
-  python prospects.py --location "Chambéry" --radius 3 --type coiffeur -o coiffeurs.csv
+  python prospects.py --location "Gap" --radius 5 --type restaurant --source google
+  python prospects.py --location 05000 --radius 10 --source osm
+  python prospects.py --location "Briançon" --radius 3 --type coiffeur -o coiffeurs.csv
 
 Sortie : un CSV trié par nombre d'avis décroissant, colonnes :
   nom, categorie, adresse, telephone, note_google, nb_avis,
@@ -353,7 +353,8 @@ def build_overpass_query(lat, lon, radius_m, business_type):
     return f"[out:json][timeout:90];\n(\n{body});\nout center tags;"
 
 
-def collect_osm(lat, lon, radius_m, business_type, refresh):
+def collect_osm(lat, lon, radius_m, business_type, refresh,
+                keep_chains=False):
     """Pipeline OSM : requête Overpass → filtre 'pas de tag website'."""
     query = build_overpass_query(lat, lon, radius_m, business_type)
     key = f"overpass:{hashlib.sha256(query.encode()).hexdigest()}"
@@ -391,6 +392,13 @@ def collect_osm(lat, lon, radius_m, business_type, refresh):
         name = tags.get("name", "").strip()
         if not name:
             continue  # sans nom, impossible à prospecter
+
+        # Les chaînes nationales (tag "brand" dans OSM : Intermarché,
+        # Pimkie…) ont un site corporate même si le point de vente n'a
+        # pas de tag website → exclues par défaut (--keep-chains pour
+        # les garder).
+        if not keep_chains and ("brand" in tags or "brand:wikidata" in tags):
+            continue
 
         # Un site web peut être déclaré sous plusieurs tags OSM.
         website = (tags.get("website") or tags.get("contact:website")
@@ -475,7 +483,7 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--location", "-l", required=True,
-                        help="Ville ou code postal (ex: 'Annecy' ou 74000)")
+                        help="Ville ou code postal (ex: 'Gap' ou 05000)")
     parser.add_argument("--radius", "-r", type=float, default=5.0,
                         help="Rayon de recherche en km")
     parser.add_argument("--type", "-t", dest="business_type", default=None,
@@ -489,6 +497,9 @@ def main():
                         help="Fichier CSV de sortie")
     parser.add_argument("--refresh", action="store_true",
                         help="Ignore le cache et re-télécharge tout")
+    parser.add_argument("--keep-chains", action="store_true",
+                        help="Garde les chaînes/franchises (source osm : "
+                             "exclues par défaut via le tag 'brand')")
     args = parser.parse_args()
 
     radius_m = int(args.radius * 1000)
@@ -510,7 +521,7 @@ def main():
                                    api_key, args.refresh)
     else:
         prospects = collect_osm(lat, lon, radius_m, args.business_type,
-                                args.refresh)
+                                args.refresh, args.keep_chains)
 
     before = len(prospects)
     prospects = dedupe(prospects)

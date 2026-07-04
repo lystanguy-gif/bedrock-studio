@@ -14,15 +14,15 @@ pip install requests
 
 ```bash
 # Source gratuite (OpenStreetMap), sans clé API :
-python prospects.py --location "Annecy" --radius 5 --source osm
+python prospects.py --location "Gap" --radius 5 --source osm
 
 # Source Google Places (plus riche : note, nb d'avis, téléphone fiable) :
 export GOOGLE_MAPS_API_KEY="votre_clé"
-python prospects.py --location 74000 --radius 10 --type restaurant --source google
+python prospects.py --location 05000 --radius 10 --type restaurant --source google
 
 # Autres options :
-python prospects.py --location "Chambéry" -r 3 -t coiffeur -o coiffeurs.csv
-python prospects.py --location "Annecy" -r 5 --refresh   # ignore le cache
+python prospects.py --location "Briançon" -r 3 -t coiffeur -o coiffeurs.csv
+python prospects.py --location "Embrun" -r 5 --refresh   # ignore le cache
 ```
 
 | Option | Rôle | Défaut |
@@ -33,6 +33,7 @@ python prospects.py --location "Annecy" -r 5 --refresh   # ignore le cache
 | `--source` / `-s` | `google` ou `osm` | google |
 | `--output` / `-o` | Fichier CSV de sortie | prospects.csv |
 | `--refresh` | Ignore le cache local | — |
+| `--keep-chains` | Garde les chaînes/franchises (source osm) | exclues |
 
 ## Sortie
 
