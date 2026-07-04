@@ -684,11 +684,13 @@ function buildAnimations(model){
     if (hasR) over.bones.arm_r = { rotation:{ '0.0':GR, '0.26':[108,-4,0], '0.5':[-58,-6,0], '0.62':[-14,-8,0], '0.8':GR } };
     over.bones.body = { rotation:{ '0.0':[3,-5,0], '0.26':[-13,2,0], '0.5':[16,-4,0], '0.8':[3,-5,0] } };
     if (hasHead) over.bones.head = { rotation:{ '0.0':[0,0,0], '0.26':[-9,0,0], '0.5':[11,0,0], '0.8':[0,0,0] } };
-    // le bras du bouclier ne se balance quasiment pas (il tient la garde en avant)
+    // HORS combat (repos/marche/course) : le bras gauche tourne (rotation Y ~ -86°) pour amener
+    // le scutum SUR LE CÔTÉ, parallèle au flanc (face vers l'extérieur), coude replié.
+    // En combat (attaques), arm_l revient à 0 → le bouclier est de nouveau DEVANT (garde).
     if (hasL){
-      idle.bones.arm_l = { rotation:{ '0.0':[0,0,0], '1.0':[-2,0,0], '2.0':[0,0,0] } };
-      walk.bones.arm_l = { rotation:{ '0.0':[-4,0,0], '0.5':[2,0,0], '1.0':[-4,0,0] } };
-      run.bones.arm_l  = { rotation:{ '0.0':[-6,0,0], '0.3':[3,0,0], '0.6':[-6,0,0] } };
+      idle.bones.arm_l = { rotation:{ '0.0':[11,-86,0], '1.0':[10,-86,2], '2.0':[11,-86,0] } };
+      walk.bones.arm_l = { rotation:{ '0.0':[14,-86,0], '0.5':[8,-86,0], '1.0':[14,-86,0] } };
+      run.bones.arm_l  = { rotation:{ '0.0':[16,-85,0], '0.3':[6,-85,0], '0.6':[16,-85,0] } };
     }
     // sang qui gicle de la lame (locator "blade") aux impacts
     stab.particle_effects['0.2']  = { effect:'blood', locator:'blade' };
