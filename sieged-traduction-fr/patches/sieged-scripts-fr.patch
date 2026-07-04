@@ -542,7 +542,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/villagerl
  				}
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
 --- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATB/manifest.json	2026-07-04 18:11:18.808685438 +0000
++++ addon/SiegedTATB/manifest.json	2026-07-04 19:21:00.741340758 +0000
 @@ -1,10 +1,10 @@
  {
  	"format_version": 2,
@@ -550,10 +550,10 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
 -		"name": "Sieged TAT Behavior",
 -		"description": "Medieval survival addon BP Update V1.7",
 +		"name": "Sieged TAT Behavior (FR)",
-+		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.5)",
++		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.6)",
  		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 5],
++		"version": [1, 7, 6],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -562,7 +562,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
  		{
  			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 5]
++			"version": [1, 7, 6]
  		},
  		{
  			"module_name": "@minecraft/server",
@@ -3388,7 +3388,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/settings.js addon/Si
      settings_mob:             "§eInvasão de Monstros",
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/sieged_book.js addon/SiegedTATB/scripts/sieged_book.js
 --- addon_orig/SiegedTATB/scripts/sieged_book.js	2026-06-30 13:56:23.000000000 +0000
-+++ addon/SiegedTATB/scripts/sieged_book.js	2026-07-04 18:06:51.406597535 +0000
++++ addon/SiegedTATB/scripts/sieged_book.js	2026-07-04 19:20:51.128265636 +0000
 @@ -82,6 +82,7 @@
      if (!locale || typeof locale !== 'string') return 'en_US';
      const n = locale.replace('-', '_');
@@ -3409,7 +3409,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/sieged_book.js addon
  // ── Book locale tables ─────────────────────────────────────────────
  const BOOK_START = {
      en_US: ["§nGetting Started§r","§61. §7Monarchs Castle, Plains","§62. §7Talk to the Monarch","§63. §7Hire: give §eEmeralds §7to villagers","§64. §7Promote: §eWar Order Scrolls","§65. §7Unlock Army & Research tabs","§66. §7Sound §eWar Horn §7near castle","§67. §7Quest tab tracks bosses","§68. §7§eCastle Flag§7 to grow realm","§8 Troop Claim: Crouch+Named flag"],
-+    fr_FR: ["§nPour bien commencer§r","§61. §7Château du Monarque, plaines","§62. §7Parlez au Monarque","§63. §7Recruter : donnez des §eémeraudes §7aux villageois","§64. §7Promouvoir : §eParchemins d'ordre de guerre","§65. §7Débloquez les onglets Armée et Recherche","§66. §7Sonnez le §eCor de guerre §7près du château","§67. §7L'onglet Quêtes suit les boss","§68. §7§eDrapeau de château§7 pour agrandir le royaume","§8 Revendiquer des troupes : Accroupi+bannière nommée"],
++    fr_FR: ["§nDémarrage§r","§61. §7Château du Monarque","§62. §7Parlez au Monarque","§63. §7Recruter : §eémeraudes §7aux villageois","§64. §7Promouvoir : §eParchemin d'ordre","§65. §7Débloquez Armée et Recherche","§66. §7§eCor de guerre §7près du château","§67. §7Onglet Quêtes : suivi des boss","§68. §7§eDrapeau de château §7= royaume","§8Troupes : accroupi+bannière nommée"],
      es_MX: ["§nIniciando§r","§61. §7Castillo del Monarca, Llanura","§62. §7Habla con el Monarca","§63. §7Contratar: da §eEsmeraldas §7a aldeanos","§64. §7Ascender: §eOrden de Pergaminos","§65. §7Desbloquea Ejército e Invest.","§66. §7Toca §eCuerno de Guerra §7al castillo","§67. §7Pestaña Misión rastrea jefes","§68. §7§eBandera de Castillo§7 para expandir","§8 Reclamar: Agachar+Bandera nombrada"],
      zh_CN: ["§n新手指南§r","§61. §7君主城堡，平原","§62. §7与君主交谈","§63. §7雇佣：给村民§e绿宝石","§64. §7晋升：§e战令卷轴","§65. §7解锁军队与研究标签","§66. §7在城堡附近吹响§e战争号角","§67. §7任务标签追踪首领","§68. §7§e城堡旗帜§7扩展领地","§8 占领部队：潜行+命名旗帜"],
      pt_BR: ["§nComeçando§r","§61. §7Castelo do Monarca, Planície","§62. §7Fale com o Monarca","§63. §7Contratar: dê §eEsmeraldas §7a aldeões","§64. §7Promover: §ePerganinhos de Ordem","§65. §7Desbloquear Exército/Pesquisa","§66. §7Toque o §eCorno de Guerra §7ao castelo","§67. §7Aba Missão rastreia chefes","§68. §7§eBandeira do Castelo§7 para crescer","§8 Reivindicar: Agachar+Bandeira nomeada"],
@@ -4011,7 +4011,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
  	"zh_CN"
  ]
 --- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATR/manifest.json	2026-07-04 18:11:18.809130263 +0000
++++ addon/SiegedTATR/manifest.json	2026-07-04 19:21:00.742520270 +0000
 @@ -1,10 +1,10 @@
  {
  	"format_version": 2,
@@ -4019,10 +4019,10 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
 -		"name": "Sieged TAT Resource",
 -		"description": "Medieval survival addon RP Update V1.7",
 +		"name": "Sieged TAT Resource (FR)",
-+		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.5)",
++		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.6)",
  		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 5],
++		"version": [1, 7, 6],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -4031,7 +4031,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
  		{
  			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 5]
++			"version": [1, 7, 6]
  		}
  	],
  	"capabilities": ["pbr"],
