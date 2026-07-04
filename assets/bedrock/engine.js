@@ -664,25 +664,28 @@ function buildAnimations(model){
     // NB : l'os item_r (arme) est déjà incliné de -45° vers l'avant. Le bras (arm_r)
     // ne doit donc bouger que modérément, sinon les angles s'additionnent et la lance
     // pointe vers le bas. Ici GR est quasi neutre : l'arme est portée en avant par item_r.
-    const GL = [-52,0,-6];      // bras gauche : bouclier levé devant (modéré)
+    // Le scutum est tenu DEVANT le corps par défaut (bras plié, os shield_l). Le bras
+    // gauche ne fait donc AUCUN grand balayage : il ne bouge que pour le coup de bouclier.
     const GR = [-8,-8,0];       // bras droit : garde (arme déjà en avant via item_r)
-    // atk1 — estoc bas (le bras pique en avant → arme ~ horizontale)
+    // atk1 — estoc bas (le bras pique en avant → arme ~ horizontale). Bouclier reste devant.
     const stab = { loop:false, animation_length:0.55, bones:{}, particle_effects:{} };
-    if (hasL) stab.bones.arm_l = { rotation:{ '0.0':GL, '0.55':GL } };
     if (hasR) stab.bones.arm_r = { rotation:{ '0.0':GR, '0.2':[-48,-16,0], '0.38':GR, '0.55':GR } };
     stab.bones.body = { rotation:{ '0.0':[3,-5,0], '0.2':[7,-11,0], '0.55':[3,-5,0] } };
     if (hasLegR) stab.bones.leg_r = { rotation:{ '0.0':[0,0,0], '0.2':[-14,0,0], '0.55':[0,0,0] } };
-    // atk2 — coup de bouclier (le scutum frappe en avant), arme gardée en garde
+    // atk2 — coup de bouclier : le bras gauche POUSSE le scutum vers l'avant, puis revient
     const bash = { loop:false, animation_length:0.5, bones:{}, particle_effects:{} };
-    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':GL, '0.16':[-84,0,-14], '0.34':GL, '0.5':GL } };
+    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.14':[-42,0,0], '0.3':[-10,0,0], '0.5':[0,0,0] } };
     if (hasR) bash.bones.arm_r = { rotation:{ '0.0':GR, '0.5':GR } };
-    bash.bones.body = { rotation:{ '0.0':[3,-5,0], '0.16':[3,15,0], '0.5':[3,-5,0] } };
-    // atk3 — estoc haut (lève l'arme puis pique en avant, ligne haute)
+    bash.bones.body = { rotation:{ '0.0':[3,-5,0], '0.16':[6,4,0], '0.5':[3,-5,0] } };
+    // atk3 — estoc haut (lève l'arme puis pique en avant, ligne haute). Bouclier reste devant.
     const over = { loop:false, animation_length:0.65, bones:{}, particle_effects:{} };
-    if (hasL) over.bones.arm_l = { rotation:{ '0.0':GL, '0.65':GL } };
     if (hasR) over.bones.arm_r = { rotation:{ '0.0':GR, '0.2':[12,-6,0], '0.4':[-52,-8,0], '0.55':GR, '0.65':GR } };
     over.bones.body = { rotation:{ '0.0':[3,-5,0], '0.2':[-6,0,0], '0.4':[10,-5,0], '0.65':[3,-5,0] } };
     if (hasHead) over.bones.head = { rotation:{ '0.0':[0,0,0], '0.4':[8,0,0], '0.65':[0,0,0] } };
+    // le bras du bouclier ne se balance quasiment pas (il tient la garde en avant)
+    if (hasL){ walk.bones.arm_l = { rotation:{ '0.0':[-4,0,0], '0.5':[2,0,0], '1.0':[-4,0,0] } };
+      run.bones.arm_l = { rotation:{ '0.0':[-6,0,0], '0.3':[3,0,0], '0.6':[-6,0,0] } };
+      idle.bones.arm_l = { rotation:{ '0.0':[0,0,0], '1.0':[-2,0,0], '2.0':[0,0,0] } }; }
     // sang qui gicle de la lame (locator "blade") aux impacts
     stab.particle_effects['0.2']  = { effect:'blood', locator:'blade' };
     over.particle_effects['0.38'] = { effect:'blood', locator:'blade' };

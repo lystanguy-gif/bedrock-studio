@@ -587,23 +587,28 @@ const LEGIONNAIRE = {
       c([-6.55,27.8,-2.98],[0.42,2.6,0.14],'#7c0f0f'),         // goutte qui coule
       c([-6.53,26.9,-2.98],[0.36,0.8,0.14],'#8a1414'),         // bout de goutte
     ],{ parent:'item_r' }),
+    // bras gauche = HAUT DU BRAS seulement (épaule → coude), vertical
     bone('arm_l',[5,22,0],[
-      c([4,12,-2],[4,12,4],'skin',{ mirror:true }),
-      c([3.8,17.5,-2.2],[4.4,5,4.4],'leather'),
-      c([3.6,18.9,-2.4],[4.8,1.9,4.8],'red'),
-      c([3.6,20.4,-2.4],[4.8,2.1,4.8],'steel'),
-      c([4.5,20.7,-2.5],[3.6,0.7,0.6],'gold'),
-      c([3.65,12.8,-2.35],[4.7,2.8,4.7],'leather'),
-      // scutum : plateau rouge centré (centre y=13.75, z=0), décor symétrique autour de l'umbo
-      c([8.6,5,-5],[1.3,17.5,10],'red'),
-      c([8.5,21.4,-5.2],[1.5,1.1,10.4],'gold'), c([8.5,5.0,-5.2],[1.5,1.1,10.4],'gold'), // bordures haut/bas
-      c([8.5,5,-5.4],[1.5,17.5,1],'gold'), c([8.5,5,4.4],[1.5,17.5,1],'gold'),           // bordures avant/arrière
-      c([9.7,12.45,-5],[0.8,2.6,10],'steel'),                  // bande horizontale (traverse le centre)
-      c([9.65,5.5,-1],[0.75,16.5,2],'gold'),                   // épine verticale (traverse le centre)
-      c([9.9,11.85,-2],[0.95,3.8,4],'steel'),                  // umbo (bombe) dead center
-      c([9.8,15.5,-3.8],[0.6,3,1.6],'gold'), c([9.8,15.5,2.2],[0.6,3,1.6],'gold'),       // ailes hautes
-      c([9.8,9.0,-3.8],[0.6,3,1.6],'gold'), c([9.8,9.0,2.2],[0.6,3,1.6],'gold'),         // ailes basses (miroir)
+      c([4,17.5,-2],[4,6.5,4],'skin',{ mirror:true }),         // haut du bras
+      c([3.8,18.3,-2.2],[4.4,4.2,4.4],'leather'),              // manche
+      c([3.6,18.9,-2.4],[4.8,1.9,4.8],'red'),                  // épaulette rouge
+      c([3.6,20.4,-2.4],[4.8,2.1,4.8],'steel'),                // spallière
+      c([4.5,20.7,-2.5],[3.6,0.7,0.6],'gold'),                 // liseré d'or
     ],{ parent:'body' }),
+    // AVANT-BRAS (coude) plié à l'horizontale + SCUTUM tenu DEVANT le corps, face à l'avant
+    bone('shield_l',[5.5,18.5,-1.5],[
+      c([4.2,15.9,-5.9],[3.6,3.4,4.6],'skin',{ mirror:true }), // avant-bras (horizontal vers l'avant)
+      c([3.9,15.6,-5.4],[4.2,4,3],'leather'),                  // brassard
+      // scutum vertical face à l'avant (centré sur le corps, couvre le torse)
+      c([-4.6,6,-5.7],[9.2,16,1.3],'red'),                     // plateau rouge
+      c([-4.85,20.7,-5.85],[9.7,1.3,1.55],'gold'), c([-4.85,6,-5.85],[9.7,1.3,1.55],'gold'), // bordures haut/bas
+      c([-4.85,6,-5.85],[1.3,16,1.55],'gold'), c([3.55,6,-5.85],[1.3,16,1.55],'gold'),       // bordures gauche/droite
+      c([-4.6,12.6,-5.95],[9.2,2.4,0.7],'steel'),              // bande horizontale (traverse le centre)
+      c([-0.8,6.5,-5.95],[1.6,15,0.7],'gold'),                 // épine verticale
+      c([-2,12,-6.35],[4,3.8,0.9],'steel'),                    // umbo (bombe) centre
+      c([-3.9,15.6,-6.05],[1.6,3,0.6],'gold'), c([2.3,15.6,-6.05],[1.6,3,0.6],'gold'),       // ailes hautes
+      c([-3.9,8.6,-6.05],[1.6,3,0.6],'gold'), c([2.3,8.6,-6.05],[1.6,3,0.6],'gold'),         // ailes basses
+    ],{ parent:'arm_l' }),
     bone('leg_r',[-2,12,0],[
       c([-4,0,-2],[4,12,4],'skin'),
       c([-4.2,0,-2.2],[4.4,4.6,4.4],'leather'),                // bottes (caligae)
