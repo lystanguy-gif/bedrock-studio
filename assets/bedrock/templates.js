@@ -597,7 +597,52 @@ const LEGIONNAIRE = {
   eyes:{ style:'none' },
 };
 
-const CREATURES = [ DRAGON, HYDRA, SPIDER, WOLF, GOLEM, WISP, HUMANOID, LEGIONNAIRE ];
+// ═══════════════════════ CENTURION (clone du légionnaire) ═══════════════════════
+// Officier : masque de parade argenté + crête TRANSVERSALE (crista transversa),
+// le reste de la panoplie est identique au légionnaire.
+const CENTURION = (function(){
+  const base = JSON.parse(JSON.stringify(LEGIONNAIRE));
+  base.key='centurion';
+  base.name='Centurion Romain';
+  base.emoji='🎖️';
+  base.category='Soldat en armure';
+  base.desc='Officier au masque de parade et à la crête transversale (portée de gauche à droite), sur la panoplie complète.';
+  base.stats = Object.assign({}, LEGIONNAIRE.stats, { hp:80, damage:10, armor:18 });
+  base.colorSlots = LEGIONNAIRE.colorSlots.concat([{ key:'mask', label:'Masque de parade', def:'#dde1e7', mat:'metal' }]);
+  const head = base.bones.find(b=>b.name==='head');
+  head.cubes = [
+    c([-4,24,-4],[8,8,8],'skin'),
+    // casque identique au légionnaire (dôme, visière, bandeau, joues, flancs, nuque)
+    c([-4.6,28,-4.6],[9.2,4.4,9.2],'steel'),
+    c([-4.85,28.2,-5.2],[9.7,1.3,1.6],'steel'),
+    c([-4.7,29.6,-4.85],[9.4,1.1,1.1],'gold'),
+    c([-2.9,30.9,-4.9],[1.2,0.9,0.5],'gold'), c([1.7,30.9,-4.9],[1.2,0.9,0.5],'gold'),
+    c([-4.85,23.8,-4.5],[1.5,4.7,4.8],'steel'),
+    c([3.35,23.8,-4.5],[1.5,4.7,4.8],'steel'),
+    c([-4.7,24,-4],[0.7,4,8],'steel'),
+    c([4.0,24,-4],[0.7,4,8],'steel'),
+    c([-4,24,4.0],[8,4,0.7],'steel'),
+    c([-4.95,23.2,2.8],[9.9,3,2.9],'steel'),
+    // crête TRANSVERSALE : socle doré + arc rouge gauche→droite + retombées aux deux bouts
+    c([-4.8,31.9,-1.4],[9.6,0.9,2.8],'gold'),
+    c([-5.4,32.3,-1.1],[10.8,2.4,2.2],'red'),
+    c([-4.4,34.5,-1.1],[9,2.6,2.2],'red'),
+    c([-2.8,36.9,-1.1],[5.6,2,2.2],'red'),
+    c([-6.6,30.2,-1.1],[1.6,3,2.2],'red'),               // retombée gauche
+    c([5.0,30.2,-1.1],[1.6,3,2.2],'red'),                // retombée droite
+    // MASQUE de parade : plaque argentée, arcade, nez droit, fentes yeux/bouche, liserés d'or
+    c([-3.6,23.9,-4.55],[7.2,4.5,0.55],'mask'),          // plaque du visage
+    c([-3.7,27.7,-4.65],[7.4,0.7,0.7],'mask'),           // arcade sourcilière
+    c([-0.65,24.6,-4.9],[1.3,3.3,0.6],'mask'),           // nez droit idéalisé
+    c([-2.55,26.05,-4.62],[1.65,1.05,0.3],'#15100c'),    // fente oeil gauche
+    c([0.9,26.05,-4.62],[1.65,1.05,0.3],'#15100c'),      // fente oeil droit
+    c([-1.3,24.15,-4.62],[2.6,0.5,0.28],'#15100c'),      // fente de bouche
+    c([-3.8,23.8,-4.5],[0.45,4.6,0.5],'gold'), c([3.35,23.8,-4.5],[0.45,4.6,0.5],'gold'), // liserés du masque
+  ];
+  return base;
+})();
+
+const CREATURES = [ DRAGON, HYDRA, SPIDER, WOLF, GOLEM, WISP, HUMANOID, LEGIONNAIRE, CENTURION ];
 
 // ═══════════════════════ OBJETS 3D (modèles) ═══════════════════════
 // Objets "attachable" tenus en main. Géométrie simple à plat + reliefs.
