@@ -569,19 +569,22 @@ const LEGIONNAIRE = {
       c([-8.4,20.4,-2.4],[4.8,2.1,4.8],'steel'),               // spallière d'acier ajustée sur l'épaule
       c([-8.1,20.7,-2.5],[3.6,0.7,0.6],'gold'),                // liseré d'or
       c([-8.35,12.8,-2.35],[4.7,2.8,4.7],'leather'),           // brassard
-      // hasta (lance romaine) EMPOIGNÉE dans la main droite (collée à l'avant du bras)
+    ],{ parent:'body' }),
+    // ARME dans son propre os (enfant du bras, pivot au poing) : inclinée vers l'avant
+    // → tenue "prête", et suit tout le mouvement du bras. Hasta pour le légionnaire.
+    bone('item_r',[-6,12.5,-2.3],[
       c([-6.6,0.5,-2.7],[1.1,34,1.1],'leather'),               // hampe
       c([-6.8,28,-2.85],[1.5,2,1.4],'gold'),                   // douille
       c([-7.0,29.8,-2.85],[1.9,5.2,1.35],'steel'),             // fer en feuille (large)
       c([-6.5,34.5,-2.7],[0.9,2.4,0.9],'steel'),               // pointe
       c([-6.5,-1,-2.65],[0.9,2.2,0.9],'gold'),                 // talon (sauroterion)
-    ],{ parent:'body', locators:{ blade:[-6.05,33,-2.2] } }),
+    ],{ parent:'arm_r', rotation:[-45,0,0], locators:{ blade:[-6.05,33,-2.2] } }),
     // sang sur le fer (caché par défaut, apparaît au coup via l'animation)
     bone('blood',[-6.05,31,-2.85],[
       c([-7.03,29.9,-2.98],[1.96,4.8,0.16],'#7c0f0f'),         // film de sang sur le fer
       c([-6.55,27.8,-2.98],[0.42,2.6,0.14],'#7c0f0f'),         // goutte qui coule
       c([-6.53,26.9,-2.98],[0.36,0.8,0.14],'#8a1414'),         // bout de goutte
-    ],{ parent:'arm_r' }),
+    ],{ parent:'item_r' }),
     bone('arm_l',[5,22,0],[
       c([4,12,-2],[4,12,4],'skin',{ mirror:true }),
       c([3.8,17.5,-2.2],[4.4,5,4.4],'leather'),
@@ -664,23 +667,17 @@ const CENTURION = (function(){
     c([-1.3,24.15,-4.62],[2.6,0.5,0.28],'#15100c'),      // fente de bouche
     c([-3.8,23.8,-4.5],[0.45,4.6,0.5],'gold'), c([3.35,23.8,-4.5],[0.45,4.6,0.5],'gold'), // liserés du masque
   ];
-  // le centurion (officier) porte le GLADIUS au lieu de la hasta
-  const armR = base.bones.find(b=>b.name==='arm_r');
-  armR.cubes = [
-    c([-8,12,-2],[4,12,4],'skin'),
-    c([-8.2,17.5,-2.2],[4.4,5,4.4],'leather'),               // manche
-    c([-8.4,18.9,-2.4],[4.8,1.9,4.8],'red'),                 // épaulette rouge
-    c([-8.4,20.4,-2.4],[4.8,2.1,4.8],'steel'),               // spallière
-    c([-8.1,20.7,-2.5],[3.6,0.7,0.6],'gold'),                // liseré d'or
-    c([-8.35,12.8,-2.35],[4.7,2.8,4.7],'leather'),           // brassard
-    // GLADIUS large empoigné dans la main droite (arme de l'officier)
+  // le centurion (officier) porte le GLADIUS au lieu de la hasta (dans item_r)
+  const itemR = base.bones.find(b=>b.name==='item_r');
+  itemR.cubes = [
     c([-6.55,8.4,-2.55],[1,1.5,1],'gold'),                   // pommeau
     c([-6.65,9.7,-2.65],[1.2,3.8,1.2],'leather'),            // poignée (dans le poing)
     c([-7.35,13.4,-2.95],[2.6,1,1.8],'gold'),                // garde large
     c([-6.85,14.3,-2.75],[1.7,10.5,0.8],'steel'),            // lame LARGE
     c([-6.55,24.6,-2.75],[1.1,2.4,0.8],'steel'),             // pointe triangulaire
   ];
-  armR.locators = { blade:[-6.0,26,-2.3] };
+  itemR.rotation = [-45,0,0];
+  itemR.locators = { blade:[-6.0,26,-2.3] };
   const bloodB = base.bones.find(b=>b.name==='blood');
   bloodB.pivot = [-6.0,19,-2.85];
   bloodB.cubes = [
