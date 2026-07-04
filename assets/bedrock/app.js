@@ -141,7 +141,8 @@ function baseModel(inst){
   const slotDefs={}; (tpl.colorSlots||[]).forEach(s=>slotDefs[s.key]=s);
   model.bones.forEach(b=>(b.cubes||[]).forEach(cu=>{
     if(cu.slot){
-      if(inst.colors[cu.slot]) cu.color=inst.colors[cu.slot];
+      if(cu.slot.charAt(0)==='#') cu.color=cu.slot;              // slot = couleur hex directe (yeux, sang, détails)
+      else if(inst.colors[cu.slot]) cu.color=inst.colors[cu.slot];
       const sd=slotDefs[cu.slot]; if(sd&&sd.mat&&!cu.mat) cu.mat=sd.mat;
     }
   }));

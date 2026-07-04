@@ -556,9 +556,11 @@ const LEGIONNAIRE = {
       c([-1.1,26,5.4],[2.2,4,1.3],'red'),                      // queue basse
       // visage : yeux plats à fleur de peau (pas de cubes qui dépassent) + nez + bouche
       // blanc de l'oeil (légèrement crème pour ne pas paraître gris) puis iris/pupille bien centré
-      c([-2.7,26.5,-4.15],[1.9,1.15,0.22],'#f2efe6'), c([0.8,26.5,-4.15],[1.9,1.15,0.22],'#f2efe6'),
-      c([-2.25,26.55,-4.3],[1.0,0.95,0.22],'#160f0a'), c([1.25,26.55,-4.3],[1.0,0.95,0.22],'#160f0a'), // pupilles noires centrées
-      c([-2.75,27.8,-4.12],[1.9,0.45,0.2],'#3a2718'), c([0.85,27.8,-4.12],[1.9,0.45,0.2],'#3a2718'), // sourcils fins
+      // yeux bruns francs : base brune + pupille noire + petit reflet blanc (vivant, jamais gris)
+      c([-2.6,26.35,-4.14],[1.8,1.15,0.16],'#5a3a1e'), c([0.8,26.35,-4.14],[1.8,1.15,0.16],'#5a3a1e'),
+      c([-2.15,26.45,-4.22],[0.85,0.85,0.16],'#0a0603'), c([1.3,26.45,-4.22],[0.85,0.85,0.16],'#0a0603'), // pupille noire
+      c([-2.5,27.0,-4.26],[0.45,0.35,0.16],'#f0ece0'), c([0.95,27.0,-4.26],[0.45,0.35,0.16],'#f0ece0'), // reflet blanc
+      c([-2.7,27.65,-4.14],[1.85,0.42,0.18],'#43301c'), c([0.85,27.65,-4.14],[1.85,0.42,0.18],'#43301c'), // sourcils
       c([-0.65,24.9,-4.25],[1.3,1.9,0.4],'skin'),              // nez en relief
       c([-1.4,24.1,-4.18],[2.8,0.35,0.18],'#7a4638'),          // bouche
     ],{ parent:'body' }),
@@ -670,20 +672,20 @@ const CENTURION = (function(){
   // le centurion (officier) porte le GLADIUS au lieu de la hasta (dans item_r)
   const itemR = base.bones.find(b=>b.name==='item_r');
   itemR.cubes = [
-    c([-6.55,8.4,-2.55],[1,1.5,1],'gold'),                   // pommeau
-    c([-6.65,9.7,-2.65],[1.2,3.8,1.2],'leather'),            // poignée (dans le poing)
-    c([-7.35,13.4,-2.95],[2.6,1,1.8],'gold'),                // garde large
-    c([-6.85,14.3,-2.75],[1.7,10.5,0.8],'steel'),            // lame LARGE
-    c([-6.55,24.6,-2.75],[1.1,2.4,0.8],'steel'),             // pointe triangulaire
+    c([-6.55,9.5,-1.95],[1,1.5,1],'gold'),                   // pommeau
+    c([-6.65,10.8,-2.05],[1.2,3.8,1.2],'leather'),           // poignée (rentre dans le poing)
+    c([-7.35,14.5,-2.35],[2.6,1,1.8],'gold'),                // garde large
+    c([-6.85,15.4,-2.15],[1.7,10.5,0.8],'steel'),            // lame LARGE
+    c([-6.55,25.7,-2.15],[1.1,2.4,0.8],'steel'),             // pointe triangulaire
   ];
   itemR.rotation = [-45,0,0];
-  itemR.locators = { blade:[-6.0,26,-2.3] };
+  itemR.locators = { blade:[-6.0,27,-1.7] };
   const bloodB = base.bones.find(b=>b.name==='blood');
-  bloodB.pivot = [-6.0,19,-2.85];
+  bloodB.pivot = [-6.0,20,-2.25];
   bloodB.cubes = [
-    c([-6.88,14.4,-2.88],[1.76,9.4,0.15],'#7c0f0f'),         // film de sang sur la lame
-    c([-6.5,12.2,-2.88],[0.42,2.6,0.14],'#7c0f0f'),          // goutte
-    c([-6.48,11.3,-2.88],[0.36,0.8,0.14],'#8a1414'),
+    c([-6.88,15.5,-2.28],[1.76,9.4,0.15],'#7c0f0f'),         // film de sang sur la lame
+    c([-6.5,13.3,-2.28],[0.42,2.6,0.14],'#7c0f0f'),          // goutte
+    c([-6.48,12.4,-2.28],[0.36,0.8,0.14],'#8a1414'),
   ];
   return base;
 })();
