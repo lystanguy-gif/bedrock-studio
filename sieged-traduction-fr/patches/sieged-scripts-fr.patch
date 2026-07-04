@@ -1,12 +1,57 @@
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/items/the_golden_crossbow.item.json addon/SiegedTATB/items/the_golden_crossbow.item.json
+--- addon_orig/SiegedTATB/items/the_golden_crossbow.item.json	2026-06-29 13:55:32.000000000 +0000
++++ addon/SiegedTATB/items/the_golden_crossbow.item.json	2026-07-04 17:34:38.009063229 +0000
+@@ -8,6 +8,11 @@
+ 			}
+ 		},
+ 		"components": {
++			"minecraft:icon": {
++				"textures": {
++					"default": "golden_crossbow_trophy"
++				}
++			},
+ 			"minecraft:display_name": {
+ 				"value": "Mark of the Tyrant"
+ 			},
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/items/the_golden_horn.item.json addon/SiegedTATB/items/the_golden_horn.item.json
+--- addon_orig/SiegedTATB/items/the_golden_horn.item.json	2026-06-29 13:55:33.000000000 +0000
++++ addon/SiegedTATB/items/the_golden_horn.item.json	2026-07-04 17:34:38.009453821 +0000
+@@ -8,6 +8,11 @@
+ 			}
+ 		},
+ 		"components": {
++			"minecraft:icon": {
++				"textures": {
++					"default": "golden_horn_trophy"
++				}
++			},
+ 			"minecraft:display_name": {
+ 				"value": "Mark of the Ravager"
+ 			},
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/items/the_golden_shield.item.json addon/SiegedTATB/items/the_golden_shield.item.json
+--- addon_orig/SiegedTATB/items/the_golden_shield.item.json	2026-06-29 13:55:30.000000000 +0000
++++ addon/SiegedTATB/items/the_golden_shield.item.json	2026-07-04 17:34:38.009617930 +0000
+@@ -8,6 +8,11 @@
+ 			}
+ 		},
+ 		"components": {
++			"minecraft:icon": {
++				"textures": {
++					"default": "golden_shield_trophy"
++				}
++			},
+ 			"minecraft:display_name": {
+ 				"value": "Mark of the Forsaken"
+ 			},
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
 --- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATB/manifest.json	2026-07-04 17:22:08.142002891 +0000
++++ addon/SiegedTATB/manifest.json	2026-07-04 17:35:44.636792651 +0000
 @@ -4,7 +4,7 @@
  		"name": "Sieged TAT Behavior",
  		"description": "Medieval survival addon BP Update V1.7",
  		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 2],
++		"version": [1, 7, 3],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -15,7 +60,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
  		{
  			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 2]
++			"version": [1, 7, 3]
  		},
  		{
  			"module_name": "@minecraft/server",
@@ -1201,13 +1246,13 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  	"zh_CN"
  ]
 --- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATR/manifest.json	2026-07-04 17:22:08.142232419 +0000
++++ addon/SiegedTATR/manifest.json	2026-07-04 17:35:44.637530495 +0000
 @@ -4,7 +4,7 @@
  		"name": "Sieged TAT Resource",
  		"description": "Medieval survival addon RP Update V1.7",
  		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 2],
++		"version": [1, 7, 3],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -1216,7 +1261,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  		{
  			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 2]
++			"version": [1, 7, 3]
  		}
  	],
  	"capabilities": ["pbr"],

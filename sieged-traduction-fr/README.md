@@ -1,4 +1,4 @@
-# Traduction française de l'add-on Sieged (TAT) — v1.7.2
+# Traduction française de l'add-on Sieged (TAT) — v1.7.3
 
 Ce dossier contient la traduction française complète de l'add-on **Sieged** pour
 Minecraft Bedrock, ainsi que la simplification de la déclaration de guerre.
@@ -56,8 +56,17 @@ par tick. Cette traduction a été conçue pour avoir un coût d'exécution nul 
   (déclenché uniquement au clic), là où l'ancien système scanne déjà chaque
   seconde — aucun scan supplémentaire n'a été ajouté.
 
-### 4. Version
-Les deux packs passent de 1.7.1 à **1.7.2** pour que l'import remplace
+### 4. Correctif : objets invisibles (gris foncé) dans l'inventaire
+Bug présent dans l'add-on d'origine : les trois trophées **Marque du Tyran**,
+**Marque du Ravageur** et **Marque du Déchu** n'avaient pas de composant
+`minecraft:icon`, d'où une icône grise dans l'inventaire. Les clés de texture
+existaient déjà dans `item_texture.json` (`golden_*_trophy`) — elles sont
+désormais référencées par les trois fichiers d'objets. Audit complet effectué :
+tous les autres objets (160) et blocs ont une icône et un fichier de texture
+valides.
+
+### 5. Version
+Les deux packs passent de 1.7.1 à **1.7.3** pour que l'import remplace
 proprement la version déjà installée sur la Xbox.
 
 ## Réappliquer sur une future mise à jour de Sieged
