@@ -677,11 +677,11 @@ function buildAnimations(model){
     if (hasL) bash.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.14':[26,0,0], '0.3':[7,0,0], '0.5':[0,0,0] } };
     if (hasR) bash.bones.arm_r = { rotation:{ '0.0':GR, '0.5':GR } };
     bash.bones.body = { rotation:{ '0.0':[3,-5,0], '0.16':[6,4,0], '0.5':[3,-5,0] } };
-    // atk3 — estoc haut (lève l'arme puis pique en avant, ligne haute). Bouclier reste devant.
-    const over = { loop:false, animation_length:0.65, bones:{}, particle_effects:{} };
-    if (hasR) over.bones.arm_r = { rotation:{ '0.0':GR, '0.2':[12,-6,0], '0.4':[-52,-8,0], '0.55':GR, '0.65':GR } };
-    over.bones.body = { rotation:{ '0.0':[3,-5,0], '0.2':[-6,0,0], '0.4':[10,-5,0], '0.65':[3,-5,0] } };
-    if (hasHead) over.bones.head = { rotation:{ '0.0':[0,0,0], '0.4':[8,0,0], '0.65':[0,0,0] } };
+    // atk3 — VRAI coup haut : armé du glaive au-dessus de la tête (windup) puis frappe descendante
+    const over = { loop:false, animation_length:0.8, bones:{}, particle_effects:{} };
+    if (hasR) over.bones.arm_r = { rotation:{ '0.0':GR, '0.26':[108,-4,0], '0.5':[-58,-6,0], '0.62':[-14,-8,0], '0.8':GR } };
+    over.bones.body = { rotation:{ '0.0':[3,-5,0], '0.26':[-13,2,0], '0.5':[16,-4,0], '0.8':[3,-5,0] } };
+    if (hasHead) over.bones.head = { rotation:{ '0.0':[0,0,0], '0.26':[-9,0,0], '0.5':[11,0,0], '0.8':[0,0,0] } };
     // le bras du bouclier ne se balance quasiment pas (il tient la garde en avant)
     if (hasL){ walk.bones.arm_l = { rotation:{ '0.0':[-4,0,0], '0.5':[2,0,0], '1.0':[-4,0,0] } };
       run.bones.arm_l = { rotation:{ '0.0':[-6,0,0], '0.3':[3,0,0], '0.6':[-6,0,0] } };

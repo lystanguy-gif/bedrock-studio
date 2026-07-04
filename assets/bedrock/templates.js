@@ -587,20 +587,21 @@ const LEGIONNAIRE = {
       c([-6.55,27.8,-2.98],[0.42,2.6,0.14],'#7c0f0f'),         // goutte qui coule
       c([-6.53,26.9,-2.98],[0.36,0.8,0.14],'#8a1414'),         // bout de goutte
     ],{ parent:'item_r' }),
-    // bras gauche = HAUT DU BRAS seulement (épaule → coude), vertical
+    // bras gauche = HAUT DU BRAS (épaule → coude), descend jusqu'au coude sans trou
     bone('arm_l',[5,22,0],[
-      c([4,16.5,-2],[4,7.5,4],'skin',{ mirror:true }),         // haut du bras
+      c([4,15,-2],[4,9,4],'skin',{ mirror:true }),             // haut du bras (jusqu'au coude)
       c([3.8,18.3,-2.2],[4.4,4.2,4.4],'leather'),              // manche
       c([3.6,18.9,-2.4],[4.8,1.9,4.8],'red'),                  // épaulette rouge
       c([3.6,20.4,-2.4],[4.8,2.1,4.8],'steel'),                // spallière
       c([4.5,20.7,-2.5],[3.6,0.7,0.6],'gold'),                 // liseré d'or
     ],{ parent:'body' }),
-    // AVANT-BRAS (coude) qui TRAVERSE devant le ventre jusqu'au CENTRE du scutum
-    // (poignée derrière l'umbo, comme un vrai scutum). Bouclier face à l'avant.
-    bone('shield_l',[5.5,16.5,-1],[
-      c([-0.4,13,-4.2],[6.2,3.5,3.1],'skin',{ mirror:true }),  // avant-bras : coude → centre
-      c([-0.1,13.2,-4.0],[5.4,3.1,2.7],'leather'),             // brassard
-      c([-1.1,12.6,-4.6],[2.2,2.7,1.1],'skin',{ mirror:true }),// poing derrière l'umbo (centre)
+    // AVANT-BRAS (coude) épais et plein : comble coude→épaule ET coude→bouclier,
+    // traverse jusqu'au CENTRE du scutum (poignée derrière l'umbo).
+    bone('shield_l',[5.5,16,-1],[
+      c([-0.5,13,-5.3],[6.7,4,4.5],'skin',{ mirror:true }),    // avant-bras plein (coude → centre)
+      c([-0.2,13.3,-5.1],[6.1,3.5,4.1],'leather'),             // brassard (par-dessus)
+      c([3.5,15.5,-2.6],[4,3,2.4],'skin',{ mirror:true }),     // comble la jonction coude↔épaule
+      c([-1.3,12.7,-5.7],[2.6,2.9,1.3],'skin',{ mirror:true }),// poing derrière l'umbo (centre)
       // scutum vertical face à l'avant (centré, saisi par-derrière au centre)
       c([-4.6,6,-5.5],[9.2,16,1.3],'red'),                     // plateau rouge
       c([-4.85,20.7,-5.65],[9.7,1.3,1.55],'gold'), c([-4.85,6,-5.65],[9.7,1.3,1.55],'gold'), // bordures haut/bas
