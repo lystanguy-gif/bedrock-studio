@@ -542,7 +542,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/villagerl
  				}
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
 --- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATB/manifest.json	2026-07-04 19:21:00.741340758 +0000
++++ addon/SiegedTATB/manifest.json	2026-07-04 19:36:13.080379888 +0000
 @@ -1,10 +1,10 @@
  {
  	"format_version": 2,
@@ -550,10 +550,10 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
 -		"name": "Sieged TAT Behavior",
 -		"description": "Medieval survival addon BP Update V1.7",
 +		"name": "Sieged TAT Behavior (FR)",
-+		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.6)",
++		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.7)",
  		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 6],
++		"version": [1, 7, 7],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -562,7 +562,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
  		{
  			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 6]
++			"version": [1, 7, 7]
  		},
  		{
  			"module_name": "@minecraft/server",
@@ -2361,7 +2361,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/kingdom.js addon/Sie
      }
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/lore_i18n.js addon/SiegedTATB/scripts/lore_i18n.js
 --- addon_orig/SiegedTATB/scripts/lore_i18n.js	2026-06-30 12:49:12.000000000 +0000
-+++ addon/SiegedTATB/scripts/lore_i18n.js	2026-07-04 17:09:56.462083414 +0000
++++ addon/SiegedTATB/scripts/lore_i18n.js	2026-07-04 19:36:12.832342438 +0000
 @@ -2157,6 +2157,577 @@
              ],
          },
@@ -2948,6 +2948,21 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/lore_i18n.js addon/S
      if (n.startsWith('es')) return 'es_MX';
      if (n.startsWith('zh')) return 'zh_CN';
      if (n.startsWith('pt')) return 'pt_BR';
+@@ -2181,9 +2753,12 @@
+     try {
+         const stored = player.getDynamicProperty('sieged:lang');
+         if (stored) return stored;
+-        return normLoreLocale(player.locale ?? 'en_US');
++        // Serveur francophone : français par défaut pour tous les joueurs,
++        // quelle que soit la langue de leur console. Un joueur peut toujours
++        // choisir une autre langue via Paramètres de Sieged → Langue.
++        return 'fr_FR';
+     } catch {
+-        return 'en_US';
++        return 'fr_FR';
+     }
+ }
+ 
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/quest_log.js addon/SiegedTATB/scripts/quest_log.js
 --- addon_orig/SiegedTATB/scripts/quest_log.js	2026-06-25 16:02:30.000000000 +0000
 +++ addon/SiegedTATB/scripts/quest_log.js	2026-07-04 17:52:26.467134543 +0000
@@ -4011,7 +4026,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
  	"zh_CN"
  ]
 --- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATR/manifest.json	2026-07-04 19:21:00.742520270 +0000
++++ addon/SiegedTATR/manifest.json	2026-07-04 19:36:13.082436022 +0000
 @@ -1,10 +1,10 @@
  {
  	"format_version": 2,
@@ -4019,10 +4034,10 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
 -		"name": "Sieged TAT Resource",
 -		"description": "Medieval survival addon RP Update V1.7",
 +		"name": "Sieged TAT Resource (FR)",
-+		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.6)",
++		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.7)",
  		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 6],
++		"version": [1, 7, 7],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -4031,7 +4046,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
  		{
  			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 6]
++			"version": [1, 7, 7]
  		}
  	],
  	"capabilities": ["pbr"],

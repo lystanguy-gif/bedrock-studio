@@ -1,4 +1,4 @@
-# Traduction française de l'add-on Sieged (TAT) — v1.7.5
+# Traduction française de l'add-on Sieged (TAT) — v1.7.7
 
 Ce dossier contient la traduction française complète de l'add-on **Sieged** pour
 Minecraft Bedrock, ainsi que la simplification de la déclaration de guerre.
@@ -71,7 +71,7 @@ Les packs s'affichent désormais comme **« Sieged TAT Behavior (FR) »** et
 français — pour distinguer la version traduite de l'originale d'un coup d'œil.
 
 ### 6. Version
-Les deux packs passent de 1.7.1 à **1.7.5** pour que l'import remplace
+Les deux packs passent de 1.7.1 à **1.7.7** pour que l'import remplace
 proprement la version déjà installée sur la Xbox.
 
 ### 7. v1.7.5 — traduction totale + guide
@@ -95,6 +95,14 @@ Le dossier `guide-en-jeu/GuideSiegedBP` est un **pack de comportement autonome**
 blasons, guerre, PvE, conseils) entièrement en français. Aucun bloc de commande,
 aucune boucle : un simple événement d'utilisation d'objet. Pas de pack de
 ressources nécessaire (le livre vanilla et l'interface du jeu suffisent).
+
+### 9. v1.7.6–1.7.7
+- v1.7.6 : la page « Démarrage » du Registre en français tenait sur 487
+  caractères alors que l interface du livre tronque chaque onglet à 400 —
+  texte raccourci à 397.
+- v1.7.7 : **français par défaut pour tous les joueurs**, quelle que soit la
+  langue de leur console (getPlayerLocale renvoie fr_FR par défaut). Un joueur
+  peut toujours choisir une autre langue via Paramètres de Sieged → Langue.
 
 ## Réappliquer sur une future mise à jour de Sieged
 
