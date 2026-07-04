@@ -145,6 +145,7 @@ function baseModel(inst){
       const sd=slotDefs[cu.slot]; if(sd&&sd.mat&&!cu.mat) cu.mat=sd.mat;
     }
   }));
+  model.combat = !!tpl.combat;
   E.autoUV(model);
   applyEyes(model,inst);
   // annotation pour la sélection au clic (nom d'os + index de cube)
@@ -778,6 +779,14 @@ async function buildAddon(assets){
   return zip;
 }
 
+// petite texture 8×8 pour les particules de sang (rouge sombre avec variation)
+function bloodParticleB64(){
+  const c=document.createElement('canvas'); c.width=8; c.height=8; const x=c.getContext('2d');
+  x.fillStyle='#7a0d0d'; x.fillRect(0,0,8,8);
+  x.fillStyle='#a81818'; x.fillRect(1,1,4,4);
+  x.fillStyle='#5a0808'; x.fillRect(4,4,3,3);
+  return c.toDataURL('image/png').split(',')[1];
+}
 function addCreature(inst,NS,rp,bp,langFR,langEN){
   const id=slug(inst.mobId), ident=NS+':'+id, geoId='geometry.'+NS+'.'+id;
   const model=inst._resolved;
@@ -794,18 +803,48 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
   }
   rp.file('animations/'+id+'.animation.json',J(animJson));
   // animation controller (états idle/marche/combat)
+  const combat=!!model.combat;
+  const ctrlStates = combat ? {
+    // soldat : enchaînement d'attaques VARIÉ (estoc → coup de bouclier → coup haut), en boucle tant qu'il y a une cible
+    idle:{ animations:['idle'], transitions:[{ move:'q.modified_move_speed > 0.1' },{ atk1:'q.has_target' }] },
+    move:{ animations:['walk'], blend_transition:0.2, transitions:[{ run:'q.modified_move_speed > 0.5' },{ idle:'q.modified_move_speed <= 0.1' },{ atk1:'q.has_target' }] },
+    run:{ animations:['run'], blend_transition:0.15, transitions:[{ move:'q.modified_move_speed <= 0.5' },{ atk1:'q.has_target' }] },
+    atk1:{ animations:['attack_stab'], blend_transition:0.08, transitions:[{ atk2:'q.all_animations_finished && q.has_target' },{ idle:'q.all_animations_finished && !q.has_target' }] },
+    atk2:{ animations:['attack_bash'], blend_transition:0.08, transitions:[{ atk3:'q.all_animations_finished && q.has_target' },{ idle:'q.all_animations_finished && !q.has_target' }] },
+    atk3:{ animations:['attack_over'], blend_transition:0.08, transitions:[{ atk1:'q.all_animations_finished && q.has_target' },{ idle:'q.all_animations_finished && !q.has_target' }] },
+  } : {
+    idle:{ animations:['idle'], transitions:[{ move:'q.modified_move_speed > 0.1' },{ roar:'q.has_target' }] },
+    move:{ animations:['walk'], blend_transition:0.2, transitions:[{ run:'q.modified_move_speed > 0.5' },{ idle:'q.modified_move_speed <= 0.1' },{ attack:'q.has_target' }] },
+    run:{ animations:['run'], blend_transition:0.15, transitions:[{ move:'q.modified_move_speed <= 0.5' },{ attack:'q.has_target' }] },
+    roar:{ animations:['roar'], blend_transition:0.1, transitions:[{ attack:'q.all_animations_finished' },{ idle:'!q.has_target' }] },
+    attack:{ animations:['attack'], blend_transition:0.1, transitions:[{ idle:'!q.has_target' }] },
+  };
   rp.file('animation_controllers/'+id+'.animation_controllers.json',J({
     format_version:'1.10.0',
-    animation_controllers:{ ['controller.animation.'+NS+'_'+id+'.general']:{
-      initial_state:'idle',
-      states:{
-        idle:{ animations:['idle'], transitions:[{ move:'q.modified_move_speed > 0.1' },{ roar:'q.has_target' }] },
-        move:{ animations:['walk'], blend_transition:0.2, transitions:[{ run:'q.modified_move_speed > 0.5' },{ idle:'q.modified_move_speed <= 0.1' },{ attack:'q.has_target' }] },
-        run:{ animations:['run'], blend_transition:0.15, transitions:[{ move:'q.modified_move_speed <= 0.5' },{ attack:'q.has_target' }] },
-        roar:{ animations:['roar'], blend_transition:0.1, transitions:[{ attack:'q.all_animations_finished' },{ idle:'!q.has_target' }] },
-        attack:{ animations:['attack'], blend_transition:0.1, transitions:[{ idle:'!q.has_target' }] },
-      } } }
+    animation_controllers:{ ['controller.animation.'+NS+'_'+id+'.general']:{ initial_state:'idle', states:ctrlStates } }
   }));
+  // particule de sang (giclée depuis la lame) pour les soldats
+  if(combat){
+    rp.file('textures/particle/'+id+'_blood.png',b64toBlob(bloodParticleB64()));
+    rp.file('particles/'+id+'_blood.particle.json',J({
+      format_version:'1.10.0',
+      'particle_effect':{
+        description:{ identifier:NS+':'+id+'_blood',
+          basic_render_parameters:{ material:'particles_alpha', texture:'textures/particle/'+id+'_blood' } },
+        components:{
+          'minecraft:emitter_rate_instant':{ num_particles:12 },
+          'minecraft:emitter_lifetime_once':{ active_time:0.05 },
+          'minecraft:emitter_shape_point':{ offset:[0,0,0] },
+          'minecraft:particle_lifetime_expression':{ max_lifetime:0.7 },
+          'minecraft:particle_initial_speed':'math.random(1.5,4.5)',
+          'minecraft:particle_motion_dynamic':{ linear_acceleration:[0,-16,0], linear_drag_coefficient:0.6 },
+          'minecraft:particle_appearance_billboard':{ size:[0.055,0.055], facing_camera_mode:'lookat_xyz',
+            uv:{ texture_width:8, texture_height:8, uv:[0,0], uv_size:[8,8] } },
+          'minecraft:particle_appearance_tinting':{ color:[0.55,0.04,0.04,1] }
+        }
+      }
+    }));
+  }
   // render controller
   rp.file('render_controllers/'+id+'.render_controllers.json',J({
     format_version:'1.10.0',
@@ -823,7 +862,9 @@ function addCreature(inst,NS,rp,bp,langFR,langEN){
       animations:Object.assign({ idle:'animation.'+id+'.idle', walk:'animation.'+id+'.walk', attack:'animation.'+id+'.attack',
         run:'animation.'+id+'.run', roar:'animation.'+id+'.roar', sleep:'animation.'+id+'.sleep',
         general:'controller.animation.'+NS+'_'+id+'.general' },
-        headBone?{ look_at:'animation.'+id+'.look_at' }:{}),
+        headBone?{ look_at:'animation.'+id+'.look_at' }:{},
+        combat?{ attack_stab:'animation.'+id+'.attack_stab', attack_bash:'animation.'+id+'.attack_bash', attack_over:'animation.'+id+'.attack_over' }:{}),
+      particle_effects: combat?{ blood:NS+':'+id+'_blood' }:{},
       scripts:{ animate: headBone?['general','look_at']:['general'] },
       render_controllers:['controller.render.'+NS+'_'+id],
       spawn_egg:{ base_color:rgbHex(eng), overlay_color:'#e8c878' },

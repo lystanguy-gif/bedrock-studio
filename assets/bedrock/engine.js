@@ -172,7 +172,9 @@ function renderModel(canvas, model, opts){
     });
   }
 
-  bones.forEach(b => collectFaces(b.cubes, world[b.name], b.color));
+  // l'os "blood" est un effet de combat (sang sur la lame) : masqué dans l'aperçu,
+  // il n'apparaît qu'en jeu au moment du coup via l'animation.
+  bones.forEach(b => { if (b.name==='blood') return; collectFaces(b.cubes, world[b.name], b.color); });
 
   // échelle & centrage
   const spanX = maxX-minX, spanY = maxY-minY;
@@ -440,6 +442,7 @@ function toGeometryJSON(model, identifier){
     if (b.parent) out.parent = b.parent;
     if (b.rotation && (b.rotation[0]||b.rotation[1]||b.rotation[2])) out.rotation = b.rotation;
     if (b.mirror) out.mirror = true;
+    if (b.locators) out.locators = b.locators;
     if (b.cubes && b.cubes.length){
       out.cubes = b.cubes.filter(cu=>!cu.previewOnly).map(cu => {
         // UV PAR FACE : chaque face déclare exactement son rectangle de
@@ -642,8 +645,50 @@ function buildAnimations(model){
     } else if (kind==='body' && b.name==='body'){
       roar.bones[b.name] = { rotation: { '0.0':[0,0,0], '0.4':[-8,0,0], '1.2':[-8,0,0], '1.6':[0,0,0] } };
     }
+    // os "blood" (sang sur la lame) : caché par défaut (scale 0) dans toutes les poses
+    if (b.name==='blood'){
+      idle.bones[b.name]={ scale:0 }; walk.bones[b.name]={ scale:0 }; run.bones[b.name]={ scale:0 };
+      roar.bones[b.name]={ scale:0 }; sleep.bones[b.name]={ scale:0 }; attack.bones[b.name]={ scale:0 };
+    }
   });
-  return { idle, walk, attack, run, roar, sleep };
+  const anims = { idle, walk, attack, run, roar, sleep };
+  // ── Combat des soldats : combos variés + sang qui gicle ─────────────────
+  if (model.combat){
+    const names = bones.map(b=>b.name);
+    const hasR = names.includes('arm_r'), hasL = names.includes('arm_l');
+    const hasBlood = names.includes('blood');
+    // estoc au glaive (arm_r pique en avant), bouclier en garde
+    const stab = { loop:false, animation_length:0.7, bones:{}, particle_effects:{} };
+    if (hasR) stab.bones.arm_r = { rotation:{ '0.0':[0,0,0], '0.18':[-104,-8,0], '0.34':[-86,0,0], '0.7':[0,0,0] } };
+    if (hasL) stab.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.18':[-42,0,-12], '0.5':[-28,0,-8], '0.7':[0,0,0] } };
+    stab.bones.body = { rotation:{ '0.0':[0,0,0], '0.16':[6,-12,0], '0.36':[6,12,0], '0.7':[0,0,0] } };
+    stab.bones.head = { rotation:{ '0.0':[0,0,0], '0.18':[-8,-8,0], '0.7':[0,0,0] } };
+    if (names.includes('leg_r')) stab.bones.leg_r = { rotation:{ '0.0':[0,0,0], '0.18':[-20,0,0], '0.7':[0,0,0] } };
+    // coup de bouclier (arm_l frappe en avant), glaive ramené
+    const bash = { loop:false, animation_length:0.6, bones:{}, particle_effects:{} };
+    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.16':[-88,0,-18], '0.3':[-64,0,-6], '0.6':[0,0,0] } };
+    if (hasR) bash.bones.arm_r = { rotation:{ '0.0':[0,0,0], '0.16':[14,12,0], '0.6':[0,0,0] } };
+    bash.bones.body = { rotation:{ '0.0':[0,0,0], '0.16':[4,16,0], '0.34':[2,-6,0], '0.6':[0,0,0] } };
+    // taille haute puis remontant (arm_r par-dessus la tête, chop, flick haut)
+    const over = { loop:false, animation_length:0.8, bones:{}, particle_effects:{} };
+    if (hasR) over.bones.arm_r = { rotation:{ '0.0':[0,0,0], '0.2':[-158,0,0], '0.42':[34,0,0], '0.58':[-34,0,0], '0.8':[0,0,0] } };
+    if (hasL) over.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.2':[-30,0,12], '0.8':[0,0,0] } };
+    over.bones.body = { rotation:{ '0.0':[0,0,0], '0.2':[-10,0,0], '0.42':[14,0,0], '0.8':[0,0,0] } };
+    over.bones.head = { rotation:{ '0.0':[0,0,0], '0.42':[12,0,0], '0.8':[0,0,0] } };
+    // sang qui gicle de la lame (locator "blade")
+    stab.particle_effects['0.28'] = { effect:'blood', locator:'blade' };
+    bash.particle_effects['0.26'] = { effect:'blood', locator:'blade' };
+    over.particle_effects['0.44'] = { effect:'blood', locator:'blade' };
+    over.particle_effects['0.6']  = { effect:'blood', locator:'blade' };
+    // sang qui apparaît sur la lame puis s'estompe
+    if (hasBlood){
+      stab.bones.blood = { scale:{ '0.0':0, '0.28':1, '0.5':0.6, '0.7':0 } };
+      bash.bones.blood = { scale:0 };
+      over.bones.blood = { scale:{ '0.0':0, '0.44':1, '0.62':0.7, '0.8':0 } };
+    }
+    anims.attack_stab = stab; anims.attack_bash = bash; anims.attack_over = over;
+  }
+  return anims;
 }
 
 global.BSEngine = {

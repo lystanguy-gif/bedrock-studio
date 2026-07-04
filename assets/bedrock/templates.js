@@ -458,7 +458,7 @@ const HYDRA = {
 const LEGIONNAIRE = {
   key:'legionnaire', name:'Légionnaire Romain', emoji:'🏛️', category:'Soldat en armure',
   desc:'Soldat au gabarit Steve portant la panoplie complète : casque à cimier, lorica segmentata, ptéruges et scutum.',
-  defaultScale:1, flying:false,
+  defaultScale:1, flying:false, combat:true,
   stats:{ hp:60, damage:8, armor:15, speed:0.3, knockback:0.2 },
   sounds:{ ambient:'mob.villager.idle', hurt:'mob.villager.hurt', death:'mob.villager.death' },
   colorSlots:[
@@ -569,7 +569,19 @@ const LEGIONNAIRE = {
       c([-8.4,20.4,-2.4],[4.8,2.1,4.8],'steel'),               // spallière d'acier ajustée sur l'épaule
       c([-8.1,20.7,-2.5],[3.6,0.7,0.6],'gold'),                // liseré d'or
       c([-8.35,12.8,-2.35],[4.7,2.8,4.7],'leather'),           // brassard
-    ],{ parent:'body' }),
+      // hasta (lance romaine) tenue dans la main droite, dressée
+      c([-6.6,1,-3.6],[1,32,1],'leather'),                     // hampe
+      c([-6.85,27.5,-3.75],[1.5,1.8,1.3],'gold'),              // douille
+      c([-7,29,-3.7],[2,4.5,1.1],'steel'),                     // fer en feuille
+      c([-6.5,33,-3.6],[1,2,0.9],'steel'),                     // pointe
+      c([-6.5,-0.6,-3.55],[1,2,0.9],'gold'),                   // talon
+    ],{ parent:'body', locators:{ blade:[-6.5,32,-3.6] } }),
+    // sang sur la lame (caché par défaut, apparaît au coup via l'animation)
+    bone('blood',[-6.5,30,-3.7],[
+      c([-7.02,29.2,-3.82],[2.04,4.2,0.16],'#7c0f0f'),         // film de sang sur le fer
+      c([-6.55,27.0,-3.82],[0.4,2.8,0.14],'#7c0f0f'),          // goutte qui coule
+      c([-6.52,26.0,-3.82],[0.34,0.8,0.14],'#8a1414'),         // bout de goutte
+    ],{ parent:'arm_r' }),
     bone('arm_l',[5,22,0],[
       c([4,12,-2],[4,12,4],'skin',{ mirror:true }),
       c([3.8,17.5,-2.2],[4.4,5,4.4],'leather'),
@@ -728,6 +740,72 @@ const ITEMS_3D = [
       c([-1,20,-1],[2,3,2],'gem',{ glow:true, alpha:0.85 }),
     ]),
     stats:{ damage:6, durability:900 },
+  },
+  {
+    key:'hasta', name:'Hasta (lance romaine)', emoji:'🔱', category:'Arme',
+    itemType:'sword', defaultScale:1.0,
+    colorSlots:[
+      { key:'shaft', label:'Hampe',  def:'#6a4a24' },
+      { key:'iron',  label:'Fer',    def:'#c7ccd4', mat:'metal' },
+      { key:'bronze',label:'Bronze', def:'#b5893a', mat:'metal' },
+    ],
+    bones: itemBone([
+      c([-0.5,-10,-0.5],[1,32,1],'shaft'),         // hampe
+      c([-0.9,20,-0.6],[1.8,1.8,1.2],'bronze'),    // douille
+      c([-1,21.5,-0.4],[2,4.5,0.8],'iron'),        // fer en feuille
+      c([-0.5,26,-0.4],[1,2,0.8],'iron'),          // pointe
+      c([-0.7,-11.5,-0.5],[1.4,2,1],'bronze'),     // talon (sauroterion)
+    ]),
+    stats:{ damage:8, durability:1200 },
+  },
+  {
+    key:'pilum', name:'Pilum (javelot)', emoji:'🎯', category:'Arme',
+    itemType:'sword', defaultScale:1.0,
+    colorSlots:[
+      { key:'shaft', label:'Hampe', def:'#6a4a24' },
+      { key:'iron',  label:'Fer',   def:'#b8bcc4', mat:'metal' },
+    ],
+    bones: itemBone([
+      c([-0.5,-8,-0.5],[1,16,1],'shaft'),          // hampe bois
+      c([-0.9,7,-0.6],[1.8,1.5,1.2],'iron'),       // collet
+      c([-0.35,8,-0.35],[0.7,14,0.7],'iron'),      // long fût de fer
+      c([-0.4,22,-0.4],[0.8,1.5,0.8],'iron'),      // pointe pyramidale
+    ]),
+    stats:{ damage:7, durability:400 },
+  },
+  {
+    key:'rhomphaia', name:'Glaive (rhomphaia)', emoji:'⚔️', category:'Arme',
+    itemType:'axe', defaultScale:1.0,
+    colorSlots:[
+      { key:'shaft', label:'Manche',  def:'#5a3a1a' },
+      { key:'iron',  label:'Lame',    def:'#c7ccd4', mat:'metal' },
+      { key:'bind',  label:'Ligature',def:'#b5893a', mat:'metal' },
+    ],
+    bones: itemBone([
+      c([-0.5,-8,-0.5],[1,18,1],'shaft'),          // hampe
+      c([-1.4,9,-0.6],[1.8,1.5,1.2],'bind'),       // jonction
+      c([-1,10,-0.4],[2,14,0.8],'iron'),           // longue lame
+      c([-0.6,23,-0.4],[1.2,3,0.8],'iron'),        // pointe
+    ]),
+    stats:{ damage:9, durability:1100 },
+  },
+  {
+    key:'gladius', name:'Gladius', emoji:'🗡️', category:'Arme',
+    itemType:'sword', defaultScale:1.0,
+    colorSlots:[
+      { key:'blade', label:'Lame',    def:'#cfd3da', mat:'metal' },
+      { key:'guard', label:'Garde',   def:'#7a5a30' },
+      { key:'grip',  label:'Poignée', def:'#3a2a18' },
+      { key:'pommel',label:'Pommeau', def:'#c8a55a', mat:'metal' },
+    ],
+    bones: itemBone([
+      c([-1.3,2,-0.4],[2.6,13,0.8],'blade'),       // lame large
+      c([-0.7,15,-0.4],[1.4,2.5,0.8],'blade'),     // pointe triangulaire
+      c([-2,0.5,-0.5],[4,1.5,1],'guard'),          // garde
+      c([-0.8,-3.5,-0.5],[1.6,4,1],'grip'),        // poignée
+      c([-1.3,-5,-0.6],[2.6,2,1.2],'pommel'),      // pommeau
+    ]),
+    stats:{ damage:7, durability:1500 },
   },
   {
     key:'potion', name:'Fiole de potion', emoji:'⚗️', category:'Consommable',
