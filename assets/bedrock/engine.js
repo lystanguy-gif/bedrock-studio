@@ -674,7 +674,7 @@ function buildAnimations(model){
     if (hasLegR) stab.bones.leg_r = { rotation:{ '0.0':[0,0,0], '0.2':[-14,0,0], '0.55':[0,0,0] } };
     // atk2 — coup de bouclier : le bras gauche POUSSE le scutum vers l'avant, puis revient
     const bash = { loop:false, animation_length:0.5, bones:{}, particle_effects:{} };
-    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.14':[-42,0,0], '0.3':[-10,0,0], '0.5':[0,0,0] } };
+    if (hasL) bash.bones.arm_l = { rotation:{ '0.0':[0,0,0], '0.14':[26,0,0], '0.3':[7,0,0], '0.5':[0,0,0] } };
     if (hasR) bash.bones.arm_r = { rotation:{ '0.0':GR, '0.5':GR } };
     bash.bones.body = { rotation:{ '0.0':[3,-5,0], '0.16':[6,4,0], '0.5':[3,-5,0] } };
     // atk3 — estoc haut (lève l'arme puis pique en avant, ligne haute). Bouclier reste devant.
