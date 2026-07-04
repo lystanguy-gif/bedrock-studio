@@ -1,0 +1,23 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "Guide Sieged (FR)",
+		"description": "Guide en jeu de l'add-on Sieged — utilisez un livre pour ouvrir le menu du guide.",
+		"uuid": "fe9f7496-1642-4457-ac8c-f613e597e179",
+		"version": [1, 0, 0],
+		"min_engine_version": [1, 26, 0]
+	},
+	"modules": [
+		{
+			"type": "script",
+			"language": "javascript",
+			"uuid": "2ea40d40-b0d8-4c52-a310-29c2c28b7ccb",
+			"version": [1, 0, 0],
+			"entry": "scripts/main.js"
+		}
+	],
+	"dependencies": [
+		{ "module_name": "@minecraft/server", "version": "2.6.0" },
+		{ "module_name": "@minecraft/server-ui", "version": "2.0.0" }
+	]
+}

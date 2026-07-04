@@ -88,6 +88,14 @@ proprement la version déjà installée sur la Xbox.
   stocke désormais la valeur canonique et n'affiche que la traduction.
 - Ajout de `GUIDE-SIEGED-FR.md` : guide complet des mécaniques en français.
 
+### 8. Guide en jeu (pack séparé)
+Le dossier `guide-en-jeu/GuideSiegedBP` est un **pack de comportement autonome**
+(« Guide Sieged (FR) », livré aussi en `.mcaddon`). Une fois activé sur le monde,
+**utiliser un livre classique** ouvre un menu à chapitres (royaume, armée, objets,
+blasons, guerre, PvE, conseils) entièrement en français. Aucun bloc de commande,
+aucune boucle : un simple événement d'utilisation d'objet. Pas de pack de
+ressources nécessaire (le livre vanilla et l'interface du jeu suffisent).
+
 ## Réappliquer sur une future mise à jour de Sieged
 
 1. Décompresser le nouveau `.mcaddon` (c'est un zip).
