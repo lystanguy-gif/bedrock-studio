@@ -491,11 +491,14 @@ const LEGIONNAIRE = {
       c([-3.2,22.9,-2.85],[6.4,1.5,1.1],'red'),
       c([-3.4,22.9,-2.3],[1.1,1.7,4.4],'red'),
       c([2.3,22.9,-2.3],[1.1,1.7,4.4],'red'),
-      // rivets d'or aux extrémités des bandes (flancs)
-      c([-4.75,20.5,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,20.5,-0.7],[0.5,0.9,1.4],'gold'),
-      c([-4.75,17.9,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,17.9,-0.7],[0.5,0.9,1.4],'gold'),
-      c([-2.4,21,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,21,-2.95],[0.8,0.8,0.4],'gold'),
-      c([-2.4,15.6,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,15.6,-2.95],[0.8,0.8,0.4],'gold'),
+      // rivets d'or : alignés au centre exact des 3 bandes (haute 20.8, milieu 18.2, basse 15.6)
+      // 2 rivets frontaux + 2 rivets de flanc par bande, parfaitement symétriques
+      c([-2.4,20.4,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,20.4,-2.95],[0.8,0.8,0.4],'gold'),
+      c([-2.4,17.8,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,17.8,-2.95],[0.8,0.8,0.4],'gold'),
+      c([-2.4,15.2,-2.95],[0.8,0.8,0.4],'gold'), c([1.6,15.2,-2.95],[0.8,0.8,0.4],'gold'),
+      c([-4.75,20.4,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,20.4,-0.7],[0.5,0.9,1.4],'gold'),
+      c([-4.75,17.8,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,17.8,-0.7],[0.5,0.9,1.4],'gold'),
+      c([-4.75,15.2,-0.7],[0.5,0.9,1.4],'gold'), c([4.25,15.2,-0.7],[0.5,0.9,1.4],'gold'),
       // ceinture (cingulum) + boucle
       c([-4.4,11.6,-2.4],[8.8,1.8,4.8],'leather'),
       c([-1,11.7,-2.7],[2,1.6,0.5],'gold'),
@@ -530,6 +533,10 @@ const LEGIONNAIRE = {
       c([-4.85,23.8,-4.5],[1.5,4.7,4.8],'steel'),              // joue gauche (avant)
       c([3.35,23.8,-4.5],[1.5,4.7,4.8],'steel'),               // joue droite (avant)
       c([-3.6,23.6,-4.45],[0.9,1.2,0.6],'gold'), c([2.7,23.6,-4.45],[0.9,1.2,0.6],'gold'), // rivets de joues
+      // plaques latérales + arrière : ferment le bas du casque (plus aucun trou de peau nue)
+      c([-4.7,24,-4],[0.7,4,8],'steel'),                       // flanc gauche
+      c([4.0,24,-4],[0.7,4,8],'steel'),                        // flanc droit
+      c([-4,24,4.0],[8,4,0.7],'steel'),                        // arrière (au-dessus du couvre-nuque)
       c([-4.95,23.2,2.8],[9.9,3,2.9],'steel'),                 // couvre-nuque évasé
       // socle doré du cimier puis grand cimier rouge + retombée arrière
       c([-1.4,31.9,-4.8],[2.8,0.9,9.6],'gold'),
@@ -539,35 +546,38 @@ const LEGIONNAIRE = {
       c([-1.1,30.4,-6.6],[2.2,3,1.6],'red'),                   // touffe avant
       c([-1.1,29.4,4.9],[2.2,4.6,1.5],'red'),                  // retombée arrière
       c([-1.1,26,5.4],[2.2,4,1.3],'red'),                      // queue basse
-      // visage : yeux nets et saillants + sourcils
-      c([-2.6,26.8,-4.55],[1.8,1.6,0.6],'#ffffff'), c([0.8,26.8,-4.55],[1.8,1.6,0.6],'#ffffff'),
-      c([-1.8,26.9,-4.65],[1,1.4,0.6],'#2e2016'), c([1.6,26.9,-4.65],[1,1.4,0.6],'#2e2016'),
-      c([-2.7,28.4,-4.5],[2,0.6,0.5],'#4a3320'), c([0.7,28.4,-4.5],[2,0.6,0.5],'#4a3320'),
+      // visage : yeux plats à fleur de peau (pas de cubes qui dépassent) + nez + bouche
+      // blanc de l'oeil (légèrement crème pour ne pas paraître gris) puis iris/pupille bien centré
+      c([-2.7,26.5,-4.15],[1.9,1.15,0.22],'#f2efe6'), c([0.8,26.5,-4.15],[1.9,1.15,0.22],'#f2efe6'),
+      c([-2.25,26.55,-4.3],[1.0,0.95,0.22],'#160f0a'), c([1.25,26.55,-4.3],[1.0,0.95,0.22],'#160f0a'), // pupilles noires centrées
+      c([-2.75,27.8,-4.12],[1.9,0.45,0.2],'#3a2718'), c([0.85,27.8,-4.12],[1.9,0.45,0.2],'#3a2718'), // sourcils fins
+      c([-0.65,24.9,-4.25],[1.3,1.9,0.4],'skin'),              // nez en relief
+      c([-1.4,24.1,-4.18],[2.8,0.35,0.18],'#7a4638'),          // bouche
     ],{ parent:'body' }),
     bone('arm_r',[-5,22,0],[
       c([-8,12,-2],[4,12,4],'skin'),
       c([-8.2,17.5,-2.2],[4.4,5,4.4],'leather'),               // manche
-      c([-8.45,18.9,-2.45],[4.9,2.4,4.9],'red'),               // épaulette rouge
-      c([-8.75,20.7,-2.7],[5.1,3.5,5.4],'steel'),              // spallière d'acier
-      c([-8.2,21.2,-2.85],[4,0.8,0.6],'gold'),                 // liseré d'or
+      c([-8.4,18.9,-2.4],[4.8,1.9,4.8],'red'),                 // épaulette rouge (fine)
+      c([-8.4,20.4,-2.4],[4.8,2.1,4.8],'steel'),               // spallière d'acier ajustée sur l'épaule
+      c([-8.1,20.7,-2.5],[3.6,0.7,0.6],'gold'),                // liseré d'or
       c([-8.35,12.8,-2.35],[4.7,2.8,4.7],'leather'),           // brassard
     ],{ parent:'body' }),
     bone('arm_l',[5,22,0],[
       c([4,12,-2],[4,12,4],'skin',{ mirror:true }),
       c([3.8,17.5,-2.2],[4.4,5,4.4],'leather'),
-      c([3.55,18.9,-2.45],[4.9,2.4,4.9],'red'),
-      c([3.65,20.7,-2.7],[5.1,3.5,5.4],'steel'),
-      c([4.2,21.2,-2.85],[4,0.8,0.6],'gold'),
+      c([3.6,18.9,-2.4],[4.8,1.9,4.8],'red'),
+      c([3.6,20.4,-2.4],[4.8,2.1,4.8],'steel'),
+      c([4.5,20.7,-2.5],[3.6,0.7,0.6],'gold'),
       c([3.65,12.8,-2.35],[4.7,2.8,4.7],'leather'),
-      // scutum : plateau rouge, bordure d'or, umbo d'acier, motif ailé
+      // scutum : plateau rouge centré (centre y=13.75, z=0), décor symétrique autour de l'umbo
       c([8.6,5,-5],[1.3,17.5,10],'red'),
-      c([8.5,21.6,-5.3],[1.5,1.1,10.6],'gold'), c([8.5,4.3,-5.3],[1.5,1.1,10.6],'gold'),
-      c([8.5,4.3,-5.5],[1.5,18.4,1],'gold'), c([8.5,4.3,4.5],[1.5,18.4,1],'gold'),
-      c([9.7,12.4,-5.1],[0.8,2.6,10.2],'steel'),               // bande horizontale centrale
-      c([9.9,11.8,-2],[0.9,3.8,4],'steel'),                    // umbo central
-      c([9.8,15.6,-1],[0.6,5,2],'gold'),                       // hampe verticale
-      c([9.8,16.4,-3.9],[0.6,3.6,1.7],'gold'), c([9.8,16.4,2.2],[0.6,3.6,1.7],'gold'), // ailes
-      c([9.8,6.4,-3.4],[0.6,3.6,1.5],'gold'), c([9.8,6.4,1.9],[0.6,3.6,1.5],'gold'),   // foudres bas
+      c([8.5,21.4,-5.2],[1.5,1.1,10.4],'gold'), c([8.5,5.0,-5.2],[1.5,1.1,10.4],'gold'), // bordures haut/bas
+      c([8.5,5,-5.4],[1.5,17.5,1],'gold'), c([8.5,5,4.4],[1.5,17.5,1],'gold'),           // bordures avant/arrière
+      c([9.7,12.45,-5],[0.8,2.6,10],'steel'),                  // bande horizontale (traverse le centre)
+      c([9.65,5.5,-1],[0.75,16.5,2],'gold'),                   // épine verticale (traverse le centre)
+      c([9.9,11.85,-2],[0.95,3.8,4],'steel'),                  // umbo (bombe) dead center
+      c([9.8,15.5,-3.8],[0.6,3,1.6],'gold'), c([9.8,15.5,2.2],[0.6,3,1.6],'gold'),       // ailes hautes
+      c([9.8,9.0,-3.8],[0.6,3,1.6],'gold'), c([9.8,9.0,2.2],[0.6,3,1.6],'gold'),         // ailes basses (miroir)
     ],{ parent:'body' }),
     bone('leg_r',[-2,12,0],[
       c([-4,0,-2],[4,12,4],'skin'),
