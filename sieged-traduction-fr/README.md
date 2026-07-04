@@ -1,4 +1,4 @@
-# Traduction française de l'add-on Sieged (TAT) — v1.7.3
+# Traduction française de l'add-on Sieged (TAT) — v1.7.4
 
 Ce dossier contient la traduction française complète de l'add-on **Sieged** pour
 Minecraft Bedrock, ainsi que la simplification de la déclaration de guerre.
@@ -65,8 +65,13 @@ désormais référencées par les trois fichiers d'objets. Audit complet effectu
 tous les autres objets (160) et blocs ont une icône et un fichier de texture
 valides.
 
-### 5. Version
-Les deux packs passent de 1.7.1 à **1.7.3** pour que l'import remplace
+### 5. Nom des packs
+Les packs s'affichent désormais comme **« Sieged TAT Behavior (FR) »** et
+**« Sieged TAT Resource (FR) »** dans Minecraft, avec une description en
+français — pour distinguer la version traduite de l'originale d'un coup d'œil.
+
+### 6. Version
+Les deux packs passent de 1.7.1 à **1.7.4** pour que l'import remplace
 proprement la version déjà installée sur la Xbox.
 
 ## Réappliquer sur une future mise à jour de Sieged

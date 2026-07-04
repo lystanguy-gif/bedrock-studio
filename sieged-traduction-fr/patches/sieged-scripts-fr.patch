@@ -45,13 +45,18 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/items/the_golden_shield.item
  			},
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
 --- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATB/manifest.json	2026-07-04 17:35:44.636792651 +0000
-@@ -4,7 +4,7 @@
- 		"name": "Sieged TAT Behavior",
- 		"description": "Medieval survival addon BP Update V1.7",
++++ addon/SiegedTATB/manifest.json	2026-07-04 17:39:27.261110646 +0000
+@@ -1,10 +1,10 @@
+ {
+ 	"format_version": 2,
+ 	"header": {
+-		"name": "Sieged TAT Behavior",
+-		"description": "Medieval survival addon BP Update V1.7",
++		"name": "Sieged TAT Behavior (FR)",
++		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.4)",
  		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 3],
++		"version": [1, 7, 4],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -60,7 +65,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
  		{
  			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 3]
++			"version": [1, 7, 4]
  		},
  		{
  			"module_name": "@minecraft/server",
@@ -1246,13 +1251,18 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  	"zh_CN"
  ]
 --- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATR/manifest.json	2026-07-04 17:35:44.637530495 +0000
-@@ -4,7 +4,7 @@
- 		"name": "Sieged TAT Resource",
- 		"description": "Medieval survival addon RP Update V1.7",
++++ addon/SiegedTATR/manifest.json	2026-07-04 17:39:27.261630489 +0000
+@@ -1,10 +1,10 @@
+ {
+ 	"format_version": 2,
+ 	"header": {
+-		"name": "Sieged TAT Resource",
+-		"description": "Medieval survival addon RP Update V1.7",
++		"name": "Sieged TAT Resource (FR)",
++		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.4)",
  		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 3],
++		"version": [1, 7, 4],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -1261,7 +1271,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  		{
  			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 3]
++			"version": [1, 7, 4]
  		}
  	],
  	"capabilities": ["pbr"],
