@@ -1,0 +1,5 @@
+# Cache local des réponses API — jamais commité
+.cache_prospects/
+# CSV générés
+*.csv
+__pycache__/
