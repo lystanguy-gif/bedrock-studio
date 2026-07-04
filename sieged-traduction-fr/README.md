@@ -1,4 +1,4 @@
-# Traduction française de l'add-on Sieged (TAT) — v1.7.4
+# Traduction française de l'add-on Sieged (TAT) — v1.7.5
 
 Ce dossier contient la traduction française complète de l'add-on **Sieged** pour
 Minecraft Bedrock, ainsi que la simplification de la déclaration de guerre.
@@ -71,8 +71,22 @@ Les packs s'affichent désormais comme **« Sieged TAT Behavior (FR) »** et
 français — pour distinguer la version traduite de l'originale d'un coup d'œil.
 
 ### 6. Version
-Les deux packs passent de 1.7.1 à **1.7.4** pour que l'import remplace
+Les deux packs passent de 1.7.1 à **1.7.5** pour que l'import remplace
 proprement la version déjà installée sur la Xbox.
+
+### 7. v1.7.5 — traduction totale + guide
+- Système de quêtes entièrement en français (titres, objectifs, objets à collecter,
+  choix de cartes, insignes de difficulté).
+- Boutique/échanges des royaumes PNJ, casernes (remiser/déployer), rapport de moral,
+  blasons (noms + descriptions), rangs, niveaux de royaume (Colonie→Royaume).
+- Menu complet du Garde-bannière (y compris avertissements et pluie de flèches),
+  cors de commandement (noms + lore dynamique), reddition/tribut, Charretier,
+  Registre (onglet siège), dialogues du Monarque, du Général et du Roi Illageois,
+  cartes de butin.
+- Correction d'un bug latent : le rang choisi dans le menu était stocké tel quel
+  (traduit) alors que la logique compare "Noble"/"Knight"/"Peasant" — le code
+  stocke désormais la valeur canonique et n'affiche que la traduction.
+- Ajout de `GUIDE-SIEGED-FR.md` : guide complet des mécaniques en français.
 
 ## Réappliquer sur une future mise à jour de Sieged
 

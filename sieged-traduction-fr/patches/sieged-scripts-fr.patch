@@ -1,3 +1,368 @@
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/dialogue/illager_king_bound.json addon/SiegedTATB/dialogue/illager_king_bound.json
+--- addon_orig/SiegedTATB/dialogue/illager_king_bound.json	2026-06-10 01:19:53.000000000 +0000
++++ addon/SiegedTATB/dialogue/illager_king_bound.json	2026-07-04 18:08:11.521305921 +0000
+@@ -4,17 +4,17 @@
+     "scenes": [
+       {
+         "scene_tag": "illager_king_judgment",
+-        "npc_name": "§4The Illager King",
+-        "text": "§8...So it ends like this.\n\n§7The king kneels before you,\nbound and silent.\nHis eyes burn with something\nthat has not yet died.\n\n§cWhat is your verdict?",
++        "npc_name": "§4Le Roi Illageois",
++        "text": "§8...Ainsi cela se termine.\n\n§7Le roi est agenouillé devant vous,\nligoté et silencieux.\nDans ses yeux brûle quelque chose\nqui n'est pas encore mort.\n\n§cQuel est votre verdict ?",
+         "buttons": [
+           {
+-            "name": "\uE90E §cLet Him Hang",
++            "name": " §cLet Him Hang",
+             "commands": [
+               "scriptevent sieged:king_hang msg"
+             ]
+           },
+           {
+-            "name": "\uE90F §2Spare Him",
++            "name": " §2Spare Him",
+             "commands": [
+               "tag @initiator add spared_king",
+               "scriptevent sieged:king_spare msg"
+@@ -24,4 +24,4 @@
+       }
+     ]
+   }
+-}
++}
+\ No newline at end of file
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/dialogue/villager_general.json addon/SiegedTATB/dialogue/villager_general.json
+--- addon_orig/SiegedTATB/dialogue/villager_general.json	2026-05-01 13:26:43.000000000 +0000
++++ addon/SiegedTATB/dialogue/villager_general.json	2026-07-04 18:08:11.521121627 +0000
+@@ -4,29 +4,29 @@
+     "scenes": [
+       {
+         "scene_tag": "main_dialogue",
+-        "npc_name": "Village General",
+-        "text": "Greetings, Sire. Complete the training challenge to earn a powerful ally!\n\nDefeat the trainee.",
++        "npc_name": "Général villageois",
++        "text": "Salutations, Sire. Réussissez l'épreuve d'entraînement pour gagner un puissant allié !\n\nVainquez la recrue.",
+         "buttons": [
+           {
+-            "name": "Begin Training!",
++            "name": "Commencer l'entraînement !",
+             "commands": [
+               "/event entity @s sieged:spawn_trainee_group",
+               "/dialogue change @s training_started"
+             ]
+           },
+           {
+-            "name": "Not yet",
++            "name": "Pas encore",
+             "commands": []
+           }
+         ]
+       },
+       {
+         "scene_tag": "training_started",
+-        "npc_name": "Village General",
+-        "text": "The training has begun! Defeat your opponent and prove your worth!",
++        "npc_name": "Général villageois",
++        "text": "L'entraînement a commencé ! Vainquez votre adversaire et prouvez votre valeur !",
+         "buttons": [
+           {
+-            "name": "Understood",
++            "name": "Compris",
+             "commands": [
+               "/dialogue change @s main_dialogue"
+             ]
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/dialogue/villager_king.json addon/SiegedTATB/dialogue/villager_king.json
+--- addon_orig/SiegedTATB/dialogue/villager_king.json	2026-06-18 12:59:04.000000000 +0000
++++ addon/SiegedTATB/dialogue/villager_king.json	2026-07-04 18:08:11.520669708 +0000
+@@ -4,41 +4,41 @@
+     "scenes": [
+       {
+         "scene_tag": "king_main",
+-        "npc_name": "§6The Monarch",
+-        "text": "§0Greetings, brave adventurer.\nThe kingdom stands strong thanks\nto warriors like you.\n\n§0I have urgent need of your skills.\nWill you hear my request?",
++        "npc_name": "§6Le Monarque",
++        "text": "§0Salutations, brave aventurier.\nLe royaume tient bon grâce à\ndes guerriers comme vous.\n\n§0J'ai un besoin urgent de vos talents.\nÉcouterez-vous ma requête ?",
+         "buttons": [
+           {
+-            "name": "§aQuest",
++            "name": "§aQuête",
+             "commands": [
+               "scriptevent sieged:king_show_quest x"
+             ]
+           },
+           {
+-            "name": "§eTurn In",
++            "name": "§eRendre la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_turnin x"
+             ]
+           },
+           {
+-            "name": "§cLeave",
++            "name": "§cPartir",
+             "commands": []
+           }
+         ]
+       },
+       {
+         "scene_tag": "king_quest_1",
+-        "npc_name": "§6The Monarch",
+-        "text": "§1§lFound a Kingdom\n\n§0Every great realm begins with\na banner planted in the earth.\n\n§0Prove you are worthy to lead.\nBring me the materials to forge\nyour kingdom's foundation:\n\n§2- 64 Bread\n§2- 64 Stone Bricks\n§2- 32 Gold Ingots\n§2- 1 Goat Horn\n\n§0In return, I shall grant you\n§6a Castle Flag§0 — the mark\nof a true sovereign.",
++        "npc_name": "§6Le Monarque",
++        "text": "§1§lFonder un royaume\n\n§0Tout grand royaume commence par\nune bannière plantée dans la terre.\n\n§0Prouvez que vous êtes digne de régner.\nApportez-moi les matériaux pour forger\nles fondations de votre royaume :\n\n§2- 64 Pains\n§2- 64 Pierres taillées\n§2- 32 Lingots d'or\n§2- 1 Corne de chèvre\n\n§0En échange, je vous accorderai\n§6un Drapeau de château§0 — la marque\nd'un vrai souverain.",
+         "buttons": [
+           {
+-            "name": "§aAccept Quest",
++            "name": "§aAccepter la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_accept x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_accepted"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -47,18 +47,18 @@
+       },
+       {
+         "scene_tag": "king_quest_2",
+-        "npc_name": "§6The Monarch",
+-        "text": "§1§lDrive Back the Pillagers\n\n§0Foul pillagers encroach on our\nborders and grow bolder daily.\n\n§0Cut them down and return with\n§45 Totems of Undying§0 as proof\nyou have slain their champions.",
++        "npc_name": "§6Le Monarque",
++        "text": "§1§lRepousser les pillards\n\n§0D'infâmes pillards empiètent sur nos\nfrontières et s'enhardissent chaque jour.\n\n§0Abattez-les et revenez avec\n§45 Totems d'immortalité§0 pour prouver\nque vous avez terrassé leurs champions.",
+         "buttons": [
+           {
+-            "name": "§aAccept Quest",
++            "name": "§aAccepter la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_accept x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_accepted"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -67,18 +67,18 @@
+       },
+       {
+         "scene_tag": "king_quest_3",
+-        "npc_name": "§6The Monarch",
+-        "text": "§1§lThe War Horn\n\n§0A dreaded Siege Beast lurks among\nthe enemy ranks. It carries a\n§4War Horn§0 that rallies their forces\nand emboldens their armies.\n\n§0Slay the beast.\nBring me the horn.",
++        "npc_name": "§6Le Monarque",
++        "text": "§1§lLe Cor de guerre\n\n§0Une terrible Bête de siège rôde parmi\nles rangs ennemis. Elle porte un\n§4Cor de guerre§0 qui rallie leurs forces\net enhardit leurs armées.\n\n§0Terrassez la bête.\nRapportez-moi le cor.",
+         "buttons": [
+           {
+-            "name": "§aAccept Quest",
++            "name": "§aAccepter la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_accept x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_accepted"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -87,33 +87,33 @@
+       },
+       {
+         "scene_tag": "king_quest_accepted",
+-        "npc_name": "§6The Monarch",
+-        "text": "§2Excellent! You have my gratitude.\n\n§0Return when you have fulfilled\nyour duty.\n\n§0May fortune favor you.",
++        "npc_name": "§6Le Monarque",
++        "text": "§2Excellent ! Vous avez ma gratitude.\n\n§0Revenez quand vous aurez accompli\nvotre devoir.\n\n§0Que la fortune vous sourie.",
+         "buttons": [
+           {
+-            "name": "§fFarewell",
++            "name": "§fAdieu",
+             "commands": []
+           }
+         ]
+       },
+       {
+         "scene_tag": "king_quest_complete",
+-        "npc_name": "§6The Monarch",
+-        "text": "§2§lWell done, champion!\n\n§0You have proven yourself a true\ndefender of this kingdom.\n\n§0Here is your reward.\n§0The kingdom is in your debt.",
++        "npc_name": "§6Le Monarque",
++        "text": "§2§lBien joué, champion !\n\n§0Vous avez prouvé que vous êtes un\nvrai défenseur de ce royaume.\n\n§0Voici votre récompense.\n§0Le royaume vous est redevable.",
+         "buttons": [
+           {
+-            "name": "§fFarewell",
++            "name": "§fAdieu",
+             "commands": []
+           }
+         ]
+       },
+       {
+         "scene_tag": "king_quest_incomplete",
+-        "npc_name": "§6The Monarch",
+-        "text": "§4§lTask not yet complete.\n\n§0Return only when you have\nfulfilled your duty, brave one.\nThe kingdom is counting on you.",
++        "npc_name": "§6Le Monarque",
++        "text": "§4§lTâche inachevée.\n\n§0Ne revenez que lorsque vous aurez\naccompli votre devoir, brave âme.\nLe royaume compte sur vous.",
+         "buttons": [
+           {
+-            "name": "§fUnderstood",
++            "name": "§fCompris",
+             "commands": [
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_main"
+             ]
+@@ -122,18 +122,18 @@
+       },
+       {
+         "scene_tag": "king_quest_4",
+-        "npc_name": "§6The Monarch",
+-        "text": "§1§lFell the War Ravager\n\n§0A monstrous War Ravager has broken\nthrough our eastern lines.\n\n§0Its hide is thick as iron and its\nrage knows no bounds. No common\nsoldier can face it alone.\n\n§0Slay the beast.\nReturn to me victorious.",
++        "npc_name": "§6Le Monarque",
++        "text": "§1§lAbattre le Ravageur de guerre\n\n§0Un monstrueux Ravageur de guerre a\npercé nos lignes à l'est.\n\n§0Sa peau est dure comme le fer et sa\nrage sans limites. Aucun simple soldat\nne peut l'affronter seul.\n\n§0Terrassez la bête.\nRevenez victorieux.",
+         "buttons": [
+           {
+-            "name": "§aAccept Quest",
++            "name": "§aAccepter la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_accept x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_accepted"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -142,18 +142,18 @@
+       },
+       {
+         "scene_tag": "king_quest_5",
+-        "npc_name": "§6The Monarch",
+-        "text": "§1§lChart the Unknown\n\n§0Our cartographers have lost contact\nwith scouts beyond the frontier.\nWe need maps of the outer lands.\n\n§0Chart the region yourself and\nbring me proof of your journey:\n\n§2- 3 Filled Maps\n§2- 2 Compasses",
++        "npc_name": "§6Le Monarque",
++        "text": "§1§lCartographier l'inconnu\n\n§0Nos cartographes ont perdu contact\navec les éclaireurs au-delà de la frontière.\nIl nous faut des cartes des terres lointaines.\n\n§0Cartographiez la région vous-même et\napportez-moi la preuve de votre périple :\n\n§2- 3 Cartes remplies\n§2- 2 Boussoles",
+         "buttons": [
+           {
+-            "name": "§aAccept Quest",
++            "name": "§aAccepter la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_accept x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_accepted"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -162,18 +162,18 @@
+       },
+       {
+         "scene_tag": "king_quest_6",
+-        "npc_name": "§6The Monarch",
+-        "text": "§1§lThe Villager Codex\n\n§0An ancient codex of our people\nhas been locked away by a master\nlibrarian and will not come cheap.\n\n§0Accumulate the wealth to reclaim\nit. The name tag alone will take\nsignificant trade to obtain:\n\n§2- 3 Emerald Blocks\n§2- 1 Name Tag",
++        "npc_name": "§6Le Monarque",
++        "text": "§1§lLe Codex des villageois\n\n§0Un ancien codex de notre peuple\nest gardé sous clef par un maître\nbibliothécaire, et il coûtera cher.\n\n§0Amassez la richesse nécessaire pour\nle récupérer. L'étiquette à elle seule\ndemandera bien des échanges :\n\n§2- 3 Blocs d'émeraude\n§2- 1 Étiquette",
+         "buttons": [
+           {
+-            "name": "§aAccept Quest",
++            "name": "§aAccepter la quête",
+             "commands": [
+               "scriptevent sieged:king_quest_accept x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_accepted"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -182,17 +182,17 @@
+       },
+       {
+         "scene_tag": "king_quest_prestige",
+-        "npc_name": "§6The Monarch",
+-        "text": "§4§l⚠ WARNING, CHAMPION ⚠\n\n§0You seek the Prestige — to wipe\nyour victories and face the darkness\nanew under a stronger curse.\n\n§4This cannot be undone.\n\n§c• Your Forsaken Knight kill will be\n  erased from the realm's memory.\n§c• Your War Ravager kill will be\n  forgotten.\n§c• You must slay BOTH again before\n  you may challenge The Tyrant.\n\n§0The Forsaken Knight and War Ravager\nwill be §4more ferocious §0than before.\n\n§0Are you certain you wish to proceed?",
++        "npc_name": "§6Le Monarque",
++        "text": "§4§l⚠ ATTENTION, CHAMPION ⚠\n\n§0Vous recherchez le Prestige — effacer\nvos victoires et affronter les ténèbres\nà nouveau, sous une malédiction plus forte.\n\n§4Ceci est irréversible.\n\n§c• Votre victoire sur le Chevalier Déchu\n  sera effacée de la mémoire du royaume.\n§c• Votre victoire sur le Ravageur de guerre\n  sera oubliée.\n§c• Vous devrez terrasser les DEUX à nouveau\n  avant de pouvoir défier le Tyran.\n\n§0Le Chevalier Déchu et le Ravageur de guerre\nrenaîtront, plus puissants que jamais.",
+         "buttons": [
+           {
+-            "name": "§aAccept — I'm Ready",
++            "name": "§aAccepter — Je suis prêt",
+             "commands": [
+               "scriptevent sieged:king_quest_prestige_accept x"
+             ]
+           },
+           {
+-            "name": "§cDecline",
++            "name": "§cRefuser",
+             "commands": [
+               "scriptevent sieged:king_quest_decline x"
+             ]
+@@ -201,22 +201,22 @@
+       },
+       {
+         "scene_tag": "king_prestige_confirmed",
+-        "npc_name": "§6The Monarch",
+-        "text": "§6§lThe Prestige is granted.\n\n§0Your victories have been undone\nby your own will, champion.\n\n§0The darkness grows stronger — but\nso must you. Prove once more that\nthe realm's enemies cannot stand\nagainst a true warrior.\n\n§8The Forsaken Knight and War Ravager\nstir with renewed fury.",
++        "npc_name": "§6Le Monarque",
++        "text": "§6§lLe Prestige est accordé.\n\n§0Vos victoires ont été effacées\npar votre propre volonté, champion.\n\n§0Les ténèbres se renforcent — vous\ndevez en faire autant. Prouvez encore que\nles ennemis du royaume ne peuvent rien\ncontre un vrai guerrier.\n\n§8Le Chevalier Déchu et le Ravageur de guerre\ns'agitent d'une fureur nouvelle.",
+         "buttons": [
+           {
+-            "name": "§fFarewell",
++            "name": "§fAdieu",
+             "commands": []
+           }
+         ]
+       },
+       {
+         "scene_tag": "king_prestige_not_ready",
+-        "npc_name": "§6The Monarch",
+-        "text": "§4§lNot yet, champion.\n\n§0You must first prove yourself\nworthy of the Prestige.\n\n§cYou have not yet slain both:\n§c• The Forsaken Knight\n§c• The War Ravager\n\n§0Return only when both enemies\nhave fallen at your feet.",
++        "npc_name": "§6Le Monarque",
++        "text": "§4§lPas encore, champion.\n\n§0Vous devez d'abord vous montrer\ndigne du Prestige.\n\n§cVous n'avez pas encore terrassé :\n§c• Le Chevalier Déchu\n§c• Le Ravageur de guerre\n\n§0Ne revenez que lorsque ces deux ennemis\nseront tombés à vos pieds.",
+         "buttons": [
+           {
+-            "name": "§fUnderstood",
++            "name": "§fCompris",
+             "commands": [
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_main"
+             ]
+@@ -225,18 +225,18 @@
+       },
+       {
+         "scene_tag": "king_quest_3_map_choice",
+-        "npc_name": "§6The Monarch",
+-        "text": "§6§lA Final Boon\n\n§0You have served this kingdom well,\nchampion. As an additional reward\nI shall share secret knowledge.\n\n§0Choose which location you wish\nto seek out:\n\n§8A forsaken fortress, dark\nand long abandoned...\n\n§8...or the kingdom's\nhidden training grounds.",
++        "npc_name": "§6Le Monarque",
++        "text": "§6§lUne dernière faveur\n\n§0Vous avez bien servi ce royaume,\nchampion. En récompense supplémentaire,\nje vais partager un savoir secret.\n\n§0Choisissez le lieu que vous\nsouhaitez découvrir :\n\n§8Une forteresse déchue, sombre\net abandonnée depuis longtemps...\n\n§8...ou le camp d'entraînement\nsecret du royaume.",
+         "buttons": [
+           {
+-            "name": "§cForsaken Castle",
++            "name": "§cChâteau Déchu",
+             "commands": [
+               "scriptevent sieged:king_quest_3_map_forsaken x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_complete"
+             ]
+           },
+           {
+-            "name": "§bTraining Camp",
++            "name": "§bCamp d'entraînement",
+             "commands": [
+               "scriptevent sieged:king_quest_3_map_camp x",
+               "dialogue open @e[type=sieged:villager_king,r=10] @initiator king_quest_complete"
+@@ -246,4 +246,4 @@
+       }
+     ]
+   }
+-}
++}
+\ No newline at end of file
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/items/the_golden_crossbow.item.json addon/SiegedTATB/items/the_golden_crossbow.item.json
 --- addon_orig/SiegedTATB/items/the_golden_crossbow.item.json	2026-06-29 13:55:32.000000000 +0000
 +++ addon/SiegedTATB/items/the_golden_crossbow.item.json	2026-07-04 17:34:38.009063229 +0000
@@ -43,9 +408,141 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/items/the_golden_shield.item
  			"minecraft:display_name": {
  				"value": "Mark of the Forsaken"
  			},
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/forsaken_castle_loot.json addon/SiegedTATB/loot_tables/chests/forsaken_castle_loot.json
+--- addon_orig/SiegedTATB/loot_tables/chests/forsaken_castle_loot.json	2026-06-29 18:49:16.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/forsaken_castle_loot.json	2026-07-04 18:08:42.218842697 +0000
+@@ -28,7 +28,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cForsaken Castle Map"
++							"name": "§cCarte du Château Déchu"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/qm_map_desert_castle.json addon/SiegedTATB/loot_tables/chests/qm_map_desert_castle.json
+--- addon_orig/SiegedTATB/loot_tables/chests/qm_map_desert_castle.json	2026-06-05 19:46:18.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/qm_map_desert_castle.json	2026-07-04 18:08:42.218972346 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§eDesert Castle Map"
++							"name": "§eCarte du Château du désert"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/qm_map_greek_ship.json addon/SiegedTATB/loot_tables/chests/qm_map_greek_ship.json
+--- addon_orig/SiegedTATB/loot_tables/chests/qm_map_greek_ship.json	2026-06-05 19:46:22.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/qm_map_greek_ship.json	2026-07-04 18:08:42.219494659 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§aGreek Ship Map"
++							"name": "§aCarte du Navire grec"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/qm_map_pillager_castle.json addon/SiegedTATB/loot_tables/chests/qm_map_pillager_castle.json
+--- addon_orig/SiegedTATB/loot_tables/chests/qm_map_pillager_castle.json	2026-06-05 19:46:13.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/qm_map_pillager_castle.json	2026-07-04 18:08:42.219615051 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cPillager Castle Map"
++							"name": "§cCarte du Château des pillards"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/qm_map_pillager_fort.json addon/SiegedTATB/loot_tables/chests/qm_map_pillager_fort.json
+--- addon_orig/SiegedTATB/loot_tables/chests/qm_map_pillager_fort.json	2026-06-05 19:46:16.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/qm_map_pillager_fort.json	2026-07-04 18:08:42.219093433 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§6Pillager Fort Map"
++							"name": "§6Carte du Fort des pillards"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/qm_map_viking_castle.json addon/SiegedTATB/loot_tables/chests/qm_map_viking_castle.json
+--- addon_orig/SiegedTATB/loot_tables/chests/qm_map_viking_castle.json	2026-06-05 19:46:21.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/qm_map_viking_castle.json	2026-07-04 18:08:42.219160092 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§bViking Castle Map"
++							"name": "§bCarte du Château viking"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/training_camp_loot.json addon/SiegedTATB/loot_tables/chests/training_camp_loot.json
+--- addon_orig/SiegedTATB/loot_tables/chests/training_camp_loot.json	2026-05-26 02:36:27.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/training_camp_loot.json	2026-07-04 18:08:42.219326116 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cTraining Camp Map"
++							"name": "§cCarte du Camp d'entraînement"
+ 						}
+ 					]
+ 				}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/villagerloot.json addon/SiegedTATB/loot_tables/chests/villagerloot.json
+--- addon_orig/SiegedTATB/loot_tables/chests/villagerloot.json	2026-06-29 18:49:15.000000000 +0000
++++ addon/SiegedTATB/loot_tables/chests/villagerloot.json	2026-07-04 18:08:42.219254278 +0000
+@@ -18,7 +18,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cPillager Castle Map"
++							"name": "§cCarte du Château des pillards"
+ 						}
+ 					]
+ 				},
+@@ -37,7 +37,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cPillager Fort Map"
++							"name": "§cCarte du Fort des pillards"
+ 						}
+ 					]
+ 				},
+@@ -56,7 +56,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cGreek Ship Map"
++							"name": "§cCarte du Navire grec"
+ 						}
+ 					]
+ 				},
+@@ -75,7 +75,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cViking Castle Map"
++							"name": "§cCarte du Château viking"
+ 						}
+ 					]
+ 				},
+@@ -94,7 +94,7 @@
+ 						},
+ 						{
+ 							"function": "set_name",
+-							"name": "§cDesert Castle Map"
++							"name": "§cCarte du Château du désert"
+ 						}
+ 					]
+ 				}
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
 --- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATB/manifest.json	2026-07-04 17:39:27.261110646 +0000
++++ addon/SiegedTATB/manifest.json	2026-07-04 18:11:18.808685438 +0000
 @@ -1,10 +1,10 @@
  {
  	"format_version": 2,
@@ -53,10 +550,10 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
 -		"name": "Sieged TAT Behavior",
 -		"description": "Medieval survival addon BP Update V1.7",
 +		"name": "Sieged TAT Behavior (FR)",
-+		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.4)",
++		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.5)",
  		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 4],
++		"version": [1, 7, 5],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -65,13 +562,13 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTA
  		{
  			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 4]
++			"version": [1, 7, 5]
  		},
  		{
  			"module_name": "@minecraft/server",
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/banner_guard_script.js addon/SiegedTATB/scripts/banner_guard_script.js
 --- addon_orig/SiegedTATB/scripts/banner_guard_script.js	2026-06-25 22:08:37.000000000 +0000
-+++ addon/SiegedTATB/scripts/banner_guard_script.js	2026-07-04 17:19:57.777900187 +0000
++++ addon/SiegedTATB/scripts/banner_guard_script.js	2026-07-04 18:05:08.405693006 +0000
 @@ -2234,6 +2234,59 @@
      btn_ranged:       "Ranged",
      btn_banner_guard: "Banner Guard §7(guard only)",
@@ -132,9 +629,435 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/banner_guard_script.
    pt_BR: {
      band_active:   (color, label, count) => `\n${color}[Banda ${label}] §7ativa — mostrando §f${count}§7 unidade(s) atribuída(s) apenas`,
      band_empty:    (color, label)        => `\n${color}[Banda ${label}] §7ativa — §cnenhuma unidade atribuída ainda`,
+@@ -2318,19 +2371,19 @@
+   const form = new ActionFormData()
+     .title(bgT(locale, "main_title", factionLabel))
+     .body(bgT(locale, "main_body", bandLine, warders.length, templars.length, sentinels.length, falconers.length, chevaliers.length, playerLevel, cmdTarget, SCAN_RADIUS))
+-    .button(hasVanguard ? " \uE95A Advanced Formations " : " \uE95A Advanced Formations §8[Vanguard Arts]")
+-    .button(" Charge")
+-    .button(" Command View")
+-    .button(" Follow")
+-    .button(" Wander")
+-    .button(" Formation March")
+-    .button(" Hold Position")
+-    .button(" Rally to Flag")
+-    .button(` Train Falconers §7(${FALCONER_XP_COST} XP)`)
+-    .button(" Arrow Rain")
+-    .button(hasVanguard ? ` Pavise Crossbow §7(${PAVISE_XP_COST} XP)` : ` Pavise Crossbow §8[Vanguard Arts]`)
+-    .button(" Unequip All Armor")
+-    .button(` \uE949 Cover Commander §7(Templars: ${templars.length})`);
++    .button(hasVanguard ? " \uE95A Formations avancées " : " \uE95A Formations avancées §8[Arts d'avant-garde]")
++    .button(" Charger")
++    .button(" Vue Commandant")
++    .button(" Suivre")
++    .button(" Vagabonder")
++    .button(" Marche en formation")
++    .button(" Tenir la position")
++    .button(" Rallier au drapeau")
++    .button(` Former des fauconniers §7(${FALCONER_XP_COST} XP)`)
++    .button(" Pluie de flèches")
++    .button(hasVanguard ? ` Arbalète à pavois §7(${PAVISE_XP_COST} XP)` : ` Arbalète à pavois §8[Arts d'avant-garde]`)
++    .button(" Retirer toutes les armures")
++    .button(` \uE949 Protéger le commandant §7(Templiers : ${templars.length})`);
+ 
+   const response = await form.show(player);
+   if (response.canceled || response.selection === undefined) return;
+@@ -2359,8 +2412,8 @@
+     if (!hasVanguard) {
+       const warn = new MessageFormData()
+         .title("§cUpgrade Required")
+-        .body("Advanced Formations require the §6Vanguard Arts§r upgrade.\n\nResearch it in the Sieged Book.")
+-        .button1("§aBack").button2("§cCancel");
++        .body("Les Formations avancées nécessitent l'amélioration §6Arts d'avant-garde§r.\n\nRecherchez-la dans le Registre.")
++        .button1("§aRetour").button2("§cAnnuler");
+       const r = await warn.show(player);
+       if (r.selection === 0) system.run(() => openCommandMenu(player, guard));
+       return;
+@@ -2368,7 +2421,7 @@
+     const subform = new ActionFormData()
+       .title("§lAdvanced Formations")
+       .body(
+-        `§7Warders nearby: §f${warders.length}   §7Your XP: §a${playerLevel} levels\n\n` +
++        `§7Gardiens à proximité : §f${warders.length}   §7Votre XP : §a${playerLevel} niveaux\n\n` +
+         `§7Choose a formation for your warders:`
+       )
+       .button(` Phalanx §7(${SHIELDWALL_XP_COST} XP)\n§7Shield wall, 3 ranks deep`)
+@@ -2381,24 +2434,24 @@
+       // Phalanx
+       if (warders.length < SHIELDWALL_THRESHOLD) {
+         const warn = new MessageFormData()
+-          .title("§cNot Enough Warders")
++          .title("§cPas assez de Gardiens")
+           .body(
+-            `Phalanx requires at least ${SHIELDWALL_THRESHOLD} warders nearby.\n` +
+-            `You currently have §c${warders.length}§r warder(s) in range.\n\nIssue a different command?`
++            `La phalange nécessite au moins ${SHIELDWALL_THRESHOLD} gardiens à proximité.\n` +
++            `Vous avez actuellement §c${warders.length}§r gardien(s) à portée.\n\nDonner un autre ordre ?`
+           )
+-          .button1("§aBack").button2("§cCancel");
++          .button1("§aRetour").button2("§cAnnuler");
+         const r = await warn.show(player);
+         if (r.selection === 0) system.run(() => openCommandMenu(player, guard));
+         return;
+       }
+       if (playerLevel < SHIELDWALL_XP_COST) {
+         const warn = new MessageFormData()
+-          .title("§cInsufficient XP")
++          .title("§cXP insuffisante")
+           .body(
+-            `You need §a${SHIELDWALL_XP_COST} XP levels§r to form a phalanx.\n` +
+-            `You currently have §c${playerLevel}§r level(s).\n\nIssue a different command?`
++            `Il vous faut §a${SHIELDWALL_XP_COST} niveaux d'XP§r pour former une phalange.\n` +
++            `Vous avez actuellement §c${playerLevel}§r niveau(x).\n\nDonner un autre ordre ?`
+           )
+-          .button1("§aBack").button2("§cCancel");
++          .button1("§aRetour").button2("§cAnnuler");
+         const r = await warn.show(player);
+         if (r.selection === 0) system.run(() => openCommandMenu(player, guard));
+         return;
+@@ -2409,24 +2462,24 @@
+       // Turtle
+       if (warders.length < SHIELDWALL_THRESHOLD) {
+         const warn = new MessageFormData()
+-          .title("§cNot Enough Warders")
++          .title("§cPas assez de Gardiens")
+           .body(
+-            `Turtle formation requires at least ${SHIELDWALL_THRESHOLD} warders nearby.\n` +
+-            `You currently have §c${warders.length}§r warder(s) in range.\n\nIssue a different command?`
++            `La formation Tortue nécessite au moins ${SHIELDWALL_THRESHOLD} gardiens à proximité.\n` +
++            `Vous avez actuellement §c${warders.length}§r gardien(s) à portée.\n\nDonner un autre ordre ?`
+           )
+-          .button1("§aBack").button2("§cCancel");
++          .button1("§aRetour").button2("§cAnnuler");
+         const r = await warn.show(player);
+         if (r.selection === 0) system.run(() => openCommandMenu(player, guard));
+         return;
+       }
+       if (playerLevel < TURTLE_XP_COST) {
+         const warn = new MessageFormData()
+-          .title("§cInsufficient XP")
++          .title("§cXP insuffisante")
+           .body(
+-            `You need §a${TURTLE_XP_COST} XP levels§r to form a turtle.\n` +
+-            `You currently have §c${playerLevel}§r level(s).\n\nIssue a different command?`
++            `Il vous faut §a${TURTLE_XP_COST} niveaux d'XP§r pour former une tortue.\n` +
++            `Vous avez actuellement §c${playerLevel}§r niveau(x).\n\nDonner un autre ordre ?`
+           )
+-          .button1("§aBack").button2("§cCancel");
++          .button1("§aRetour").button2("§cAnnuler");
+         const r = await warn.show(player);
+         if (r.selection === 0) system.run(() => openCommandMenu(player, guard));
+         return;
+@@ -2453,16 +2506,16 @@
+   if (chosen === COMMANDS.FALCONERS) {
+     if (sentinels.length < FALCONER_CONVERSION_THRESHOLD) {
+       const warn = new MessageFormData()
+-        .title("§cNot Enough Sentinels")
++        .title("§cPas assez de Sentinelles")
+         .body(
+-          `Training falconers requires at least ${FALCONER_CONVERSION_THRESHOLD} sentinels nearby.\n` +
+-          `You currently have §c${sentinels.length}§r sentinel(s) in range.\n\n` +
+-          `§72 sentinels = 1 falconer\n` +
+-          `§7Cost: ${FALCONER_XP_COST} XP levels\n\n` +
+-          `Issue a different command?`
++          `Former des fauconniers nécessite au moins ${FALCONER_CONVERSION_THRESHOLD} sentinelles à proximité.\n` +
++          `Vous avez actuellement §c${sentinels.length}§r sentinelle(s) à portée.\n\n` +
++          `§72 sentinelles = 1 fauconnier\n` +
++          `§7Coût : ${FALCONER_XP_COST} niveaux d'XP\n\n` +
++          `Donner un autre ordre ?`
+         )
+-        .button1("§aBack")
+-        .button2("§cCancel");
++        .button1("§aRetour")
++        .button2("§cAnnuler");
+ 
+       const warnResp = await warn.show(player);
+       if (warnResp.selection === 0) system.run(() => openCommandMenu(player, guard));
+@@ -2471,14 +2524,14 @@
+ 
+     if (playerLevel < FALCONER_XP_COST) {
+       const warn = new MessageFormData()
+-        .title("§cInsufficient XP")
++        .title("§cXP insuffisante")
+         .body(
+-          `You need §a${FALCONER_XP_COST} XP levels§r to train falconers.\n` +
++          `Il vous faut §a${FALCONER_XP_COST} niveaux d'XP§r pour former des fauconniers.\n` +
+           `You currently have §c${playerLevel}§r level(s).\n\n` +
+-          `Issue a different command?`
++          `Donner un autre ordre ?`
+         )
+-        .button1("§aBack")
+-        .button2("§cCancel");
++        .button1("§aRetour")
++        .button2("§cAnnuler");
+ 
+       const warnResp = await warn.show(player);
+       if (warnResp.selection === 0) system.run(() => openCommandMenu(player, guard));
+@@ -2496,7 +2549,7 @@
+         `§aFalconers can use arrow rain abilities!`
+       )
+       .button1("§aTrain Falconers")
+-      .button2("§cCancel");
++      .button2("§cAnnuler");
+ 
+     const confirmResp = await confirm.show(player);
+     if (confirmResp.selection === 0) {
+@@ -2509,10 +2562,10 @@
+   if (chosen === "arrow_rain") {
+     if (falconers.length === 0) {
+       const warn = new MessageFormData()
+-        .title("§cNo Falconers Available")
+-        .body("Arrow Rain requires at least one falconer nearby.\n\nTrain falconers from sentinels using the §6Train Falconers§r button.\n\nIssue a different command?")
+-        .button1("§aBack")
+-        .button2("§cCancel");
++        .title("§cAucun fauconnier disponible")
++        .body("La Pluie de flèches nécessite au moins un fauconnier à proximité.\n\nFormez des fauconniers à partir de sentinelles avec le bouton §6Former des fauconniers§r.\n\nDonner un autre ordre ?")
++        .button1("§aRetour")
++        .button2("§cAnnuler");
+       
+       const warnResp = await warn.show(player);
+       if (warnResp.selection === 0) system.run(() => openCommandMenu(player, guard));
+@@ -2521,17 +2574,17 @@
+ 
+     // Show info about marker system
+     const info = new MessageFormData()
+-      .title("§6Arrow Rain System")
++      .title("§6Système de pluie de flèches")
+       .body(
+-        `§7You have §f${falconers.length}§7 falconer(s) ready.\n\n` +
+-        `§aHow to use:§r\n` +
+-        `1. Click "Give Me Marker" below to get an Arrow Rain Marker\n` +
+-        `2. Throw the marker where you want arrows to rain\n` +
+-        `3. All nearby falconers will bombard that area!\n\n` +
+-        `§7Falconers need ammo (regenerates over time)`
++        `§7Vous avez §f${falconers.length}§7 fauconnier(s) prêt(s).\n\n` +
++        `§aMode d'emploi :§r\n` +
++        `1. Cliquez sur « Donnez-moi un marqueur » ci-dessous pour recevoir un Marqueur de pluie de flèches\n` +
++        `2. Lancez le marqueur là où vous voulez faire pleuvoir les flèches\n` +
++        `3. Tous les fauconniers proches bombarderont cette zone !\n\n` +
++        `§7Les fauconniers ont besoin de munitions (elles se régénèrent avec le temps)`
+       )
+-      .button1("§aGive Me Marker")
+-      .button2("§7Got It");
++      .button1("§aDonnez-moi un marqueur")
++      .button2("§7Compris");
+     
+     const infoResp = await info.show(player);
+     if (infoResp.selection === 0) {
+@@ -2547,30 +2600,30 @@
+       const warn = new MessageFormData()
+         .title("§cUpgrade Required")
+         .body("Pavise Crossbow requires the §6Vanguard Arts§r upgrade.\n\nResearch it in the Sieged Book.")
+-        .button1("§aBack").button2("§cCancel");
++        .button1("§aRetour").button2("§cAnnuler");
+       const r = await warn.show(player);
+       if (r.selection === 0) system.run(() => openCommandMenu(player, guard));
+       return;
+     }
+     if (sentinels.length === 0) {
+       const warn = new MessageFormData()
+-        .title("§cNo Sentinels Available")
+-        .body("Pavise Crossbow requires at least one sentinel nearby.\n\nIssue a different command?")
+-        .button1("§aBack")
+-        .button2("§cCancel");
++        .title("§cAucune sentinelle disponible")
++        .body("L'Arbalète à pavois nécessite au moins une sentinelle à proximité.\n\nDonner un autre ordre ?")
++        .button1("§aRetour")
++        .button2("§cAnnuler");
+       const warnResp = await warn.show(player);
+       if (warnResp.selection === 0) system.run(() => openCommandMenu(player, guard));
+       return;
+     }
+     if (playerLevel < PAVISE_XP_COST) {
+       const warn = new MessageFormData()
+-        .title("§cInsufficient XP")
++        .title("§cXP insuffisante")
+         .body(
+-          `You need §a${PAVISE_XP_COST} XP levels§r to use Pavise Crossbow.\n` +
+-          `You currently have §c${playerLevel}§r level(s).\n\nIssue a different command?`
++          `Il vous faut §a${PAVISE_XP_COST} niveaux d'XP§r pour utiliser l'Arbalète à pavois.\n` +
++          `Vous avez actuellement §c${playerLevel}§r niveau(x).\n\nDonner un autre ordre ?`
+         )
+-        .button1("§aBack")
+-        .button2("§cCancel");
++        .button1("§aRetour")
++        .button2("§cAnnuler");
+       const warnResp = await warn.show(player);
+       if (warnResp.selection === 0) system.run(() => openCommandMenu(player, guard));
+       return;
+@@ -2584,7 +2637,7 @@
+         `§7Shields cannot be picked up and despawn after §a1 minute`
+       )
+       .button1("§aDeploy Shields")
+-      .button2("§cCancel");
++      .button2("§cAnnuler");
+     const confirmResp = await confirm.show(player);
+     if (confirmResp.selection === 0) {
+       player.addLevels(-PAVISE_XP_COST);
+@@ -2660,12 +2713,12 @@
+   if (chosen === "cover_commander") {
+     if (templars.length === 0) {
+       const warn = new MessageFormData()
+-        .title("§cNo Templars Available")
+-        .body(`Cover Commander requires at least one templar nearby.
++        .title("§cAucun Templier disponible")
++        .body(`« Protéger le commandant » nécessite au moins un templier à proximité.
+ 
+-Issue a different command?`)
+-        .button1("§aBack")
+-        .button2("§cCancel");
++Donner un autre ordre ?`)
++        .button1("§aRetour")
++        .button2("§cAnnuler");
+       const warnResp = await warn.show(player);
+       if (warnResp.selection === 0) system.run(() => openCommandMenu(player, guard));
+       return;
+@@ -2681,13 +2734,13 @@
+   // Follow Me — unit type submenu
+   if (chosen === COMMANDS.FOLLOW) {
+     const subform = new ActionFormData()
+-      .title("§lFollow Me")
+-      .body("Which units should follow you?")
+-      .button("All Units")
+-      .button("Infantry", "textures/items/icons/SwordiconS")
+-      .button("Cavalry", "textures/items/icons/horseiconS")
+-      .button("Ranged", "textures/items/icons/bowiconS")
+-      .button("Banner Guard §7(guard only)");
++      .title("§lSuivez-moi")
++      .body("Quelles unités doivent vous suivre ?")
++      .button("Toutes les unités")
++      .button("Infanterie", "textures/items/icons/SwordiconS")
++      .button("Cavalerie", "textures/items/icons/horseiconS")
++      .button("Tireurs", "textures/items/icons/bowiconS")
++      .button("Garde-bannière §7(garde uniquement)");
+ 
+     const subResp = await subform.show(player);
+     if (subResp.canceled || subResp.selection === undefined) return;
+@@ -2736,13 +2789,13 @@
+   // Wander — unit type submenu (mirrors Follow Me)
+   if (chosen === COMMANDS.WANDER) {
+     const subform = new ActionFormData()
+-      .title("§l Wander")
+-      .body("Which units should wander freely?")
+-      .button("All Units")
+-      .button("Infantry", "textures/items/icons/SwordiconS")
+-      .button("Cavalry", "textures/items/icons/horseiconS")
+-      .button("Ranged", "textures/items/icons/bowiconS")
+-      .button("Banner Guard §7(guard only)");
++      .title("§l Vagabonder")
++      .body("Quelles unités doivent vagabonder librement ?")
++      .button("Toutes les unités")
++      .button("Infanterie", "textures/items/icons/SwordiconS")
++      .button("Cavalerie", "textures/items/icons/horseiconS")
++      .button("Tireurs", "textures/items/icons/bowiconS")
++      .button("Garde-bannière §7(garde uniquement)");
+ 
+     const subResp = await subform.show(player);
+     if (subResp.canceled || subResp.selection === undefined) return;
+@@ -2843,10 +2896,10 @@
+ // ─── Commanding Horn ──────────────────────────────────────────────────────────
+ 
+ const HORN_TIERS = new Map([
+-  ["sieged:commanding_horn",           { range: 15,  displayName: "§6§lCommanding Horn",           grade: "§7Base"       }],
+-  ["sieged:commanding_horn_gilded",    { range: 25,  displayName: "§e§lGilded Commanding Horn",    grade: "§6Gilded"     }],
+-  ["sieged:commanding_horn_diamond",   { range: 40,  displayName: "§b§lDiamond Commanding Horn",   grade: "§bDiamond"    }],
+-  ["sieged:commanding_horn_netherite", { range: 75,  displayName: "§5§lNetherite Commanding Horn", grade: "§5Netherite"  }],
++  ["sieged:commanding_horn",           { range: 15,  displayName: "§6§lCor de commandement",           grade: "§7Base"       }],
++  ["sieged:commanding_horn_gilded",    { range: 25,  displayName: "§e§lCor de commandement doré",    grade: "§6Doré"     }],
++  ["sieged:commanding_horn_diamond",   { range: 40,  displayName: "§b§lCor de commandement en diamant",   grade: "§bDiamant"    }],
++  ["sieged:commanding_horn_netherite", { range: 75,  displayName: "§5§lCor de commandement en netherite", grade: "§5Netherite"  }],
+ ]);
+ 
+ const hornLinks = new Map(); // playerId → guardId
+@@ -2864,10 +2917,10 @@
+     const linked = staticLines.linked;
+     item.setLore([
+       linked[0],
+-      `§8Tier: ${tier.grade}  §7Range: §e${tier.range} blocks`,
++      `§8Niveau : ${tier.grade}  §7Portée : §e${tier.range} blocs`,
+       linked[1],
+-      `§aLinked: §f${linkedGuardName}`,
+-      `§7Use within §e${tier.range} blocks §7to open their menu.`,
++      `§aLié à : §f${linkedGuardName}`,
++      `§7Utilisez-le à moins de §e${tier.range} blocs §7pour ouvrir son menu.`,
+       linked[2],
+       linked[3],
+     ]);
+@@ -2875,7 +2928,7 @@
+     const unlinked = staticLines.unlinked;
+     item.setLore([
+       unlinked[0],
+-      `§8Tier: ${tier.grade}  §7Range: §e${tier.range} blocks`,
++      `§8Niveau : ${tier.grade}  §7Portée : §e${tier.range} blocs`,
+       unlinked[1],
+       unlinked[2],
+       unlinked[3],
+@@ -2914,7 +2967,7 @@
+     // Update lore on every commanding horn in inventory
+     const inv = player.getComponent("inventory")?.container;
+     if (inv) {
+-      const guardName = guard.nameTag || "Banner Guard";
++      const guardName = guard.nameTag || "Garde-bannière";
+       const locale = getPlayerLocale(player);
+       for (let i = 0; i < inv.size; i++) {
+         const it = inv.getItem(i);
+@@ -2923,7 +2976,7 @@
+           inv.setItem(i, it);
+         }
+       }
+-      player.onScreenDisplay.setActionBar({ rawtext: [{ translate: "sieged.banner_guard.horn_linked", with: [guard.nameTag || "Banner Guard"] }] });
++      player.onScreenDisplay.setActionBar({ rawtext: [{ translate: "sieged.banner_guard.horn_linked", with: [guard.nameTag || "Garde-bannière"] }] });
+       player.playSound("random.levelup", { volume: 0.8, pitch: 1.3 });
+     }
+   });
+@@ -3057,7 +3110,7 @@
+         const it = inv.getItem(i);
+         if (!it || !isCommandingHorn(it.typeId)) continue;
+         // Guard name isn't known at spawn time — show generic linked state
+-        applyCommandingHornLore(it, guardId ? "Banner Guard" : null, locale);
++        applyCommandingHornLore(it, guardId ? "Garde-bannière" : null, locale);
+         inv.setItem(i, it);
+       }
+     } catch (_) {}
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/field_battle.js addon/SiegedTATB/scripts/field_battle.js
+--- addon_orig/SiegedTATB/scripts/field_battle.js	2026-06-30 13:49:28.000000000 +0000
++++ addon/SiegedTATB/scripts/field_battle.js	2026-07-04 18:09:08.762160472 +0000
+@@ -646,7 +646,7 @@
+             }
+             const bd = startNavalBattle(player, center);
+             if (!bd) {
+-                player.sendMessage("§c[FieldBattle] Naval spawn failed — ships could not be placed.");
++                player.sendMessage("§c[Bataille] Échec de l'apparition navale — impossible de placer les navires.");
+             } else {
+                 player.sendMessage(`§a[FieldBattle] Naval battle started! §7defenders:${bd.defenders.length} invaders:${bd.invaders.length} ships`);
+             }
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/illager.js addon/SiegedTATB/scripts/illager.js
+--- addon_orig/SiegedTATB/scripts/illager.js	2026-06-05 22:56:41.000000000 +0000
++++ addon/SiegedTATB/scripts/illager.js	2026-07-04 18:09:08.761632071 +0000
+@@ -390,7 +390,7 @@
+         }
+ 
+         // Adult in barter mode — remind player of the mechanic
+-        player.sendMessage("§7The civilian eyes your crown.\n§fToss an §aemerald§f onto the ground to trade!");
++        player.sendMessage("§7Le civil lorgne votre couronne.\n§fJetez une §aémeraude§f au sol pour commercer !");
+     });
+ });
+ 
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/invasion_event.js addon/SiegedTATB/scripts/invasion_event.js
+--- addon_orig/SiegedTATB/scripts/invasion_event.js	2026-06-29 00:34:54.000000000 +0000
++++ addon/SiegedTATB/scripts/invasion_event.js	2026-07-04 18:09:08.763584164 +0000
+@@ -2976,7 +2976,7 @@
+         // Force spawn scouts immediately for the territory owner (bypasses timer/tier check)
+         const castle = findNearestCastle(player);
+         const fakecastle = castle ?? { location: player.location, tier: 1 };
+-        if (!castle) player.sendMessage("§e[Raid] No castle found — spawning scouts at your location.");
++        if (!castle) player.sendMessage("§e[Raid] Aucun château trouvé — apparition des éclaireurs à votre position.");
+ 
+         // Scouts are shared per territory — spawn once for the owner
+         const owner = castle?.ownerName
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/kingdom.js addon/SiegedTATB/scripts/kingdom.js
 --- addon_orig/SiegedTATB/scripts/kingdom.js	2026-06-30 13:40:06.000000000 +0000
-+++ addon/SiegedTATB/scripts/kingdom.js	2026-07-04 17:18:26.277467285 +0000
++++ addon/SiegedTATB/scripts/kingdom.js	2026-07-04 18:00:00.584495855 +0000
 @@ -218,6 +218,218 @@
      disband_btn1:  "§c§l Yes, Disband",
      disband_btn2:  "§aCancel",
@@ -354,6 +1277,1088 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/kingdom.js addon/Sie
    pt_BR: {
      style_title:       "§d§l Mudar Estilo da Bandeira",
      style_body:        "§8Escolha um estilo para seu estandarte.",
+@@ -432,6 +644,8 @@
+   },
+ };
+ 
++const RANK_FR = { King: "Roi", Noble: "Noble", Knight: "Chevalier", Peasant: "Paysan" };
++function rankDisplay(rank) { return RANK_FR[rank] ?? rank; }
+ function kgT(locale, key, ...args) {
+   const dict = _KG[locale] ?? _KG.en_US;
+   const val  = dict[key] ?? _KG.en_US[key];
+@@ -493,7 +707,7 @@
+ // ── Tier definitions ──────────────────────────────────────────────
+ export const KINGDOM_TIERS = [
+     {
+-        name:        "Settlement",
++        name:        "Colonie",
+         radius:      20,
+         invasionMin: 20,
+         invasionMax: 30,
+@@ -517,7 +731,7 @@
+         },
+     },
+     {
+-        name:        "Town",
++        name:        "Ville",
+         radius:      40,
+         invasionMin: 45,
+         invasionMax: 60,
+@@ -533,7 +747,7 @@
+         },
+     },
+     {
+-        name:        "City",
++        name:        "Cité",
+         radius:      64,
+         invasionMin: 69,
+         invasionMax: 84,
+@@ -549,7 +763,7 @@
+         },
+     },
+     {
+-        name:        "Kingdom",
++        name:        "Royaume",
+         radius:      96,
+         invasionMin: 101,
+         invasionMax: 116,
+@@ -673,24 +887,24 @@
+ // perm: permanent purchase (fully tamed, no expiry)
+ const NPC_TRADE_TABLE = [
+     // Settlement (tier 0+)
+-    { label: "§f  32× Bread  §8— §e8 em",                        cost: 8,  give: ["minecraft:bread",           32], minRep: 10, minTier: 0 },
+-    { label: "§f  32× Stone Bricks  §8— §e6 em",                 cost: 6,  give: ["minecraft:stone_bricks",    32], minRep: 10, minTier: 0 },
+-    { label: "§f  3× Hay Bale  §8— §e4 em",                      cost: 4,  give: ["minecraft:hay_block",        3], minRep: 10, minTier: 0 },
++    { label: "§f  32× Pain  §8— §e8 ém",                        cost: 8,  give: ["minecraft:bread",           32], minRep: 10, minTier: 0 },
++    { label: "§f  32× Pierre taillée  §8— §e6 ém",                 cost: 6,  give: ["minecraft:stone_bricks",    32], minRep: 10, minTier: 0 },
++    { label: "§f  3× Botte de foin  §8— §e4 ém",                      cost: 4,  give: ["minecraft:hay_block",        3], minRep: 10, minTier: 0 },
+     // Village (tier 1+)
+-    { label: "§e  16× Iron Ingots  §8— §e14 em",                 cost: 14, give: ["minecraft:iron_ingot",       16], minRep: 40, minTier: 1 },
+-    { label: "§e  Iron Sword  §8— §e18 em",                      cost: 18, give: ["minecraft:iron_sword",        1], minRep: 40, minTier: 1 },
+-    { label: "§e  Crossbow  §8— §e16 em",                        cost: 16, give: ["minecraft:crossbow",          1], minRep: 40, minTier: 1 },
++    { label: "§e  16× Lingots de fer  §8— §e14 ém",                 cost: 14, give: ["minecraft:iron_ingot",       16], minRep: 40, minTier: 1 },
++    { label: "§e  Épée en fer  §8— §e18 ém",                      cost: 18, give: ["minecraft:iron_sword",        1], minRep: 40, minTier: 1 },
++    { label: "§e  Arbalète  §8— §e16 ém",                        cost: 16, give: ["minecraft:crossbow",          1], minRep: 40, minTier: 1 },
+     // Town (tier 2+) — temporary mercenary hire
+-    { label: "§6  Hire 2 Warders  §8— §e10 em §8(10 min)",       cost: 10, merc: ["sieged:warder",    2],           minRep: 40, minTier: 2 },
+-    { label: "§6  Hire 2 Sentinels  §8— §e10 em §8(10 min)",     cost: 10, merc: ["sieged:sentinel",  2],           minRep: 50, minTier: 2 },
+-    { label: "§e  Diamond Sword  §8— §e35 em",                   cost: 35, give: ["minecraft:diamond_sword",    1], minRep: 60, minTier: 2 },
++    { label: "§6  Louer 2 Gardiens  §8— §e10 ém §8(10 min)",       cost: 10, merc: ["sieged:warder",    2],           minRep: 40, minTier: 2 },
++    { label: "§6  Louer 2 Sentinelles  §8— §e10 ém §8(10 min)",     cost: 10, merc: ["sieged:sentinel",  2],           minRep: 50, minTier: 2 },
++    { label: "§e  Épée en diamant  §8— §e35 ém",                   cost: 35, give: ["minecraft:diamond_sword",    1], minRep: 60, minTier: 2 },
+     // City (tier 3+) — permanent unit purchase
+-    { label: "§a  Buy 2 Warders  §8— §e42 em §8(permanent)",     cost: 42, perm: ["sieged:warder",    2],           minRep: 60, minTier: 3 },
+-    { label: "§a  Buy 2 Sentinels  §8— §e55 em §8(permanent)",   cost: 55, perm: ["sieged:sentinel",  2],           minRep: 65, minTier: 3 },
+-    { label: "§c  Buy 2 Chevaliers  §8— §e68 em §8(permanent)",  cost: 68, perm: ["sieged:chevalier", 2],           minRep: 75, minTier: 3 },
++    { label: "§a  Acheter 2 Gardiens  §8— §e42 ém §8(permanent)",     cost: 42, perm: ["sieged:warder",    2],           minRep: 60, minTier: 3 },
++    { label: "§a  Acheter 2 Sentinelles  §8— §e55 ém §8(permanent)",   cost: 55, perm: ["sieged:sentinel",  2],           minRep: 65, minTier: 3 },
++    { label: "§c  Acheter 2 Chevaliers  §8— §e68 ém §8(permanent)",  cost: 68, perm: ["sieged:chevalier", 2],           minRep: 75, minTier: 3 },
+     // Kingdom (tier 4) — elite permanent units
+-    { label: "§d  Buy 2 Templars  §8— §e80 em §8(permanent)",    cost: 80, perm: ["sieged:templar",   2],           minRep: 80, minTier: 4 },
+-    { label: "§6  2× Netherite Scrap  §8— §e60 em",              cost: 60, give: ["minecraft:netherite_scrap",   2], minRep: 75, minTier: 4 },
++    { label: "§d  Acheter 2 Templiers  §8— §e80 ém §8(permanent)",    cost: 80, perm: ["sieged:templar",   2],           minRep: 80, minTier: 4 },
++    { label: "§6  2× Débris de netherite  §8— §e60 ém",              cost: 60, give: ["minecraft:netherite_scrap",   2], minRep: 75, minTier: 4 },
+ ];
+ 
+ const NPC_CREST_POOL = [
+@@ -704,39 +918,39 @@
+ 
+ const NPC_SHUFFLE_POOL = [
+     // Settlement (tier 0+)
+-    { label: "§f  Javelin  §8§7Daily§8 §8— §e10 em",          cost: 10, give: ["sieged:javelin",           1], minRep: 10, minTier: 0 },
+-    { label: "§f  Spear  §8§7Daily§8 §8— §e10 em",            cost: 10, give: ["sieged:spear",             1], minRep: 10, minTier: 0 },
+-    { label: "§f  Pike  §8§7Daily§8 §8— §e12 em",             cost: 12, give: ["sieged:pike",              1], minRep: 10, minTier: 0 },
+-    { label: "§f  Buckler Shield  §8§7Daily§8 §8— §e8 em",    cost: 8,  give: ["sieged:buckler_shield",    1], minRep: 10, minTier: 0 },
+-    { label: "§f  Round Shield  §8§7Daily§8 §8— §e10 em",     cost: 10, give: ["sieged:round_shield",      1], minRep: 10, minTier: 0 },
+-    { label: "§f  Gladius  §8§7Daily§8 §8— §e12 em",          cost: 12, give: ["sieged:gladius",           1], minRep: 10, minTier: 0 },
+-    { label: "§f  Sabre  §8§7Daily§8 §8— §e14 em",            cost: 14, give: ["sieged:sabre",             1], minRep: 10, minTier: 0 },
++    { label: "§f  Javelot  §8§7Quotidien§8 §8— §e10 ém",          cost: 10, give: ["sieged:javelin",           1], minRep: 10, minTier: 0 },
++    { label: "§f  Épieu  §8§7Quotidien§8 §8— §e10 ém",            cost: 10, give: ["sieged:spear",             1], minRep: 10, minTier: 0 },
++    { label: "§f  Pique  §8§7Quotidien§8 §8— §e12 ém",             cost: 12, give: ["sieged:pike",              1], minRep: 10, minTier: 0 },
++    { label: "§f  Rondache  §8§7Quotidien§8 §8— §e8 ém",    cost: 8,  give: ["sieged:buckler_shield",    1], minRep: 10, minTier: 0 },
++    { label: "§f  Bouclier rond  §8§7Quotidien§8 §8— §e10 ém",     cost: 10, give: ["sieged:round_shield",      1], minRep: 10, minTier: 0 },
++    { label: "§f  Gladius  §8§7Quotidien§8 §8— §e12 ém",          cost: 12, give: ["sieged:gladius",           1], minRep: 10, minTier: 0 },
++    { label: "§f  Sabre  §8§7Quotidien§8 §8— §e14 ém",            cost: 14, give: ["sieged:sabre",             1], minRep: 10, minTier: 0 },
+     // Village (tier 1+)
+-    { label: "§e  Longsword  §8§7Daily§8 §8— §e20 em",        cost: 20, give: ["sieged:longsword",         1], minRep: 40, minTier: 1 },
+-    { label: "§e  Halberd  §8§7Daily§8 §8— §e22 em",          cost: 22, give: ["sieged:halberd",           1], minRep: 40, minTier: 1 },
+-    { label: "§e  Heavy Crossbow  §8§7Daily§8 §8— §e24 em",   cost: 24, give: ["sieged:heavy_crossbow",    1], minRep: 40, minTier: 1 },
+-    { label: "§e  Heater Shield  §8§7Daily§8 §8— §e18 em",    cost: 18, give: ["sieged:heater_shield",     1], minRep: 40, minTier: 1 },
+-    { label: "§e  Glaive  §8§7Daily§8 §8— §e20 em",           cost: 20, give: ["sieged:glaive",            1], minRep: 40, minTier: 1 },
+-    { label: "§e  Longbow  §8§7Daily§8 §8— §e20 em",          cost: 20, give: ["sieged:longbow",           1], minRep: 40, minTier: 1 },
+-    { label: "§e  Morningstar  §8§7Daily§8 §8— §e22 em",      cost: 22, give: ["sieged:morningstar",       1], minRep: 40, minTier: 1 },
+-    { label: "§e  2x Golden Apple  §8§7Daily§8 §8— §e20 em",  cost: 20, give: ["minecraft:golden_apple",   2], minRep: 40, minTier: 1 },
++    { label: "§e  Épée longue  §8§7Quotidien§8 §8— §e20 ém",        cost: 20, give: ["sieged:longsword",         1], minRep: 40, minTier: 1 },
++    { label: "§e  Hallebarde  §8§7Quotidien§8 §8— §e22 ém",          cost: 22, give: ["sieged:halberd",           1], minRep: 40, minTier: 1 },
++    { label: "§e  Arbalète lourde  §8§7Quotidien§8 §8— §e24 ém",   cost: 24, give: ["sieged:heavy_crossbow",    1], minRep: 40, minTier: 1 },
++    { label: "§e  Écu  §8§7Quotidien§8 §8— §e18 ém",    cost: 18, give: ["sieged:heater_shield",     1], minRep: 40, minTier: 1 },
++    { label: "§e  Glaive  §8§7Quotidien§8 §8— §e20 ém",           cost: 20, give: ["sieged:glaive",            1], minRep: 40, minTier: 1 },
++    { label: "§e  Arc long  §8§7Quotidien§8 §8— §e20 ém",          cost: 20, give: ["sieged:longbow",           1], minRep: 40, minTier: 1 },
++    { label: "§e  Étoile du matin  §8§7Quotidien§8 §8— §e22 ém",      cost: 22, give: ["sieged:morningstar",       1], minRep: 40, minTier: 1 },
++    { label: "§e  2× Pomme dorée  §8§7Quotidien§8 §8— §e20 ém",  cost: 20, give: ["minecraft:golden_apple",   2], minRep: 40, minTier: 1 },
+     // Town (tier 2+)
+-    { label: "§6  War Hammer  §8§7Daily§8 §8— §e32 em",       cost: 32, give: ["sieged:war_hammer",        1], minRep: 50, minTier: 2 },
+-    { label: "§6  Zweihander  §8§7Daily§8 §8— §e35 em",       cost: 35, give: ["sieged:zweihander",        1], minRep: 50, minTier: 2 },
+-    { label: "§6  Two-Headed Axe  §8§7Daily§8 §8— §e30 em",   cost: 30, give: ["sieged:twoheadedaxe",      1], minRep: 50, minTier: 2 },
+-    { label: "§6  Kite Shield  §8§7Daily§8 §8— §e28 em",      cost: 28, give: ["sieged:kite_shield",       1], minRep: 50, minTier: 2 },
+-    { label: "§6  Commanding Horn  §8§7Daily§8 §8— §e40 em",  cost: 40, give: ["sieged:commanding_horn",   1], minRep: 60, minTier: 2 },
+-    { label: "§6  Forging Glove  §8§7Daily§8 §8— §e30 em",    cost: 30, give: ["sieged:forging_glove",     1], minRep: 50, minTier: 2 },
+-    { label: "§6  Large Round Shield  §8§7Daily§8 §8— §e28 em", cost: 28, give: ["sieged:large_round_shield", 1], minRep: 50, minTier: 2 },
++    { label: "§6  Marteau de guerre  §8§7Quotidien§8 §8— §e32 ém",       cost: 32, give: ["sieged:war_hammer",        1], minRep: 50, minTier: 2 },
++    { label: "§6  Zweihander  §8§7Quotidien§8 §8— §e35 ém",       cost: 35, give: ["sieged:zweihander",        1], minRep: 50, minTier: 2 },
++    { label: "§6  Hache à deux têtes  §8§7Quotidien§8 §8— §e30 ém",   cost: 30, give: ["sieged:twoheadedaxe",      1], minRep: 50, minTier: 2 },
++    { label: "§6  Bouclier en amande  §8§7Quotidien§8 §8— §e28 ém",      cost: 28, give: ["sieged:kite_shield",       1], minRep: 50, minTier: 2 },
++    { label: "§6  Cor de commandement  §8§7Quotidien§8 §8— §e40 ém",  cost: 40, give: ["sieged:commanding_horn",   1], minRep: 60, minTier: 2 },
++    { label: "§6  Gant de forge  §8§7Quotidien§8 §8— §e30 ém",    cost: 30, give: ["sieged:forging_glove",     1], minRep: 50, minTier: 2 },
++    { label: "§6  Grand bouclier rond  §8§7Quotidien§8 §8— §e28 ém", cost: 28, give: ["sieged:large_round_shield", 1], minRep: 50, minTier: 2 },
+     // City (tier 3+)
+-    { label: "§c  Commanding Horn  §8§7Daily§8 §8— §e45 em",    cost: 45, give: ["sieged:commanding_horn",    1], minRep: 65, minTier: 3 },
+-    { label: "§c  War Order Scroll  §8§7Daily§8 §8— §e50 em", cost: 50, give: ["sieged:war_order_scroll",  1], minRep: 65, minTier: 3 },
+-    { label: "§c  Tower Shield  §8§7Daily§8 §8— §e40 em",     cost: 40, give: ["sieged:tower_shield",       1], minRep: 65, minTier: 3 },
+-    { label: "§c  Blank Schematic  §8§7Daily§8 §8— §e45 em",  cost: 45, give: ["sieged:blank_schematic",   1], minRep: 65, minTier: 3 },
+-    { label: "§c  Ominous Bottle  §8§7Daily§8 §8— §e35 em",   cost: 35, give: ["minecraft:ominous_bottle", 1], minRep: 60, minTier: 3 },
++    { label: "§c  Cor de commandement  §8§7Quotidien§8 §8— §e45 ém",    cost: 45, give: ["sieged:commanding_horn",    1], minRep: 65, minTier: 3 },
++    { label: "§c  Parchemin d'ordre de guerre  §8§7Quotidien§8 §8— §e50 ém", cost: 50, give: ["sieged:war_order_scroll",  1], minRep: 65, minTier: 3 },
++    { label: "§c  Pavois  §8§7Quotidien§8 §8— §e40 ém",     cost: 40, give: ["sieged:tower_shield",       1], minRep: 65, minTier: 3 },
++    { label: "§c  Plan vierge  §8§7Quotidien§8 §8— §e45 ém",  cost: 45, give: ["sieged:blank_schematic",   1], minRep: 65, minTier: 3 },
++    { label: "§c  Fiole de mauvais présage  §8§7Quotidien§8 §8— §e35 ém",   cost: 35, give: ["minecraft:ominous_bottle", 1], minRep: 60, minTier: 3 },
+     // Kingdom (tier 4)
+-    { label: "§d  2x Tempered Steel  §8§7Daily§8 §8— §e60 em", cost: 60, give: ["sieged:tempered_steel",   2], minRep: 75, minTier: 4 },
+-    { label: "§d  Enchanted Golden Apple  §8§7Daily§8 §8— §e75 em", cost: 75, give: ["minecraft:enchanted_golden_apple", 1], minRep: 80, minTier: 4 },
++    { label: "§d  2× Acier trempé  §8§7Quotidien§8 §8— §e60 ém", cost: 60, give: ["sieged:tempered_steel",   2], minRep: 75, minTier: 4 },
++    { label: "§d  Pomme dorée enchantée  §8§7Quotidien§8 §8— §e75 ém", cost: 75, give: ["minecraft:enchanted_golden_apple", 1], minRep: 80, minTier: 4 },
+ ];
+ 
+ function getDailyShuffleTrades() {
+@@ -782,10 +996,10 @@
+ const BARRACKS_SCAN_RADIUS   = 400;  // blocks around the flag to scan for enrolled troops
+ const STORAGE_PROP  = "sieged:stored_troops"; // JSON on flag: { "sieged:warder": 2, ... }
+ const STORAGE_UNITS = {
+-    "sieged:warder":    "Warder",
+-    "sieged:sentinel":  "Sentinel",
+-    "sieged:templar":   "Templar",
+-    "sieged:falconer":  "Falconer",
++    "sieged:warder":    "Gardien",
++    "sieged:sentinel":  "Sentinelle",
++    "sieged:templar":   "Templier",
++    "sieged:falconer":  "Fauconnier",
+     "sieged:chevalier": "Chevalier",
+ };
+ 
+@@ -811,12 +1025,12 @@
+ 
+ // All enrollable unit type IDs → display names
+ const BARRACKS_UNITS = {
+-    "sieged:banner_guard": "Banner Guard",
+-    "sieged:warder":    "Warder",
+-    "sieged:sentinel":  "Sentinel",
+-    "sieged:templar":   "Templar",
+-    "sieged:shieldwall":"Shieldwall",
+-    "sieged:falconer":  "Falconer",
++    "sieged:banner_guard": "Garde-bannière",
++    "sieged:warder":    "Gardien",
++    "sieged:sentinel":  "Sentinelle",
++    "sieged:templar":   "Templier",
++    "sieged:shieldwall":"Mur de boucliers",
++    "sieged:falconer":  "Fauconnier",
+     "sieged:chevalier": "Chevalier",
+ };
+ const RANKS        = ["King", "Noble", "Knight", "Peasant"];
+@@ -899,9 +1113,9 @@
+ const CREST_REGISTRY = {
+     "sieged:crest_of_morale": {
+         id:          "morale",
+-        name:        "Crest of Morale",
++        name:        "Blason du Moral",
+         color:       "§a",
+-        description: "§8Your people's resolve is iron.\n§8All morale losses are reduced by §a50%§8.\n§8Daily morale recovery increased by §a+20§8.\n§8Troops §acannot rebel§8, no matter how low morale falls.",
++        description: "§8La détermination de votre peuple est de fer.\n§8Toutes les pertes de moral sont réduites de §a50 %§8.\n§8Récupération quotidienne de moral §a+20§8.\n§8Les troupes §ane peuvent pas se rebeller§8, quel que soit le moral.",
+         onApply(flag, ownerName) {},
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {},
+@@ -909,9 +1123,9 @@
+     },
+     "sieged:crest_of_fortitude": {
+         id:          "fortitude",
+-        name:        "Crest of Fortitude",
++        name:        "Blason de Vigueur",
+         color:       "§b",
+-        description: "§8Stone walls stand unyielding.\n§8Explosions are cancelled within the territory.",
++        description: "§8Les murs de pierre restent inébranlables.\n§8Les explosions sont annulées dans le territoire.",
+         onApply(flag, ownerName) {},
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {},
+@@ -919,9 +1133,9 @@
+     },
+     "sieged:crest_of_arms": {
+         id:          "arms",
+-        name:        "Crest of Arms",
++        name:        "Blason des Armes",
+         color:       "§c",
+-        description: "§8Your banner calls warriors to battle.\n§8Summons §c1 Warder §8& §c1 Sentinel §8each day.\n§8When sieged or invaded: summons §c5 Chevaliers§8, §c5 Warders §8& §c5 Sentinels§8.",
++        description: "§8Votre bannière appelle les guerriers au combat.\n§8Invoque §c1 Gardien §8et §c1 Sentinelle §8chaque jour.\n§8En cas de siège ou d'invasion : invoque §c5 Chevaliers§8, §c5 Gardiens §8et §c5 Sentinelles§8.",
+         onApply(flag, ownerName) {},
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {
+@@ -937,9 +1151,9 @@
+     },
+     "sieged:crest_of_architecture": {
+         id:          "architecture",
+-        name:        "Crest of Architecture",
++        name:        "Blason d'Architecture",
+         color:       "§6",
+-        description: "§8Your builders work tirelessly.\n§8Integrity drain is halved.\n§8Unlocks §6Rally Villagers §8and the §6Integrity HUD §8on your flag.",
++        description: "§8Vos bâtisseurs travaillent sans relâche.\n§8La perte d'intégrité est divisée par deux.\n§8Débloque §6Rallier les villageois §8et l'§6ATH d'intégrité §8sur votre drapeau.",
+         onApply(flag) {},
+         onRemove(flag) {},
+         onDailyTick(flag, ownerName) {},
+@@ -947,9 +1161,9 @@
+     },
+     "sieged:crest_of_pursuit": {
+         id:          "pursuit",
+-        name:        "Crest of Pursuit",
++        name:        "Blason de Poursuite",
+         color:       "§e",
+-        description: "§8Your banner empowers the faithful and weakens the foe.\n§8Tamed units inside the territory gain §eStrength I §8& §eSpeed I§8.\n§8Enemy players and hostile mobs inside the territory suffer §eWeakness I§8.",
++        description: "§8Votre bannière renforce les fidèles et affaiblit l'ennemi.\n§8Les unités apprivoisées du territoire gagnent §eForce I §8et §eVitesse I§8.\n§8Les joueurs ennemis et les créatures hostiles du territoire subissent §eFaiblesse I§8.",
+         onApply(flag, ownerName) {},
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {},
+@@ -957,9 +1171,9 @@
+     },
+     "sieged:crest_of_war": {
+         id:          "war",
+-        name:        "Crest of War",
++        name:        "Blason de Guerre",
+         color:       "§4",
+-        description: "§8Iron and fire serve the prepared.\n§8Every §c2 days§8, grants a random siege machine.\n§8Siege machines destroyed inside the territory drop their spawn egg.\n§8Being at war §cno longer penalises §8daily morale.",
++        description: "§8Le fer et le feu servent ceux qui s'y préparent.\n§8Tous les §c2 jours§8, accorde une machine de siège aléatoire.\n§8Les machines de siège détruites dans le territoire lâchent leur œuf d'apparition.\n§8Être en guerre §cne pénalise plus §8le moral quotidien.",
+         onApply(flag, ownerName) {
+             try { world.setDynamicProperty(KEY_WARDAYS + ownerName, 0); } catch (_) {}
+         },
+@@ -993,9 +1207,9 @@
+     },
+     "sieged:crest_of_wealth": {
+         id:          "wealth",
+-        name:        "Crest of Wealth",
++        name:        "Blason de Richesse",
+         color:       "§2",
+-        description: "§8Emeralds flows to the prosperous.\n§8Daily tax yield increased by §a50%§8.\n§8Kingdom members gain §aHero of the Village §8while inside the territory.",
++        description: "§8Les émeraudes affluent vers les prospères.\n§8Rendement quotidien des impôts §a+50 %§8.\n§8Les membres du royaume gagnent §aHéros du village §8dans le territoire.",
+         onApply(flag, ownerName) {},
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {},
+@@ -1003,18 +1217,18 @@
+     },
+     "sieged:crest_of_empty": {
+         id:          "empty",
+-        name:        "Empty Crest",
++        name:        "Blason vierge",
+         color:       "§8",
+-        description: "§8Remove the current crest from this flag.",
++        description: "§8Retire le blason actuel de ce drapeau.",
+         onApply(flag, ownerName) {},   // handled directly in showCrestApplyUI
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {},
+     },
+     "sieged:crest_of_knowledge": {
+         id:          "knowledge",
+-        name:        "Crest of Knowledge",
++        name:        "Blason du Savoir",
+         color:       "§3",
+-        description: "§8Scholars fill your halls with wisdom.\n§8All research costs reduced by §325%§8.\n§8Each day, your scholars grant the owner §3+3 XP levels§8.",
++        description: "§8Les érudits emplissent vos salles de sagesse.\n§8Coût de toutes les recherches réduit de §325 %§8.\n§8Chaque jour, vos érudits accordent §3+3 niveaux d'XP §8au propriétaire.",
+         onApply(flag, ownerName) {},
+         onRemove(flag, ownerName) {},
+         onDailyTick(flag, ownerName) {
+@@ -1116,7 +1330,7 @@
+     const owner = getOwner(flag);
+     if (!owner) { try { flag.nameTag = "§8Unclaimed Flag"; } catch (_) {} return; }
+     if (owner === PILLAGER_OWNER) { try { flag.nameTag = "§c §4Pillager Outpost"; } catch (_) {} return; }
+-    const tierName = KINGDOM_TIERS[getTier(flag)]?.name ?? "Settlement";
++    const tierName = KINGDOM_TIERS[getTier(flag)]?.name ?? "Colonie";
+     if (flag.hasTag(TAG_NPC_KINGDOM)) { try { flag.nameTag = `§2 §a${getNpcName(flag)} (AI)  §8${tierName}`; } catch (_) {} return; }
+     const kingName = getKingdomKing(flag) ?? owner;
+     const displayName = getKingdomName(flag) ?? kingName;
+@@ -1463,7 +1677,7 @@
+         }
+     }
+     try { dim.playSound("mob.villager.yes", loc, { volume: 2.0, pitch: 0.7 }); } catch (_) {}
+-    world.sendMessage(`§2§l ⚑ ${name} (AI) §ahas mustered its defenders!`);
++    world.sendMessage(`§2§l ⚑ ${name} (PNJ) §aa rassemblé ses défenseurs !`);
+ }
+ 
+ function _tickVillagerKingdomDaily(tick) {
+@@ -1505,7 +1719,7 @@
+             setNpcGroupTier(g, newTier);
+             setNpcGroupGrowth(g, tick);
+             const newTierName = KINGDOM_TIERS[newTier]?.name ?? "Village";
+-            world.sendMessage(`§2§l ⚑ §aVillager Kingdoms (Group ${g}) have grown into §e${newTierName}§a settlements!`);
++            world.sendMessage(`§2§l ⚑ §aLes royaumes de villageois (groupe ${g}) sont devenus des colonies de niveau §e${newTierName}§a !`);
+         } catch (_) {}
+     }
+ }
+@@ -1670,7 +1884,7 @@
+             dim.playSound("ambient.weather.thunder", loc, { volume: 2.0, pitch: 0.4 });
+             dim.spawnParticle("minecraft:large_explosion", loc);
+         } catch (_) {}
+-        world.sendMessage(`§4§l ⚔ The Villager Kingdom was sacked by §e${attackerName}§4! All kingdoms mourn this treachery.`);
++        world.sendMessage(`§4§l ⚔ Le royaume de villageois a été saccagé par §e${attackerName}§4 ! Tous les royaumes pleurent cette traîtrise.`);
+         console.warn(`[Kingdom] ${attackerName} sacked the NPC villager kingdom.`);
+         return;
+     }
+@@ -2493,7 +2707,7 @@
+     }
+ 
+     new MessageFormData()
+-        .title(`${crestDef.color}§l Apply ${crestDef.name}?`)
++        .title(`${crestDef.color}§l Appliquer ${crestDef.name} ?`)
+         .body([
+             crestDef.description,
+             "",
+@@ -2645,7 +2859,7 @@
+ §8§e${VIL_TRAVEL_REP_THRESHOLD}%§8 notoriety`;
+ 
+     const body = [
+-        `§2§r §8${tDef.name}  §8— Tier §e${tier + 1}§8/5`,
++        `§2§r §8${tDef.name}  §8— Niveau §e${tier + 1}§8/5`,
+         `§8Territory: §e${tDef.radius} §8blocks`,
+         `§8Population: §e${villagers}`,
+         ``,
+@@ -2692,7 +2906,7 @@
+     actions.push({ label: "§8Close", fn: () => {} });
+ 
+     const form = new ActionFormData()
+-        .title(`§2§l ${npcName} §7(AI)`)
++        .title(`§2§l ${npcName} §7(PNJ)`)
+         .body(body);
+     for (const { label } of actions) form.button(label);
+     form.show(player).then(res => {
+@@ -2704,7 +2918,7 @@
+ function showNpcTradeUI(player, flag) {
+     const rep      = getVillagerRep(player.name);
+     const tier     = getTier(flag);
+-    const tierName = KINGDOM_TIERS[tier]?.name ?? "Settlement";
++    const tierName = KINGDOM_TIERS[tier]?.name ?? "Colonie";
+     const npcName  = getNpcName(flag);
+     const emeralds = countItem(player, "minecraft:emerald");
+ 
+@@ -2723,22 +2937,22 @@
+     ].join("\n");
+ 
+     const form = new ActionFormData()
+-        .title(`§6§l  ${npcName} — Trade`)
++        .title(`§6§l  ${npcName} — Échanges`)
+         .body(body);
+ 
+     for (const t of allTrades) {
+         if (t.tierLocked || t.repLocked) {
+             const lockReason = t.tierLocked
+-                ? `§8Requires
+-§8${KINGDOM_TIERS[t.minTier]?.name ?? "higher tier"}`
+-                : `§8Requires §e${t.minRep}%
+-§8 notoriety`;
++                ? `§8Nécessite
++§8${KINGDOM_TIERS[t.minTier]?.name ?? "un niveau supérieur"}`
++                : `§8Nécessite §e${t.minRep}%
++§8 de notoriété`;
+             form.button(`§8 ${t.label.replace(/§[0-9a-fk-or]/g, "")}\n${lockReason}`);
+         } else {
+-            form.button(emeralds >= t.cost ? t.label : `§8${t.label.replace(/§[0-9a-fk-or]/g, "")}  §c(need ${t.cost} em)`);
++            form.button(emeralds >= t.cost ? t.label : `§8${t.label.replace(/§[0-9a-fk-or]/g, "")}  §c(il faut ${t.cost} ém)`);
+         }
+     }
+-    form.button("§8Back");
++    form.button("§8Retour");
+ 
+     form.show(player).then(res => {
+         if (res.canceled || res.selection === undefined) return;
+@@ -2841,7 +3055,7 @@
+             sendToast(player, { rawtext: [{ text: `§a Tribute accepted. Notoriety: §e${getVillagerRep(player.name)}%` }] });
+             try { flag.dimension.playSound("note.bell", flag.location, { volume: 1.0, pitch: 0.9 }); } catch (_) {}
+             if (isPeace && getVillagerRep(player.name) >= VIL_REP_ENEMY_THRESHOLD) {
+-                player.sendMessage("§a[Villager Kingdom] The villagers have begun to forgive your past transgressions.");
++                player.sendMessage("§a[Royaume villageois] Les villageois commencent à pardonner vos fautes passées.");
+             }
+         }).catch(() => {});
+ }
+@@ -3072,7 +3286,7 @@
+         const ownerDisplay   = owner === PILLAGER_OWNER
+             ? kgT(locale, "flag_owner_pillager")
+             : owner ?? kgT(locale, "flag_owner_unclaimed");
+-        const tierDisplay    = owner === PILLAGER_OWNER ? "Outpost" : tDef.name;
++        const tierDisplay    = owner === PILLAGER_OWNER ? "Avant-poste" : tDef.name;
+         const siegeState     = activeSieges.get(flag.id);
+         const siegeText      = siegeState
+             ? kgT(locale, "flag_body_siege", siegeState.isPillager ? "pillagers" : siegeState.attackerName)
+@@ -3104,7 +3318,7 @@
+ 
+         if (!atWar && !canClaim) {
+             new MessageFormData()
+-                .title(`§6 ${ownerDisplay}'s ${tierDisplay}`)
++                .title(`§6 ${tierDisplay} de ${ownerDisplay}`)
+                 .body(body)
+                 .button1(kgT(locale, "btn_okay"))
+                 .button2(kgT(locale, "btn_close"))
+@@ -3119,7 +3333,7 @@
+         actions.push({ label: kgT(locale, "btn_close"), fn: () => {} });
+ 
+         const form = new ActionFormData()
+-            .title(`§6 ${ownerDisplay}'s ${tierDisplay}`)
++            .title(`§6 ${tierDisplay} de ${ownerDisplay}`)
+             .body(body);
+         for (const { label } of actions) form.button(label);
+         form.show(player).then(res => {
+@@ -3191,7 +3405,7 @@
+     const integrity = getIntegrity(owner);
+ 
+     const actions = [];
+-    if (!maxTier) actions.push({ label: `§a§l  Upgrade to ${nextDef.name} `,    fn: () => attemptUpgrade(player, flag, tier) });
++    if (!maxTier) actions.push({ label: `§a§l  Améliorer en ${nextDef.name} `,    fn: () => attemptUpgrade(player, flag, tier) });
+     actions.push({ label: kgT(locale, "manage_btn_rally"),                        fn: () => rallyTroops(player, flag)          });
+ 
+     if ((KINGDOM_TIERS[tier]?.barracks ?? false)) {
+@@ -3224,7 +3438,7 @@
+                     });
+                     sendToast(player, { rawtext: [{ translate: "sieged.kingdom.wagoner_summoned" }] });
+                 } catch (_) {
+-                    player.sendMessage(`§c[Kingdom] Failed to summon wagoner.`);
++                    player.sendMessage(`§c[Royaume] Impossible de convoquer le Charretier.`);
+                 }
+             },
+         });
+@@ -3270,7 +3484,7 @@
+ 
+     const kingdomDisplayName = getKingdomName(flag) ?? player.name;
+     const form = new ActionFormData()
+-        .title(`§6 ${kingdomDisplayName}'s ${tDef.name}`)
++        .title(`§6 ${tDef.name} de ${kingdomDisplayName}`)
+         .body(lines.join("\n\n"));
+     for (const { label } of actions) form.button(label);
+ 
+@@ -3288,8 +3502,8 @@
+     system.run(() => {
+         const current = getKingdomName(flag) ?? player.name;
+         new ModalFormData()
+-            .title("§d§l Rename Kingdom")
+-            .textField("§8Kingdom name:", "e.g. Ironhaven", { defaultValue: current })
++            .title("§d§l Renommer le royaume")
++            .textField("§8Nom du royaume :", "ex. : Fort-de-Fer", { defaultValue: current })
+             .show(player)
+             .then(res => {
+                 if (res.canceled) return;
+@@ -3415,28 +3629,28 @@
+     const sign        = v => v > 0 ? `§a+${v}` : v < 0 ? `§c${v}` : `§7+0`;
+ 
+     const lines = [
+-        `§6§l── Kingdom Morale Report ──`,
+-        `§8Current morale: ${moraleBar(morale)}`,
+-        `§8(If the day ended now: §e${net >= 0 ? "+" : ""}${net}§8)`,
++        `§6§l── Rapport de moral du royaume ──`,
++        `§8Moral actuel : ${moraleBar(morale)}`,
++        `§8(Si la journée se terminait maintenant : §e${net >= 0 ? "+" : ""}${net}§8)`,
+         ``,
+-        `§a§lDaily Gains`,
+-        `  ${sign(10)} §8base recovery`,
+-        golemBonus  ? `  ${sign(golemBonus)} §8iron golem present`             : `  §7+0 §8no iron golems`,
+-        unitBonus   ? `  ${sign(unitBonus)} §8military units present`          : `  §7+0 §8no military units`,
+-        animalBonus ? `  ${sign(animalBonus)} §8farm animals present`          : `  §7+0 §8no farm animals`,
+-        cropBonus   ? `  ${sign(cropBonus)} §8crops present`                   : `  §7+0 §8no crops`,
+-        crestBonus  ? `  ${sign(crestBonus)} §8Crest of Morale`                : null,
++        `§a§lGains quotidiens`,
++        `  ${sign(10)} §8récupération de base`,
++        golemBonus  ? `  ${sign(golemBonus)} §8golem de fer présent`             : `  §7+0 §8aucun golem de fer`,
++        unitBonus   ? `  ${sign(unitBonus)} §8unités militaires présentes`          : `  §7+0 §8aucune unité militaire`,
++        animalBonus ? `  ${sign(animalBonus)} §8animaux de ferme présents`          : `  §7+0 §8aucun animal de ferme`,
++        cropBonus   ? `  ${sign(cropBonus)} §8cultures présentes`                   : `  §7+0 §8aucune culture`,
++        crestBonus  ? `  ${sign(crestBonus)} §8Blason du Moral`                : null,
+         ``,
+-        `§c§lPenalties`,
+-        thunderPenalty ? `  ${sign(thunderPenalty)} §8thunderstorm active`      : `  §7 — §8no storm`,
+-        firePenalty    ? `  ${sign(firePenalty)} §8fire in territory`           : `  §7 — §8no fire`,
+-        warPenalty     ? `  ${sign(warPenalty)} §8at war`                       : `  §7 — §8not at war`,
+-        netherPenalty  ? `  ${sign(netherPenalty)} §8visited Nether this cycle` : `  §7 — §8no Nether visit`,
+-        spiralPenalty  ? `  ${sign(spiralPenalty)} §8spiral (3+ penalties)`     : `  §7 — §8no spiral`,
++        `§c§lPénalités`,
++        thunderPenalty ? `  ${sign(thunderPenalty)} §8orage en cours`      : `  §7 — §8pas d'orage`,
++        firePenalty    ? `  ${sign(firePenalty)} §8incendie sur le territoire`           : `  §7 — §8pas d'incendie`,
++        warPenalty     ? `  ${sign(warPenalty)} §8en guerre`                       : `  §7 — §8pas en guerre`,
++        netherPenalty  ? `  ${sign(netherPenalty)} §8passage dans le Nether ce cycle` : `  §7 — §8aucun passage dans le Nether`,
++        spiralPenalty  ? `  ${sign(spiralPenalty)} §8spirale (3 pénalités ou +)`     : `  §7 — §8pas de spirale`,
+     ].filter(v => v !== null).join("\n");
+ 
+     new MessageFormData()
+-        .title(`§6 ${player.name}'s Kingdom Report`)
++        .title(`§6 Rapport du royaume de ${player.name}`)
+         .body(lines)
+         .button1(kgT(locale, "btn_close_ok"))
+         .button2(kgT(locale, "btn_close"))
+@@ -3453,7 +3667,7 @@
+ function enrollNearbyTroops(player, flag) {
+     const castleId = getCastleId(flag);
+     if (!castleId) {
+-        player.sendMessage("§c[Barracks] This flag has no castle ID. Try re-placing it.");
++        player.sendMessage("§c[Caserne] Ce drapeau n'a pas d'identifiant de château. Essayez de le replacer.");
+         return;
+     }
+     const flagOwner = getOwner(flag) ?? player.name;
+@@ -3496,11 +3710,11 @@
+         sendToast(player, _barRaw);
+         try { flag.dimension.playSound("random.levelup", flag.location, { volume: 1.0, pitch: 1.2 }); } catch (_) {}
+     } else if (alreadyHere > 0 && skipped === 0) {
+-        player.sendMessage("§8[Barracks] All nearby units are already enrolled here.");
++        player.sendMessage("§8[Caserne] Toutes les unités proches sont déjà enrôlées ici.");
+     } else if (skipped > 0) {
+-        player.sendMessage(`§c[Barracks] No eligible units. §7(${skipped} in another castle or unowned)`);
++        player.sendMessage(`§c[Caserne] Aucune unité éligible. §7(${skipped} dans un autre château ou sans propriétaire)`);
+     } else {
+-        player.sendMessage(`§8[Barracks] No tamed units within §e${BARRACKS_ENROLL_RADIUS} §8blocks.`);
++        player.sendMessage(`§8[Caserne] Aucune unité apprivoisée dans un rayon de §e${BARRACKS_ENROLL_RADIUS} §8blocs.`);
+     }
+ }
+ 
+@@ -3508,7 +3722,7 @@
+     const locale = getPlayerLocale(player);
+     const troops = getEnrolledTroops(flag);
+     if (troops.length === 0) {
+-        player.sendMessage("§8[Barracks] No units currently enrolled.");
++        player.sendMessage("§8[Caserne] Aucune unité enrôlée pour le moment.");
+         return;
+     }
+     const counts = {};
+@@ -3534,7 +3748,7 @@
+     const locale = getPlayerLocale(player);
+     const troops = getEnrolledTroops(flag);
+     if (troops.length === 0) {
+-        player.sendMessage("§8[Barracks] No enrolled units to remove.");
++        player.sendMessage("§8[Caserne] Aucune unité enrôlée à retirer.");
+         return;
+     }
+     const counts = {};
+@@ -3604,7 +3818,7 @@
+     });
+ 
+     if (eligible.length === 0) {
+-        player.sendMessage(`§8[Barracks] No storable units within §e${BARRACKS_ENROLL_RADIUS} §8blocks.`);
++        player.sendMessage(`§8[Caserne] Aucune unité à remiser dans un rayon de §e${BARRACKS_ENROLL_RADIUS} §8blocs.`);
+         system.run(() => openBarracksUI(player, flag));
+         return;
+     }
+@@ -3617,10 +3831,10 @@
+     const typeEntries = Object.entries(byType);
+ 
+     const form = new ActionFormData()
+-        .title("§6§l Store Troops")
+-        .body(`§8Select a unit type to store in the barracks.\n§8Stored troops can be deployed at any time.\n§8Total nearby: §e${eligible.length}`);
++        .title("§6§l Remiser les troupes")
++        .body(`§8Sélectionnez un type d'unité à remiser dans la caserne.\n§8Les troupes remisées peuvent être déployées à tout moment.\n§8Total à proximité : §e${eligible.length}`);
+     for (const [typeId, units] of typeEntries) form.button(`§e${STORAGE_UNITS[typeId]}  §8(${units.length})`);
+-    form.button("§7Store All");
++    form.button("§7Tout remiser");
+     form.button(kgT(locale, "btn_back"));
+ 
+     const res = await form.show(player);
+@@ -3647,8 +3861,8 @@
+         let amount = max;
+         if (max > 1) {
+             const amountRes = await new ModalFormData()
+-                .title(`§6§l Store: ${name}`)
+-                .slider(`§8Amount to store  §7(${max} nearby)`, 1, max)
++                .title(`§6§l Remiser : ${name}`)
++                .slider(`§8Quantité à remiser  §7(${max} à proximité)`, 1, max)
+                 .show(player);
+             if (amountRes.canceled || !amountRes.formValues) {
+                 system.run(() => openStoreTroopsUI(player, flag));
+@@ -3676,7 +3890,7 @@
+     const total   = entries.reduce((a, [, n]) => a + n, 0);
+ 
+     if (total === 0) {
+-        player.sendMessage("§8[Barracks] No troops in storage to deploy.");
++        player.sendMessage("§8[Caserne] Aucune troupe en réserve à déployer.");
+         system.run(() => openBarracksUI(player, flag));
+         return;
+     }
+@@ -3688,12 +3902,12 @@
+     const membersStr = getCastleMembers(flag).map(m => m.name).join(",");
+ 
+     const form = new ActionFormData()
+-        .title("§6§l Deploy Troops")
+-        .body(`§8Select a unit type to spawn near you.\n§8Total in storage: §e${total}`);
++        .title("§6§l Déployer les troupes")
++        .body(`§8Sélectionnez un type d'unité à faire apparaître près de vous.\n§8Total en réserve : §e${total}`);
+     for (const [typeId, count] of entries) {
+         form.button(`§e${STORAGE_UNITS[typeId] ?? typeId.replace("sieged:", "")}  §8(${count})`);
+     }
+-    form.button("§7Deploy All");
++    form.button("§7Tout déployer");
+     form.button(kgT(locale, "btn_back"));
+ 
+     const res = await form.show(player);
+@@ -3737,8 +3951,8 @@
+         let amount = storedCount;
+         if (storedCount > 1) {
+             const amountRes = await new ModalFormData()
+-                .title(`§6§l Deploy: ${name}`)
+-                .slider(`§8Amount to deploy  §7(${storedCount} stored)`, 1, storedCount)
++                .title(`§6§l Déployer : ${name}`)
++                .slider(`§8Quantité à déployer  §7(${storedCount} en réserve)`, 1, storedCount)
+                 .show(player);
+             if (amountRes.canceled || !amountRes.formValues) {
+                 system.run(() => openDeployTroopsUI(player, flag));
+@@ -3867,14 +4081,14 @@
+ async function openManageMembersUI(player, flag) {
+     const locale = getPlayerLocale(player);
+     if (getOwner(flag) !== player.name) {
+-        player.sendMessage("§c[Kingdom] Only the kingdom owner can manage members.");
++        player.sendMessage("§c[Royaume] Seul le propriétaire du royaume peut gérer les membres.");
+         return;
+     }
+     const members = getCastleMembers(flag);
+ 
+     const RANK_COLOR = { King: "§6", Noble: "§d", Knight: "§b", Peasant: "§7" };
+     const memberLines = members.length > 0
+-        ? members.map(m => "  " + (RANK_COLOR[m.rank ?? "Peasant"] ?? "§7") + (m.rank ?? "Peasant") + " §f" + m.name).join("\n")
++        ? members.map(m => "  " + (RANK_COLOR[m.rank ?? "Peasant"] ?? "§7") + rankDisplay(m.rank ?? "Peasant") + " §f" + m.name).join("\n")
+         : "  §8None";
+ 
+     const form = new ActionFormData()
+@@ -3912,7 +4126,7 @@
+     const allKingdomFlags = getAllKingdomFlags(kingName);
+     const online = world.getAllPlayers().filter(p => p.id !== player.id);
+     if (online.length === 0) {
+-        player.sendMessage("§8[Kingdom] No other players are online.");
++        player.sendMessage("§8[Royaume] Aucun autre joueur en ligne.");
+         system.run(() => openManageMembersUI(player, flag));
+         return;
+     }
+@@ -3922,7 +4136,7 @@
+         return !allKingdomFlags.some(f => getCastleMembers(f).some(m => m.id === p.id));
+     });
+     if (eligiblePlayers.length === 0) {
+-        player.sendMessage("§8[Kingdom] All online players are already kingdom members.");
++        player.sendMessage("§8[Royaume] Tous les joueurs en ligne sont déjà membres du royaume.");
+         system.run(() => openManageMembersUI(player, flag));
+         return;
+     }
+@@ -3951,7 +4165,7 @@
+     }
+     applyRankTag(invited, existingRank);
+     sendToast(player, { rawtext: [{ translate: "sieged.kingdom.member_invited", with: [invited.name, existingRank] }] });
+-    invited.sendMessage("§6[Kingdom] You have been added to §e" + (kingName ?? player.name) + "§6's kingdom as §e" + existingRank + "§6.");
++    invited.sendMessage("§6[Royaume] Vous avez rejoint le royaume de §e" + (kingName ?? player.name) + "§6 en tant que §e" + rankDisplay(existingRank) + "§6.");
+     system.run(() => openManageMembersUI(player, flag));
+ }
+ 
+@@ -3959,7 +4173,7 @@
+     const locale = getPlayerLocale(player);
+     const members = getCastleMembers(flag);
+     if (members.length === 0) {
+-        player.sendMessage("§8[Kingdom] No members to remove.");
++        player.sendMessage("§8[Royaume] Aucun membre à retirer.");
+         system.run(() => openManageMembersUI(player, flag));
+         return;
+     }
+@@ -3967,7 +4181,7 @@
+     const form = new ActionFormData()
+         .title(kgT(locale, "remove_member_title"))
+         .body(kgT(locale, "remove_member_body"));
+-    for (const m of members) form.button("§c" + m.name + "  §8(" + (m.rank ?? "Peasant") + ")");
++    for (const m of members) form.button("§c" + m.name + "  §8(" + rankDisplay(m.rank ?? "Peasant") + ")");
+     form.button(kgT(locale, "btn_cancel"));
+ 
+     const res = await form.show(player);
+@@ -3987,7 +4201,7 @@
+     const removedPlayer = world.getAllPlayers().find(p => p.id === removed.id);
+     if (removedPlayer) {
+         applyRankTag(removedPlayer, null);
+-        removedPlayer.sendMessage("§c[Kingdom] You have been removed from §e" + (kingName ?? player.name) + "§c's kingdom.");
++        removedPlayer.sendMessage("§c[Royaume] Vous avez été retiré du royaume de §e" + (kingName ?? player.name) + "§c.");
+     }
+     system.run(() => openManageMembersUI(player, flag));
+ }
+@@ -3996,7 +4210,7 @@
+     const locale = getPlayerLocale(player);
+     const members = getCastleMembers(flag);
+     if (members.length === 0) {
+-        player.sendMessage("§8[Kingdom] No members to rank.");
++        player.sendMessage("§8[Royaume] Aucun membre à classer.");
+         system.run(() => openManageMembersUI(player, flag));
+         return;
+     }
+@@ -4004,7 +4218,7 @@
+     const pickForm = new ActionFormData()
+         .title(kgT(locale, "rank_pick_title"))
+         .body(kgT(locale, "rank_pick_body"));
+-    for (const m of members) pickForm.button("§e" + m.name + "  §8(" + (m.rank ?? "Peasant") + ")");
++    for (const m of members) pickForm.button("§e" + m.name + "  §8(" + rankDisplay(m.rank ?? "Peasant") + ")");
+     pickForm.button(kgT(locale, "btn_cancel"));
+ 
+     const pick = await pickForm.show(player);
+@@ -4015,6 +4229,7 @@
+     const target = members[pick.selection];
+ 
+     // Pick rank (Noble, Knight, Peasant — King is reserved for transfer)
++    const RANK_CANON    = ["Noble", "Knight", "Peasant"];
+     const eligibleRanks = [kgT(locale, "rank_noble"), kgT(locale, "rank_knight"), kgT(locale, "rank_peasant")];
+     const rankForm = new ActionFormData()
+         .title(kgT(locale, "rank_set_title", target.name))
+@@ -4027,7 +4242,7 @@
+         system.run(() => openManageMembersUI(player, flag));
+         return;
+     }
+-    const newRank = eligibleRanks[rankRes.selection];
++    const newRank = RANK_CANON[rankRes.selection];
+     target.rank = newRank;
+     setCastleMembers(flag, members);
+     restampEnrolledTroops(flag);
+@@ -4038,9 +4253,9 @@
+     const targetPlayer = world.getAllPlayers().find(p => p.id === target.id);
+     if (targetPlayer) {
+         applyRankTag(targetPlayer, newRank);
+-        targetPlayer.sendMessage("§6[Kingdom] " + player.name + " has set your rank to §e" + newRank + "§6.");
++        targetPlayer.sendMessage("§6[Royaume] " + player.name + " a défini votre rang : §e" + rankDisplay(newRank) + "§6.");
+     }
+-    sendToast(player, { rawtext: [{ translate: "sieged.kingdom.member_rank_set", with: [target.name, newRank] }] });
++    sendToast(player, { rawtext: [{ translate: "sieged.kingdom.member_rank_set", with: [target.name, rankDisplay(newRank)] }] });
+     system.run(() => openManageMembersUI(player, flag));
+ }
+ 
+@@ -4048,7 +4263,7 @@
+     const locale = getPlayerLocale(player);
+     const members = getCastleMembers(flag);
+     if (members.length === 0) {
+-        player.sendMessage("§8[Kingdom] No members to transfer to.");
++        player.sendMessage("§8[Royaume] Aucun membre à qui transmettre.");
+         system.run(() => openManageMembersUI(player, flag));
+         return;
+     }
+@@ -4056,7 +4271,7 @@
+     const pickForm = new ActionFormData()
+         .title(kgT(locale, "transfer_title"))
+         .body(kgT(locale, "transfer_body"));
+-    for (const m of members) pickForm.button("§e" + m.name + "  §8(" + (m.rank ?? "Peasant") + ")");
++    for (const m of members) pickForm.button("§e" + m.name + "  §8(" + rankDisplay(m.rank ?? "Peasant") + ")");
+     pickForm.button(kgT(locale, "btn_cancel"));
+ 
+     const pick = await pickForm.show(player);
+@@ -4094,7 +4309,7 @@
+     const newKingPlayer = world.getAllPlayers().find(p => p.id === newKingEntry.id);
+     if (newKingPlayer) {
+         applyRankTag(newKingPlayer, "King");
+-        newKingPlayer.sendMessage("§6[Kingdom] §e" + player.name + "§6 has made you the new §6§lKing§r§6 of the kingdom!");
++        newKingPlayer.sendMessage("§6[Royaume] §e" + player.name + "§6 a fait de vous le nouveau §6§lRoi§r§6 du royaume !");
+     }
+     sendToast(player, { rawtext: [{ translate: "sieged.kingdom.crown_transferred", with: [newKingEntry.name] }] });
+ }
+@@ -4105,7 +4320,7 @@
+     const hasEmeralds = countItem(player, "minecraft:emerald") >= PEASANT_TAX_AMT;
+ 
+     const form = new ActionFormData()
+-        .title("§7 Peasant  §8|§7 " + (owner ?? "Kingdom"))
++        .title("§7 Paysan  §8|§7 " + (owner ?? "Royaume"))
+         .body([
+             kgT(locale, "peasant_rank"),
+             kgT(locale, "peasant_kingdom", owner ?? "Unknown"),
+@@ -4123,13 +4338,13 @@
+     if (res.canceled || res.selection === 3 || res.selection === undefined) return;
+     if (res.selection === 0) {
+         // Pay tax
+-        if (!hasEmeralds) { player.sendMessage("§c[Kingdom] You need §e" + PEASANT_TAX_AMT + "§c emeralds to pay tax."); return; }
++        if (!hasEmeralds) { player.sendMessage("§c[Royaume] Il vous faut §e" + PEASANT_TAX_AMT + "§c émeraudes pour payer l'impôt."); return; }
+         removeItemFromInventory(player, "minecraft:emerald", PEASANT_TAX_AMT);
+         addToTaxBank(flag, PEASANT_TAX_AMT);
+         sendToast(player, { rawtext: [{ translate: "sieged.kingdom.tax_paid", with: [String(PEASANT_TAX_AMT)] }] });
+         try { flag.dimension.playSound("random.orb", flag.location, { volume: 1.0, pitch: 1.2 }); } catch (_) {}
+         const kingPlayer = findOnlinePlayer(owner ?? "");
+-        if (kingPlayer) kingPlayer.sendMessage("§6[Kingdom] §e" + player.name + "§6 paid their tax (§e" + PEASANT_TAX_AMT + "§6 emeralds). Bank: §e" + getTaxBank(flag) + "§6.");
++        if (kingPlayer) kingPlayer.sendMessage("§6[Royaume] §e" + player.name + "§6 a payé son impôt (§e" + PEASANT_TAX_AMT + "§6 émeraudes). Banque : §e" + getTaxBank(flag) + "§6.");
+     } else if (res.selection === 1) {
+         openRosterUI(player, flag);
+     } else if (res.selection === 2) {
+@@ -4143,7 +4358,7 @@
+     const barraksOk = KINGDOM_TIERS[flagTier]?.barracks ?? false;
+ 
+     const form = new ActionFormData()
+-        .title("§b Knight  §8|§b " + (owner ?? "Kingdom"))
++        .title("§b Chevalier  §8|§b " + (owner ?? "Royaume"))
+         .body([
+             kgT(locale, "knight_rank"),
+             kgT(locale, "knight_kingdom", owner ?? "Unknown"),
+@@ -4161,7 +4376,7 @@
+     const res = await form.show(player);
+     if (res.canceled || res.selection === 3 || res.selection === undefined) return;
+     if (res.selection === 0) {
+-        if (!barraksOk) { player.sendMessage("§c[Kingdom] Barracks unlocks at Town tier."); return; }
++        if (!barraksOk) { player.sendMessage("§c[Royaume] La caserne se débloque au niveau Ville."); return; }
+         system.run(() => openBarracksUI(player, flag));
+     } else if (res.selection === 1) rallyTroops(player, flag);
+     else if (res.selection === 2) leaveKingdom(player, flag);
+@@ -4169,13 +4384,13 @@
+ async function knightSpawnTroopUI(player, flag) {
+     const locale = getPlayerLocale(player);
+     if (player.level < KNIGHT_SPAWN_COST) {
+-        player.sendMessage("§c[Kingdom] Need §e" + KNIGHT_SPAWN_COST + "§c XP levels to spawn a troop.");
++        player.sendMessage("§c[Royaume] Il faut §e" + KNIGHT_SPAWN_COST + "§c niveaux d'XP pour recruter une unité.");
+         return;
+     }
+     const SPAWNABLE = [
+-        { typeId: "sieged:warder",    name: "Warder"    },
+-        { typeId: "sieged:sentinel",  name: "Sentinel"  },
+-        { typeId: "sieged:templar",   name: "Templar"   },
++        { typeId: "sieged:warder",    name: "Gardien"    },
++        { typeId: "sieged:sentinel",  name: "Sentinelle"  },
++        { typeId: "sieged:templar",   name: "Templier"   },
+         { typeId: "sieged:chevalier", name: "Chevalier" },
+     ];
+     const form = new ActionFormData()
+@@ -4205,7 +4420,7 @@
+     const warsWith = getWarTargets(player);
+ 
+     const form = new ActionFormData()
+-        .title("§d Noble  §8|§d " + (owner ?? "Kingdom"))
++        .title("§d Noble  §8|§d " + (owner ?? "Royaume"))
+         .body([
+             kgT(locale, "noble_rank"),
+             kgT(locale, "noble_kingdom", owner ?? "Unknown"),
+@@ -4236,7 +4451,7 @@
+     const res = await form.show(player);
+     if (res.canceled || res.selection === 5 || res.selection === undefined) return;
+     if (res.selection === 0) {
+-        if (!(KINGDOM_TIERS[getTier(flag)]?.barracks)) { player.sendMessage("§c[Kingdom] Barracks unlocks at Town tier."); return; }
++        if (!(KINGDOM_TIERS[getTier(flag)]?.barracks)) { player.sendMessage("§c[Royaume] La caserne se débloque au niveau Ville."); return; }
+         system.run(() => openBarracksUI(player, flag));
+     }
+     else if (res.selection === 1) rallyTroops(player, flag);
+@@ -4251,26 +4466,26 @@
+     if (activeCoups.has(flagId)) {
+         const c = activeCoups.get(flagId);
+         if (c.nobleId === player.id) {
+-            player.sendMessage("§c[Coup] Your coup is already in progress...");
++            player.sendMessage("§c[Coup d'État] Votre coup d'État est déjà en cours...");
+         } else {
+-            player.sendMessage("§c[Coup] Another noble is already staging a coup here.");
++            player.sendMessage("§c[Coup d'État] Un autre noble prépare déjà un coup d'État ici.");
+         }
+         return;
+     }
+     const owner = getOwner(flag);
+-    if (!owner) { player.sendMessage("§c[Coup] This flag has no owner."); return; }
++    if (!owner) { player.sendMessage("§c[Coup d'État] Ce drapeau n'a pas de propriétaire."); return; }
+ 
+     // Must be the king's MAIN flag (owner === kingdomKing)
+     const kingdomKing = getKingdomKing(flag);
+     if (owner !== kingdomKing) {
+-        player.sendMessage("§c[Coup] You can only stage a coup on the king's main flag, not a vassal flag.");
++        player.sendMessage("§c[Coup d'État] Un coup d'État ne peut viser que le drapeau principal du roi, pas un drapeau vassal.");
+         return;
+     }
+ 
+     // King's morale must be below 10
+     const kingMorale = getMorale(owner);
+     if (kingMorale >= 10) {
+-        player.sendMessage("§c[Coup] The king's morale is too high (§e" + kingMorale + "§c). Wait until morale drops below §e10§c.");
++        player.sendMessage("§c[Coup d'État] Le moral du roi est trop élevé (§e" + kingMorale + "§c). Attendez qu'il tombe sous §e10§c.");
+         return;
+     }
+ 
+@@ -4286,7 +4501,7 @@
+ 
+ function collectTaxBank(player, flag) {
+     const amount = getTaxBank(flag);
+-    if (amount <= 0) { player.sendMessage("§8[Kingdom] Tax bank is empty."); return; }
++    if (amount <= 0) { player.sendMessage("§8[Royaume] La banque d'impôts est vide."); return; }
+     clearTaxBank(flag);
+     giveItems(player, "minecraft:emerald", amount);
+     sendToast(player, { rawtext: [{ translate: "sieged.kingdom.tax_bank_collected", with: [String(amount)] }] });
+@@ -4306,7 +4521,7 @@
+     });
+ 
+     if (vassalFlags.length === 0) {
+-        player.sendMessage("§8[Kingdom] No flags found under your kingdom.");
++        player.sendMessage("§8[Royaume] Aucun drapeau trouvé sous votre royaume.");
+         return;
+     }
+ 
+@@ -4333,7 +4548,7 @@
+     lines.unshift("", slotLine);
+ 
+     const form = new ActionFormData()
+-        .title("§6§l My Kingdom  §8(" + vassalFlags.length + " flags)")
++        .title("§6§l Mon royaume  §8(" + vassalFlags.length + " drapeaux)")
+         .body(lines.join("\n"))
+         .button(kingTDefUI.maxVassals > 0 ? kgT(locale, "my_kingdom_btn_grant") : kgT(locale, "my_kingdom_btn_grant_locked"))
+         .button(kgT(locale, "btn_close"));
+@@ -4350,18 +4565,18 @@
+     const kingTier   = mainFlag ? getTier(mainFlag) : 0;
+     const kingTDef   = KINGDOM_TIERS[kingTier] ?? KINGDOM_TIERS[0];
+     if (kingTDef.maxVassals === 0) {
+-        player.sendMessage("§c[Kingdom] Granting flags to Nobles requires at least §eTown§c tier.");
++        player.sendMessage("§c[Royaume] Accorder des drapeaux aux Nobles nécessite au moins le niveau §eVille§c.");
+         return;
+     }
+     const curVassals = countVassalFlags(player.name);
+     if (curVassals >= kingTDef.maxVassals) {
+-        player.sendMessage("§c[Kingdom] Vassal limit reached (§e" + curVassals + "§c/§e" + kingTDef.maxVassals + "§c). Upgrade your main flag to grant more.");
++        player.sendMessage("§c[Royaume] Limite de vassaux atteinte (§e" + curVassals + "§c/§e" + kingTDef.maxVassals + "§c). Améliorez votre drapeau principal pour en accorder plus.");
+         return;
+     }
+     const members = getCastleMembers(flag);
+     const nobles  = members.filter(m => m.rank === "Noble");
+     if (nobles.length === 0) {
+-        player.sendMessage("§c[Kingdom] No Nobles in this flag's member list. Promote a member to Noble first.");
++        player.sendMessage("§c[Royaume] Aucun Noble parmi les membres de ce drapeau. Promouvez d'abord un membre au rang de Noble.");
+         return;
+     }
+ 
+@@ -4404,7 +4619,7 @@
+     const noblePlayer = findOnlinePlayer(noble.name);
+     if (noblePlayer) {
+         applyRankTag(noblePlayer, "King"); // they are king of this flag now
+-        noblePlayer.sendMessage("§6[Kingdom] §e" + player.name + "§6 has granted you ownership of their flag. You are now its §6§lKing§r§6 (still under §e" + player.name + "§6's kingdom).");
++        noblePlayer.sendMessage("§6[Royaume] §e" + player.name + "§6 vous a accordé la propriété de son drapeau. Vous en êtes désormais le §6§lRoi§r§6 (toujours sous le royaume de §e" + player.name + "§6).");
+     }
+     sendToast(player, { rawtext: [{ translate: "sieged.kingdom.flag_granted", with: [noble.name] }] });
+ }
+@@ -4437,7 +4652,7 @@
+ 
+ function rallyTroops(player, flag) {
+     let dim;
+-    try { dim = flag.dimension; } catch (_) { player.sendMessage("§c[Kingdom] Flag unavailable."); return; }
++    try { dim = flag.dimension; } catch (_) { player.sendMessage("§c[Royaume] Drapeau indisponible."); return; }
+ 
+     let candidates = [];
+     try { candidates = dim.getEntities({ location: flag.location, maxDistance: 300 }); } catch (_) {}
+@@ -4456,7 +4671,7 @@
+     });
+ 
+     if (troops.length === 0) {
+-        player.sendMessage("§8[Kingdom] No claimed troops found within §e300 §8blocks.");
++        player.sendMessage("§8[Royaume] Aucune troupe revendiquée dans un rayon de §e300 §8blocs.");
+         return;
+     }
+ 
+@@ -4484,14 +4699,14 @@
+ 
+ function rallyVillagers(player, flag) {
+     let dim;
+-    try { dim = flag.dimension; } catch (_) { player.sendMessage("§c[Kingdom] Flag unavailable."); return; }
++    try { dim = flag.dimension; } catch (_) { player.sendMessage("§c[Royaume] Drapeau indisponible."); return; }
+ 
+     const radius = getEffectiveRadius(flag);
+     let villagers = [];
+     try { villagers = dim.getEntities({ location: flag.location, maxDistance: radius, type: "minecraft:villager" }); } catch (_) {}
+ 
+     if (villagers.length === 0) {
+-        player.sendMessage("§8[Kingdom] No villagers found within the territory.");
++        player.sendMessage("§8[Royaume] Aucun villageois trouvé dans le territoire.");
+         return;
+     }
+ 
+@@ -4529,7 +4744,7 @@
+     const converts = Math.max(1, Math.floor(cap * morale / 100));
+ 
+     let dim;
+-    try { dim = flag.dimension; } catch (_) { player.sendMessage("§c[Kingdom] Flag unavailable."); return; }
++    try { dim = flag.dimension; } catch (_) { player.sendMessage("§c[Royaume] Drapeau indisponible."); return; }
+ 
+     // Find only real villagers (not engineers) within territory
+     let villagers = [];
+@@ -4539,7 +4754,7 @@
+     villagers = villagers.filter(v => { try { return v.getDynamicProperty("sieged:borrowed") !== true; } catch (_) { return true; } });
+ 
+     if (villagers.length === 0) {
+-        player.sendMessage("§8[Kingdom] No villagers available to call upon.");
++        player.sendMessage("§8[Royaume] Aucun villageois disponible à appeler.");
+         return;
+     }
+ 
+@@ -4570,7 +4785,7 @@
+     }
+ 
+     if (spawned === 0) {
+-        player.sendMessage("§c[Kingdom] Failed to call any villagers to arms.");
++        player.sendMessage("§c[Royaume] Impossible d'appeler des villageois aux armes.");
+         return;
+     }
+ 
+@@ -4588,7 +4803,7 @@
+     const left  = taxTicksRemaining(owner);
+ 
+     if (left > 0) {
+-        player.sendMessage(`§c[Kingdom] Tax not ready — available in §e${formatTicks(left)}§c.`);
++        player.sendMessage(`§c[Royaume] Impôt pas encore prêt — disponible dans §e${formatTicks(left)}§c.`);
+         return;
+     }
+ 
+@@ -4604,7 +4819,7 @@
+     taxNotified.delete(owner);
+ 
+     if (amount <= 0) {
+-        player.sendMessage("§8[Kingdom] §e0 emeralds §8collected (no villagers or zero morale).");
++        player.sendMessage("§8[Royaume] §e0 émeraude §8collectée (aucun villageois ou moral à zéro).");
+         return;
+     }
+ 
+@@ -4866,12 +5081,12 @@
+     const integrity = getIntegrity(owner);
+ 
+     if (integrity >= 100) {
+-        player.sendMessage("§8[Kingdom] Castle is already at full integrity.");
++        player.sendMessage("§8[Royaume] Le château est déjà à son intégrité maximale.");
+         return;
+     }
+ 
+     if (countItem(player, "minecraft:iron_ingot") < ironCost) {
+-        player.sendMessage(`§c[Kingdom] Need §e${ironCost}x iron ingot§c to repair. You have §e${countItem(player, "minecraft:iron_ingot")}§c.`);
++        player.sendMessage(`§c[Royaume] Il faut §e${ironCost} lingots de fer§c pour réparer. Vous en avez §e${countItem(player, "minecraft:iron_ingot")}§c.`);
+         return;
+     }
+ 
+@@ -4901,13 +5116,13 @@
+     const villagers   = countVillagers(flag.dimension, flag.location, radius);
+ 
+     if (villagers < upgrade.villagers) {
+-        player.sendMessage(`§c[Kingdom] Need §e${upgrade.villagers} §cvillagers. Have §e${villagers}§c.`);
++        player.sendMessage(`§c[Royaume] Il faut §e${upgrade.villagers} §cvillageois. Vous en avez §e${villagers}§c.`);
+         return;
+     }
+     for (const [typeId, amt] of Object.entries(upgrade.materials)) {
+         if (countItem(player, typeId) < amt) {
+             const label = typeId.replace("minecraft:", "").replace(/_/g, " ");
+-            player.sendMessage(`§c[Kingdom] Not enough §e${label}§c. Need §e${amt}§c.`);
++            player.sendMessage(`§c[Royaume] Pas assez de §e${label}§c. Il en faut §e${amt}§c.`);
+             return;
+         }
+     }
+@@ -5004,8 +5219,8 @@
+         const resolveTierName = ownerName => {
+             try {
+                 const f = flags.find(f => getOwner(f) === ownerName);
+-                return f ? KINGDOM_TIERS[getTier(f)]?.name ?? "Kingdom" : "Kingdom";
+-            } catch (_) { return "Kingdom"; }
++                return f ? KINGDOM_TIERS[getTier(f)]?.name ?? "Royaume" : "Royaume";
++            } catch (_) { return "Royaume"; }
+         };
+ 
+         if (currentOwner !== null) {
+@@ -5426,7 +5641,7 @@
+             );
+             if (dist > COUP_RADIUS) {
+                 activeCoups.delete(flagId);
+-                noble.sendMessage("§c[Coup] You moved too far from the flag. Coup failed!");
++                noble.sendMessage("§c[Coup d'État] Vous vous êtes trop éloigné du drapeau. Coup d'État échoué !");
+                 const kingPlayer = findOnlinePlayer(getOwner(flag) ?? "");
+                 if (kingPlayer) sendToast(kingPlayer, { rawtext: [{ translate: "sieged.kingdom.coup_foiled", with: [coup.nobleName] }] });
+                 continue;
+@@ -5466,7 +5681,7 @@
+                 }
+             } else if (elapsed % 200 === 0) {
+                 // Progress ping every 10 s
+-                noble.sendMessage("§4[Coup] §e" + pct + "§4% — hold position...");
++                noble.sendMessage("§4[Coup d'État] §e" + pct + "§4 % — tenez la position...");
+             }
+         } catch (_) { activeCoups.delete(flagId); }
+     }
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/lore_i18n.js addon/SiegedTATB/scripts/lore_i18n.js
 --- addon_orig/SiegedTATB/scripts/lore_i18n.js	2026-06-30 12:49:12.000000000 +0000
 +++ addon/SiegedTATB/scripts/lore_i18n.js	2026-07-04 17:09:56.462083414 +0000
@@ -943,6 +2948,370 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/lore_i18n.js addon/S
      if (n.startsWith('es')) return 'es_MX';
      if (n.startsWith('zh')) return 'zh_CN';
      if (n.startsWith('pt')) return 'pt_BR';
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/quest_log.js addon/SiegedTATB/scripts/quest_log.js
+--- addon_orig/SiegedTATB/scripts/quest_log.js	2026-06-25 16:02:30.000000000 +0000
++++ addon/SiegedTATB/scripts/quest_log.js	2026-07-04 17:52:26.467134543 +0000
+@@ -17,7 +17,7 @@
+ 
+ const TIER_NAMES  = ['easy', 'medium', 'difficult', 'extreme', 'noble'];
+ const TIER_COLORS = ['§a', '§e', '§c', '§4§l', '§6'];
+-const TIER_BADGES = ['§a[Easy]', '§e[Medium]', '§c[Difficult]', '§4§l[Extreme]', '§6[Noble Quest]'];
++const TIER_BADGES = ['§a[Facile]', '§e[Moyenne]', '§c[Difficile]', '§4§l[Extrême]', '§6[Quête du Noble]'];
+ const FK_RANGE    = 35; // blocks — within this radius counts as "in the fight"
+ 
+ // ─── Reward helpers ───────────────────────────────────────────────────────────
+@@ -90,11 +90,11 @@
+ // ─── Structure map rewards ────────────────────────────────────────────────────
+ 
+ const MAP_CHOICES = [
+-    { label: '§c Pillager Castle', dropper: 'sieged:map_dropper_pillager_castle' },
+-    { label: '§6 Pillager Fort',   dropper: 'sieged:map_dropper_pillager_fort'   },
+-    { label: '§e Desert Castle',   dropper: 'sieged:map_dropper_desert_castle'   },
+-    { label: '§b Viking Castle',   dropper: 'sieged:map_dropper_viking_castle'   },
+-    { label: '§a Greek Ship',      dropper: 'sieged:map_dropper_greek_ship'      }
++    { label: "§c Château des pillards", dropper: 'sieged:map_dropper_pillager_castle' },
++    { label: "§6 Fort des pillards",   dropper: 'sieged:map_dropper_pillager_fort'   },
++    { label: "§e Château du désert",   dropper: 'sieged:map_dropper_desert_castle'   },
++    { label: "§b Château viking",   dropper: 'sieged:map_dropper_viking_castle'   },
++    { label: "§a Navire grec",      dropper: 'sieged:map_dropper_greek_ship'      }
+ ];
+ 
+ function spawnDropper(player, dropperTypeId) {
+@@ -111,10 +111,10 @@
+ 
+ export function showMapChoice(player) {
+     const form = new ActionFormData()
+-        .title("§6§l Cartographer's Boon")
+-        .body("As thanks for your service, I can reveal the location of a hidden structure.\n\nChoose wisely:");
++        .title("§6§l Le cadeau du cartographe")
++        .body("En remerciement de vos services, je peux révéler l'emplacement d'une structure cachée.\n\nChoisissez bien :");
+     MAP_CHOICES.forEach(m => form.button(m.label));
+-    form.button('§7 No thank you');
++    form.button("§7 Non merci");
+     function tryShow() {
+         form.show(player).then(res => {
+             if (res.cancelationReason === FormCancelationReason.UserBusy) {
+@@ -133,18 +133,33 @@
+     spawnDropper(player, chosen.dropper);
+ }
+ 
++
++const COLLECT_ITEM_NAMES_FR = {
++    'minecraft:bread':        'pain',
++    'minecraft:stone_bricks': 'pierres taillées',
++    'minecraft:gold_ingot':   "lingots d'or",
++    'minecraft:goat_horn':    'corne de chèvre',
++    'minecraft:filled_map':   'cartes',
++    'minecraft:compass':      'boussoles',
++    'minecraft:emerald_block':"blocs d'émeraude",
++    'minecraft:name_tag':     'étiquette',
++};
++function collectItemName(id) {
++    return COLLECT_ITEM_NAMES_FR[id] ?? id.replace('minecraft:', '').replace(/_/g, ' ');
++}
++
+ // ─── Quest Definitions ────────────────────────────────────────────────────────
+ const QUESTS = {
+     easy: [
+         {
+             id: 'road_patrol',
+-            title: 'Road Patrol',
+-            lore:  '§7The roads are plagued by Javaliiers.',
+-            lore2: '§7Slay §f5 Javaliiers §7to make the roads safe.',
++            title: "Patrouille des routes",
++            lore:  "§7Les routes sont infestées de Javeliniers.",
++            lore2: "§7Terrassez §f5 Javeliniers §7pour sécuriser les routes.",
+             type:  'kill',
+             targets:  ['sieged:javalier'],
+             required: 5,
+-            rewardHint: '§8Reward: §6Gold, Tempered Steel, War Scrolls, Siege Weapon',
++            rewardHint: "§8Récompense : §6Or, Acier trempé, Parchemins de guerre, Arme de siège",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 16'       },
+                 { cmd:  'give @s sieged:tempered_steel 8'       },
+@@ -156,9 +171,9 @@
+         },
+         {
+             id: 'berserker_hunt',
+-            title: 'Berserker Hunt',
+-            lore:  '§7Berserkers are raiding the settlement.',
+-            lore2: '§7Cut down §f8 Berserkers §7before they strike.',
++            title: "Chasse aux Berserkers",
++            lore:  "§7Des Berserkers pillent la colonie.",
++            lore2: "§7Abattez §f8 Berserkers §7avant qu'ils ne frappent.",
+             type:  'kill',
+             targets:  ['sieged:berserker'],
+             required: 8,
+@@ -174,9 +189,9 @@
+         },
+         {
+             id: 'vanquisher_end',
+-            title: "Vanquisher's End",
+-            lore:  '§7Enemy Vanquishers press toward the gate.',
+-            lore2: '§7Cut down §f5 Vanquishers §7before they breach it.',
++            title: "La fin du Vainqueur",
++            lore:  "§7Des Vainqueurs ennemis se pressent vers la porte.",
++            lore2: "§7Abattez §f5 Vainqueurs §7avant qu'ils ne la franchissent.",
+             type:  'kill',
+             targets:  ['sieged:vanquisher'],
+             required: 5,
+@@ -194,13 +209,13 @@
+     medium: [
+         {
+             id: 'ransacker_purge',
+-            title: 'Ransacker Purge',
+-            lore:  '§7Ransackers pillage the countryside.',
+-            lore2: '§7Hunt down and slay §f15 Ransackers.',
++            title: "Purge des Saccageurs",
++            lore:  "§7Des Saccageurs pillent la campagne.",
++            lore2: "§7Traquez et terrassez §f15 Saccageurs.",
+             type:  'kill',
+             targets:  ['sieged:ransacker'],
+             required: 15,
+-            rewardHint: '§8Reward: §6Diamonds, Enchanted Weapon & Shield, Siege Weapon',
++            rewardHint: "§8Récompense : §6Diamants, Arme et bouclier enchantés, Arme de siège",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 32'        },
+                 { cmd:  'give @s sieged:tempered_steel 16'       },
+@@ -213,9 +228,9 @@
+         },
+         {
+             id: 'lancers_fall',
+-            title: "The Lancer's Fall",
+-            lore:  '§7Enemy lancers charge through the village.',
+-            lore2: '§7Defeat §f10 Lancers §7in open field.',
++            title: "La chute des Lanciers",
++            lore:  "§7Des lanciers ennemis chargent à travers le village.",
++            lore2: "§7Vainquez §f10 Lanciers §7en rase campagne.",
+             type:  'kill',
+             targets:  ['sieged:lancers'],
+             required: 10,
+@@ -232,13 +247,13 @@
+         },
+         {
+             id: 'executioner_trial',
+-            title: 'The Executioner',
+-            lore:  '§7Two Executioners terrorize the captured town.',
+-            lore2: '§7Bring them down §8— §7slay §f2 Executioners.',
++            title: "Le Bourreau",
++            lore:  "§7Deux Bourreaux terrorisent la ville occupée.",
++            lore2: "§7Faites-les tomber §8— §7terrassez §f2 Bourreaux.",
+             type:  'kill',
+             targets:  ['sieged:executioner'],
+             required: 2,
+-            rewardHint: '§8Reward: §6Diamonds, Enchanted Weapon & Shield, Catapult',
++            rewardHint: "§8Récompense : §6Diamants, Arme et bouclier enchantés, Catapulte",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 40'        },
+                 { cmd:  'give @s sieged:tempered_steel 18'       },
+@@ -251,13 +266,13 @@
+         },
+         {
+             id: 'eradicator_bane',
+-            title: "Eradicator's Bane",
+-            lore:  '§7Eradicators lay waste to the countryside.',
+-            lore2: '§7Prove your steel §8— §7fell §f3 Eradicators.',
++            title: "Le fléau des Éradicateurs",
++            lore:  "§7Des Éradicateurs ravagent la campagne.",
++            lore2: "§7Prouvez votre valeur §8— §7abattez §f3 Éradicateurs.",
+             type:  'kill',
+             targets:  ['sieged:eradicator'],
+             required: 3,
+-            rewardHint: '§8Reward: §6Diamonds, Enchanted Weapon & Shield, Balista',
++            rewardHint: "§8Récompense : §6Diamants, Arme et bouclier enchantés, Baliste",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 44'        },
+                 { cmd:  'give @s sieged:tempered_steel 18'       },
+@@ -272,13 +287,13 @@
+     difficult: [
+         {
+             id: 'war_beast',
+-            title: 'War Beast',
+-            lore:  '§7A War Ravager has broken through the line.',
+-            lore2: '§7Put the beast down §8— §7slay §f1 War Ravager.',
++            title: "Bête de guerre",
++            lore:  "§7Un Ravageur de guerre a percé la ligne.",
++            lore2: "§7Abattez la bête §8— §7terrassez §f1 Ravageur de guerre.",
+             type:  'kill',
+             targets:  ['sieged:war_ravager'],
+             required: 1,
+-            rewardHint: '§8Reward: §6Diamonds, Netherite Template, Enchanted Weapon, Trebuchet',
++            rewardHint: "§8Récompense : §6Diamants, Modèle de netherite, Arme enchantée, Trébuchet",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 56'                        },
+                 { cmd:  'give @s sieged:tempered_steel 28'                       },
+@@ -294,13 +309,13 @@
+         },
+         {
+             id: 'forsaken_knight',
+-            title: 'The Forsaken Knight',
+-            lore:  '§7A dread knight haunts the forsaken ruins.',
+-            lore2: '§7Seek out and slay §fThe Forsaken Knight.',
++            title: "Le Chevalier Déchu",
++            lore:  "§7Un chevalier funeste hante les ruines déchues.",
++            lore2: "§7Trouvez et terrassez §fle Chevalier Déchu.",
+             type:  'kill',
+             targets:  [FK_ID],
+             required: 1,
+-            rewardHint: '§8Reward: §6Netherite Template, Enchanted Weapon & Armor, Trebuchet',
++            rewardHint: "§8Récompense : §6Modèle de netherite, Arme et armure enchantées, Trébuchet",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 64'                        },
+                 { cmd:  'give @s sieged:tempered_steel 30'                       },
+@@ -316,13 +331,13 @@
+         },
+         {
+             id: 'chieftain_trophy',
+-            title: "Chieftain's Trophy",
+-            lore:  '§7Two mighty chieftains lead the enemy horde.',
+-            lore2: '§7Slay §f2 Chieftains §7and claim their heads.',
++            title: "Le trophée du Chef de guerre",
++            lore:  "§7Deux puissants chefs de guerre mènent la horde ennemie.",
++            lore2: "§7Terrassez §f2 Chefs de guerre §7et réclamez leurs têtes.",
+             type:  'kill',
+             targets:  ['sieged:cheiftain'],
+             required: 2,
+-            rewardHint: '§8Reward: §6Diamonds, Enchanted Weapon, Shield & Armor, Catapult',
++            rewardHint: "§8Récompense : §6Diamants, Arme, bouclier et armure enchantés, Catapulte",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 64'                        },
+                 { cmd:  'give @s sieged:tempered_steel 24'                       },
+@@ -341,13 +356,13 @@
+     extreme: [
+         {
+             id: 'flawless_knight',
+-            title: 'Flawless Victory',
+-            lore:  '§7Prove your mastery against the Forsaken Knight.',
+-            lore2: '§7Defeat him §4without taking a single blow.',
++            title: "Victoire parfaite",
++            lore:  "§7Prouvez votre maîtrise face au Chevalier Déchu.",
++            lore2: "§7Vainquez-le §4sans subir le moindre coup.",
+             type:  'kill_undamaged',
+             targets:  [FK_ID],
+             required: 1,
+-            rewardHint: '§4★ Crest of Empty §8+ §6Full Enchanted Set, Totems, Templates',
++            rewardHint: "§4★ Blason vierge §8+ §6Panoplie enchantée complète, Totems, Modèles",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 64'                        },
+                 { cmd:  'give @s sieged:tempered_steel 40'                       },
+@@ -367,16 +382,16 @@
+         },
+         {
+             id: 'warlords_gauntlet',
+-            title: "Warlord's Gauntlet",
+-            lore:  '§7Complete the ultimate warrior trial.',
++            title: "L'épreuve du Seigneur de guerre",
++            lore:  "§7Accomplissez l'épreuve ultime du guerrier.",
+             lore2: '',
+             type:  'multi_kill',
+             subTargets: [
+-                { target: FK_ID,              key: 'fk',    required: 1,  label: 'Forsaken Knight' },
+-                { target: 'sieged:cheiftain', key: 'chief', required: 1,  label: 'Chieftain'       },
+-                { target: 'sieged:ransacker', key: 'ransom',required: 20, label: 'Ransackers'      }
++                { target: FK_ID,              key: 'fk',    required: 1,  label: "Chevalier Déchu" },
++                { target: 'sieged:cheiftain', key: 'chief', required: 1,  label: "Chef de guerre" },
++                { target: 'sieged:ransacker', key: 'ransom',required: 20, label: "Saccageurs" }
+             ],
+-            rewardHint: '§4★ Crest of Empty §8+ §6Enchanted Weapon, Armor, Siege Weapons',
++            rewardHint: "§4★ Blason vierge §8+ §6Arme et armure enchantées, Armes de siège",
+             reward: [
+                 { cmd:  'give @s minecraft:gold_ingot 64'                        },
+                 { cmd:  'give @s sieged:tempered_steel 40'                       },
+@@ -402,8 +417,8 @@
+ const NOBLE_QUESTS = {
+     found_a_kingdom: {
+         id:    'found_a_kingdom',
+-        title: 'Found a Kingdom',
+-        lore:  '§7The Villager Noble calls upon you to help found a new kingdom.',
++        title: "Fonder un royaume",
++        lore:  "§7Le Noble du village fait appel à vous pour fonder un nouveau royaume.",
+         lore2: '',
+         type:  'collect',
+         tier:  'noble',
+@@ -413,15 +428,15 @@
+             { item: 'minecraft:gold_ingot',   amount: 32 },
+             { item: 'minecraft:goat_horn',    amount: 1  }
+         ],
+-        rewardHint: '§8Reward: §6Castle Flag',
++        rewardHint: "§8Récompense : §6Drapeau de château",
+         reward: [
+             { cmd: 'give @s sieged:castle_flag_spawn_egg 1' }
+         ]
+     },
+     chart_the_unknown: {
+         id:    'chart_the_unknown',
+-        title: 'Chart the Unknown',
+-        lore:  '§7The realm must be charted. The Noble needs maps of unexplored lands.',
++        title: "Cartographier l'inconnu",
++        lore:  "§7Le royaume doit être cartographié. Le Noble a besoin de cartes des terres inexplorées.",
+         lore2: '',
+         type:  'collect',
+         tier:  'noble',
+@@ -429,7 +444,7 @@
+             { item: 'minecraft:filled_map', amount: 3 },
+             { item: 'minecraft:compass',    amount: 2 }
+         ],
+-        rewardHint: '§8Reward: §6Commanding Horn + 30 War Scrolls + Structure Map of your choice',
++        rewardHint: "§8Récompense : §6Cor de commandement + 30 Parchemins de guerre + Carte de structure au choix",
+         reward: [
+             { cmd: 'give @s sieged:commanding_horn 1'    },
+             { cmd: 'give @s sieged:war_order_scroll 30'  }
+@@ -438,8 +453,8 @@
+     },
+     villager_codex: {
+         id:    'villager_codex',
+-        title: 'The Villager Codex',
+-        lore:  '§7The Noble seeks to compile the great Villager Codex.',
++        title: "Le Codex des villageois",
++        lore:  "§7Le Noble veut compiler le grand Codex des villageois.",
+         lore2: '',
+         type:  'collect',
+         tier:  'noble',
+@@ -447,7 +462,7 @@
+             { item: 'minecraft:emerald_block', amount: 3 },
+             { item: 'minecraft:name_tag',      amount: 1 }
+         ],
+-        rewardHint: '§8Reward: §630 Return Order Scrolls + 15 War Scrolls + 1 Tempered Steel Block',
++        rewardHint: "§8Récompense : §630 Parchemins d'ordre de retour + 15 Parchemins de guerre + 1 Bloc d'acier trempé",
+         reward: [
+             { cmd: 'give @s sieged:return_order_scroll 30' },
+             { cmd: 'give @s sieged:war_order_scroll 15'    },
+@@ -559,7 +574,7 @@
+     try { prog = JSON.parse(progressStr); } catch { prog = { count: 0 }; }
+ 
+     const color = TIER_COLORS[tierIdx] ?? '§6';
+-    const badge = TIER_BADGES[tierIdx] ?? '§6[Noble Quest]';
++    const badge = TIER_BADGES[tierIdx] ?? '§6[Quête du Noble]';
+     const L     = getQuestLogStaticLabels(locale);
+ 
+     const lore = [
+@@ -575,7 +590,7 @@
+         for (const r of q.items) {
+             const have = countItem(player, r.item);
+             const done = have >= r.amount ? '§a✓' : '§7○';
+-            const name = r.item.replace('minecraft:', '').replace(/_/g, ' ');
++            const name = collectItemName(r.item);
+             lore.push(`${done} §7${name}: §f${Math.min(have, r.amount)}§8/§f${r.amount}`);
+         }
+         lore.push('');
+@@ -589,7 +604,7 @@
+         lore.push(bar(cnt, q.required));
+         if (q.type === 'kill_undamaged') {
+             const lost = player.getDynamicProperty(PROP_HEALTH_LOST);
+-            lore.push(lost ? '§c✗ Damaged — slay him to reset' : '§a✓ Undamaged');
++            lore.push(lost ? "§c✗ Touché — terrassez-le pour recommencer" : "§a✓ Sans dégât");
+         }
+     } else if (q.type === 'multi_kill') {
+         for (const s of q.subTargets) {
+@@ -641,7 +656,7 @@
+         if (missing.length > 0) {
+             const summary = missing
+                 .map(r => {
+-                    const name = r.item.replace('minecraft:', '').replace(/_/g, ' ');
++                    const name = collectItemName(r.item);
+                     return `§c${countItem(player, r.item)}§7/§f${r.amount} §7${name}`;
+                 })
+                 .join('  ');
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/settings.js addon/SiegedTATB/scripts/settings.js
 --- addon_orig/SiegedTATB/scripts/settings.js	2026-06-26 00:18:21.000000000 +0000
 +++ addon/SiegedTATB/scripts/settings.js	2026-07-04 17:19:19.188876599 +0000
@@ -1019,7 +3388,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/settings.js addon/Si
      settings_mob:             "§eInvasão de Monstros",
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/sieged_book.js addon/SiegedTATB/scripts/sieged_book.js
 --- addon_orig/SiegedTATB/scripts/sieged_book.js	2026-06-30 13:56:23.000000000 +0000
-+++ addon/SiegedTATB/scripts/sieged_book.js	2026-07-04 17:20:42.195434723 +0000
++++ addon/SiegedTATB/scripts/sieged_book.js	2026-07-04 18:06:51.406597535 +0000
 @@ -82,6 +82,7 @@
      if (!locale || typeof locale !== 'string') return 'en_US';
      const n = locale.replace('-', '_');
@@ -1075,6 +3444,376 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/sieged_book.js addon
      es_MX: { researching:"§7Investigando ", research:"§aInvestigar ", vt:"§aEnt. Veterano §824+5", id:"§aDisc. de Hierro §832+10", fa:"§aCetrería §832+10", va:"§aArtes Vanguardia §832+10", hc:"§aCab. Pesada §848+15", wb:"§aHerm. de Guerra §864+25" },
      zh_CN: { researching:"§7研究中 ",         research:"§a研究 ",         vt:"§a老兵训练 §824+5",    id:"§a铁血纪律 §832+10",    fa:"§a猎鹰术 §832+10", va:"§a先锋战术 §832+10",   hc:"§a重骑兵 §848+15",     wb:"§a战争兄弟会 §864+25" },
      pt_BR: { researching:"§7Pesquisando ",    research:"§aPesquisar ",    vt:"§aTrein. Veterano §824+5", id:"§aDisc. de Ferro §832+10", fa:"§aFalcoaria §832+10", va:"§aArtes Vanguarda §832+10", hc:"§aCav. Pesada §848+15", wb:"§aIrm. de Guerra §864+25" },
+@@ -254,7 +267,7 @@
+ }
+ 
+ // ── Castle tier helpers ───────────────────────────────────────────
+-const CASTLE_TIER_NAMES = ["Settlement", "Village", "Town", "City", "Kingdom"];
++const CASTLE_TIER_NAMES = ["Colonie", "Village", "Ville", "Cité", "Royaume"];
+ 
+ // ── Siege engineer helper ─────────────────────────────────────────
+ // Returns true if a sieged:siege_engineer exists within 150 blocks of the
+@@ -356,11 +369,11 @@
+         resLine +
+         `\n${c("transport")}§8 16\n` +
+         `\n${c("brazier")}§8 24\n` +
+-        `\n${c("battering_ram")}§8 28 Village+  Eng\n` +
+-        `\n${c("ballista")}§8 32 Village+  Eng\n` +
+-        `\n${c("catapult")}§8 48 Town+  Eng\n` +
+-        `\n${c("siege_tower")}§8 64 Town+  Eng\n` +
+-        `\n${c("trebuchet")}§8 96 City+  Eng`
++        `\n${c("battering_ram")}§8 28 Village+  Ing\n` +
++        `\n${c("ballista")}§8 32 Village+  Ing\n` +
++        `\n${c("catapult")}§8 48 Ville+  Ing\n` +
++        `\n${c("siege_tower")}§8 64 Ville+  Ing\n` +
++        `\n${c("trebuchet")}§8 96 Cité+  Ing`
+     );
+ }
+ 
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/surrender.js addon/SiegedTATB/scripts/surrender.js
+--- addon_orig/SiegedTATB/scripts/surrender.js	2026-06-11 13:52:01.000000000 +0000
++++ addon/SiegedTATB/scripts/surrender.js	2026-07-04 18:04:08.234483822 +0000
+@@ -66,15 +66,15 @@
+         item.nameTag = def.name;
+         item.setLore(def.lore);
+     } else {
+-        item.nameTag = "§f§lSurrender Flag";
++        item.nameTag = "§f§lDrapeau de reddition";
+         item.setLore([
+-            "§8A banner of white — the cost of defeat.",
++            "§8Une bannière blanche — le prix de la défaite.",
+             "",
+-            "§7Use to negotiate surrender:",
+-            "§e  • §7With players you are at war with",
+-            "§e  • §7With the illager Clan",
++            "§7À utiliser pour négocier une reddition :",
++            "§e  • §7Avec les joueurs contre qui vous êtes en guerre",
++            "§e  • §7Avec le clan illageois",
+             "",
+-            "§c Cannot surrender during The Tyrant's Invasion.",
++            "§c Impossible de se rendre pendant l'invasion du Tyran.",
+         ]);
+     }
+     return true;
+@@ -293,19 +293,19 @@
+ }
+ 
+ // Prefix embedded in the nameTag of surrender-terms papers.
+-const TERMS_PAPER_PREFIX = "§e§lSurrender Terms: ";
++const TERMS_PAPER_PREFIX = "§e§lConditions de reddition : ";
+ 
+ // Give the winner a paper item. Drops at their feet if inventory is full.
+ function giveSurrenderPaper(winner, surrendererName) {
+     const paper = new ItemStack("minecraft:paper", 1);
+     paper.nameTag = TERMS_PAPER_PREFIX + surrendererName;
+     paper.setLore([
+-        "§8A plea for mercy from the defeated.",
++        "§8Une supplique du vaincu.",
+         "",
+-        `§c${surrendererName} §7has raised the white flag.`,
+-        "§7They await your terms of surrender.",
++        `§c${surrendererName} §7a hissé le drapeau blanc.`,
++        "§7Il attend vos conditions de reddition.",
+         "",
+-        "§eRight-click to set your demands.",
++        "§eClic droit pour fixer vos exigences.",
+     ]);
+     const inv = winner.getComponent("inventory")?.container;
+     if (inv) {
+@@ -378,23 +378,23 @@
+         }
+ 
+         const form = new ActionFormData()
+-            .title("§c§l  Raise the White Flag")
++            .title("§c§l  Hisser le drapeau blanc")
+             .body(
+-                "§7You seek to end the conflict through negotiation.\n\n" +
+-                "§8Terms may include resources, morale costs, or land.\n" +
+-                "§8War ends when both agree.\n\n" +
+-                "§c Invasions cannot be surrendered to."
++                "§7Vous cherchez à mettre fin au conflit par la négociation.\n\n" +
++                "§8Les conditions peuvent inclure des ressources, du moral ou des terres.\n" +
++                "§8La guerre prend fin quand les deux camps acceptent.\n\n" +
++                "§c Impossible de se rendre face à une invasion."
+             );
+ 
+         for (const name of warPartners) {
+-            form.button(`§c⚔ §f${name}\n§8Negotiate terms with this player`);
++            form.button(`§c⚔ §f${name}\n§8Négocier les conditions avec ce joueur`);
+         }
+ 
+         if (pillagerThreat) {
+-            form.button("§4 §cPillager Clan\n§8Pay them off to end the siege or raid");
++            form.button("§4 §cClan des Pillards\n§8Payez-les pour mettre fin au siège ou au raid");
+         }
+ 
+-        form.button("§7✗ §8Cancel");
++        form.button("§7✗ §8Annuler");
+ 
+         const res = await form.show(player);
+         if (res.canceled) return;
+@@ -424,13 +424,13 @@
+     "minecraft:netherite_ingot",
+ ];
+ const ITEM_NAMES = [
+-    "Emeralds",
+-    "Gold Ingots",
+-    "Diamonds",
+-    "Iron Ingots",
+-    "Netherite Ingots",
++    "Émeraudes",
++    "Lingots d'or",
++    "Diamants",
++    "Lingots de fer",
++    "Lingots de netherite",
+ ];
+-const INTERVAL_LABELS = ["Every 1 day", "Every 2 days", "Every 3 days", "Every 5 days", "Every 7 days"];
++const INTERVAL_LABELS = ["Tous les jours", "Tous les 2 jours", "Tous les 3 jours", "Tous les 5 jours", "Tous les 7 jours"];
+ const INTERVAL_DAYS   = [1, 2, 3, 5, 7];
+ 
+ function surrenderToPlayer(surrenderer, targetName) {
+@@ -496,18 +496,18 @@
+ 
+ async function promptForTerms(winner, loserName) {
+     const form = new ModalFormData()
+-        .title("§c§l Terms of Surrender")
++        .title("§c§l Conditions de reddition")
+         .dropdown(
+-            `§e${loserName}§7 surrenders to you. Set your terms.\n§6[Payment] §7Item:`,
++            `§e${loserName}§7 se rend à vous. Fixez vos conditions.\n§6[Paiement] §7Objet :`,
+             ITEM_NAMES, { defaultValueIndex: 0 }
+         )
+-        .slider("§7[Payment] Amount paid immediately:", 0, 64, { valueStep: 1, defaultValue: 0 })
+-        .dropdown("§6[Tribute] §7Item paid each cycle:", ITEM_NAMES, { defaultValueIndex: 0 })
+-        .slider("§7[Tribute] Amount per payment:", 0, 32, { valueStep: 1, defaultValue: 0 })
+-        .dropdown("§7[Tribute] Frequency:", INTERVAL_LABELS, { defaultValueIndex: 2 })
+-        .slider("§7[Tribute] Number of payments:", 1, 20, { valueStep: 1, defaultValue: 5 })
+-        .slider("§4[Penalty] §7Morale loss for the loser:", 0, 40, { valueStep: 5, defaultValue: 0 })
+-        .toggle("§4[Territory] §7Demand their castle (triggers collapse):", { defaultValue: false });
++        .slider("§7[Paiement] Montant payé immédiatement :", 0, 64, { valueStep: 1, defaultValue: 0 })
++        .dropdown("§6[Tribut] §7Objet payé à chaque cycle :", ITEM_NAMES, { defaultValueIndex: 0 })
++        .slider("§7[Tribut] Montant par paiement :", 0, 32, { valueStep: 1, defaultValue: 0 })
++        .dropdown("§7[Tribut] Fréquence :", INTERVAL_LABELS, { defaultValueIndex: 2 })
++        .slider("§7[Tribut] Nombre de paiements :", 1, 20, { valueStep: 1, defaultValue: 5 })
++        .slider("§4[Pénalité] §7Perte de moral du vaincu :", 0, 40, { valueStep: 5, defaultValue: 0 })
++        .toggle("§4[Territoire] §7Exiger leur château (provoque l'effondrement) :", { defaultValue: false });
+ 
+     const res = await form.show(winner);
+     if (res.canceled || !res.formValues) return null;
+@@ -531,26 +531,26 @@
+ function buildTermsText(terms) {
+     const lines = [];
+     if (terms.payAmount > 0)
+-        lines.push(`§e• §6${terms.payAmount}x ${terms.payItemName} §7paid immediately`);
++        lines.push(`§e• §6${terms.payAmount}x ${terms.payItemName} §7payés immédiatement`);
+     if (terms.tribAmount > 0)
+-        lines.push(`§e• §6${terms.tribAmount}x ${terms.tribItemName} §7every §6${terms.intervalDays} §7day(s) × §6${terms.paymentCount} §7payment(s) — paid to messenger`);
++        lines.push(`§e• §6${terms.tribAmount}x ${terms.tribItemName} §7tous les §6${terms.intervalDays} §7jour(s) × §6${terms.paymentCount} §7paiement(s) — remis au messager`);
+     if (terms.moralePenalty > 0)
+-        lines.push(`§c• Lose §4${terms.moralePenalty} §cmorale`);
++        lines.push(`§c• Perte de §4${terms.moralePenalty} §cmoral`);
+     if (terms.demandCastle)
+-        lines.push(`§4• §cForfeit your castle §8(kingdom collapses)`);
+-    return lines.length ? lines.join("\n") : "§7No demands — free passage.";
++        lines.push(`§4• §cCession de votre château §8(le royaume s'effondre)`);
++    return lines.length ? lines.join("\n") : "§7Aucune exigence — libre passage.";
+ }
+ 
+ async function reviewTerms(surrenderer, winnerName, terms) {
+     const form = new MessageFormData()
+-        .title("§c§l Terms of Surrender")
++        .title("§c§l Conditions de reddition")
+         .body(
+-            `§e${winnerName}§7 demands:\n\n${buildTermsText(terms)}\n\n` +
+-            "§7Accept to end the war and honor all terms.\n" +
+-            "§8Decline to fight on."
++            `§e${winnerName}§7 exige :\n\n${buildTermsText(terms)}\n\n` +
++            "§7Acceptez pour mettre fin à la guerre et honorer les conditions.\n" +
++            "§8Refusez pour continuer le combat."
+         )
+-        .button1("§2§l Accept — End the War")
+-        .button2("§c Decline — Fight On");
++        .button1("§2§l Accepter — Fin de la guerre")
++        .button2("§c Refuser — Continuer le combat");
+ 
+     const res = await form.show(surrenderer);
+     if (res.canceled) return false;
+@@ -669,20 +669,20 @@
+ 
+     if (!isRetry) player.playSound("mob.pillager.celebrate", { volume: 1.0, pitch: 0.6 });
+ 
+-    const retryBanner = isRetry ? "§e⚠ Same demands as before — 3-day window.\n\n" : "";
++    const retryBanner = isRetry ? "§e⚠ Mêmes exigences qu'avant — fenêtre de 3 jours.\n\n" : "";
+ 
+     const form = new MessageFormData()
+-        .title("§4§l Pillager Demands")
++        .title("§4§l Exigences des pillards")
+         .body(
+-            `§8The Pillager Clan surveys your §e${tierName}§8.\n` +
+-            `§8Their demands grow heavier the more you prosper.\n\n` +
++            `§8Le Clan des Pillards lorgne sur votre §e${tierName}§8.\n` +
++            `§8Leurs exigences s'alourdissent à mesure que vous prospérez.\n\n` +
+             retryBanner +
+-            `§7Their terms:\n\n${lines.join("\n")}\n\n` +
+-            "§7Submit to end the raids, or leave to gather what you need.\n" +
+-            "§8§o(Terms are held for 3 in-game days — use the flag again to return.)"
++            `§7Leurs conditions :\n\n${lines.join("\n")}\n\n` +
++            "§7Soumettez-vous pour mettre fin aux raids, ou partez rassembler ce qu'il faut.\n" +
++            "§8§o(Les conditions restent valables 3 jours de jeu — utilisez à nouveau le drapeau pour revenir.)"
+         )
+-        .button1("§2§l Submit to Their Terms")
+-        .button2("§7 Gather Resources First");
++        .button1("§2§l Se soumettre à leurs conditions")
++        .button2("§7 Rassembler des ressources d'abord");
+ 
+     const res = await form.show(player);
+ 
+@@ -817,22 +817,22 @@
+ 
+         const has   = countInInventory(player, t.item);
+         const color = has >= t.amount ? "§a" : "§c";
+-        const remaining = t.paymentsLeft !== undefined ? `§8${t.paymentsLeft} payment(s) remaining.\n\n` : "";
++        const remaining = t.paymentsLeft !== undefined ? `§8${t.paymentsLeft} paiement(s) restant(s).\n\n` : "";
+ 
+-        const displayTo = t.to === "pillager_clan" ? "Illagers" : t.to;
++        const displayTo = t.to === "pillager_clan" ? "les Illageois" : t.to;
+ 
+         const form = new MessageFormData()
+-            .title("§6§l Tribute Collection")
++            .title("§6§l Collecte du tribut")
+             .body(
+-                `§7The messenger of §e${displayTo}§7 awaits payment.\n\n` +
+-                `§6Required: §c${t.amount}x ${t.itemName}\n` +
+-                `§7You have: ${color}${has}\n\n` +
++                `§7Le messager de §e${displayTo}§7 attend son paiement.\n\n` +
++                `§6Requis : §c${t.amount}x ${t.itemName}\n` +
++                `§7Vous avez : ${color}${has}\n\n` +
+                 remaining +
+-                "§7Pay now to honor your agreement.\n" +
+-                "§8Killing this messenger will restart the war."
++                "§7Payez maintenant pour honorer votre accord.\n" +
++                "§8Tuer ce messager relancera la guerre."
+             )
+-            .button1("§2§l Pay Now")
+-            .button2("§c Later");
++            .button1("§2§l Payer maintenant")
++            .button2("§c Plus tard");
+ 
+         let res;
+         try { res = await form.show(player); } catch { return; }
+@@ -968,7 +968,7 @@
+                 if (messenger) {
+                     t.messengerEntityId = messenger.id;
+                     dirty = true;
+-                    const displayTo = t.to === "pillager_clan" ? "Illagers" : t.to;
++                    const displayTo = t.to === "pillager_clan" ? "les Illageois" : t.to;
+                     sendToast(player, { rawtext: [{ translate: "sieged.toast.tribute_messenger_arrived", with: [displayTo, String(t.amount), t.itemName] }] });
+                     const recipient = world.getAllPlayers().find(p => p.name === t.to);
+                     if (recipient) sendToast(recipient, { rawtext: [{ translate: "sieged.toast.tribute_messenger_sent", with: [player.name] }] });
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/wagoner.js addon/SiegedTATB/scripts/wagoner.js
+--- addon_orig/SiegedTATB/scripts/wagoner.js	2026-06-29 00:10:55.000000000 +0000
++++ addon/SiegedTATB/scripts/wagoner.js	2026-07-04 18:09:32.810770276 +0000
+@@ -28,7 +28,7 @@
+ const FC_PFX       = "sieged:fc.";
+ const FC_OWNERS_KEY = "sieged:fc_owners";
+ 
+-const TIER_NAMES  = ["Settlement", "Village", "Town", "City", "Kingdom"];
++const TIER_NAMES  = ["Colonie", "Village", "Ville", "Cité", "Royaume"];
+ const troopToggle    = new Map(); // player.name -> boolean
+ const travelCooldown = new Map(); // player.name -> timestamp ms
+ 
+@@ -227,7 +227,7 @@
+                     if (Math.sqrt(dx * dx + dz * dz) <= DISCOVERY_RADIUS) {
+                         markDiscovered(player, owner);
+                         const npcName  = getNpcFlagName(flag);
+-                        const tierName = TIER_NAMES[getTier(flag)] ?? "Settlement";
++                        const tierName = TIER_NAMES[getTier(flag)] ?? "Colonie";
+                         sendToast(player, { rawtext: [{ text: `§2 §a${npcName} (AI) discovered — ${tierName}!` }] });
+                     }
+                     continue;
+@@ -250,7 +250,7 @@
+                 const dz = flag.location.z - player.location.z;
+                 if (Math.sqrt(dx * dx + dz * dz) <= DISCOVERY_RADIUS) {
+                     markDiscovered(player, owner);
+-                    const tierName = TIER_NAMES[getTier(flag)] ?? "Settlement";
++                    const tierName = TIER_NAMES[getTier(flag)] ?? "Colonie";
+                     sendToast(player, { rawtext: [{ translate: "sieged.toast.wagoner_location_unlocked", with: [String(owner), String(tierName)] }] });
+                 }
+             } catch (_) {}
+@@ -279,18 +279,18 @@
+                 seen.add(lk);
+                 const tier     = getTier(flag);
+                 const npcName  = getNpcFlagName(flag);
+-                const tierName = TIER_NAMES[tier] ?? "Settlement";
++                const tierName = TIER_NAMES[tier] ?? "Colonie";
+                 const loc      = flag.location;
+                 const coords   = `§8(${Math.round(loc.x)}, ${Math.round(loc.z)})`;
+                 const canTravel  = npcKingdomTravelable(player, tier);
+                 const lockReason = !canTravel
+                     ? (getVillagerRep(player.name) < VIL_REP_TRAVEL_THRESHOLD
+-                        ? `§cNeed §e${VIL_REP_TRAVEL_THRESHOLD}%§c notoriety to travel to ${npcName}.`
+-                        : `§c${npcName} must reach §eTown§c tier before fast travel unlocks.`)
++                        ? `§cIl faut §e${VIL_REP_TRAVEL_THRESHOLD}%§c de notoriété pour voyager vers ${npcName}.`
++                        : `§c${npcName} doit atteindre le niveau §eVille§c pour débloquer le voyage rapide.`)
+                     : null;
+                 const label = canTravel
+                     ? `§2 §a${npcName} (AI) — ${tierName} ${coords}`
+-                    : `§8 §7${npcName} (AI) — §8${tierName} ${coords} §c[locked]`;
++                    : `§8 §7${npcName} (PNJ) — §8${tierName} ${coords} §c[verrouillé]`;
+                 destinations.push({ label, loc, sortKey: 1, locked: !canTravel, lockReason });
+                 continue;
+             }
+@@ -307,7 +307,7 @@
+             const isVassal = !isOwn && king === player.name;
+             const isAlly   = !isOwn && !isVassal && getRelation(player.name, owner) === "allied";
+             const tier     = getTier(flag);
+-            const tierName = TIER_NAMES[tier] ?? "Settlement";
++            const tierName = TIER_NAMES[tier] ?? "Colonie";
+             const loc      = flag.location;
+             const coords   = `§8(${Math.round(loc.x)}, ${Math.round(loc.z)})`;
+ 
+@@ -333,18 +333,18 @@
+             if (owner === NPC_KINGDOM_OWNER) {
+                 if (!isDiscovered(player, owner)) continue;
+                 const npcName    = cached.npcName ?? "Villager Kingdom";
+-                const tierName   = TIER_NAMES[cached.tier] ?? "Settlement";
++                const tierName   = TIER_NAMES[cached.tier] ?? "Colonie";
+                 const loc        = { x: cached.x, y: cached.y, z: cached.z };
+                 const coords     = `§8(${Math.round(loc.x)}, ${Math.round(loc.z)})`;
+                 const canTravel  = npcKingdomTravelable(player, cached.tier);
+                 const lockReason = !canTravel
+                     ? (getVillagerRep(player.name) < VIL_REP_TRAVEL_THRESHOLD
+-                        ? `§cNeed §e${VIL_REP_TRAVEL_THRESHOLD}%§c notoriety to travel to ${npcName}.`
+-                        : `§c${npcName} must reach §eTown§c tier before fast travel unlocks.`)
++                        ? `§cIl faut §e${VIL_REP_TRAVEL_THRESHOLD}%§c de notoriété pour voyager vers ${npcName}.`
++                        : `§c${npcName} doit atteindre le niveau §eVille§c pour débloquer le voyage rapide.`)
+                     : null;
+                 const label = canTravel
+-                    ? `§2 §a${npcName} (AI) — ${tierName} ${coords}`
+-                    : `§8 §7${npcName} (AI) — §8${tierName} ${coords} §c[locked]`;
++                    ? `§2 §a${npcName} (PNJ) — ${tierName} ${coords}`
++                    : `§8 §7${npcName} (PNJ) — §8${tierName} ${coords} §c[verrouillé]`;
+                 destinations.push({ label, loc, sortKey: 1, locked: !canTravel, lockReason });
+                 continue;
+             }
+@@ -356,7 +356,7 @@
+             const isOwn    = owner === player.name;
+             const isVassal = !isOwn && king === player.name;
+             const isAlly   = !isOwn && !isVassal && getRelation(player.name, owner) === "allied";
+-            const tierName = TIER_NAMES[cached.tier] ?? "Settlement";
++            const tierName = TIER_NAMES[cached.tier] ?? "Colonie";
+             const loc      = { x: cached.x, y: cached.y, z: cached.z };
+             const coords   = `§8(${Math.round(loc.x)}, ${Math.round(loc.z)})`;
+ 
+@@ -551,7 +551,7 @@
+ 
+         const dest = destinations[destIndex];
+         if (dest.locked) {
+-            player.sendMessage(dest.lockReason ?? "§cThis destination is not available.");
++            player.sendMessage(dest.lockReason ?? "§cCette destination n'est pas disponible.");
+             return;
+         }
+ 
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js addon/SiegedTATB/scripts/war_declaration.js
 --- addon_orig/SiegedTATB/scripts/war_declaration.js	2026-06-10 12:08:41.000000000 +0000
 +++ addon/SiegedTATB/scripts/war_declaration.js	2026-07-04 17:14:35.212802226 +0000
@@ -1221,6 +3960,27 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  // PARROT → CROW CONVERSION
  // ============================================================
  system.runInterval(() => {
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js addon/SiegedTATB/scripts/war_targeting.js
+--- addon_orig/SiegedTATB/scripts/war_targeting.js	2026-06-25 21:16:36.000000000 +0000
++++ addon/SiegedTATB/scripts/war_targeting.js	2026-07-04 18:09:08.764163014 +0000
+@@ -197,7 +197,7 @@
+ if (command === "testwar") {
+   player.addTag("sieged_war_with_FakeEnemy");
+ 
+-  player.sendMessage("§aSpawning your troops (Green faction)...");
++  player.sendMessage("§aApparition de vos troupes (faction verte)...");
+   for (let i = 0; i < 4; i++) {
+     const friendly = player.dimension.spawnEntity("sieged:warder", {
+       x: player.location.x + (i * 2) - 3,
+@@ -249,7 +249,7 @@
+ else if (command === "testwar2") {
+   player.addTag("sieged_war_with_FakeEnemy");
+ 
+-  player.sendMessage("§aSpawning your sentinels (Green faction)...");
++  player.sendMessage("§aApparition de vos sentinelles (faction verte)...");
+ 
+   const fakeEnemyId = "fake_enemy_" + Date.now();
+ 
 --- addon_orig/SiegedTATR/texts/en_US.lang	2026-06-24 22:22:47.000000000 +0000
 +++ addon/SiegedTATR/texts/en_US.lang	2026-07-04 17:14:58.618413497 +0000
 @@ -1011,4 +1011,13 @@
@@ -1251,7 +4011,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  	"zh_CN"
  ]
 --- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATR/manifest.json	2026-07-04 17:39:27.261630489 +0000
++++ addon/SiegedTATR/manifest.json	2026-07-04 18:11:18.809130263 +0000
 @@ -1,10 +1,10 @@
  {
  	"format_version": 2,
@@ -1259,10 +4019,10 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
 -		"name": "Sieged TAT Resource",
 -		"description": "Medieval survival addon RP Update V1.7",
 +		"name": "Sieged TAT Resource (FR)",
-+		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.4)",
++		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.5)",
  		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 4],
++		"version": [1, 7, 5],
  		"min_engine_version": [1, 26, 0]
  	},
  	"modules": [
@@ -1271,7 +4031,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_declaration.js a
  		{
  			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 4]
++			"version": [1, 7, 5]
  		}
  	],
  	"capabilities": ["pbr"],
