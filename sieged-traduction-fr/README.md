@@ -104,6 +104,19 @@ ressources nécessaire (le livre vanilla et l'interface du jeu suffisent).
   langue de leur console (getPlayerLocale renvoie fr_FR par défaut). Un joueur
   peut toujours choisir une autre langue via Paramètres de Sieged → Langue.
 
+### 10. Alcadia royaumes v1.2 (add-on du joueur, rendu compatible Sieged)
+Le dossier `alcadia/behavior_pack` contient les scripts corrigés de l add-on
+Alcadia royaumes (PNJ, économie, peuples, immobilier) :
+- les entités `sieged:*` et les perroquets sauvages sont exclus de la
+  conversion en PNJ (le bâton et les menus d Alcadia ne les touchent plus) ;
+- monnaie par défaut = émeraude (cohérente avec l économie Sieged) ;
+- guide intégré réécrit pour correspondre à Sieged (FR) v1.7.7 (recherches
+  du Registre, guerre via perroquet→corbeau, commandement au Garde-bannière) ;
+- fiche « Mon personnage » réparée (le menu attendait des champs d une
+  ancienne version : classe/passé/région → prénom/sexe/gabarit/civilisation) ;
+- texte d aide aligné sur le vrai outil (bâton de configuration).
+Le pack de ressources (voix) est inchangé.
+
 ## Réappliquer sur une future mise à jour de Sieged
 
 1. Décompresser le nouveau `.mcaddon` (c'est un zip).
