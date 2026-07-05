@@ -235,7 +235,12 @@ export function openMyNation(player) {
   let na; try { na = player.getDynamicProperty(DP_NATION); } catch (e) {}
   const nations = loadNations();
   const nation = na ? nations[na] : null;
-  if (!nation) { player.sendMessage("§7Tu n'appartiens à aucune civilisation."); return; }
+  if (!nation) {
+    try { player.setDynamicProperty(DP_NATION, undefined); } catch (e) {}
+    player.sendMessage("§7Tu n'appartiens à aucune civilisation. Choisis-en une.");
+    chooseNation(player);
+    return;
+  }
   const isFounder = nation.founderId === player.id;
   const members = world.getAllPlayers().filter((p) => { try { return p.getDynamicProperty(DP_NATION) === na; } catch (e) { return false; } });
   const form = new ActionFormData().title(nation.name)
@@ -244,6 +249,7 @@ export function openMyNation(player) {
   form.button("Voir les membres en ligne"); acts.push("members");
   form.button("Me téléporter au point de ralliement"); acts.push("rally");
   if (isFounder) { form.button("Définir le point de ralliement ici"); acts.push("setrally"); }
+  form.button(isFounder ? "§cDissoudre ma civilisation" : "§cQuitter la civilisation"); acts.push("leave");
   form.button("Fermer"); acts.push("close");
   form.show(player).then((res) => {
     if (res.canceled || res.selection >= acts.length) return;
@@ -256,8 +262,32 @@ export function openMyNation(player) {
     } else if (a === "setrally" && isFounder) {
       const loc = player.location; const all = loadNations();
       if (all[na]) { all[na].rp = { x: Math.floor(loc.x), y: Math.floor(loc.y), z: Math.floor(loc.z), dim: player.dimension.id }; saveNations(all); player.sendMessage("§aPoint de ralliement défini ici. Les nouveaux membres arriveront à cet endroit."); }
+    } else if (a === "leave") {
+      confirmLeaveNation(player, na, nation, isFounder);
     }
   });
+}
+
+// ===================== quitter ou dissoudre sa civilisation ===
+function confirmLeaveNation(player, na, nation, isFounder) {
+  const body = isFounder
+    ? "Tu es le chef des " + nation.name + ".\nSi tu pars, la civilisation est §cdissoute§r : elle redevient disponible à la fondation, et ses membres devront en choisir une autre.\n\nContinuer ?"
+    : "Quitter les " + nation.name + " ?\nTu pourras ensuite fonder une civilisation libre ou en rejoindre une autre.";
+  new ActionFormData().title("Quitter la civilisation").body(body)
+    .button(isFounder ? "§cOui, dissoudre et partir" : "§cOui, quitter")
+    .button("Annuler")
+    .show(player).then((res) => {
+      if (res.canceled || res.selection === 1) { openMyNation(player); return; }
+      if (isFounder) {
+        const all = loadNations();
+        delete all[na];
+        saveNations(all);
+        try { world.sendMessage("§7La civilisation des §f" + nation.name + "§7 a été dissoute par son chef."); } catch (e) {}
+      }
+      try { player.setDynamicProperty(DP_NATION, undefined); } catch (e) {}
+      player.sendMessage(isFounder ? "§eTu as dissous les " + nation.name + "." : "§eTu as quitté les " + nation.name + ".");
+      chooseNation(player);
+    });
 }
 
 // ===================== menu admin Civilisations ===============
