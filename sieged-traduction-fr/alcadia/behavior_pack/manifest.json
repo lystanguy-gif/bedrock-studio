@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Alcadia royaumes 1.2",
-    "description": "PNJ, peuples, économie et immobilier — compatible Sieged (FR) : entités Sieged protégées, monnaie émeraude, guide aligné v1.7.7.",
+    "name": "★ ALCADIA ROYAUMES — PNJ & Économie (v1.2.1)",
+    "description": "PNJ à métiers, banque, civilisations, immobilier — compatible Sieged (FR).",
     "uuid": "6ba71838-d590-4ec3-b3d4-59e001b906ba",
     "version": [
       1,
       2,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -23,7 +23,7 @@
       "version": [
         1,
         2,
-        0
+        1
       ],
       "entry": "scripts/main.js"
     }
@@ -41,8 +41,8 @@
       "uuid": "dfbdf877-5e2e-460a-af02-5e17826b1f90",
       "version": [
         1,
-        0,
-        0
+        2,
+        1
       ]
     }
   ]
