@@ -402,6 +402,149 @@ const GUIDE = [
                     "\uE2A0\uE2A1\uE2A2\uE2A3\uE2A4\n\uE2B0\uE2B1\uE2B2\uE2B3\uE2B4\n\uE2C0\uE2C1\uE2C2\uE2C3\uE2C4\n\uE2D0\uE2D1\uE2D2\uE2D3\uE2D4\n\uE2E0\uE2E1\uE2E2\uE2E3\uE2E4\n\n" +
                     "§7De bas en haut : §efût§7 (le cercle monté à la verticale), §earchères§7 (fentes de 1×1 verre ou vide), §eencorbellement§7 (rangée qui déborde d'1 bloc), puis §etoit conique§7 : rétrécis d'1 bloc tous les 2 blocs de hauteur.\n" +
                     "§8Finis par un épi de faîtage (clôture + torche, ou cloche)."
+            },
+            {
+                titre: "§cToits pointus (45°)",
+                texte:
+                    "\uE300\uE301\uE302\uE303\uE304\n\uE310\uE311\uE312\uE313\uE314\n\uE320\uE321\uE322\uE323\uE324\n\uE330\uE331\uE332\uE333\uE334\n\uE340\uE341\uE342\uE343\uE344\n\n" +
+                    "§7À gauche : §etoit en A§7 — la pente descend jusqu'au sol, murs à l'intérieur.\n§7À droite : §epignon classique§7 — murs de 3-4 blocs, pente 45° en escaliers, §edébord d'1 bloc§7.\n§8Le 45° se fait entièrement en escaliers : simple et toujours joli."
+            },
+            {
+                titre: "§cToit à pente douce (dalles)",
+                texte:
+                    "\uE305\uE306\uE307\uE308\uE309\n\uE315\uE316\uE317\uE318\uE319\n\uE325\uE326\uE327\uE328\uE329\n\uE335\uE336\uE337\uE338\uE339\n\uE345\uE346\uE347\uE348\uE349\n\n" +
+                    "§7Pente §e1 de haut pour 2 de large§7 : alterne §edalle basse puis dalle haute§7 en avançant (demi-cases sur le schéma).\n§7Style grange ou halle de marché. Pense au débord d'1 bloc et à une bordure d'une autre matière sur le rebord."
+            },
+            {
+                titre: "§cMansarde et brisis",
+                texte:
+                    "\uE30A\uE30B\uE30C\uE30D\uE30E\n\uE31A\uE31B\uE31C\uE31D\uE31E\n\uE32A\uE32B\uE32C\uE32D\uE32E\n\uE33A\uE33B\uE33C\uE33D\uE33E\n\uE34A\uE34B\uE34C\uE34D\uE34E\n\n" +
+                    "§7À gauche : §emansarde§7 — pentes presque verticales puis sommet plat en dalles : un vrai étage sous le toit.\n§7À droite : §ebrisis (gambrel)§7 — pente raide en bas (2 de haut pour 1), douce en haut (45°). Style grange.\n§8Escaliers pour les pentes, dalles pour le sommet."
+            },
+            {
+                titre: "§cAppentis et saltbox",
+                texte:
+                    "\uE350\uE351\uE352\uE353\uE354\n\uE360\uE361\uE362\uE363\uE364\n\uE370\uE371\uE372\uE373\uE374\n\uE380\uE381\uE382\uE383\uE384\n\uE390\uE391\uE392\uE393\uE394\n\n" +
+                    "§7À gauche : §eappentis§7 — une seule pente douce en dalles, parfait pour extensions, échoppes et appentis de forge.\n§7À droite : §esaltbox§7 — pignon asymétrique : un côté court, un côté qui descend plus bas. Beaucoup de charme pour les maisons de pêcheurs."
+            },
+            {
+                titre: "§cToits papillon et en M",
+                texte:
+                    "\uE355\uE356\uE357\uE358\uE359\n\uE365\uE366\uE367\uE368\uE369\n\uE375\uE376\uE377\uE378\uE379\n\uE385\uE386\uE387\uE388\uE389\n\uE395\uE396\uE397\uE398\uE399\n\n" +
+                    "§7À gauche : §epapillon§7 — deux pentes qui descendent vers le centre (récupération d'eau au milieu !).\n§7À droite : §etoit en M§7 — deux pignons accolés avec noue centrale, pour les grandes bâtisses et les ateliers doubles.\n§8Pense à un drain au creux de la noue."
+            },
+            {
+                titre: "§7Arches de couloirs",
+                texte:
+                    "\uE35A\uE35B\uE35C\uE35D\uE35E\n\uE36A\uE36B\uE36C\uE36D\uE36E\n\uE37A\uE37B\uE37C\uE37D\uE37E\n\uE38A\uE38B\uE38C\uE38D\uE38E\n\uE39A\uE39B\uE39C\uE39D\uE39E\n\n" +
+                    "§7Trois ouvertures de 5 de large :\n§e• Plein cintre§7 — l'arc roman, arrondi régulier.\n§e• Ogive§7 — l'arc gothique, pointe au sommet.\n§e• Épaulée§7 — linteau droit à coins adoucis, la plus simple.\n§8Utilise des escaliers renversés dans les angles pour arrondir encore."
+            },
+            {
+                titre: "§7Arches gothiques",
+                texte:
+                    "\uE3A0\uE3A1\uE3A2\uE3A3\uE3A4\n\uE3B0\uE3B1\uE3B2\uE3B3\uE3B4\n\uE3C0\uE3C1\uE3C2\uE3C3\uE3C4\n\uE3D0\uE3D1\uE3D2\uE3D3\uE3D4\n\uE3E0\uE3E1\uE3E2\uE3E3\uE3E4\n\n" +
+                    "§e• Lancette§7 — ogive étroite et haute, pour cathédrales.\n§e• Trilobée§7 — trois lobes autour d'un pendentif central.\n§e• À clef pendante§7 — un pilier suspendu au centre de l'arc.\n§8Répète le même motif tout le long d'un couloir pour un cloître."
+            },
+            {
+                titre: "§7Ponts : charpente et arche",
+                texte:
+                    "\uE3A5\uE3A6\uE3A7\uE3A8\uE3A9\n\uE3B5\uE3B6\uE3B7\uE3B8\uE3B9\n\uE3C5\uE3C6\uE3C7\uE3C8\uE3C9\n\uE3D5\uE3D6\uE3D7\uE3D8\uE3D9\n\uE3E5\uE3E6\uE3E7\uE3E8\uE3E9\n\n" +
+                    "§7À gauche : §echarpente en croix§7 (bois sombre) — l'ossature type d'un pont couvert ou d'un colombage de grange.\n§7À droite : §earche de pont§7 en pierre sur pile centrale — surbaissée, elle enjambe 11 blocs.\n§8Élargis en répétant la travée : pile, arche, pile, arche..."
+            },
+            {
+                titre: "§7Murs en diagonale",
+                texte:
+                    "\uE3AA\uE3AB\uE3AC\uE3AD\uE3AE\n\uE3BA\uE3BB\uE3BC\uE3BD\uE3BE\n\uE3CA\uE3CB\uE3CC\uE3CD\uE3CE\n\uE3DA\uE3DB\uE3DC\uE3DD\uE3DE\n\uE3EA\uE3EB\uE3EC\uE3ED\uE3EE\n\n" +
+                    "§7Quatre inclinaisons, de haut en bas :\n§e• ~12°§7 : décale d'1 bloc tous les §e5 blocs§7.\n§e• ~20°§7 : tous les §e3 blocs§7.\n§e• ~26°§7 : tous les §e2 blocs§7.\n§e• 45°§7 : à §echaque bloc§7.\n§8Intermédiaires : ~15° = tous les 4 · ~33° = 2 puis 1 en alternance. Au-delà de 45°, inverse la règle (2 de haut pour 1 de côté = ~64°...)."
+            },
+            {
+                titre: "§7Grands cercles Ø15 et Ø19",
+                texte:
+                    "\uE400\uE401\uE402\uE403\uE404\n\uE410\uE411\uE412\uE413\uE414\n\uE420\uE421\uE422\uE423\uE424\n\uE430\uE431\uE432\uE433\uE434\n\uE440\uE441\uE442\uE443\uE444\n\n" +
+                    "§7Tours de garde et donjons moyens. §eDiamètre impair = un vrai bloc central§7, plus facile à axer sur une porte.\n§8Astuce : trace d'abord les 4 points cardinaux, puis relie par les diagonales du schéma."
+            },
+            {
+                titre: "§7Grand cercle Ø25",
+                texte:
+                    "\uE405\uE406\uE407\uE408\uE409\n\uE415\uE416\uE417\uE418\uE419\n\uE425\uE426\uE427\uE428\uE429\n\uE435\uE436\uE437\uE438\uE439\n\uE445\uE446\uE447\uE448\uE449\n\n" +
+                    "§7Belle taille de §edonjon principal§7 ou de tour maîtresse. Compte les cases du quart supérieur puis recopie par symétrie sur les 3 autres quarts."
+            },
+            {
+                titre: "§7Grand cercle Ø31",
+                texte:
+                    "\uE40A\uE40B\uE40C\uE40D\uE40E\n\uE41A\uE41B\uE41C\uE41D\uE41E\n\uE42A\uE42B\uE42C\uE42D\uE42E\n\uE43A\uE43B\uE43C\uE43D\uE43E\n\uE44A\uE44B\uE44C\uE44D\uE44E\n\n" +
+                    "§7Pour une §etour colossale§7, un phare ou un amphithéâtre. Même méthode : un quart, puis symétrie."
+            },
+            {
+                titre: "§7Très grand cercle Ø37",
+                texte:
+                    "\uE450\uE451\uE452\uE453\uE454\n\uE460\uE461\uE462\uE463\uE464\n\uE470\uE471\uE472\uE473\uE474\n\uE480\uE481\uE482\uE483\uE484\n\uE490\uE491\uE492\uE493\uE494\n\n" +
+                    "§7Enceinte ronde, arène ou base de dôme géant.\n§8Pour un dôme : ce cercle au sol, puis des cercles de plus en plus petits en montant (Ø37 → 35 → 31 → 27...)."
+            }
+        ]
+    },
+    {
+        titre: "§d🖼 Inspirations",
+        sections: [
+            {
+                titre: "§dEscaliers d'exception",
+                texte:
+                    "\uE455\uE456\uE457\uE458\uE459\n\uE465\uE466\uE467\uE468\uE469\n\uE475\uE476\uE477\uE478\uE479\n\uE485\uE486\uE487\uE488\uE489\n\uE495\uE496\uE497\uE498\uE499\n\n" +
+                    "§7Quatre styles d'escaliers monumentaux :\n§e• Royal§7 (haut gauche) — pierre taillée, jardinières et paliers.\n§e• Soigné§7 (haut droite) — tapis rouge, rambardes et lanternes.\n§e• Rustique§7 (bas gauche) — bois brut et rondins mélangés.\n§e• Organique§7 (bas droite) — marches irrégulières et verdure."
+            },
+            {
+                titre: "§dPonts",
+                texte:
+                    "\uE45A\uE45B\uE45C\uE45D\uE45E\n\uE46A\uE46B\uE46C\uE46D\uE46E\n\uE47A\uE47B\uE47C\uE47D\uE47E\n\uE48A\uE48B\uE48C\uE48D\uE48E\n\uE49A\uE49B\uE49C\uE49D\uE49E\n\n" +
+                    "§e• Soigné§7 (haut gauche) — bois clair, lampadaires réguliers.\n§e• Royal§7 (haut droite) — pierre crénelée sur piles massives.\n§e• Organique§7 (bas gauche) — tablier de terre sur rochers.\n§e• Rustique§7 (bas droite) — bois sombre volontairement irrégulier."
+            },
+            {
+                titre: "§dLucarnes de toit",
+                texte:
+                    "\uE4A0\uE4A1\uE4A2\uE4A3\uE4A4\n\uE4B0\uE4B1\uE4B2\uE4B3\uE4B4\n\uE4C0\uE4C1\uE4C2\uE4C3\uE4C4\n\uE4D0\uE4D1\uE4D2\uE4D3\uE4D4\n\uE4E0\uE4E1\uE4E2\uE4E3\uE4E4\n\n" +
+                    "§7Quatre lucarnes à poser sur tes pentes :\n§e• À pignon§7 (haut gauche) — la classique à deux pentes.\n§e• À croupe§7 (haut droite) — trois pans adoucis.\n§e• Rampante§7 (bas gauche) — toit plat incliné, très large.\n§e• En sourcil§7 (bas droite) — la vague qui soulève le toit."
+            },
+            {
+                titre: "§dDômes et flèches",
+                texte:
+                    "\uE4A5\uE4A6\uE4A7\uE4A8\uE4A9\n\uE4B5\uE4B6\uE4B7\uE4B8\uE4B9\n\uE4C5\uE4C6\uE4C7\uE4C8\uE4C9\n\uE4D5\uE4D6\uE4D7\uE4D8\uE4D9\n\uE4E5\uE4E6\uE4E7\uE4E8\uE4E9\n\n" +
+                    "§7Pour couronner tours et clochers :\n§e• Dôme hémisphérique§7 (haut gauche) — la demi-sphère.\n§e• Dôme en chaînette§7 (haut droite) — plus haut que large.\n§e• Bulbe§7 (bas gauche) — style oriental ou russe.\n§e• Flèche conique§7 (bas droite) — le clocher pointu."
+            },
+            {
+                titre: "§dFenêtres habillées 1",
+                texte:
+                    "\uE4AA\uE4AB\uE4AC\uE4AD\uE4AE\n\uE4BA\uE4BB\uE4BC\uE4BD\uE4BE\n\uE4CA\uE4CB\uE4CC\uE4CD\uE4CE\n\uE4DA\uE4DB\uE4DC\uE4DD\uE4DE\n\uE4EA\uE4EB\uE4EC\uE4ED\uE4EE\n\n" +
+                    "§7Quatre encadrements : bois et pierre, blanc à consoles, brique rouge à grille, grès sculpté.\n§8Le secret : la fenêtre déborde TOUJOURS du mur — linteau, appui saillant, jardinière."
+            },
+            {
+                titre: "§dFenêtres habillées 2",
+                texte:
+                    "\uE500\uE501\uE502\uE503\uE504\n\uE510\uE511\uE512\uE513\uE514\n\uE520\uE521\uE522\uE523\uE524\n\uE530\uE531\uE532\uE533\uE534\n\uE540\uE541\uE542\uE543\uE544\n\n" +
+                    "§7Suite : jardinière fleurie sous appui, colombage à volets, encadrement bois sur mur sombre, grande baie d'atelier.\n§8Varie les vitres (verre teinté clair) pour éviter l'effet miroir uniforme."
+            },
+            {
+                titre: "§dBibliothèques et rangements 1",
+                texte:
+                    "\uE505\uE506\uE507\uE508\uE509\n\uE515\uE516\uE517\uE518\uE519\n\uE525\uE526\uE527\uE528\uE529\n\uE535\uE536\uE537\uE538\uE539\n\uE545\uE546\uE547\uE548\uE549\n\n" +
+                    "§7Modèles de meubles muraux en chêne clair : étagères mixtes livres/coffres, vitrine, cheminée-bibliothèque, buffet bas.\n§8Mélange bibliothèques vanilla, dalles, escaliers renversés et trappes pour casser les lignes."
+            },
+            {
+                titre: "§dBibliothèques et rangements 2",
+                texte:
+                    "\uE50A\uE50B\uE50C\uE50D\uE50E\n\uE51A\uE51B\uE51C\uE51D\uE51E\n\uE52A\uE52B\uE52C\uE52D\uE52E\n\uE53A\uE53B\uE53C\uE53D\uE53E\n\uE54A\uE54B\uE54C\uE54D\uE54E\n\n" +
+                    "§7Versions bois sombre : cabinet de lecture, grande armoire, mur de rangement d'atelier, vaisselier.\n§8Une lanterne encastrée réchauffe immédiatement un meuble."
+            },
+            {
+                titre: "§dDallages de places",
+                texte:
+                    "\uE550\uE551\uE552\uE553\uE554\n\uE560\uE561\uE562\uE563\uE564\n\uE570\uE571\uE572\uE573\uE574\n\uE580\uE581\uE582\uE583\uE584\n\uE590\uE591\uE592\uE593\uE594\n\n" +
+                    "§7Quatre grands motifs de sol pour cours et places de château (pierre, andésite, basalte) : rosace crénelée, médaillon central, carré emboîté, anneau rayonnant.\n§8Répète le motif en damier pour paver une place entière."
+            },
+            {
+                titre: "§dMurs et textures",
+                texte:
+                    "\uE555\uE556\uE557\uE558\uE559\n\uE565\uE566\uE567\uE568\uE569\n\uE575\uE576\uE577\uE578\uE579\n\uE585\uE586\uE587\uE588\uE589\n\uE595\uE596\uE597\uE598\uE599\n\n" +
+                    "§7Idées de parements : panneau doré ouvragé, mosaïque glacée, damier de bois, claustra à colonnes.\n§8Un mur de 2 matières + 1 accent suffit : au-delà, ça devient brouillon."
             }
         ]
     },
