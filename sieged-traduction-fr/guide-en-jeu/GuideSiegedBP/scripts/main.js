@@ -335,6 +335,77 @@ const GUIDE = [
         ]
     },
     {
+        titre: "§6🏗 Modèles de construction",
+        sections: [
+            {
+                titre: "§7Lire les schémas",
+                texte:
+                    "§7Dans ce chapitre, chaque case des schémas = §e1 bloc§7. Compte les cases et reproduis à l'identique !\n\n" +
+                    "§8Astuces générales :\n" +
+                    "§7• Varie les blocs d'une même famille (pierre, pierre taillée, andésite) pour donner de la texture.\n" +
+                    "§7• Ajoute de la profondeur : murs pas tout plats, poutres en relief, escaliers sous les débords.\n" +
+                    "§7• Les diamètres §eimpairs§7 (5, 7, 9, 13...) donnent des tours avec un vrai centre."
+            },
+            {
+                titre: "§7Tours rondes : les cercles",
+                texte:
+                    "\uE200\uE201\uE202\uE203\uE204\n\uE210\uE211\uE212\uE213\uE214\n\uE220\uE221\uE222\uE223\uE224\n\uE230\uE231\uE232\uE233\uE234\n\uE240\uE241\uE242\uE243\uE244\n\n" +
+                    "§7En haut : §eØ5§7 (gauche) et §eØ7§7 (droite).\n" +
+                    "§7En bas : §eØ9§7 (gauche) et §eØ13§7 (droite).\n\n" +
+                    "§8Ø5 = échauguette · Ø7 = tourelle · Ø9 = tour de garde · Ø13 = donjon rond. Monte le cercle à la verticale, puis ajoute l'encorbellement et le toit (voir « Tour ronde complète »)."
+            },
+            {
+                titre: "§cToit 45° (classique)",
+                texte:
+                    "\uE205\uE206\uE207\uE208\uE209\n\uE215\uE216\uE217\uE218\uE219\n\uE225\uE226\uE227\uE228\uE229\n\uE235\uE236\uE237\uE238\uE239\n\uE245\uE246\uE247\uE248\uE249\n\n" +
+                    "§7La pente monte de §e1 bloc par bloc§7 (45°) : parfaite pour les §eescaliers§7.\n" +
+                    "§7Fais §edéborder le toit d'1 bloc§7 de chaque côté du mur : c'est ce débord qui rend une maison jolie.\n" +
+                    "§8Dessous du débord : escaliers renversés ou dalles."
+            },
+            {
+                titre: "§cToit mansardé (2 pentes)",
+                texte:
+                    "\uE20A\uE20B\uE20C\uE20D\uE20E\n\uE21A\uE21B\uE21C\uE21D\uE21E\n\uE22A\uE22B\uE22C\uE22D\uE22E\n\uE23A\uE23B\uE23C\uE23D\uE23E\n\uE24A\uE24B\uE24C\uE24D\uE24E\n\n" +
+                    "§7Deux pentes : d'abord §epresque verticale§7 (2 de haut pour 1 de côté), puis §edouce§7 (1 de haut pour 2 de côté).\n" +
+                    "§7Donne un étage habitable sous le toit — idéal pour les maisons de ville serrées.\n" +
+                    "§8Blocs : escaliers + dalles pour la pente douce."
+            },
+            {
+                titre: "§fFaçade à colombage",
+                texte:
+                    "\uE250\uE251\uE252\uE253\uE254\n\uE260\uE261\uE262\uE263\uE264\n\uE270\uE271\uE272\uE273\uE274\n\uE280\uE281\uE282\uE283\uE284\n\uE290\uE291\uE292\uE293\uE294\n\n" +
+                    "§7La recette du médiéval : §esoubassement en pierre§7, murs clairs (béton blanc, laine, terre cuite blanche), et §epoutres en chêne noir§7.\n" +
+                    "§7Place un poteau vertical tous les §e5-6 blocs§7, des sablières en haut et en bas, puis des §ecroix de Saint-André§7 (diagonales) dans les panneaux.\n" +
+                    "§8Étage légèrement en surplomb = encore plus médiéval."
+            },
+            {
+                titre: "§bFenêtres",
+                texte:
+                    "\uE255\uE256\uE257\uE258\uE259\n\uE265\uE266\uE267\uE268\uE269\n\uE275\uE276\uE277\uE278\uE279\n\uE285\uE286\uE287\uE288\uE289\n\uE295\uE296\uE297\uE298\uE299\n\n" +
+                    "§7Trois modèles, de gauche à droite :\n" +
+                    "§e• Lancette§7 : 1×3 avec linteau sombre — pour tours et églises.\n" +
+                    "§e• Croisée§7 : 2×3 encadrée de poutres — pour maisons riches.\n" +
+                    "§e• Œil rond§7 : cercle Ø5 avec verre au centre — pignons et chapelles.\n" +
+                    "§8Varie les vitres : verre blanc, gris clair, jaune pâle."
+            },
+            {
+                titre: "§7Remparts : créneaux",
+                texte:
+                    "\uE25A\uE25B\uE25C\uE25D\uE25E\n\uE26A\uE26B\uE26C\uE26D\uE26E\n\uE27A\uE27B\uE27C\uE27D\uE27E\n\uE28A\uE28B\uE28C\uE28D\uE28E\n\uE29A\uE29B\uE29C\uE29D\uE29E\n\n" +
+                    "§7Rythme des créneaux : §e2 pleins, 1 vide§7 (les merlons font 2 blocs de haut).\n" +
+                    "§7Juste sous le parapet, fais une rangée §een surplomb d'1 bloc§7 avec des trous : le §emâchicoulis§7.\n" +
+                    "§8Un rempart efficace fait au moins 4-5 blocs d'épaisseur avec un chemin de ronde."
+            },
+            {
+                titre: "§7Tour ronde complète",
+                texte:
+                    "\uE2A0\uE2A1\uE2A2\uE2A3\uE2A4\n\uE2B0\uE2B1\uE2B2\uE2B3\uE2B4\n\uE2C0\uE2C1\uE2C2\uE2C3\uE2C4\n\uE2D0\uE2D1\uE2D2\uE2D3\uE2D4\n\uE2E0\uE2E1\uE2E2\uE2E3\uE2E4\n\n" +
+                    "§7De bas en haut : §efût§7 (le cercle monté à la verticale), §earchères§7 (fentes de 1×1 verre ou vide), §eencorbellement§7 (rangée qui déborde d'1 bloc), puis §etoit conique§7 : rétrécis d'1 bloc tous les 2 blocs de hauteur.\n" +
+                    "§8Finis par un épi de faîtage (clôture + torche, ou cloche)."
+            }
+        ]
+    },
+    {
         titre: "§3💡 Conseils pour le serveur",
         sections: [
             {
