@@ -22,6 +22,23 @@ import { container, countItem, removeItem } from "./util.js";
 
 const EMERALD = "minecraft:emerald";
 
+// ── Réservé aux chefs de royaume ─────────────────────────────────────────────
+// Sieged pose le tag « sieged_rank_king » sur le roi quand il utilise son
+// drapeau. En secours (tag pas encore posé), on accepte aussi un joueur dont
+// un drapeau chargé à proximité porte son nom (tag « sieged:owner.<nom> »).
+export function isKingdomChief(player) {
+  try { if (player.hasTag("sieged_rank_king")) return true; } catch (e) {}
+  try {
+    const flags = player.dimension.getEntities({ type: "sieged:castle_flag", location: player.location, maxDistance: 96 });
+    for (const flag of flags)
+      for (const t of flag.getTags())
+        if (t === "sieged:owner." + player.name) return true;
+  } catch (e) {}
+  return false;
+}
+
+const NOT_CHIEF_MSG = "§cSeul un §echef de royaume§c peut lever une armée. Fonde ton royaume (pose ton drapeau de château), puis reviens.";
+
 // Catalogue : œufs d'apparition des unités alliées de Sieged.
 const CATALOG = [
   { egg: "sieged:warder_spawn_egg",       name: "Gardien",        cost: 8,  desc: "Fantassin à l'épée, solide et polyvalent." },
@@ -32,6 +49,14 @@ const CATALOG = [
 ];
 
 export function openTroupesShop(player) {
+  if (!isKingdomChief(player)) {
+    new ActionFormData()
+      .title("§2⚔ Troupes de siège")
+      .body("§cRéservé aux chefs de royaume.\n\n§7Cette boutique permet de lever une armée : seul le §eroi§7 d'un royaume (celui qui a posé le §fdrapeau de château§7) peut y acheter des troupes.\n\n§8Astuce : si tu es bien roi, ouvre d'abord le menu de ton drapeau (le tag de rang se met à jour), ou tiens-toi près de ton drapeau.")
+      .button("Fermer")
+      .show(player);
+    return;
+  }
   const cont = container(player);
   const have = cont ? countItem(cont, EMERALD) : 0;
   const form = new ActionFormData()
@@ -55,6 +80,7 @@ export function openTroupesShop(player) {
 }
 
 function buyEgg(player, u) {
+  if (!isKingdomChief(player)) { player.sendMessage(NOT_CHIEF_MSG); return; }
   const cont = container(player);
   const have = cont ? countItem(cont, EMERALD) : 0;
   if (have < u.cost) {
@@ -94,6 +120,13 @@ world.afterEvents.playerInteractWithEntity.subscribe((ev) => {
   let held = ev.itemStack;
   if (!held) { try { held = player.getComponent("minecraft:equippable")?.getEquipment("Mainhand"); } catch (e) {} }
   if (!held || held.typeId !== EMERALD) return;
+
+  // La réussite garantie est un privilège de chef de royaume ; les autres
+  // joueurs gardent la chance vanilla de Sieged (33 % par émeraude).
+  if (!isKingdomChief(player)) {
+    player.onScreenDisplay.setActionBar("§7Recrutement fiable réservé aux §echefs de royaume§7 — tentative normale (1 chance sur 3).");
+    return;
+  }
 
   system.run(() => {
     try {
