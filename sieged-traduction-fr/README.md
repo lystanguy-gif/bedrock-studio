@@ -117,6 +117,23 @@ Alcadia royaumes (PNJ, économie, peuples, immobilier) :
 - texte d aide aligné sur le vrai outil (bâton de configuration).
 Le pack de ressources (voix) est inchangé.
 
+### 11. ROYAUME SIEGE FR V5 — Troupes de siège à l'émeraude
+Nouveau dans le pack du joueur (`alcadia/behavior_pack/scripts/troupes.js`),
+sans toucher à l'add-on Sieged :
+- **Boutique « ⚔ Troupes de siège »** dans le menu d'Alcadia : œufs de
+  Gardien (8 ém), Sentinelle (8), Chevalier (12), Templier (14),
+  Garde-bannière (24), payés en émeraudes de l'inventaire.
+- **Recrutement garanti** : poser l'œuf, puis émeraude en main + interagir sur
+  l'unité → recrutée pour 1 émeraude (Sieged vanilla ne donne que 33 % de
+  chance par émeraude). Le script pose les propriétés attendues par Sieged
+  (`sieged:tamed`, `sieged:owner`).
+- **Caserne automatique** : si le drapeau du joueur est à moins de 48 blocs,
+  la recrue est inscrite à la caserne (`sieged:castle_id`/`castle_owner`),
+  donc visible dans le menu Caserne et l'Appel aux armes.
+- Chevalier et Garde-bannière restent recrutés par les scripts de Sieged
+  (déjà garantis à 1 émeraude) — aucun double paiement.
+- Uniquement des événements d'interaction : aucun coût par tick, pas de lag.
+
 ## Réappliquer sur une future mise à jour de Sieged
 
 1. Décompresser le nouveau `.mcaddon` (c'est un zip).

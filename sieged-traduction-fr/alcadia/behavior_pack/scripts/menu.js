@@ -5,6 +5,7 @@ import { openMyHouses, openPropertyAdmin, openPlayerHousesAdmin, propertiesCount
 import { openMyRoom } from "./inn.js";
 import { openMyGrade, describeGrade, resetGrade } from "./grades.js";
 import { describeCharacter, isCharacterCreated, resetCharacter, openMyNation, openCivAdmin, openNationSpawnsAdmin } from "./origins.js";
+import { openTroupesShop } from "./troupes.js";
 
 // vrai pour les opérateurs (ceux qui ont les commandes) et les joueurs en créatif
 function isAdmin(player) {
@@ -48,7 +49,8 @@ const GUIDE_PAGES = [
   {
     title: "§eTroupes et commandement",
     body:
-      "§6Recruter §7: émeraudes aux villageois, promotion aux §eParchemins d'ordre§7, recrutement contre XP au drapeau (rang Chevalier+), ou §eAppel aux armes§7 à la caserne.\n" +
+      "§6Recruter §7: la boutique §2⚔ Troupes de siège§7 de ce menu vend des œufs d'unités — pose l'œuf puis §eémeraude en main + interagir§7 sur l'unité pour la recruter (réussite garantie, caserne auto si ton drapeau est proche).\n" +
+      "§7Aussi : émeraudes aux villageois, promotion aux §eParchemins d'ordre§7, recrutement contre XP au drapeau (rang Chevalier+), ou §eAppel aux armes§7 à la caserne.\n" +
       "§7Revendiquer des unités libres : renomme une §ebannière§7 à l'enclume puis §eaccroupi + utiliser§7 près d'elles.\n\n" +
       "§6Commander §7: apprivoise un §eGarde-bannière§7 (émeraude en main) et interagis avec lui : charger, suivre, tenir, formations, pluie de flèches...\n" +
       "§7Lie un §eCor de commandement§7 (accroupi + interagir sur le garde) pour le commander à distance.\n" +
@@ -124,6 +126,7 @@ function openMainMenu(player) {
   form.button("Ma maison"); actions.push("house");
   form.button("Ma chambre"); actions.push("room");
   form.button("Mon grade"); actions.push("grade");
+  form.button("§2⚔ Troupes de siège"); actions.push("troops");
   form.button("§2Guide du serveur"); actions.push("guide");
   if (admin) {
     form.button("§9Gérer un joueur"); actions.push("players");
@@ -143,6 +146,7 @@ function openMainMenu(player) {
     else if (a === "house") openMyHouses(player);
     else if (a === "room") openMyRoom(player);
     else if (a === "grade") openMyGrade(player);
+    else if (a === "troops") openTroupesShop(player);
     else if (a === "guide") openGuideMenu(player);
     else if (a === "players") openPlayersAdmin(player);
     else if (a === "propadmin") openPropertyAdmin(player);
