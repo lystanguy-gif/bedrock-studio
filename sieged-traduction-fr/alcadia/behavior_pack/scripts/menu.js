@@ -49,7 +49,8 @@ const GUIDE_PAGES = [
   {
     title: "§eTroupes et commandement",
     body:
-      "§6Recruter §7: la boutique §2⚔ Troupes de siège§7 de ce menu §8(réservée au §eroi§8 du royaume)§7 vend des œufs d'unités — pose l'œuf puis §eémeraude en main + interagir§7 sur l'unité pour la recruter (réussite garantie pour le roi, caserne auto si ton drapeau est proche).\n" +
+      "§6Recruter §7: la boutique §2⚔ Troupes de siège§7 de ce menu vend des œufs d'unités — pose l'œuf puis §eémeraude en main + interagir§7 sur l'unité (réussite garantie, caserne auto si le drapeau est proche).\n" +
+      "§8Réservée au §eroi§8 du royaume — il peut autoriser des membres via le bouton §6🛡 Autorisations§8 de la boutique.\n" +
       "§7Aussi : émeraudes aux villageois, promotion aux §eParchemins d'ordre§7, recrutement contre XP au drapeau (rang Chevalier+), ou §eAppel aux armes§7 à la caserne.\n" +
       "§7Revendiquer des unités libres : renomme une §ebannière§7 à l'enclume puis §eaccroupi + utiliser§7 près d'elles.\n\n" +
       "§6Commander §7: apprivoise un §eGarde-bannière§7 (émeraude en main) et interagis avec lui : charger, suivre, tenir, formations, pluie de flèches...\n" +
