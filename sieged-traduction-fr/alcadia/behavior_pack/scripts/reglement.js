@@ -341,8 +341,9 @@ world.afterEvents.playerDimensionChange.subscribe((ev) => {
 // 1) La table d'enchantement est bloquée (événement annulable).
 // 2) Tout objet enchanté TENU ou PORTÉ est désenchanté par la vérification
 //    périodique (les enchantements arrivent aussi par pêche, coffres,
-//    bibliothécaires : bloquer la table ne suffit pas). Les objets custom de
-//    Sieged ne sont jamais touchés (uniquement les objets minecraft:*).
+//    bibliothécaires : bloquer la table ne suffit pas). Tous les objets sont
+//    couverts, y compris ceux des autres add-ons (Epic Knights…) — seuls les
+//    objets de Sieged (sieged:*) ne sont jamais touchés.
 world.beforeEvents.playerInteractWithBlock.subscribe((ev) => {
   try {
     if (ev.block.typeId !== "minecraft:enchanting_table") return;
@@ -368,7 +369,7 @@ function stripEnchants(p) {
   for (const slot of EQUIP_SLOTS) {
     try {
       const it = eq.getEquipment(slot);
-      if (!it || !it.typeId.startsWith("minecraft:")) continue;
+      if (!it || it.typeId.startsWith("sieged:")) continue;
       if (it.typeId === "minecraft:enchanted_book") {
         eq.setEquipment(slot, new ItemStack("minecraft:book", it.amount));
         p.sendMessage("§c⚠ Règle 10 : ton livre enchanté redevient un livre ordinaire.");
