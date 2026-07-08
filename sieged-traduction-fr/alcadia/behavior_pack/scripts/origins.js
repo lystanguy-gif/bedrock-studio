@@ -1,6 +1,7 @@
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { addBalance } from "./util.js";
+import { chooseSpecCreation, specLabel, clearSpec } from "./specialites.js";
 
 // ===================== identité du joueur =====================
 const DP_PRENOM = "origin:prenom";   // utilisé aussi par le marchand
@@ -60,7 +61,7 @@ export function describeCharacter(player) {
   const nat = na ? civName(na) : "aucune";
   const st = loadNations()[na];
   const role = (st && st.founderId === player.id) ? " (fondateur)" : "";
-  return "§ePersonnage\n§7Prénom §f" + (pr || "non défini") + "\n§7Sexe §f" + (sx || "non défini") + "\n§7Gabarit §f" + (GAB_NAME[gb] || "non défini") + "\n§7Civilisation §f" + nat + role;
+  return "§ePersonnage\n§7Prénom §f" + (pr || "non défini") + "\n§7Sexe §f" + (sx || "non défini") + "\n§7Gabarit §f" + (GAB_NAME[gb] || "non défini") + "\n§7Spécialité §f" + specLabel(player) + "\n§7Civilisation §f" + nat + role;
 }
 export function isCharacterCreated(player) {
   try { return player.getDynamicProperty(DP_DONE) === true; } catch (e) { return false; }
@@ -73,6 +74,7 @@ export function resetCharacter(player) {
     player.setDynamicProperty(DP_NATION, undefined);
     player.setDynamicProperty(DP_DONE, undefined);
   } catch (e) {}
+  clearSpec(player);
 }
 
 // Relance la création de personnage chez un joueur (utilisé par le menu admin) :
@@ -110,7 +112,7 @@ function startCreation(player) {
     const sexe = ["Homme", "Femme", "Autre"][res.formValues[1] | 0];
     const gab = GABARITS[res.formValues[2] | 0].id;
     try { player.setDynamicProperty(DP_PRENOM, prenom); player.setDynamicProperty(DP_SEXE, sexe); player.setDynamicProperty(DP_GABARIT, gab); } catch (e) {}
-    chooseNation(player);
+    chooseSpecCreation(player, () => chooseNation(player));
   });
 }
 

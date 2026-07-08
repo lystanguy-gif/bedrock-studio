@@ -1,4 +1,5 @@
 import { world, system, ItemStack } from "@minecraft/server";
+import { specTradeCost } from "./specialites.js";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import {
   LIMIT_MAX, TALK, MANAGED_TAG, COIN_ID,
@@ -198,15 +199,18 @@ function doTrade(player, entity, cfg, t, index) {
   const cont = container(player);
   if (!cont) return;
   if (limitReached(t.limit, tradeCount(entity, index, player.id))) { player.sendMessage("§eTu as atteint la limite de cet échange."); play(player, "note.bass"); return; }
-  if (countItem(cont, t.costId) < t.costCount) {
-    let msg = `§cIl te faut ${t.costCount}x ${shortId(t.costId)}.`;
+  // Remise de spécialité (forgeron) sur le prix demandé
+  const costN = specTradeCost(player, t.costCount);
+  if (countItem(cont, t.costId) < costN) {
+    let msg = `§cIl te faut ${costN}x ${shortId(t.costId)}.`;
     if (t.costId === COIN_ID) msg += " Retire des pièces via ton menu.";
     player.sendMessage(msg); play(player, "note.bass"); return;
   }
   if (t.sellId !== COIN_ID) {
     try { new ItemStack(t.sellId, t.sellCount); } catch (e) { player.sendMessage("§cCet échange est mal configuré (item vendu invalide)."); return; }
   }
-  removeItem(cont, t.costId, t.costCount);
+  removeItem(cont, t.costId, costN);
+  if (costN < t.costCount) player.sendMessage("§6⚒ Remise forgeron : §f" + costN + "§6 au lieu de §f" + t.costCount + "§6 " + shortId(t.costId) + ".");
   if (t.sellId === COIN_ID) { addBalance(player, t.sellCount); player.sendMessage("§a+" + t.sellCount + " pièces créditées sur ton compte."); }
   else giveCustom(player, t.sellId, t.sellCount, t.sellName);
   const n = bumpTrade(entity, index, player.id);

@@ -7,6 +7,7 @@ import { openMyGrade, describeGrade, resetGrade } from "./grades.js";
 import { describeCharacter, isCharacterCreated, resetCharacter, relaunchCreation, removeFromNation, openMyNation, openCivAdmin, openNationSpawnsAdmin } from "./origins.js";
 import { openTroupesShop } from "./troupes.js";
 import { openReglement, openSanctions } from "./reglement.js";
+import { openMySpec, openSpecAdmin } from "./specialites.js";
 
 // vrai pour les opérateurs (ceux qui ont les commandes) et les joueurs en créatif
 function isAdmin(player) {
@@ -128,6 +129,7 @@ function openMainMenu(player) {
   form.button("Ma maison"); actions.push("house");
   form.button("Ma chambre"); actions.push("room");
   form.button("Mon grade"); actions.push("grade");
+  form.button("Ma spécialité"); actions.push("spec");
   form.button("§2⚔ Troupes de siège"); actions.push("troops");
   form.button("§f⚖ Règlement"); actions.push("rules");
   form.button("§2Guide du serveur"); actions.push("guide");
@@ -149,6 +151,7 @@ function openMainMenu(player) {
     else if (a === "house") openMyHouses(player);
     else if (a === "room") openMyRoom(player);
     else if (a === "grade") openMyGrade(player);
+    else if (a === "spec") openMySpec(player);
     else if (a === "troops") openTroupesShop(player);
     else if (a === "rules") openReglement(player, isAdmin);
     else if (a === "guide") openGuideMenu(player);
@@ -286,6 +289,7 @@ function openPlayerAdmin(viewer, target) {
     .button("§6Vider son inventaire")
     .button("§6Retirer de sa civilisation")
     .button("§6Relancer la création du personnage")
+    .button("§6Changer sa spécialité")
     .button("§cRéinitialiser le personnage")
     .button("Retour")
     .show(viewer).then((res) => {
@@ -302,7 +306,8 @@ function openPlayerAdmin(viewer, target) {
         openPlayerAdmin(viewer, target);
       }
       else if (res.selection === 7) confirmRelaunchCreation(viewer, target);
-      else if (res.selection === 8) confirmResetChar(viewer, target);
+      else if (res.selection === 8) openSpecAdmin(viewer, target, () => openPlayerAdmin(viewer, target));
+      else if (res.selection === 9) confirmResetChar(viewer, target);
     });
 }
 
