@@ -48,7 +48,7 @@ const RULES = [
   { titre: "§e1. Respect et fair-play", texte: "§7Aucune insulte, harcèlement ou provocation hors-RP entre joueurs.\n\n§7Triche interdite : x-ray, exploitation de bugs, duplication d'objets.\n\n§7Les décisions des administrateurs sont définitives." },
   { titre: "§e2. Jeu de rôle", texte: "§7Chacun incarne son personnage : un prénom, un peuple, une histoire.\n\n§7Les conflits se règlent §edans le jeu§7 (diplomatie, guerre déclarée, tribunal du roi), pas dans le tchat hors-RP.\n\n§7Le vol et la trahison font partie du RP §8— mais dans les limites des règles 4 et 5." },
   { titre: "§c3. Guerres : déclaration obligatoire", texte: "§7Aucune attaque de royaume sans §eguerre déclarée§7 : utilise le §fParchemin sur un perroquet§7 (corbeau messager) et attends la réponse.\n\n§7Une fois la guerre déclarée, sièges, batailles et pillages du royaume ennemi sont autorisés.\n\n§7La paix se négocie au parchemin ou au §fDrapeau de reddition§7." },
-  { titre: "§c4. Attaque hors-ligne interdite (règle automatisée)", texte: "§7Il est §cinterdit§7 d'attaquer le château, le drapeau ou les troupes d'un royaume dont le §eroi est hors-ligne§7 et qui n'a §eaucun représentant en ligne§7.\n\n§6Automatique : §7si tu attaques quand même, un avertissement s'affiche avec un §ccompte à rebours§7. Pars avant la fin : simple avertissement enregistré. Reste : §cbannissement temporaire immédiat§7.\n\n§7Un roi peut nommer des §ereprésentants§7 dans ce menu : s'ils sont en ligne, le royaume est défendable donc attaquable." },
+  { titre: "§c4. Attaque hors-ligne interdite (règle automatisée)", texte: "§7Il est §cinterdit§7 d'attaquer le château, le drapeau ou les troupes d'un royaume dont le §eroi est hors-ligne§7 et qui n'a §eaucun représentant en ligne§7.\n\n§6Automatique : §7si tu attaques quand même, un avertissement s'affiche avec un §ccompte à rebours§7. Quitte le §eterritoire du royaume§7 (le rayon dépend de son niveau : Colonie 20 → Royaume 96 blocs) avant la fin : simple avertissement. Reste dedans : §cbannissement temporaire immédiat§7.\n\n§7Un roi peut nommer des §ereprésentants§7 dans ce menu : s'ils sont en ligne, le royaume est défendable donc attaquable." },
   { titre: "§c5. Pillage et destructions", texte: "§7Le pillage n'est autorisé §equ'en guerre déclarée§7, et uniquement sur le royaume ennemi.\n\n§cInterdit en toutes circonstances§7 : destruction massive gratuite, incendies volontaires hors siège, pièges au spawn, vol dans les coffres d'un royaume en paix.\n\n§7Les dégâts de siège font partie du jeu ; la destruction pour nuire, non." },
   { titre: "§e6. Territoires et constructions", texte: "§7Respecte les frontières des royaumes (rayon autour du drapeau).\n\n§7Ne construis pas collé au territoire d'autrui sans accord de son roi.\n\n§7Les constructions doivent rester dans l'esprit médiéval du serveur." },
   { titre: "§67. Sanctions", texte: "§7Les avertissements ont des niveaux : §fléger§7 (1 pt), §6sérieux§7 (2 pts), §cgrave§7 (3 pts).\n\n§7Au-delà du seuil de points, bannissement temporaire automatique.\n\n§7Selon la faute, un admin peut aussi t'envoyer en §8prison RP§7 (cellule pour une durée donnée) ou te bannir directement.\n\n§7Les points s'effacent sur décision d'un admin." },
@@ -204,7 +204,40 @@ function jailInfo(p) {
 // une caserne (sieged:castle_owner), d'un roi hors-ligne sans représentant en
 // ligne. → avertissement + compte à rebours ; s'il est encore dans la zone à
 // la fin, bannissement temporaire automatique.
-const violations = new Map(); // playerId -> { king, until, loc, dimId }
+const violations = new Map(); // playerId -> { king, until, loc, dimId, radius }
+
+// Rayons de territoire de Sieged selon le niveau du royaume (tag sieged:tier.N
+// sur le drapeau) : Colonie, Village, Ville, Cité, Royaume.
+const TIER_RADIUS = [20, 24, 40, 64, 96];
+const TERR_MARGIN = 8; // petite marge au-delà du territoire
+
+// Admins/opérateurs : jamais sanctionnés par la règle automatique.
+function isOperator(p) {
+  try { const l = p.playerPermissionLevel; if (typeof l === "number" && l >= 2) return true; if (l !== undefined && String(l).toLowerCase().includes("operator")) return true; } catch (e) {}
+  try { const c = p.commandPermissionLevel; if (typeof c === "number" && c >= 1) return true; } catch (e) {}
+  return false;
+}
+
+// Centre et rayon du territoire du royaume attaqué : le drapeau du roi le plus
+// proche de l'entité frappée, avec le rayon de son niveau. Secours : position
+// de l'entité frappée + rayon de la config si le drapeau n'est pas chargé.
+function territoryOf(king, ent, cfg) {
+  try {
+    const flags = ent.dimension.getEntities({ type: "sieged:castle_flag", location: ent.location, maxDistance: 160 });
+    for (const flag of flags) {
+      let mine = false, tier = 0;
+      for (const t of flag.getTags()) {
+        if (t === "sieged:owner." + king) mine = true;
+        else if (t.startsWith("sieged:tier.")) { const n = parseInt(t.slice("sieged:tier.".length)); if (!isNaN(n)) tier = n; }
+      }
+      if (!mine) continue;
+      const l = flag.location;
+      return { loc: { x: l.x, y: l.y, z: l.z }, radius: (TIER_RADIUS[tier] ?? TIER_RADIUS[0]) + TERR_MARGIN };
+    }
+  } catch (e) {}
+  const l = ent.location;
+  return { loc: { x: l.x, y: l.y, z: l.z }, radius: cfg.radius };
+}
 
 function kingdomOfEntity(ent) {
   try {
@@ -241,18 +274,20 @@ world.afterEvents.entityHurt.subscribe((ev) => {
   // représentants du roi ont le droit d'être là, pas d'attaquer non plus —
   // mais on ne punit pas le roi lui-même ni un admin en créatif.
   try { if (String(atk.getGameMode()).toLowerCase() === "creative") return; } catch (e) {}
+  if (isOperator(atk)) return;
 
   const cfg = getCfg();
   const cur = violations.get(atk.id);
   if (cur && Date.now() < cur.until) return; // compte à rebours déjà en cours
-  let loc, dimId;
-  try { loc = ev.hurtEntity.location; dimId = ev.hurtEntity.dimension.id; } catch (e) { loc = atk.location; dimId = atk.dimension.id; }
-  violations.set(atk.id, { king, until: Date.now() + cfg.countdown * 1000, loc: { x: loc.x, y: loc.y, z: loc.z }, dimId, name: atk.name });
+  const terr = territoryOf(king, ev.hurtEntity, cfg);
+  let dimId;
+  try { dimId = ev.hurtEntity.dimension.id; } catch (e) { dimId = atk.dimension.id; }
+  violations.set(atk.id, { king, until: Date.now() + cfg.countdown * 1000, loc: terr.loc, radius: terr.radius, dimId, name: atk.name });
   try {
     atk.onScreenDisplay.setTitle("§c⚠ INTERDIT", { fadeInDuration: 5, stayDuration: 60, fadeOutDuration: 10, subtitle: "§fLe roi " + king + " est hors-ligne" });
   } catch (e) {}
   try {
-    atk.sendMessage("§c⚠ Règle 4 : le royaume de §e" + king + "§c n'a aucun défenseur en ligne. Il est §cinterdit§c de l'attaquer.\n§eQuitte la zone avant " + cfg.countdown + " secondes§c : sinon, bannissement temporaire automatique. Si tu pars, seul un avertissement sera enregistré.");
+    atk.sendMessage("§c⚠ Règle 4 : le royaume de §e" + king + "§c n'a aucun défenseur en ligne. Il est §cinterdit§c de l'attaquer.\n§eQuitte son territoire (" + Math.round(terr.radius) + " blocs autour du drapeau) avant " + cfg.countdown + " secondes§c : sinon, bannissement temporaire automatique. Si tu pars, seul un avertissement sera enregistré.");
     atk.playSound("note.bass", { pitch: 0.6 });
   } catch (e) {}
 });
@@ -272,9 +307,10 @@ system.runInterval(() => {
       continue;
     }
     const cfg = getCfg();
+    const zone = v.radius || cfg.radius;
     let dist = Infinity;
     try { if (p.dimension.id === v.dimId) { const l = p.location; dist = Math.sqrt((l.x - v.loc.x) ** 2 + (l.y - v.loc.y) ** 2 + (l.z - v.loc.z) ** 2); } } catch (e) {}
-    if (dist <= cfg.radius) {
+    if (dist <= zone) {
       addWarning(p.name, 3, "Est resté malgré l'avertissement : attaque du royaume de " + v.king + " sans défenseur");
       banPlayer(p.name, cfg.banHours, "Attaque d'un royaume sans défenseur en ligne (règle 4)");
     } else {
@@ -321,7 +357,8 @@ function openRulesAdmin(player, isAdminFn) {
   new ActionFormData().title("§9⚙ Administration du règlement")
     .body(
       "§7Compte à rebours règle 4 : §f" + cfg.countdown + " s\n" +
-      "§7Rayon de contrôle : §f" + cfg.radius + " blocs\n" +
+      "§7Zone interdite : §fterritoire réel du royaume§7 (20→96 blocs selon son niveau)\n" +
+      "§7Rayon de secours (drapeau introuvable) : §f" + cfg.radius + " blocs\n" +
       "§7Durée du ban auto : §f" + cfg.banHours + " h\n" +
       "§7Seuil d'avertissements : §f" + cfg.warnLimit + " pts\n" +
       "§7Cellule : §f" + (prison.cell ? Math.floor(prison.cell.x) + " " + Math.floor(prison.cell.y) + " " + Math.floor(prison.cell.z) : "§cnon définie") + "\n" +
@@ -346,7 +383,7 @@ function openRulesAdmin(player, isAdminFn) {
       } else if (res.selection === 2) {
         const f = new ModalFormData().title("Durées et seuils")
           .textField("Compte à rebours de la règle 4 (secondes)", String(cfg.countdown), { defaultValue: String(cfg.countdown) })
-          .textField("Rayon de contrôle (blocs)", String(cfg.radius), { defaultValue: String(cfg.radius) })
+          .textField("Rayon de secours en blocs (utilisé seulement si le drapeau est introuvable)", String(cfg.radius), { defaultValue: String(cfg.radius) })
           .textField("Durée du bannissement automatique (heures)", String(cfg.banHours), { defaultValue: String(cfg.banHours) })
           .textField("Seuil d'avertissements avant ban (points)", String(cfg.warnLimit), { defaultValue: String(cfg.warnLimit) });
         f.show(player).then((r) => {
