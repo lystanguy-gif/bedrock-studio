@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "ROYAUME SIEGE FR V8 — PNJ & Économie",
+    "name": "ROYAUME SIEGE FR V9 — PNJ & Économie",
     "description": "PNJ à métiers, banque, civilisations, immobilier — compatible Sieged (FR).",
     "uuid": "691a8c30-7d3c-4947-8ec4-43a772f58cd9",
     "version": [
       1,
-      8,
-      2
+      9,
+      0
     ],
     "min_engine_version": [
       1,
@@ -22,8 +22,8 @@
       "uuid": "378ed4e9-c783-4154-ac4f-31d622861965",
       "version": [
         1,
-        8,
-        2
+        9,
+        0
       ],
       "entry": "scripts/main.js"
     }
@@ -41,8 +41,8 @@
       "uuid": "27eeda3d-e1a0-4e40-94c1-dc61294340ee",
       "version": [
         1,
-        8,
-        2
+        9,
+        0
       ]
     }
   ]
