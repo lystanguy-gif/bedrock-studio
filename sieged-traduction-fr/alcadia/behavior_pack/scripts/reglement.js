@@ -53,6 +53,7 @@ const RULES = [
   { titre: "§e6. Territoires et constructions", texte: "§7Respecte les frontières des royaumes (rayon autour du drapeau).\n\n§7Ne construis pas collé au territoire d'autrui sans accord de son roi.\n\n§7Les constructions doivent rester dans l'esprit médiéval du serveur." },
   { titre: "§67. Sanctions", texte: "§7Les avertissements ont des niveaux : §fléger§7 (1 pt), §6sérieux§7 (2 pts), §cgrave§7 (3 pts).\n\n§7Au-delà du seuil de points, bannissement temporaire automatique.\n\n§7Selon la faute, un admin peut aussi t'envoyer en §8prison RP§7 (cellule pour une durée donnée) ou te bannir directement.\n\n§7Les points s'effacent sur décision d'un admin." },
   { titre: "§d8. Représentants d'un royaume", texte: "§7Chaque roi peut nommer des §ereprésentants§7 (bouton 👑 de ce menu, visible par le roi).\n\n§7Quand le roi est hors-ligne mais qu'un représentant est en ligne, le royaume compte comme §edéfendu§7 : les attaques (en guerre déclarée) sont autorisées.\n\n§7Choisis des joueurs de confiance : ils portent la défense du royaume en ton absence." },
+  { titre: "§c9. Nether et End interdits (règle automatisée)", texte: "§7Ce monde médiéval se joue dans le §emonde normal§7 : le §cNether§7 et §cl'End§7 sont interdits aux joueurs.\n\n§6Automatique : §7si tu y entres, un avertissement s'affiche avec un §ccompte à rebours§7. Ressors avant la fin : aucune sanction. Reste : avertissement grave, retour forcé au spawn et §cbannissement temporaire§7.\n\n§8Les administrateurs et le mode créatif ne sont pas concernés." },
 ];
 
 export function openReglement(player, isAdminFn) {
@@ -292,6 +293,49 @@ world.afterEvents.entityHurt.subscribe((ev) => {
   } catch (e) {}
 });
 
+// ── Règle 9 automatisée : Nether et End interdits ────────────────────────────
+// Entrer dans une dimension interdite lance le même chrono que la règle 4 :
+// ressortir à temps = rien, rester = avertissement grave + retour au spawn
+// + bannissement temporaire.
+const FORBIDDEN_DIMS = { "minecraft:nether": "le Nether", "minecraft:the_end": "l'End" };
+const dimViolations = new Map(); // playerId -> { until, name }
+
+function sendToOverworldSpawn(p) {
+  try {
+    const ow = world.getDimension("minecraft:overworld");
+    const sp = world.getDefaultSpawnLocation();
+    const y = (sp.y > 319 || sp.y < -60) ? 150 : sp.y;
+    p.teleport({ x: sp.x + 0.5, y, z: sp.z + 0.5 }, { dimension: ow });
+    p.runCommand("effect @s slow_falling 15 0 true");
+  } catch (e) {}
+}
+
+function startDimViolation(p, dimName) {
+  try { if (String(p.getGameMode()).toLowerCase() === "creative") return; } catch (e) {}
+  if (isOperator(p)) return;
+  if (dimViolations.has(p.id)) return;
+  const cfg = getCfg();
+  dimViolations.set(p.id, { until: Date.now() + cfg.countdown * 1000, name: p.name });
+  try { p.onScreenDisplay.setTitle("§c⚠ INTERDIT", { fadeInDuration: 5, stayDuration: 60, fadeOutDuration: 10, subtitle: "§f" + dimName + " est interdit sur ce serveur" }); } catch (e) {}
+  try {
+    p.sendMessage("§c⚠ Règle 9 : §e" + dimName + "§c est interdit aux joueurs.\n§eRessors avant " + cfg.countdown + " secondes§c : aucune sanction. Sinon : avertissement grave, retour au spawn et bannissement temporaire.");
+    p.playSound("note.bass", { pitch: 0.6 });
+  } catch (e) {}
+}
+
+world.afterEvents.playerDimensionChange.subscribe((ev) => {
+  const p = ev.player;
+  if (!p) return;
+  let toId; try { toId = ev.toDimension.id; } catch (e) { return; }
+  const dimName = FORBIDDEN_DIMS[toId];
+  if (!dimName) {
+    // revenu dans le monde normal : chrono annulé, aucune sanction
+    if (dimViolations.delete(p.id)) { try { p.sendMessage("§aTu es ressorti à temps : aucune sanction."); } catch (e) {} }
+    return;
+  }
+  startDimViolation(p, dimName);
+});
+
 // Vérification légère toutes les 5 s : comptes à rebours, prison, bans.
 system.runInterval(() => {
   const now = Date.now();
@@ -318,9 +362,32 @@ system.runInterval(() => {
       if (!r.banned) try { p.sendMessage("§6Tu as quitté la zone à temps : avertissement enregistré (§c" + r.total + "§6 pts)."); } catch (e) {}
     }
   }
-  // 2. prison + bans (joueurs en ligne uniquement)
+  // 1 bis. comptes à rebours de la règle 9 (Nether/End)
+  for (const [id, v] of dimViolations) {
+    if (now < v.until) continue;
+    dimViolations.delete(id);
+    let p = null;
+    try { p = world.getEntity(id); } catch (e) {}
+    if (!p || p.typeId !== "minecraft:player") {
+      // déconnecté dans la dimension interdite : avertissement sérieux
+      addWarning(v.name, 2, "Est resté dans une dimension interdite (déconnecté pendant le chrono)");
+      continue;
+    }
+    let dimId = ""; try { dimId = p.dimension.id; } catch (e) {}
+    if (FORBIDDEN_DIMS[dimId]) {
+      const cfg = getCfg();
+      addWarning(p.name, 3, "Est resté dans " + FORBIDDEN_DIMS[dimId] + " malgré l'avertissement");
+      sendToOverworldSpawn(p);
+      banPlayer(p.name, cfg.banHours, "Dimension interdite malgré l'avertissement (règle 9)");
+    }
+    // sinon : déjà ressorti, rien à faire
+  }
+  // 2. prison + bans + présence en dimension interdite (joueurs en ligne)
   const prison = loadObj(DP_PRISON);
   for (const p of world.getAllPlayers()) {
+    // règle 9 : couvre aussi un joueur déjà dans le Nether/End sans avoir
+    // changé de dimension (connexion sur place, pack fraîchement activé…)
+    try { const dn = FORBIDDEN_DIMS[p.dimension.id]; if (dn) startDimViolation(p, dn); } catch (e) {}
     const j = jailInfo(p);
     if (j) {
       if (now >= j.until) { freePlayer(p); continue; }
