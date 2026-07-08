@@ -34,6 +34,7 @@ const EMERALD = "minecraft:emerald";
 
 // Catalogue : œufs d'apparition des unités alliées de Sieged.
 const CATALOG = [
+  { egg: "minecraft:villager_spawn_egg",  name: "Villageois",     cost: 6,  desc: "Population du royaume : compte pour monter de niveau, se marchande, paie l'impôt.", direct: true },
   { egg: "sieged:warder_spawn_egg",       name: "Gardien",        cost: 8,  desc: "Fantassin à l'épée, solide et polyvalent." },
   { egg: "sieged:sentinel_spawn_egg",     name: "Sentinelle",     cost: 8,  desc: "Archer de garnison, tient les remparts." },
   { egg: "sieged:chevalier_spawn_egg",    name: "Chevalier",      cost: 12, desc: "Cavalerie lourde, charge dévastatrice." },
@@ -136,7 +137,9 @@ function buyEgg(player, u) {
   if (!removeItem(cont, EMERALD, u.cost)) { player.sendMessage("§cPaiement impossible."); return; }
   const leftover = cont.addItem(stack);
   if (leftover) { try { player.dimension.spawnItem(leftover, player.location); } catch (e) {} }
-  player.sendMessage("§aŒuf de §2" + u.name + "§a acheté pour §e" + u.cost + "§a émeraudes. Pose-le, puis recrute l'unité avec §eune émeraude en main§a.");
+  player.sendMessage(u.direct
+    ? "§aŒuf de §2" + u.name + "§a acheté pour §e" + u.cost + "§a émeraudes. Pose-le dans ton territoire : il rejoint ta population directement."
+    : "§aŒuf de §2" + u.name + "§a acheté pour §e" + u.cost + "§a émeraudes. Pose-le, puis recrute l'unité avec §eune émeraude en main§a.");
   try { player.playSound("random.orb"); } catch (e) {}
   // On rouvre la boutique pour enchaîner les achats.
   system.runTimeout(() => { try { openTroupesShop(player); } catch (e) {} }, 8);
