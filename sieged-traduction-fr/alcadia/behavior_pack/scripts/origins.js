@@ -1,6 +1,6 @@
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { addBalance } from "./util.js";
+import { getBalance, setBalance } from "./util.js";
 import { chooseSpecCreation, specLabel, clearSpec } from "./specialites.js";
 
 // ===================== identité du joueur =====================
@@ -175,10 +175,12 @@ function teleportToRally(player, nation) {
 
 function finalize(player, isFounder, natName) {
   try { player.setDynamicProperty(DP_DONE, true); } catch (e) {}
-  try { addBalance(player, 100); } catch (e) {}
+  // Compte garni à 100 pièces au départ — sans s'empiler si le joueur refait
+  // sa création (avant : +100 à chaque passage, d'où des comptes à 200).
+  try { if (getBalance(player) < 100) setBalance(player, 100); } catch (e) {}
   try { player.runCommand("give @s bread 8"); } catch (e) {}
   try { player.runCommand("give @s torch 8"); } catch (e) {}
-  player.sendMessage("§7Tu reçois 100 pièces sur ton compte et un petit équipement de départ.");
+  player.sendMessage("§7Tu démarres avec 100 pièces sur ton compte et un petit équipement.");
   system.runTimeout(() => spawnForNation(player), 10);
 }
 

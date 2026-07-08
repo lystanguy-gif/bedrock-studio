@@ -19,7 +19,7 @@ import { container, countItem, removeItem, giveCustom } from "./util.js";
 
 const DP_SPEC = "spec:id";
 const EMERALD = "minecraft:emerald";
-const CHANGE_COST = 32;
+const CHANGE_COST = 200;
 
 // Réglages des bonus (petits mais réguliers, pour ne pas casser l'économie).
 const SWORD_EVERY = 5;      // un coup puissant tous les N coups d'épée
