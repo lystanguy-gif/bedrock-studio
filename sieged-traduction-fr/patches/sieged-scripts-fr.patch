@@ -542,30 +542,135 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/loot_tables/chests/villagerl
  				}
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/manifest.json addon/SiegedTATB/manifest.json
 --- addon_orig/SiegedTATB/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATB/manifest.json	2026-07-04 19:36:13.080379888 +0000
-@@ -1,10 +1,10 @@
++++ addon/SiegedTATB/manifest.json	2026-07-08 19:34:06.620828857 +0000
+@@ -1,48 +1,80 @@
  {
- 	"format_version": 2,
- 	"header": {
+-	"format_version": 2,
+-	"header": {
 -		"name": "Sieged TAT Behavior",
 -		"description": "Medieval survival addon BP Update V1.7",
-+		"name": "Sieged TAT Behavior (FR)",
-+		"description": "Add-on médiéval de survie — BP — traduit en français (v1.7.7)",
- 		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
+-		"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
 -		"version": [1, 7, 1],
-+		"version": [1, 7, 7],
- 		"min_engine_version": [1, 26, 0]
- 	},
- 	"modules": [
-@@ -24,7 +24,7 @@
- 	"dependencies": [
- 		{
- 			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
+-		"min_engine_version": [1, 26, 0]
+-	},
+-	"modules": [
+-		{
+-			"type": "data",
+-			"uuid": "d766795e-e206-49e8-ac2e-97db21d5e7ac",
+-			"version": [1, 6, 0]
+-		},
+-		{
+-			"type": "script",
+-			"language": "javascript",
+-			"uuid": "2c3559cd-8849-4b1b-8905-2a1131091f7a",
+-			"version": [1, 6, 0],
+-			"entry": "scripts/main.js"
+-		}
+-	],
+-	"dependencies": [
+-		{
+-			"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
 -			"version": [1, 7, 1]
-+			"version": [1, 7, 7]
- 		},
- 		{
- 			"module_name": "@minecraft/server",
+-		},
+-		{
+-			"module_name": "@minecraft/server",
+-			"version": "2.6.0"
+-		},
+-		{
+-			"module_name": "@minecraft/server-ui",
+-			"version": "2.0.0"
+-		}
+-	],
+-	"metadata": {
+-		"authors": ["Los"],
+-		"generated_with": {
+-			"blockbench_item_wizard": ["1.2.4"],
+-			"blockbench_entity_wizard": ["1.8.2", "1.8.3"],
+-			"blockbench_block_wizard": ["1.6.1", "1.7.0"]
+-		},
+-		"product_type": "addon"
+-	},
+-	"capabilities": ["script_eval"]
++  "format_version": 2,
++  "header": {
++    "name": "Sieged TAT Behavior (FR)",
++    "description": "Add-on médiéval de survie — BP — traduit en français (v1.7.7)",
++    "uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
++    "version": [
++      1,
++      7,
++      8
++    ],
++    "min_engine_version": [
++      1,
++      26,
++      0
++    ]
++  },
++  "modules": [
++    {
++      "type": "data",
++      "uuid": "d766795e-e206-49e8-ac2e-97db21d5e7ac",
++      "version": [
++        1,
++        7,
++        8
++      ]
++    },
++    {
++      "type": "script",
++      "language": "javascript",
++      "uuid": "2c3559cd-8849-4b1b-8905-2a1131091f7a",
++      "version": [
++        1,
++        7,
++        8
++      ],
++      "entry": "scripts/main.js"
++    }
++  ],
++  "dependencies": [
++    {
++      "uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
++      "version": [
++        1,
++        7,
++        8
++      ]
++    },
++    {
++      "module_name": "@minecraft/server",
++      "version": "2.6.0"
++    },
++    {
++      "module_name": "@minecraft/server-ui",
++      "version": "2.0.0"
++    }
++  ],
++  "metadata": {
++    "authors": [
++      "Los"
++    ],
++    "generated_with": {
++      "blockbench_item_wizard": [
++        "1.2.4"
++      ],
++      "blockbench_entity_wizard": [
++        "1.8.2",
++        "1.8.3"
++      ],
++      "blockbench_block_wizard": [
++        "1.6.1",
++        "1.7.0"
++      ]
++    },
++    "product_type": "addon"
++  },
++  "capabilities": [
++    "script_eval"
++  ]
+ }
+\ No newline at end of file
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/banner_guard_script.js addon/SiegedTATB/scripts/banner_guard_script.js
 --- addon_orig/SiegedTATB/scripts/banner_guard_script.js	2026-06-25 22:08:37.000000000 +0000
 +++ addon/SiegedTATB/scripts/banner_guard_script.js	2026-07-04 18:05:08.405693006 +0000
@@ -1057,7 +1162,7 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/invasion_event.js ad
          const owner = castle?.ownerName
 diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/kingdom.js addon/SiegedTATB/scripts/kingdom.js
 --- addon_orig/SiegedTATB/scripts/kingdom.js	2026-06-30 13:40:06.000000000 +0000
-+++ addon/SiegedTATB/scripts/kingdom.js	2026-07-04 18:00:00.584495855 +0000
++++ addon/SiegedTATB/scripts/kingdom.js	2026-07-08 19:34:06.576045759 +0000
 @@ -218,6 +218,218 @@
      disband_btn1:  "§c§l Yes, Disband",
      disband_btn2:  "§aCancel",
@@ -1922,6 +2027,21 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/kingdom.js addon/Sie
          : "  §8None";
  
      const form = new ActionFormData()
+@@ -3884,10 +4098,10 @@
+             kgT(locale, "members_list_header", members.length),
+             memberLines,
+             "",
+-            "§7Invite §8— add an online player (joins as Peasant).",
+-            "§7Remove §8— kick a member.",
+-            "§7Set Rank §8— promote or demote a member.",
+-            "§7Transfer Crown §8— make a member the new King.",
++            kgT(locale, "members_desc_invite"),
++            kgT(locale, "members_desc_remove"),
++            kgT(locale, "members_desc_rank"),
++            kgT(locale, "members_desc_transfer"),
+         ].join("\n"))
+         .button(kgT(locale, "members_btn_invite"))
+         .button(kgT(locale, "members_btn_remove"))
 @@ -3912,7 +4126,7 @@
      const allKingdomFlags = getAllKingdomFlags(kingName);
      const online = world.getAllPlayers().filter(p => p.id !== player.id);
@@ -3996,6 +4116,102 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
  
    const fakeEnemyId = "fake_enemy_" + Date.now();
  
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATR/manifest.json addon/SiegedTATR/manifest.json
+--- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
++++ addon/SiegedTATR/manifest.json	2026-07-08 19:34:06.622538125 +0000
+@@ -1,32 +1,60 @@
+ {
+-	"format_version": 2,
+-	"header": {
+-		"name": "Sieged TAT Resource",
+-		"description": "Medieval survival addon RP Update V1.7",
+-		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
+-		"version": [1, 7, 1],
+-		"min_engine_version": [1, 26, 0]
+-	},
+-	"modules": [
+-		{
+-			"type": "resources",
+-			"uuid": "4e247077-2642-471a-9bd0-ce29f6411980",
+-			"version": [1, 6, 0]
+-		}
+-	],
+-	"dependencies": [
+-		{
+-			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
+-			"version": [1, 7, 1]
+-		}
+-	],
+-	"capabilities": ["pbr"],
+-	"metadata": {
+-		"authors": ["Los"],
+-		"generated_with": {
+-			"blockbench_item_wizard": ["1.2.4"],
+-			"blockbench_entity_wizard": ["1.8.2", "1.8.3"],
+-			"blockbench_block_wizard": ["1.6.1", "1.7.0"]
+-		}
+-	}
++  "format_version": 2,
++  "header": {
++    "name": "Sieged TAT Resource (FR)",
++    "description": "Add-on médiéval de survie — RP — traduit en français (v1.7.7)",
++    "uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
++    "version": [
++      1,
++      7,
++      8
++    ],
++    "min_engine_version": [
++      1,
++      26,
++      0
++    ]
++  },
++  "modules": [
++    {
++      "type": "resources",
++      "uuid": "4e247077-2642-471a-9bd0-ce29f6411980",
++      "version": [
++        1,
++        7,
++        8
++      ]
++    }
++  ],
++  "dependencies": [
++    {
++      "uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
++      "version": [
++        1,
++        7,
++        8
++      ]
++    }
++  ],
++  "capabilities": [
++    "pbr"
++  ],
++  "metadata": {
++    "authors": [
++      "Los"
++    ],
++    "generated_with": {
++      "blockbench_item_wizard": [
++        "1.2.4"
++      ],
++      "blockbench_entity_wizard": [
++        "1.8.2",
++        "1.8.3"
++      ],
++      "blockbench_block_wizard": [
++        "1.6.1",
++        "1.7.0"
++      ]
++    }
++  }
+ }
+\ No newline at end of file
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATR/texts/en_US.lang addon/SiegedTATR/texts/en_US.lang
 --- addon_orig/SiegedTATR/texts/en_US.lang	2026-06-24 22:22:47.000000000 +0000
 +++ addon/SiegedTATR/texts/en_US.lang	2026-07-04 17:14:58.618413497 +0000
 @@ -1011,4 +1011,13 @@
@@ -4014,6 +4230,2063 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
 +sieged.hud.war_form_reason_placeholder=e.g. Theft, betrayal...
 +sieged.hud.war_form_pending=§7(pending...)
 +sieged.hud.war_form_cancel=§7Cancel
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATR/texts/fr_CA.lang addon/SiegedTATR/texts/fr_CA.lang
+--- addon_orig/SiegedTATR/texts/fr_CA.lang	1970-01-01 00:00:00.000000000 +0000
++++ addon/SiegedTATR/texts/fr_CA.lang	2026-07-04 17:14:58.618413497 +0000
+@@ -0,0 +1,1024 @@
++﻿entity.sieged:questmaster.name=Noble du village
++action.interact.quest_master=Parler au Noble du village
++sieged:siege_items=Objets de Sieged
++sieged:shields=Boucliers
++sieged:crests=Blasons
++entity.sieged:executioner.name=Bourreau
++item.spawn_egg.entity.sieged:executioner.name=Invoquer un Bourreau
++entity.sieged:vanquisher.name=Vainqueur
++item.spawn_egg.entity.sieged:vanquisher.name=Invoquer un Vainqueur
++entity.sieged:trebuchet.name=Trébuchet
++item.spawn_egg.entity.sieged:trebuchet.name= §6Plan de trébuchet
++entity.sieged:warder.name=Gardien
++item.spawn_egg.entity.sieged:warder.name=Invoquer un Gardien
++entity.sieged:sentinel.name=Sentinelle
++item.spawn_egg.entity.sieged:sentinel.name=Invoquer une Sentinelle
++entity.sieged:boulder.name=Rocher
++item.sieged:trebuchet_spawn_egg=Plan de trébuchet
++entity.sieged:catapult.name=Catapulte
++item.spawn_egg.entity.sieged:catapult.name= §6Plan de catapulte
++item.sieged:firing_staff=Bâton de mise à feu
++item.sieged:lance=Lance
++item.sieged:longsword=Épée longue
++item.sieged:twoheadedaxe=Hache à deux têtes
++item.sieged:short_doubleheaded_axe=Hache double courte
++item.sieged:zweihander=Zweihander
++item.sieged:staff=Bâton
++item.sieged:morningstar=Étoile du matin
++item.sieged:pike=Pique
++item.sieged:halberd=Hallebarde
++item.sieged:heavy_hammer=Marteau lourd
++item.sieged:war_hammer=Marteau de guerre
++item.sieged:great_sword=Grande épée
++item.sieged:gladius=Gladius
++item.sieged:sabre=Sabre
++item.sieged:billhook=Serpe de guerre
++item.sieged:javelin=Javelot
++entity.sieged:thrown_javelin.name=Javelot lancé
++item.sieged:heavy_crossbow=Arbalète lourde
++item.sieged:heavy_crossbow_loaded=Arbalète lourde (chargée)
++item.sieged:heavy_crossbow_unusable=Arbalète lourde (vide)
++item.sieged:longbow=Arc long
++entity.sieged:battering_ram.name=Bélier
++item.spawn_egg.entity.sieged:battering_ram.name=§6Plan de bélier
++item.sieged:siege_legs=Supports de siège
++item.sieged:trebuchet_arm=Bras de trébuchet
++item.sieged:catapult_arm=Bras de catapulte
++entity.sieged:balista.name=Baliste
++item.spawn_egg.entity.sieged:balista.name=§6Baliste
++entity.sieged:falconer.name=Fauconnier
++item.spawn_egg.entity.sieged:falconer.name=Invoquer un Fauconnier
++item.sieged:crown_of_dominion=§5Couronne de Souveraineté
++entity.sieged:villager_general.name=Général villageois
++entity.sieged:trainee.name=Recrue
++action.hint.exit.sieged:balista=Rechargement
++action.hint.exit.sieged:battering_ram=Descendre
++entity.sieged:berserker.name=Berserker
++item.spawn_egg.entity.sieged:berserker.name=Invoquer un Berserker
++entity.sieged:siege_tower.name=Tour de siège
++item.spawn_egg.entity.sieged:siege_tower.name=§6Plan de tour de siège
++entity.sieged:eradicator.name=Éradicateur
++item.spawn_egg.entity.sieged:eradicator.name=Invoquer un Éradicateur
++tile.sieged:arrow_block.name=Bloc de flèches
++entity.sieged:shieldwall.name=Mur de boucliers
++entity.sieged:banner_guard.name=Garde-bannière
++item.spawn_egg.entity.sieged:banner_guard.name=Invoquer un Garde-bannière
++action.interact.banner_guard=Ouvrir le menu de commandement
++action.interact.sieged.hold_position=Tenir la position
++action.interact.sieged.follow_me=Suivez-moi
++entity.sieged:messenger_crow.name=Corbeau messager
++item.sieged:blank_schematic=Plan vierge
++item.sieged:scroll=Parchemin
++item.sieged:war_order_scroll=§uParchemin d'ordre de guerre
++action.hint.exit.sieged:siege_tower=Descendre
++action.hint.exit.sieged:shieldwall=
++tile.sieged:siege_stairs.name=Escalier de siège
++entity.sieged:war_ravager.name=Ravageur de guerre
++item.spawn_egg.entity.sieged:war_ravager.name=§4Invoquer un Ravageur de guerre
++item.sieged:target=cible
++item.sieged:war_horn=§uCor de guerre
++entity.sieged:siege_cart.name=Chariot de siège
++item.spawn_egg.entity.sieged:siege_cart.name=§6Chariot de siège
++action.hint.exit.sieged:siege_cart=Descendre
++action.interact.enter_cart=Monter dans le chariot
++entity.sieged:chevalier.name=Chevalier
++item.spawn_egg.entity.sieged:chevalier.name=Invoquer un Chevalier
++entity.sieged:villager_king.name=§6Le Monarque
++entity.sieged:villager_king_combat.name=§6Le Monarque
++item.spawn_egg.entity.sieged:villager_king.name=§6Invoquer le Monarque
++entity.sieged:brazier.name=Brasero
++entity.sieged:lancers.name=Lanciers
++item.spawn_egg.entity.sieged:lancers.name=Invoquer des Lanciers
++entity.sieged:illager_king.name=§cLe Tyran
++item.spawn_egg.entity.sieged:illager_king.name=§4Invoquer le Tyran
++entity.sieged:castle_flag.name=Drapeau de château
++item.spawn_egg.entity.sieged:castle_flag.name=Déployer un drapeau de château
++itemGroup.name.crests=Blasons
++itemGroup.name.siegedItems=Objets de Sieged
++itemGroup.name.siegeWeapons=Armes de siège
++sieged:siege_weapons=Armes de siège
++sieged:banner_flags=Bannières
++item.sieged:crest_of_fortitude=Blason de Vigueur
++item.sieged:crest_of_arms=Blason des Armes
++item.sieged:crest_of_morale=Blason du Moral
++item.sieged:crest_of_pursuit=Blason de Poursuite
++item.sieged:crest_of_empty=Blason vierge
++item.sieged:crest_of_architecture=Blason d'Architecture
++item.sieged:crest_of_wealth=Blason de Richesse
++item.sieged:crest_of_war=Blason de Guerre
++item.sieged:catapult_spawn_egg=§6Plan de catapulte
++item.sieged:balista_spawn_egg=§6Baliste
++item.sieged:siege_cart_spawn_egg=§6Chariot de siège
++item.sieged:siege_tower_spawn_egg=Plan de tour de siège
++item.sieged:battering_ram_spawn_egg=Plan de bélier
++action.hint.exit.sieged:commander_platform=Accroupissez-vous pour quitter le commandement
++entity.sieged:the_forsaken_knight.name=Le Chevalier Déchu
++item.spawn_egg.entity.sieged:the_forsaken_knight.name=§4Invoquer le Chevalier Déchu
++entity.sieged:ransacker.name=Saccageur
++item.spawn_egg.entity.sieged:ransacker.name=Invoquer un Saccageur
++action.interact.load_trebuchet=Charger un rocher
++entity.sieged:templar.name=Templier
++item.spawn_egg.entity.sieged:templar.name=Invoquer un Templier
++item.sieged:tempered_steel=Acier trempé
++item.sieged:warder_gear=équipement de gardien
++item.sieged:sieged_book=Registre
++item.sieged:forsaken_helm=Heaume du Déchu
++tile.sieged:forsaken_helm_block.name=Bloc de heaume du Déchu
++entity.sieged:cheiftain.name=Chef de guerre
++item.spawn_egg.entity.sieged:cheiftain.name=Invoquer un Chef de guerre
++tile.sieged:pile_o_rocks.name=Tas de rochers
++entity.sieged:siege_engineer.name=Ingénieur de siège
++item.spawn_egg.entity.sieged:siege_engineer.name=Invoquer un Ingénieur de siège
++item.sieged:rock=Roche lourde
++item.sieged:heated_iron=Fer chauffé
++item.sieged:tempered_steel_helm=Heaume en acier trempé
++item.sieged:tempered_steel_chestplate=Plastron en acier trempé
++item.sieged:tempered_steel_leggings=Jambières en acier trempé
++item.sieged:tempered_steel_boots=Bottes en acier trempé
++item.sieged:forsaken_chestplate=Plastron du Déchu
++item.sieged:the_crown_of_domination=§4Couronne de Domination
++item.sieged:forging_glove=Gant de forge
++entity.sieged:wooden_gate.name=Porte en bois
++item.spawn_egg.entity.sieged:wooden_gate.name=Invoquer une porte en bois
++action.hint.exit.sieged:the_forsaken_knight=§4Échappez à l'emprise du Chevalier !
++item.sieged:steel_repentence_helm=Heaume d'acier de la Repentance
++item.sieged:steel_repentance_chestplate=Plastron d'acier de la Repentance
++item.sieged:steel_repentance_leggings=Jambières d'acier de la Repentance
++item.myname:steel_repentance_boots=Bottes d'acier de la Repentance
++item.sieged:steel_barren_garb=Tenue d'acier des Terres Arides
++action.interact.repair=Réparer
++action.interact.wooden_gate=Ouvrir/Fermer la porte
++action.interact.wooden_gate_lock=Verrouiller/Déverrouiller la porte
++tile.sieged:woodengateblock.name=bloc de porte en bois
++tile.sieged:castle_gate.name=Porte de château
++item.sieged:steel_barren_chestplate=Plastron d'acier des Terres Arides
++item.sieged:steel_barren_leggings=Jambières d'acier des Terres Arides
++item.sieged:steel_barren_sandals=Sandales d'acier des Terres Arides
++item.sieged:steel_repentance_boots=Bottes d'acier de la Repentance
++item.sieged:steel_warlord_helm=Heaume d'acier du Seigneur de guerre
++item.sieged:steel_warlord_chestplate=Plastron d'acier du Seigneur de guerre
++item.sieged:steel_warlord_leggings=Jambières d'acier du Seigneur de guerre
++item.sieged:steel_warlord_boots=Bottes d'acier du Seigneur de guerre
++item.sieged:templar_gear=Équipement de Templier
++tile.sieged:forging_anvil.name=Enclume de forge
++tile.sieged:tempered_steel_block.name=Bloc d'acier trempé
++item.sieged:commanding_horn=Cor de commandement
++item.sieged:commanding_horn_gilded=Cor de commandement doré
++item.sieged:commanding_horn_diamond=Cor de commandement en diamant
++item.sieged:commanding_horn_emerald=Cor de commandement en émeraude
++item.sieged:commanding_horn_netherite=Cor de commandement en netherite
++item.sieged:heater_shield=Écu
++item.sieged:kite_shield=Bouclier en amande
++item.sieged:buckler_shield=Rondache
++item.sieged:tower_shield=Pavois
++item.sieged:round_shield=Bouclier rond
++item.sieged:large_round_shield=Grand bouclier rond
++
++entity.sieged:placed_tower_shield.name=Pavois posé
++item.sieged:crest_of_knowledge=Blason du Savoir
++item.sieged:flail=Fléau d'armes
++entity.sieged:vassal_ship.name=Navire vassal
++item.spawn_egg.entity.sieged:vassal_ship.name=Invoquer un Navire vassal
++action.hint.exit.sieged:vassal_ship= s'accroupir pour débarquer
++action.interact.board_ship=Monter à bord
++action.interact.open_container=Ouvrir la cale
++action.interact.claim_ship=Revendiquer le navire
++tile.sieged:arrow_slit_i.name=Meurtrière I
++tile.sieged:arrow_slit_t.name=Meurtrière T
++tile.sieged:arrow_barrel.name=Tonneau à flèches
++item.sieged:throwing_dagger=Dague de lancer
++entity.sieged:javalier.name=Javelinier
++item.spawn_egg.entity.sieged:javalier.name=Invoquer un Javelinier
++item.sieged:repeating_crossbow=Arbalète à répétition
++item.sieged:the_summoning_bell=La Cloche d'Invocation
++item.sieged:fleet_drums=Tambour de flotte
++item.sieged:surrender_flag=Drapeau de reddition
++tile.sieged:placed_wooden_pike.name=Pique en bois posée
++item.sieged:wooden_pike=Pique en bois
++entity.sieged:messenger.name=Messager
++item.spawn_egg.entity.sieged:messenger.name=Invoquer un Messager
++item.sieged:steel_seafarer_helm=Heaume d'acier du Marin
++item.sieged:steel_seafarer_chestplate=Plastron d'acier du Marin
++item.sieged:steel_seafarer_leggings=Jambières d'acier du Marin
++item.sieged:steel_seafarers_sandals=Sandales d'acier du Marin
++item.sieged:winter_gear=Équipement d'hiver
++item.sieged:desert_gear=Équipement du désert
++item.sieged:sea_gear=Équipement marin
++item.sieged:banner_flag=Bannière
++item.sieged:banner_flag_red=Bannière (rouge)
++item.sieged:banner_flag_green=Bannière (verte)
++item.sieged:banner_flag_blue=Bannière (bleue)
++item.sieged:banner_flag_purple=Bannière (violette)
++item.sieged:banner_flag_black=Bannière (noire)
++item.sieged:banner_flag_grey=Bannière (grise)
++entity.sieged:oracle.name=Oracle
++item.spawn_egg.entity.sieged:oracle.name=Invoquer un Oracle
++entity.sieged:wagoner.name=Charretier
++item.spawn_egg.entity.sieged:wagoner.name=Invoquer un Charretier
++entity.sieged:marker.name=Marqueur
++action.hint.exit.sieged:wagoner=voyage rapide...
++item.sieged:quest_log=Journal de quêtes
++entity.sieged:questmaster.name=Noble du village
++item.spawn_egg.entity.sieged:questmaster.name=Invoquer un Noble du village
++entity.sieged:illager.name=Illageois
++item.spawn_egg.entity.sieged:illager.name=Invoquer un Illageois
++
++## Script HUD strings
++sieged.hud.gate_destroyed=§cCette porte a été détruite.
++sieged.hud.gate_outside_open=§cCette porte ne peut être ouverte que de l'intérieur.
++sieged.hud.gate_outside_close=§cCette porte ne peut être fermée que de l'intérieur.
++sieged.hud.gate_locked=§cCette porte est verrouillée.
++sieged.hud.gate_lock_first=§eFermez la porte avant de la verrouiller.
++sieged.hud.cart_linked=§aChariot de siège lié ! Descendez pour le délier.
++sieged.hud.cart_not_yours=§cChariot déjà revendiqué.
++sieged.hud.cart_claimed=§aChariot de siège revendiqué pour %1 !
++sieged.hud.construction_progress=§7Construction : %1%2 §e%3§7/§e%4 §7(bûches ou planches)
++sieged.hud.construction_hint=§7Tenez des bûches ou des planches pour construire. §8Accroupi + clic droit pour pivoter.
++sieged.hud.construction_dismantled=§c%1 §7démantelé(e). Plan restitué.
++sieged.hud.construction_rotation=§7Rotation : §e%1°
++sieged.hud.construction_complete=§a§l%1 : construction terminée !
++sieged.hud.construction_building=§7Construction de %1... §e%2 §7matériaux encore nécessaires. §8(bûches ou planches)
++sieged.hud.arrow_barrel_full=§7Le tonneau à flèches est plein ! (%1/%2)
++sieged.hud.arrow_barrel_stored=§a§f%1§a flèche(s) rangée(s) ! §7Tonneau : §f%2§7/%3
++sieged.hud.arrow_barrel_status=§7Tonneau à flèches : %1%2§7/%3  §8(Accroupi + clic pour prendre)
++sieged.hud.arrow_barrel_empty=§cLe tonneau à flèches est vide !
++sieged.hud.arrow_barrel_took=§a§f%1§a flèche(s) prise(s) ! §7Tonneau : %2%3§7/%4
++sieged.hud.arrow_rain_have_marker=§7Vous avez déjà un Marqueur de pluie de flèches !
++sieged.hud.arrow_rain_received=§aMarqueur de pluie de flèches reçu ! Lancez-le pour appeler une volée de flèches !
++sieged.hud.arrow_rain_no_falconers=§cAucun fauconnier disponible ! Invoquez-en et revendiquez-les.
++sieged.hud.arrow_rain_success=§6 %1 fauconnier(s) font pleuvoir des flèches sur la cible !
++sieged.hud.arrow_rain_failed=§cLa pluie de flèches a échoué !
++sieged.hud.arrow_rain_cooldown=§cPluie de flèches en recharge : %1s
++sieged.hud.arrow_rain_no_ammo=§cMunitions insuffisantes ! (%1/%2 nécessaires)
++sieged.hud.arrow_rain_falconer_full=§7Le fauconnier a déjà toutes ses munitions (%1/%2)
++sieged.hud.arrow_rain_supplied=§aFlèche fournie ! §7Munitions du fauconnier : %1/%2
++
++sieged.hud.oracle_cooldown=§7L'Oracle rassemble sa vision... §e(%1s)
++sieged.hud.oracle_no_threats=§7L'Oracle ne voit aucune menace à proximité.
++sieged.hud.oracle_reveals_singular=§eL'Oracle révèle §f%1§e menace !
++sieged.hud.oracle_reveals_plural=§eL'Oracle révèle §f%1§e menaces !
++
++## brazier.js
++sieged.toast.brazier_arrows_lit= §6§lBrasero §8— §eVos flèches sont désormais enflammées !
++sieged.toast.brazier_locked= §c Le brasero §8est verrouillé. Ouvrez votre §eRegistre §8pour le débloquer.
++
++## wooden_pike.js
++sieged.hud.pike_already_max=§cCette formation de piques est déjà complète.
++sieged.hud.pike_not_enough=§cPas assez de piques en bois.
++
++## Siege Weapons HUD (catapult / trebuchet / balista)
++sieged.hud.catapult_claimed=§aCatapulte revendiquée pour %1 !
++sieged.hud.trebuchet_claimed=§aTrébuchet revendiqué pour %1 !
++sieged.hud.ballista_claimed=§aBaliste revendiquée pour %1 !
++sieged.hud.banner_rename_first=§cLa bannière doit d'abord être renommée ! Utilisez une enclume pour la nommer.
++sieged.hud.need_faction_banner=§cIl vous faut une bannière « %1 » dans votre inventaire !
++sieged.hud.trebuchet_flight_path=§e Trajectoire du rocher (5s)
++sieged.hud.ballista_already_full=§7La baliste est déjà pleine (%1/%2)
++sieged.hud.arrow_loaded=§aFlèche chargée ! §7Baliste : %1/%2
++
++## battering_ram.js HUD strings
++sieged.hud.ram_priming=§eArmement du bélier...
++sieged.hud.ram_ready=§aPrêt à tirer ! Utilisez à nouveau le Bâton de mise à feu pour TIRER !
++sieged.hud.ram_fired=§c§lBÉLIER DÉCLENCHÉ !
++sieged.hud.ram_idle=§7Bélier prêt. Utilisez le Bâton de mise à feu pour l'armer.
++sieged.hud.ram_steer_hint=§7Dirigez à §egauche/droite §7| §eBâton de mise à feu §7pour armer le bélier !
++sieged.hud.ram_claimed=§aBélier revendiqué pour %1 !
++sieged.hud.ram_banner_not_named=§cLa bannière doit d'abord être renommée ! Utilisez une enclume pour la nommer.
++
++## ravager_boss.js HUD strings
++sieged.hud.banner_already_burning=§cCette bannière brûle déjà !
++sieged.hud.banner_ignites=§6La bannière s'embrase de flammes sombres...
++sieged.hud.use_horn=§eUtilisez un cor pour déclencher le siège !
++sieged.hud.horn_echoes=§6Le cor résonne sur le champ de bataille...
++
++## victory_parade.js HUD strings
++sieged.hud.return_to_kingdom=§7Retournez dans votre royaume pour organiser le défilé de la victoire.
++sieged.hud.parade_form_title=§6§l Victoire !
++sieged.hud.parade_form_body=§7Votre peuple déborde de joie !\n\n§eVoulez-vous organiser un défilé de la victoire ?\n\n§8Vos unités et vos villageois célébreront\n§8la proclamation de votre triomphe.
++sieged.hud.parade_form_button_yes=§6§l Lancer le défilé !
++sieged.hud.parade_form_button_no=§7Ignorer
++sieged.hud.parade_title=§6§l DÉFILÉ DE LA VICTOIRE
++sieged.hud.parade_subtitle=§7Votre peuple célèbre votre triomphe !
++sieged.hud.parade_mid_title=§6§l VOTRE ROYAUME TIENT DEBOUT !
++sieged.hud.parade_mid_subtitle=§7Le peuple se réjouit en votre nom.
++sieged.hud.parade_end_title=§6§l LONGUE VIE AU VAINQUEUR !
++sieged.hud.parade_end_subtitle=§7La célébration s'achève.
++
++## furniture.js HUD strings
++sieged.hud.gate_horn_inside_only=§cVous devez être à l'intérieur pour lier un cor.
++sieged.hud.gate_horn_already_linked=§cCette porte est déjà liée à un autre cor.
++sieged.hud.gate_horn_linked=§aPorte liée ! Seul ce cor peut l'ouvrir.
++sieged.hud.castle_gate_inside_only=§cCette porte ne peut être manœuvrée que de l'intérieur.
++sieged.hud.castle_gate_needs_axe=§cNécessite une hache en diamant ou en netherite.
++sieged.hud.castle_gate_no_group=§cAucun groupe de porte trouvé.
++sieged.hud.castle_gate_demolished=§aPorte démolie (%1 blocs).
++sieged.hud.castle_gate_break_error=§cErreur de destruction de la porte — voir le journal de contenu.
++
++## sieged_book.js toast strings
++sieged.toast.research_already_busy=§c Recherche déjà en cours : §e%1§c. (%2 restant)
++sieged.toast.research_need_emeralds=§c Il faut §e%1 émeraudes §c(vous en avez §e%2§c).%3
++sieged.toast.research_need_xp=§c Il faut §e%1 niveaux d'XP §c(vous en avez §e%2§c).
++sieged.toast.research_need_castle=§c Il faut un(e) §e%1 §cou supérieur pour débloquer ceci.
++sieged.toast.research_need_engineer=§c Il faut un §e Ingénieur de siège §cdans votre colonie.
++sieged.toast.research_started=§6 Recherche : §e%1§8... §7(%2)%3
++sieged.toast.research_complete=§6 §8Recherche §e%1 §8terminée !
++sieged.toast.upgrade_locked=§c %1 §cest verrouillé. Ouvrez votre §eRegistre §cpour le débloquer.
++sieged.toast.tier_gate=§c %1 §cnécessite un(e) §e%2 §cou supérieur.
++sieged.toast.upgrades_reset=§6 Toutes les améliorations du Registre ont été réinitialisées.
++sieged.toast.upgrades_unlocked=§6 Toutes les améliorations du Registre ont été débloquées.
++sieged.toast.research_discount_suffix= §3(-25 % §8Savoir§8)
++
++## the_forsaken_knight.js HUD strings
++sieged.hud.fk_intro_stirs=§8Une présence corrompue s'agite non loin...
++sieged.hud.fk_intro_condemned=§7Un villageois... condamné. Déformé par une malédiction invisible.
++sieged.hud.fk_intro_guardian=§6Autrefois gardien... §4désormais simple destructeur.
++sieged.hud.fk_intro_title=§4§l LE CHEVALIER DÉCHU
++sieged.hud.fk_intro_subtitle=§7Celui qui fut abandonné... vous abandonnera.
++sieged.hud.fk_intro_rises=§c§lIl se relève...
++sieged.hud.fk_defeat_title=§6§l LE CHEVALIER DÉCHU TOMBE 
++sieged.hud.fk_defeat_subtitle=§7Il est brisé...
++sieged.toast.fk_point_cower=Vous tremblez sous sa présence écrasante...
++sieged.hud.fk_grab_escaped=§aVous avez échappé à son emprise !
++sieged.hud.fk_grab_partial=§eÉchappé de justesse — 1 cœur perdu.
++sieged.hud.fk_grab_failed=§cImpossible de s'échapper — 3 cœurs perdus !
++sieged.toast.fk_shield_crushed=Votre bouclier a été broyé par le Chevalier Déchu !
++sieged.toast.fk_slain=Vous avez terrassé le Chevalier Déchu.
++
++## villager_king.js
++sieged.toast.king_ravager_slain= §6§lQuête mise à jour §8— §7Le Ravageur de guerre a été terrassé !
++sieged.toast.king_enemy_of_realm= §4§lEnnemi du Royaume §8— §7Vous êtes désormais un ennemi des villageois.
++sieged.hud.king_monarch_provoked=§4§l Le Monarque a été provoqué ! Sa garde est enragée ! 
++sieged.toast.king_quest_accepted= §6§lQuête acceptée §8— §7Servez bien le Monarque.
++sieged.toast.king_map_received= §6§lCarte reçue §8— §7Ramassez la carte à vos pieds !
++sieged.hud.king_royal_guard_called=§6§l Le Monarque appelle sa Garde royale ! 
++sieged.hud.king_guard_called=§6 Le Monarque fait appel à sa garde ! 
++sieged.hud.king_monarch_fallen=§6§l §r§eLe Monarque est tombé ! §6Sa garde se bat avec une fureur renouvelée ! §6§l
++
++## ambush_controller.js
++sieged.toast.ambush_mesa= §4§lEmbuscade ! §r§c— §7Des pillards dévalent des falaises !
++sieged.toast.ambush_desert= §4§lEmbuscade ! §r§c— §7Des bandits surgissent des sables !
++sieged.toast.ambush_forest= §4§lEmbuscade ! §r§c— §7Des pillards émergent des arbres !
++
++## vassal_ship.js
++sieged.hud.fleet_no_ships=§c Aucun navire de flotte revendiqué sous votre bannière.
++sieged.hud.fleet_ashore=§6Flotte : §eTout le monde à terre ! §8(%1 %2 débarqués)
++sieged.hud.fleet_hold=§6Flotte : §cTenez la position ! §8(%1 %2)
++sieged.hud.fleet_advance=§6Flotte : §aEn avant ! §8(%1 %2)
++sieged.hud.fleet_ship_claimed=§aNavire revendiqué pour §6%1§a !
++sieged.hud.fleet_no_soldiers=§c Aucun soldat revendiqué à embarquer à proximité.
++sieged.hud.fleet_ships_full=§c Les navires sont pleins ou tous les soldats sont déjà à bord.
++sieged.hud.fleet_all_aboard=§6Flotte : §aTous à bord ! §8(%1 %2 embarqués)
++
++## wagoner.js
++sieged.toast.wagoner_location_unlocked=§aLieu débloqué : §e%2 de %1
++sieged.hud.wagoner_teleport_failed=§c[Charretier] Échec de la téléportation.
++sieged.hud.wagoner_arrived=§6[Charretier] §eArrivé à destination.
++sieged.hud.wagoner_arrived_troops=§6[Charretier] §eArrivé à destination. §8(%1 soldat transporté)
++sieged.hud.wagoner_arrived_troops_plural=§6[Charretier] §eArrivé à destination. §8(%1 soldats transportés)
++sieged.hud.wagoner_no_destinations_title=§6 Charretier
++sieged.hud.wagoner_no_destinations_body=§7Aucune destination de voyage rapide disponible pour le moment.\n\n§8Explorez le monde pour découvrir des châteaux.\n§8Les châteaux ennemis sont inaccessibles.
++sieged.hud.wagoner_no_destinations_close=§8Fermer
++sieged.hud.wagoner_menu_title=§6 Charretier — Voyage rapide
++sieged.hud.wagoner_menu_body=§7Choisissez une destination. Les châteaux ennemis sont exclus.\n§8Coût : §e%1 niveaux d'XP §8+ §a%2 émeraudes\n§8Vous avez : §e%3 niveaux §8/ §a%4 émeraudes
++sieged.hud.wagoner_menu_body_cooldown=§7Choisissez une destination. Les châteaux ennemis sont exclus.\n§8Coût : §e%1 niveaux d'XP §8+ §a%2 émeraudes\n§8Vous avez : §e%3 niveaux §8/ §a%4 émeraudes\n§cEn recharge — %5 restant\n 
++sieged.hud.wagoner_toggle_troops_on=§a[✓ Transporter les troupes] §8— %1 à proximité
++sieged.hud.wagoner_toggle_troops_off_none=§7[○ Voyage en solo]
++sieged.hud.wagoner_toggle_troops_off_nearby=§7[○ Voyage en solo] §8— %1 soldat à proximité
++sieged.hud.wagoner_toggle_troops_off_nearby_plural=§7[○ Voyage en solo] §8— %1 soldats à proximité
++sieged.hud.wagoner_cancel=§8Annuler
++sieged.hud.wagoner_cooldown=§c[Charretier] §eVous devez attendre §6%1s §eavant de voyager à nouveau.
++sieged.hud.wagoner_no_xp=§c[Charretier] §ePas assez d'XP. Nécessite §6%1 niveaux §e(vous en avez §6%2§e).
++sieged.hud.wagoner_no_emeralds=§c[Charretier] §ePas assez d'émeraudes. Nécessite §a%1 §e(vous en avez §a%2§e).
++
++## quest_master.js
++sieged.toast.qm_warning_1= §e§lPrudence §8— §7Le Noble n'apprécie guère l'agressivité.
++sieged.hud.qm_warning_1=§e§l Le Noble s'agite... frappez encore à vos risques et périls.
++sieged.toast.qm_warning_2= §c§lDernier avertissement §8— §7Encore un coup et vous serez un ennemi du royaume !
++sieged.hud.qm_warning_2=§c§l Le Noble lève la main — c'est votre dernier avertissement !
++sieged.toast.qm_enemy_of_realm= §4§lEnnemi du Royaume §8— §7Vous êtes désormais un ennemi des villageois.
++sieged.hud.qm_noble_attacked=§4§l Le Noble du village a été attaqué ! Sa garde est enragée !
++sieged.toast.qm_replacement_log=§6§l Noble du village §8— §7Voici un Journal de quêtes de remplacement.
++sieged.toast.qm_already_has_quest=§6§l Noble du village §8— §7Vous avez déjà une quête. Terminez-la d'abord !
++sieged.toast.qm_quest_assigned=§6§l Noble du village §8— §7Une quête vous a été confiée. Consultez votre Journal de quêtes !
++
++## illager_king.js
++sieged.hud.king_enraged_1=§e▲ Enragé I — Le Tyran gagne en puissance !
++sieged.hud.king_enraged_2=§6▲▲ Enragé II — Sa fureur ne connaît plus de limites !
++sieged.hud.king_enraged_max=§c▲▲▲ RAGE MAXIMALE — Le Tyran est déchaîné !
++sieged.hud.king_taunt=§4Le Tyran : §c%1
++sieged.hud.king_taunt_dim=§4Le Tyran : §7%1
++sieged.hud.king_kill_reset=§6[IllagerKing] §ePalier d'éliminations réinitialisé.
++sieged.hud.king_dark_presence=§c Une sombre présence s'agite... 
++sieged.hud.king_last_stand_title=§4§l— DERNIER REMPART —
++sieged.hud.king_last_stand_subtitle=§cLe Tyran appelle ses Chefs de guerre !
++sieged.hud.king_arrow_storm=§c TEMPÊTE DE FLÈCHES §e%1s
++sieged.hud.king_arrow_storm_end=§aLa tempête s'apaise...
++sieged.hud.king_boulder_barrage=§4 DÉLUGE DE ROCHERS §e%1s
++sieged.hud.king_boulder_barrage_end=§aLe déluge s'achève...
++sieged.hud.king_guard_break=§c GARDE DU ROI ! Tuez-les pour briser le bouclier !
++sieged.toast.king_chieftains_arrive= §4§lLes Chefs de guerre arrivent ! §r§8— §eTerrassez-les pour briser le bouclier !
++sieged.toast.king_guards_summoned= §c§lGardes du Roi invoqués §8— §eTuez-les pour blesser le Tyran !
++sieged.hud.king_recovers=§c Le Roi récupère !
++sieged.hud.king_enraged_ability=§c§l ENRAGÉ !
++sieged.hud.king_ground_slam=§4 FRAPPE SISMIQUE !
++sieged.hud.king_ravager_charges=§4 Un Ravageur charge !
++sieged.hud.king_arena_boundary=§c Limite de l'arène ! 
++## the_forsaken_knight.js — TROOP_LINES (tellraw taunts during Point ability)
++sieged.hud.fk_troop_taunt_1=§6Le Chevalier Déchu§r §7gronde : §f« Vos soldats se prosternent devant moi désormais... »
++sieged.hud.fk_troop_taunt_2=§6Le Chevalier Déchu§r §7rugit : §f« Vos alliés ont déjà prêté leurs lames ! »
++sieged.hud.fk_troop_taunt_3=§6Le Chevalier Déchu§r §7déclare : §f« Vos troupes s'agenouillent devant leur véritable seigneur ! »
++sieged.hud.fk_troop_taunt_4=§6Le Chevalier Déchu§r §7ordonne : §f« Rendez-vous — vos hommes ont fait le bon choix ! »
++sieged.hud.fk_troop_taunt_5=§6Le Chevalier Déchu§r §7raille : §f« Même votre propre garde vous abandonne ! »
++
++## illager_king_bound.js
++sieged.hud.king_lives=§4§lLe Roi Illageois est en vie ! Détruisez-les tous !
++sieged.hud.king_wont_be_over=§8...Ce n'est pas terminé.
++
++## illager_king.js
++sieged.toast.king_chieftains_arrive= §4§lLes Chefs de guerre arrivent ! §r§8— §eTerrassez-les pour briser le bouclier !
++sieged.toast.king_guards_summoned= §c§lGardes du Roi invoqués §8— §eTuez-les pour blesser le Tyran !
++
++## villager_king.js
++sieged.toast.monarch_enemy= §4§lEnnemi du Royaume §8— §7Vous êtes désormais un ennemi des villageois.
++sieged.hud.monarch_provoked=§4§l Le Monarque a été provoqué ! Sa garde est enragée !
++sieged.toast.monarch_quest_accepted= §6§lQuête acceptée §8— §7Servez bien le Monarque.
++sieged.hud.monarch_royal_guard=§6§l Le Monarque appelle sa Garde royale !
++sieged.hud.monarch_guard_call=§6 Le Monarque fait appel à sa garde !
++sieged.hud.monarch_fallen=§6§l §r§eLe Monarque est tombé ! §6Sa garde se bat avec une fureur renouvelée !
++sieged.toast.monarch_warning_1= §e§lPrudence §8— §7Le Monarque n'apprécie guère l'agressivité.
++sieged.hud.monarch_warning_1=§e§l Le Monarque s'agite... frappez encore à vos risques et périls.
++sieged.toast.monarch_warning_2= §c§lDernier avertissement §8— §7Encore un coup et la guerre commence !
++sieged.hud.monarch_warning_2=§c§l Le Monarque lève la main — c'est votre dernier avertissement !
++
++## ambush_controller.js
++sieged.toast.ambush_mesa= §4§lEmbuscade ! §r§c— §7Des pillards dévalent des falaises !
++sieged.toast.ambush_desert= §4§lEmbuscade ! §r§c— §7Des bandits surgissent des sables !
++sieged.toast.ambush_forest= §4§lEmbuscade ! §r§c— §7Des pillards émergent des arbres !
++
++## vassal_ship.js
++sieged.hud.ship_no_fleet=§c Aucun navire de flotte revendiqué sous votre bannière.
++sieged.hud.fleet_ashore_singular=§6Flotte : §eTout le monde à terre ! §8(%1 unité débarquée)
++sieged.hud.fleet_ashore_plural=§6Flotte : §eTout le monde à terre ! §8(%1 unités débarquées)
++sieged.hud.fleet_hold_singular=§6Flotte : §cTenez la position ! §8(%1 navire)
++sieged.hud.fleet_hold_plural=§6Flotte : §cTenez la position ! §8(%1 navires)
++sieged.hud.fleet_advance_singular=§6Flotte : §aEn avant ! §8(%1 navire)
++sieged.hud.fleet_advance_plural=§6Flotte : §aEn avant ! §8(%1 navires)
++sieged.hud.ship_claimed=§aNavire revendiqué pour §6%1§a !
++sieged.hud.ship_no_soldiers=§c Aucun soldat revendiqué à embarquer à proximité.
++sieged.hud.ship_full=§c Les navires sont pleins ou tous les soldats sont déjà à bord.
++sieged.hud.fleet_aboard_singular=§6Flotte : §aTous à bord ! §8(%1 soldat embarqué)
++sieged.hud.fleet_aboard_plural=§6Flotte : §aTous à bord ! §8(%1 soldats embarqués)
++
++## war_declaration.js
++sieged.hud.war_disabled=§c[Sieged] Les déclarations de guerre sont actuellement désactivées.
++sieged.hud.war_no_targets=§c Aucune cible valide à qui déclarer la guerre.
++sieged.hud.war_not_at_war=§cVous n'êtes en guerre avec personne en ligne.
++sieged.hud.war_declaration_subtitle=§4§l DÉCLARATION DE GUERRE\n§7Choisissez bien votre ennemi...
++sieged.hud.war_has_declared=§7a déclaré la guerre
++sieged.hud.war_vs=§e§lVS
++sieged.hud.war_prepare=§7préparez-vous à la guerre
++sieged.hud.war_begins=§4§l LA GUERRE COMMENCE
++sieged.hud.war_victory_title=§6§l VICTOIRE
++sieged.hud.war_defeated_title=§c§lDÉFAITE
++sieged.hud.war_peace_title=§a§lPAIX
++sieged.hud.war_peace_ended=§7La guerre avec %1 est terminée
++sieged.hud.war_propose_form_title=§a§lProposer la paix
++sieged.hud.war_propose_form_body=§7Choisissez un joueur à qui offrir la paix :
++sieged.hud.war_crow_summoned= §eLe parchemin a invoqué un corbeau messager !
++sieged.hud.war_declare_via_crow=§7Déclarez la guerre par l'intermédiaire du corbeau.
++sieged.hud.war_declined_self=§7Vous avez refusé la guerre de §c%1§7.
++sieged.hud.war_declined_broadcast=§7 §c%1 §7a refusé la guerre de §c%2§7.
++sieged.hud.war_active_self= §eGuerre en cours avec §c%1§e.
++sieged.hud.war_accepted_broadcast=§c §c%1 §ea accepté la guerre de §c%2§e.
++sieged.toast.war_scroll_received= §6§lParchemin de guerre §8— §ede §c%1
++sieged.toast.war_scroll_sent= §6§lParchemin envoyé §8— §eà §c%1
++sieged.hud.war_challenged_broadcast=§e §c%1 §ea défié §c%2 §een guerre.
++sieged.hud.war_victory_subtitle=§e%1 a été vaincu
++sieged.hud.war_defeated_subtitle=§7%1 a gagné la guerre
++sieged.hud.war_now_at_war_broadcast=§c §c%1 §eet §c%2 §esont désormais en guerre !
++sieged.hud.war_won_broadcast=§6 §e%1 §6a gagné la guerre contre §c%2§6 !
++sieged.hud.war_peace_broadcast=§a §a%1 §eet §a%2 §eont fait la paix.
++sieged.hud.war_peace_already_proposed=§ePaix déjà proposée à %1.
++sieged.hud.war_peace_sent=§aOffre de paix envoyée à §f%1§a.
++sieged.hud.war_peace_offers=§a%1 §7offre la §a§lPAIX§r§7. Déposez un parchemin près du corbeau pour accepter.
++sieged.hud.war_scroll_from_subtitle=§6§l DÉCLARATION DE GUERRE\n§7De : §c%1
++sieged.hud.war_scroll_form_body=§c%1 §evous a déclaré la guerre !\n\n§7Acceptez-vous cette déclaration de guerre ?
++sieged.toast.war_at_war_declarer= §4§lEn guerre §8— §eavec §c%1
++sieged.toast.war_at_war_target= §4§lEn guerre §8— §e§c%1 §evous a déclaré la guerre !
++
++## training_battle.js
++sieged.hud.training_already_in_session=§cVous êtes déjà en session d'entraînement !
++sieged.hud.training_form_body=§eChoisissez votre épreuve, guerrier.
++sieged.hud.training_elite_btn_available=§c§lÉpreuve d'élite — Garde-bannière\n§7§aDisponible
++sieged.hud.training_elite_btn_cooldown=§c§lÉpreuve d'élite — Garde-bannière\n§7§cRecharge : %1 min restantes
++sieged.hud.training_elite_on_cooldown=§cL'entraînement de Garde-bannière est en recharge ! §e%1 minutes restantes.
++sieged.hud.training_gauntlet_start_1=§6§l=== PARCOURS D'ENTRAÎNEMENT ===
++sieged.hud.training_gauntlet_start_2=§eSurvivez aux trois vagues pour gagner vos alliés !
++sieged.hud.training_wave_cleared=§aVague terminée ! Préparez-vous...
++sieged.hud.training_gauntlet_complete_1=§a§l=== PARCOURS TERMINÉ ===
++sieged.hud.training_gauntlet_complete_2=§eVous avez prouvé votre valeur !
++sieged.hud.training_elite_start_fail=§cImpossible de lancer l'épreuve.
++sieged.hud.training_elite_start_1=§c§l=== ÉPREUVE D'ÉLITE : PROTÉGEZ LE BLESSÉ ===
++sieged.hud.training_elite_start_2=§eUn soldat est grièvement blessé. Défendez-le au péril de votre vie !
++sieged.hud.training_wave_repelled=§aVague repoussée ! Tenez la ligne...
++sieged.hud.training_elite_complete_1=§c§l=== ÉPREUVE D'ÉLITE TERMINÉE ===
++sieged.hud.training_elite_complete_2=§6Vous avez protégé le blessé — le véritable devoir d'un Garde-bannière.
++sieged.hud.training_return=§cRevenez quand vous serez prêt, guerrier.
++sieged.hud.training_fallen=§cVous êtes tombé. Entraînement terminé.
++sieged.hud.training_warder_sentinel_joined=§aUn Gardien et une Sentinelle ont rejoint votre cause !
++sieged.hud.training_banner_guard_joined=§c§lUn Garde-bannière d'élite a rejoint votre armée !
++sieged.hud.training_banner_guard_cooldown_info=§6Vous pourrez entraîner un autre Garde-bannière dans 60 minutes.
++sieged.hud.training_cancelled=§eVotre session d'entraînement a été annulée.
++sieged.hud.training_interrupted=§cEntraînement interrompu.
++sieged.hud.training_fallen_soldier_lost=§cVous êtes tombé au combat. Le soldat blessé est perdu.
++sieged.hud.training_soldier_fallen=§c§lLe soldat blessé est tombé. Vous n'avez pas été assez rapide.
++sieged.hud.training_enemies_remaining=§eEnnemis restants : §c%1
++sieged.hud.training_allied_hp=§cPV de l'allié : §f%1 ❤  §8|  §eAttaquants : §c%2
++sieged.hud.training_wave_standard_1=§eVague 1 : §rUne recrue s'avance !
++sieged.hud.training_wave_standard_2=§6Vague 2 : §rDeux recrues chargent en même temps !
++sieged.hud.training_wave_standard_3=§cVague 3 — Vétéran : §rUn vétéran endurci s'avance !
++sieged.hud.training_wave_banner_1=§eVague d'épreuve 1 : §rDeux attaquants en approche !
++sieged.hud.training_wave_banner_2=§6Vague d'épreuve 2 : §rTrois attaquants chargent !
++sieged.hud.training_wave_banner_3=§cVague finale : §rLes soldats vétérans frappent !
++sieged.toast.training_gauntlet_start= §eParcours d'entraînement — §6Survivez aux vagues !
++sieged.toast.training_gauntlet_complete= §aParcours terminé — §eDes alliés rejoignent votre cause !
++sieged.toast.training_elite_start= §c§lÉpreuve d'élite — §eProtégez le soldat blessé !
++sieged.toast.training_elite_complete= §c§lÉpreuve d'élite terminée — §6Un Garde-bannière vous rejoint !
++
++## surrender.js
++sieged.hud.tribute_offline_delivered=§6[Tribut] §7Les paiements de tribut reçus pendant votre absence ont été déposés.
++sieged.hud.surrender_paper_dropped=§c[Reddition] §7Inventaire plein — le papier des conditions de reddition est tombé à vos pieds !
++sieged.hud.surrender_tyrant_block=§c[Reddition] On ne négocie pas avec les forces du Tyran. Battez-vous ou mourez !
++sieged.hud.surrender_no_threat=§c[Reddition] §7Aucune guerre active ni menace de pillards à négocier.\n§8La reddition n'est possible que pendant une guerre, un siège ou un raid.
++sieged.hud.surrender_target_offline=§c[Reddition] §e%1 §cn'est pas en ligne.
++sieged.hud.surrender_paper_received=\n§e§l[Reddition] §c%1§7 a hissé le drapeau blanc !\n§7Un papier de §fConditions de reddition §7a été ajouté à votre inventaire.\n§8Faites un clic droit dessus pour fixer vos exigences.
++sieged.hud.surrender_winner_target_offline=§c[Reddition] §e%1§c n'est pas en ligne — impossible de fixer les conditions maintenant.
++sieged.hud.surrender_dismissed_winner=§7Vous avez rejeté la demande de reddition. La guerre continue.
++sieged.hud.surrender_dismissed_loser=§c[Reddition] §e%1§c a rejeté votre offre. La guerre continue.
++sieged.hud.surrender_target_left=§c[Reddition] §e%1§c s'est déconnecté avant d'examiner les conditions.
++sieged.hud.surrender_terms_declined_loser=§e[Reddition] §7Conditions refusées. La guerre continue.
++sieged.hud.surrender_terms_declined_winner=§c[Reddition] §e%1§c a rejeté vos conditions. La guerre continue.
++sieged.hud.tribute_partial_pay=§c[Tribut] Vous n'aviez que §e%1§c sur §e%2 §e%3§c — paiement partiel effectué.
++sieged.hud.surrender_castle_forfeited=§4 §c%1§4 a cédé son royaume à §c%2§4 ! Capturez le drapeau !
++sieged.hud.surrender_world_broadcast=§e §c%1§e s'est rendu à §6%2§e !
++sieged.hud.surrender_world_broadcast_tribute=§e §c%1§e s'est rendu à §6%2§e ! §7— §e%3§7 paiement(s) de tribut de §e%4x %5§7 tous les §e%6§7 jour(s)
++sieged.hud.tribute_paid_full=§e §7Le tribut de §c%1§7 à §e%2§7 a été payé en totalité.
++sieged.hud.pillager_tribute_failed=§c[Reddition] Paiement incomplet — les pillards s'impatientent.
++sieged.hud.pillager_tribute_world=§4 §e%1§4 a payé un tribut au §cClan des Pillards§4 !
++sieged.hud.tribute_messenger_not_yours=§c[Tribut] Ce messager n'est pas là pour vous.
++sieged.hud.tribute_messenger_killed_world=§c §e%1§c a tué le messager du tribut ! La guerre avec §e%2§c reprend !
++sieged.hud.tribute_messenger_killed_self=§c§l[Tribut] Vous avez tué le messager — §e-%1 de moral§c ! La guerre reprend !
++sieged.hud.tribute_messenger_killed_winner=§c§l[Tribut] §e%1§c a tué votre messager ! La guerre reprend !
++sieged.hud.pillager_checklist_header=§4[Exigences des pillards] §7Objets qu'il vous reste à payer :
++sieged.hud.pillager_need_enough=§a✔ suffisant
++sieged.hud.pillager_need_more=§cencore %1 manquant(s)
++sieged.hud.pillager_use_flag_same=§8Utilisez à nouveau le §fDrapeau de reddition §8pour soumettre les MÊMES conditions.
++sieged.hud.pillager_use_flag=§8Utilisez à nouveau le §fDrapeau de reddition §8pour accepter les conditions.
++sieged.hud.pillager_pay_failed=§c[Tribut] Vous n'avez pu payer que §e%1§c / §e%2 §e%3§c.
++sieged.hud.surrender_offer_sent_title=§e§l OFFRE ENVOYÉE
++sieged.hud.surrender_offer_sent_subtitle=§7%1 §7a reçu votre requête. En attente de ses conditions.
++sieged.hud.surrender_defeat_title=§c§l REDDITION
++sieged.hud.surrender_defeat_subtitle=§7La guerre est finie. Honorez vos engagements.
++sieged.hud.surrender_victory_title=§6§l VICTOIRE
++sieged.hud.surrender_victory_subtitle=§7%1 s'est rendu !
++sieged.hud.tribute_paid_title=§4§l TRIBUT PAYÉ
++sieged.hud.tribute_paid_subtitle=§7Les pillards se retirent... pour l'instant.
++sieged.toast.tribute_offline_queued= §7§e%1§7 est hors ligne — objets mis en attente pour sa prochaine connexion.
++sieged.toast.tribute_partial= §c Tribut partiel — §c-%1 de moral !
++sieged.toast.tribute_partial_recipient= §c §e%1§c n'a payé que §e%2/%3x %4§c !
++sieged.toast.tribute_paid_payer= §6 §7Tribut payé à §e%1§7 : §6%2x %3
++sieged.toast.tribute_paid_recipient= §6 §7Tribut reçu de §e%1§7 : §6%2x %3
++sieged.toast.tribute_messenger_arrived= §6⚠ §eUn messager de §e%1§e est arrivé ! Payez §c%2x %3§e.
++sieged.toast.tribute_messenger_sent= §6⚠ §7Votre messager de tribut a été envoyé à §e%1§7.
++
++## items.js
++sieged.hud.crown_fallen=§c§l §6%1 §7est tombé ! La Couronne de Souveraineté est à prendre ! §c§l
++sieged.hud.mass_equip_armed_one=§a§f%1§a unité armée.
++sieged.hud.mass_equip_armed_many=§a§f%1§a unités armées.
++sieged.hud.mass_equip_weapon_countdown=§ePrenez l'arme en main... §f%1s
++sieged.hud.mass_equip_no_weapon=§cAucune arme en main — équipement annulé.
++sieged.hud.mass_equip_no_units=§cAucune unité Sieged trouvée dans un rayon de 32 blocs.
++sieged.hud.mass_equip_weapon_one=§a§f%1§a équipé sur §f%2§a unité.
++sieged.hud.mass_equip_weapon_many=§a§f%1§a équipé sur §f%2§a unités.
++sieged.hud.crown_domination_no_targets=§c Aucune cible valide à marquer à proximité.
++sieged.hud.crown_domination_marked=§cVous marquez §4%1 §cpour la mort !
++sieged.hud.crown_domination_cooldown=§cMarque de mort : §e%1s
++sieged.hud.crown_domination_mark_faded=§7 Votre marque s'est dissipée...
++sieged.hud.crown_domination_mark_consumed=§cMarque consumée ! §4+5 cœurs §cde dégâts !
++sieged.hud.war_horn_cooldown=§c Le Cor de guerre est en recharge ! Temps restant : §e%1
++sieged.hud.war_horn_no_troops=§e Aucune troupe apprivoisée à rallier à proximité !
++sieged.hud.war_horn_rallied_one=§6 §eLe Cor de guerre résonne ! §61 §etroupe ralliée !
++sieged.hud.war_horn_rallied_many=§6 §eLe Cor de guerre résonne ! §6%1 §etroupes ralliées !
++sieged.hud.war_scroll_upgrade_required=§c[Sieged] Ouvrez votre §eRegistre §cet débloquez §e%1 §cavant de promouvoir cette unité.
++sieged.hud.forge_tempered_steel=§aAcier trempé forgé !
++sieged.hud.forge_iron_ingot=§eLingot de fer — mauvais timing.
++sieged.hud.forge_iron_nugget=§cPépite de fer — timing raté !
++sieged.hud.forge_repair_cost=§cIl faut %1 lingots de fer pour réparer.
++sieged.hud.forge_anvil_repaired=§aEnclume de forge réparée.
++sieged.hud.forge_iron_cooled=§7Le fer a refroidi.
++sieged.hud.flail_momentum_max=§6Élan : §c3x §4MAX
++sieged.hud.flail_momentum=§6Élan : §6%1x
++sieged.hud.sabre_riposte_ready=§6Riposte prête...
++sieged.hud.sabre_riposte=§c§lRiposte !
++sieged.hud.summoning_bell_cooldown=§c La Cloche d'Invocation est en recharge ! Temps restant : §e%1
++sieged.hud.summoning_bell_rings=§5 §dLa Cloche d'Invocation sonne ! §54 Templiers §drépondent à votre appel !
++sieged.hud.forsaken_pact_no_targets=§c §4Aucun illageois à soumettre à proximité.
++sieged.hud.forsaken_pact_invoked_one=§4 §cLe Pacte du Déchu est invoqué ! §41 §cillageois plie sous votre volonté !
++sieged.hud.forsaken_pact_invoked_many=§4 §cLe Pacte du Déchu est invoqué ! §4%1 §cillageois plient sous votre volonté !
++sieged.hud.forsaken_pact_cooldown=§4Pacte du Déchu : §e%1s
++## castle-siege.js
++sieged.hud.crown_reset_success=§a[Couronne] Réinitialisée ! La couronne peut être réclamée à nouveau.
++sieged.hud.crown_reset_failed=§c[Couronne] Échec de la réinitialisation
++sieged.hud.crown_check_status=§e[Couronne] A été donnée : §6%1
++sieged.hud.crown_give_success=§a[Couronne] Couronne donnée à §e%1
++sieged.hud.siege_ship_wave_final=§4§lFLOTTE FINALE §r§7— §e%1 §7navires, §c%2 §7unités en approche !
++sieged.hud.siege_ship_wave=§c§lFlotte %1 §r§7— §e%2 §7navires, §c%3 §7unités en approche !
++sieged.hud.siege_ship_title=§b§lSIÈGE NAVAL
++sieged.hud.siege_difficulty_subtitle=§7Difficulté %1
++sieged.hud.siege_victory_title=§6§l VICTOIRE ! 
++sieged.hud.siege_ship_victory_subtitle=§7La flotte ennemie est vaincue !
++sieged.hud.siege_ship_rewards_header=§b§l━━━━━━ RÉCOMPENSES DU SIÈGE NAVAL ━━━━━━
++sieged.hud.siege_reward_emeralds=§e %1 émeraudes
++sieged.hud.siege_reward_gold=§6 %1 lingots d'or
++sieged.hud.siege_reward_diamonds=§b %1 diamants
++sieged.hud.siege_reward_netherite_scrap_one=§8 1 débris de netherite
++sieged.hud.siege_reward_netherite_scrap_many=§8 %1 débris de netherite
++sieged.hud.siege_reward_golden_apple=§6 1 pomme dorée enchantée
++sieged.hud.siege_ship_rewards_footer=§b§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.siege_ship_abandoned=§eLe siège naval a été abandonné.
++sieged.hud.siege_ship_status_final=§4FLOTTE FINALE §r§8| §e%1 §7navires §8· §c%2 §7unités
++sieged.hud.siege_ship_status=§cFlotte %1 §r§8| §e%2 §7navires §8· §c%3 §7unités
++sieged.hud.siege_flagship_incoming=§4§l LE NAVIRE AMIRAL APPROCHE !
++sieged.hud.siege_fleet_next=§e§lProchaine flotte en approche...
++sieged.hud.siege_already_active=§eLe siège a déjà commencé !
++sieged.hud.siege_already_conquered=§eCe château a déjà été conquis !
++sieged.hud.siege_no_water=§c Pas d'eau à proximité — les flottes ennemies ne peuvent pas approcher ce port !
++sieged.hud.siege_ship_already_active=§eUn siège naval est déjà en cours ici !
++sieged.hud.siege_harbor_taken=§eCe port a déjà été pris !
++sieged.hud.siege_crown_title=§6§lSIÈGE DE LA COURONNE
++sieged.hud.siege_castle_title=§c§lSIÈGE DE CHÂTEAU
++sieged.hud.siege_defenders_remaining=§cDéfenseurs restants : §e%1
++sieged.hud.siege_sink_ships=§b Coulez les navires ennemis ! §e%1 §brestants en mer
++sieged.hud.siege_wave_next=§e§lProchaine vague en approche...
++sieged.hud.siege_final_wave=§4§lVAGUE FINALE EN APPROCHE !
++sieged.hud.siege_defenders_attacking=§c§lLes défenseurs attaquent — Vague %1 !
++sieged.hud.siege_defenders_attacking_final=§c§lLes défenseurs attaquent — VAGUE FINALE !
++sieged.hud.siege_arrows_incoming=§c§l FLÈCHES EN APPROCHE ! 
++sieged.hud.siege_ships_spotted=§b Navires ennemis repérés en mer ! §e(%1)
++sieged.hud.siege_victory_pardoned=§a§lGracié §8— §7Votre victoire vous a racheté.
++sieged.hud.siege_victory_subtitle=§7Le château est tombé !
++sieged.hud.crown_claimed=§6§l §e%1 §6s'est emparé de la §lCouronne de Souveraineté§r§6 ! §l
++sieged.hud.siege_divider=§6§l━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.siege_crown_obtained=§e§lVous avez obtenu la Couronne de Souveraineté !
++sieged.hud.siege_crown_only=§7La seule couronne au monde...
++sieged.hud.siege_crown_claimed_other=§7La Couronne de Souveraineté a déjà été réclamée par un autre souverain.
++sieged.hud.siege_crown_no_reward=§cPas de récompenses — la couronne est le seul prix du Mauvais Présage V !
++sieged.hud.siege_rewards_header=§6§l━━━━━━━ RÉCOMPENSES DU SIÈGE ━━━━━━━
++sieged.hud.siege_reward_netherite_ingot_one=§8 1 lingot de netherite
++sieged.hud.siege_reward_netherite_ingot_many=§8 %1 lingots de netherite
++sieged.hud.siege_reward_exp=§d %1 niveaux d'expérience
++sieged.hud.siege_rewards_footer=§6§l━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.siege_abandoned=§eLe siège a été abandonné. Vous pourrez retenter votre chance.
++## invasion_event.js keys
++sieged.hud.invasion_ship_spotted=§b §lNavire ennemi repéré ! §r§7Un navire vassal approche par la mer !
++sieged.hud.invasion_declaration_header=§4§l━━━━━━━━ DÉCLARATION DE GUERRE ━━━━━━━━
++sieged.hud.invasion_declaration_line1=§7« Ta résistance s'arrête ici.
++sieged.hud.invasion_declaration_line2=§7 Mes armées raseront tout ce que tu as bâti. »
++sieged.hud.invasion_declaration_signature=§8                        — §cLe Tyran
++sieged.hud.invasion_declaration_days=§7Invasion imminente dans §e%1 §7jours (en jeu).
++sieged.hud.invasion_declaration_footer=§4§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_declared=§4 §cLe Tyran §7a déclaré la guerre à §c%1§7 !
++sieged.hud.invasion_no_castle=§c[Invasion] Les forces du Tyran ne trouvent pas votre château ! Placez un §4Drapeau de château §cà proximité pour ancrer l'invasion.
++sieged.hud.invasion_wave1_bar=§e§lVague 1 §8— §7Les éclaireurs avancent §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave2_bar=§6§lVague 2 §8— §7L'avant-garde arrive §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave3_bar=§c§lVague 3 §8— §7Force d'assaut déchaînée §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave4_bar=§4§lVague 4 §8— §cÉquipe de frappe d'élite §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave5_bar=§4§lVague 5 §8— §c§lEscouade de la mort §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_tyrant_title=§4§l  LE TYRAN  
++sieged.hud.invasion_tyrant_subtitle_intro=§7Il vient pour ce que vous avez bâti...
++sieged.hud.invasion_tyrant_subtitle_doom=§cAffronte ton destin, champion !
++sieged.hud.invasion_repelled=§a §lInvasion repoussée ! §r§7Les forces du Tyran sont brisées !
++sieged.hud.invasion_rewards_header=§a§l━━━━━━━ RÉCOMPENSES D'INVASION ━━━━━━━
++sieged.hud.invasion_rewards_emeralds=§e 20 émeraudes
++sieged.hud.invasion_rewards_diamonds=§b 8 diamants
++sieged.hud.invasion_rewards_netherite=§7 2 lingots de netherite
++sieged.hud.invasion_rewards_apple=§6 Pomme dorée enchantée
++sieged.hud.invasion_rewards_exp=§d 30 niveaux d'expérience
++sieged.hud.invasion_rewards_footer=§a§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_world_victory=§4§l §e%1 §6a repoussé l'invasion du Tyran ! §4§l
++sieged.hud.invasion_lost_header=§4§l━━━━━━━ INVASION PERDUE ━━━━━━━
++sieged.hud.invasion_lost_integrity=§7L'intégrité de votre château est tombée à zéro.
++sieged.hud.invasion_lost_occupied=§c§lLes forces du Tyran occupent désormais votre base.
++sieged.hud.invasion_lost_footer=§4§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_world_defeat=§4§l §4Le château de §e%1§4 est tombé aux mains du Tyran !
++sieged.hud.invasion_omen_divider=§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_omen_line1=§7Une ombre menaçante s'agite à l'horizon...
++sieged.hud.invasion_omen_line2=§7§oDes rumeurs parlent d'un tyran redoutable dont le regard s'est tourné vers vous.
++sieged.hud.invasion_omen_line3=§7Le Tyran vous observe. Attendez-vous à recevoir une §4lettre§7 dans les §eprochains jours§7...
++sieged.hud.invasion_countdown_one=§c Invasion dans §e1 §cjour...
++sieged.hud.invasion_countdown_many=§c Invasion dans §e%1 §cjours...
++sieged.hud.invasion_spotted=§4 §lEnvahisseurs repérés ! §r§7Forces venues du §e%1§7 !
++sieged.hud.invasion_approach_hint=§4 §7Forces ennemies rassemblées au §e%1§7 ! Allez vers §e%2 §8(%3m)
++sieged.hud.invasion_closing_in=§c §7Les ennemis se rapprochent !
++sieged.hud.invasion_wave_cleared=§a§lVague %1 terminée ! §7Prochaine vague en approche...
++sieged.hud.invasion_all_waves_cleared=§4§l Vague 5 terminée ! §cLe Tyran approche...
++sieged.hud.invasion_scouts_stir=§c §lQuelque chose s'agite... §r§7Des éclaireurs ennemis fouillent votre royaume !
++sieged.hud.invasion_scouts_raid=§c §7Les éclaireurs illageois ont fait leur rapport ! Raid dans §e%1 §7jours !
++sieged.hud.invasion_scout_found_you=§c §l« Trouvé ! » §r§7Un éclaireur vous a repéré — tuez-le avant qu'il ne fasse son rapport !
++sieged.hud.invasion_scouts_revealed=§c §lÉclaireurs révélés ! §r§7Tuez-les avant la fin du temps imparti !
++sieged.hud.invasion_warchief_entered=§4 §lUn Chef de guerre illageois §r§4est entré dans la bataille !
++sieged.hud.invasion_raid_begins=§c §lLe raid commence ! §r§7Défendez votre royaume !
++sieged.hud.invasion_raid_wave=§c §lVague %1 §r§7— Pillards venus du §e%2§7 !
++sieged.hud.invasion_raid_repelled=§a §lRaid repoussé ! §r§7Votre royaume tient bon !
++sieged.hud.invasion_raid_sacked=§c §7Votre royaume a été saccagé par les pillards illageois !
++sieged.hud.invasion_raid_countdown_one=§c §7Raid illageois dans §e1 §cjour...
++sieged.hud.invasion_raid_countdown_many=§c §7Raid illageois dans §e%1 §cjours...
++sieged.hud.invasion_scouts_reported=§c §lLes éclaireurs ont fait leur rapport à leur chef de guerre ! §r§7Une lettre de raid arrive...
++sieged.hud.invasion_scouts_lurking=§c §7Éclaireurs tapis dans l'ombre ! §e%1 §7cachés — 
++sieged.hud.invasion_scouts_remaining=§c §7Éclaireurs ennemis ! §e%1 §7restants — 
++sieged.hud.invasion_scout_time_one=§c1 min
++sieged.hud.invasion_scout_time_many=§c%1 min
++sieged.hud.invasion_raid_cleared=§a§lRaid repoussé ! §7Belle défense !
++sieged.hud.invasion_raid_next_wave=§a§lVague %1 terminée ! §7Préparez-vous à la suite...
++sieged.hud.invasion_raiders_attack=§c §7Les forces illageoises attaquent depuis le §e%1§7 !
++sieged.hud.invasion_raid_incoming=§c §lDéfendez votre château ! §r§7Pillards en approche depuis le §e%1§7 !
++sieged.hud.invasion_raiders_closing=§c §7Les pillards se rapprochent !
++sieged.hud.invasion_scouts_eliminated=§a §lTous les éclaireurs éliminés ! §r§7Votre royaume est en sécurité... pour l'instant.
++
++## kingdom.js
++sieged.kingdom.crest_arms_reinforcements=§c §8Le §eBlason des Armes §8a convoqué les renforts quotidiens !
++sieged.kingdom.crest_war_siege_machine=§4 §8Le §cBlason de Guerre §8a livré une machine de siège !
++sieged.kingdom.crest_knowledge_xp=§3 §8Le §3Blason du Savoir §8vous accorde §3+3 niveaux d'XP §8grâce à vos érudits !
++sieged.kingdom.crest_arms_defenders=§c §8Le §eBlason des Armes §8a appelé des défenseurs à votre drapeau !
++sieged.kingdom.siege_initiated=§c Siège lancé sur §e%1§c. Restez dans un rayon de §e%2 §cblocs !
++sieged.kingdom.siege_initiated_world=§c §e%1 §ca lancé un siège sur le royaume de §e%2§c !
++sieged.kingdom.siege_besieging_you=§c §e%1 §cassiège votre drapeau ! Défendez-le !
++sieged.kingdom.siege_ended_owner=§a §8Le siège de votre drapeau est terminé.
++sieged.kingdom.siege_retreated=§a §8L'attaquant a battu en retraite. Votre drapeau est en sécurité.
++sieged.kingdom.siege_left=§c §8Vous avez quitté le siège — siège terminé.
++sieged.kingdom.siege_repelled=§a §8Siège repoussé ! Votre drapeau est en sécurité.
++sieged.kingdom.siege_failed=§c §8Siège échoué — le drapeau a été défendu.
++sieged.kingdom.siege_contested=§e⚔ Contesté
++sieged.kingdom.siege_hostile=§c §8Des forces hostiles assiègent votre drapeau !
++sieged.kingdom.siege_under_attack=§c §8Le royaume de §e%1§c est assiégé !
++sieged.kingdom.capture_pillager_world=§4 §c%1 §4est tombé aux mains des pillards !
++sieged.kingdom.capture_conquered_world=§4 §e%1 §4a conquis le royaume de §c%2§4 !
++sieged.kingdom.capture_seized_title=§6§l ROYAUME SAISI
++sieged.kingdom.capture_seized_subtitle=§8%1 est désormais à vous !
++sieged.kingdom.capture_conquered_title=§c§lROYAUME CONQUIS
++sieged.kingdom.capture_conquered_sub_pillager=§8Les pillards ont pris votre drapeau !
++sieged.kingdom.capture_conquered_sub_player=§8%1 s'est emparé de votre drapeau !
++sieged.kingdom.kingdom_fallen_toast=§c §8Votre royaume est tombé !
++sieged.kingdom.vassal_king_fell=§c §8Le château de votre roi est tombé. §eVotre colonie est désormais indépendante.
++sieged.kingdom.vassal_released_world=§4 §8Le royaume de §e%1§4 est tombé ! §8Toutes les colonies vassales ont été libérées.
++sieged.kingdom.collapse_pillagers_world=§4 §cLe royaume de %1 est tombé aux mains des pillards !
++sieged.kingdom.collapse_world=§8 §8Le royaume de %1 s'est effondré.
++sieged.kingdom.collapse_title=§c§lROYAUME DÉCHU
++sieged.kingdom.collapse_sub_morale=§8Votre peuple a perdu toute foi en votre règne.
++sieged.kingdom.collapse_sub_other=§8Votre royaume s'est effondré.
++sieged.kingdom.health_no_villagers=§c §8Aucun villageois ! Moral : §c%1%
++sieged.kingdom.trade_income_one_em=§6 §8Revenus commerciaux : §e+%1 §8émeraude (%2)
++sieged.kingdom.trade_income_many_em=§6 §8Revenus commerciaux : §e+%1 §8émeraudes (%2)
++sieged.kingdom.morale_daily_header=§a §8Moral quotidien : 
++sieged.kingdom.morale_daily_footer= §8(maintenant %1%)
++sieged.kingdom.morale_base=§e+10 §8base
++sieged.kingdom.morale_golem=§a+1 §8golems
++sieged.kingdom.morale_units=§a+1 §8unités
++sieged.kingdom.morale_animals=§a+1 §8animaux
++sieged.kingdom.morale_crops=§a+1 §8cultures
++sieged.kingdom.morale_crest=§a+%1 §8blason
++sieged.kingdom.morale_storm=§c%1 §8orage
++sieged.kingdom.morale_fire=§c%1 §8incendie
++sieged.kingdom.morale_atwar=§c%1 §8en guerre
++sieged.kingdom.morale_nether=§c%1 §8dans le Nether
++sieged.kingdom.morale_spiral=§c%1 §8spirale
++sieged.kingdom.desert_header=§c §8Moral bas — 
++sieged.kingdom.desert_villager_one=§e1 §cvillageois a fui
++sieged.kingdom.desert_villager_many=§e%1 §cvillageois ont fui
++sieged.kingdom.desert_troop_one=§e1 §ctroupe dissoute
++sieged.kingdom.desert_troop_many=§e%1 §ctroupes dissoutes
++sieged.kingdom.rebellion_world_one=§4 §c§lRÉBELLION §r§4— §4Les troupes de §e%1§4 se retournent ! §c1 unité a fait défection !
++sieged.kingdom.rebellion_world_many=§4 §c§lRÉBELLION §r§4— §4Les troupes de §e%1§4 se retournent ! §c%2 unités ont fait défection !
++sieged.kingdom.rebellion_toast_one=§4§l RÉBELLION ! §c1 troupe est passée à l'ennemi !
++sieged.kingdom.rebellion_toast_many=§4§l RÉBELLION ! §c%1 troupes sont passées à l'ennemi !
++sieged.kingdom.border_shown=§b §8Frontière du royaume affichée (rayon de %1 blocs).
++sieged.kingdom.border_hidden=§b §8Frontière du royaume masquée.
++sieged.kingdom.style_changed=§d §8Style du drapeau modifié.
++sieged.kingdom.crest_no_remove=§8 §8Ce drapeau n'a aucun blason à retirer.
++sieged.kingdom.crest_removed=§8 §8Blason retiré du drapeau.
++sieged.kingdom.crest_already_has=§c §8Ce drapeau porte déjà le §e%1§8. Utilisez un §eBlason vierge§8 pour le retirer d'abord.
++sieged.kingdom.crest_applied= §e%1 §8appliqué à votre drapeau !
++sieged.kingdom.flag_must_siege=§c §8Vous devez assiéger ce château pour capturer son drapeau !
++sieged.kingdom.already_member=§c §8Vous êtes déjà membre de §e%1§8. Quittez-le d'abord.
++sieged.kingdom.vassal_limit_claim=§c §8Votre §e%1§8 n'autorise que §e%2§8 drapeau(x) vassal(aux). Améliorez pour en avoir plus.
++sieged.kingdom.claimed_pillager_toast=§6 §eColonie revendiquée ! §8L'avant-poste de pillards est à vous.
++sieged.kingdom.claimed_abandoned_toast=§6 §eColonie revendiquée ! §8Le drapeau abandonné est à vous.
++sieged.kingdom.claimed_pillager_world=§6 §e%1 §6a revendiqué un avant-poste de pillards !
++sieged.kingdom.claimed_abandoned_world=§6 §e%1 §6a revendiqué un drapeau abandonné !
++sieged.kingdom.flag_now_owned=§cCe drapeau a désormais un propriétaire — vous ne pouvez pas le détruire.
++sieged.kingdom.flag_destroyed=§8 §8Drapeau détruit.
++sieged.kingdom.member_leave_to_found=§c §8Vous êtes membre de §e%1§8. Quittez-le avant d'en fonder un nouveau.
++sieged.kingdom.vassal_limit_spawn=§c §8Votre §e%1§8 a atteint la limite de vassaux (§e%2§8). Améliorez pour en revendiquer plus.
++sieged.kingdom.too_close_territory=§c §8Trop proche du territoire de §e%1§8. Les drapeaux doivent être espacés d'au moins %2 blocs.
++sieged.kingdom.too_close_other=§c §8Trop proche d'un autre drapeau. Les drapeaux doivent être espacés d'au moins %1 blocs.
++sieged.kingdom.settlement_founded=§6 §eColonie fondée ! §8Interagissez avec le drapeau pour gérer votre royaume.
++sieged.kingdom.barracks_locked=§c §8La caserne se débloque au niveau §eVille§8.
++sieged.kingdom.wagoner_summoned=§6 §eCharretier convoqué à votre château.
++sieged.kingdom.ft_enabled=§a §8Voyage rapide du Charretier §aactivé§8 pour votre château.
++sieged.kingdom.ft_disabled=§c §8Voyage rapide du Charretier §cdésactivé§8 pour votre château.
++sieged.kingdom.hud_enabled=§b §8ATH d'intégrité §aactivé§8.
++sieged.kingdom.hud_disabled=§b §8ATH d'intégrité §cdésactivé§8.
++sieged.kingdom.member_invited=§a §e%1 §8a rejoint le royaume en tant que §e%2§8.
++sieged.kingdom.member_removed=§c §e%1 §8retiré du royaume.
++sieged.kingdom.member_rank_set=§e §f%1 §8est désormais §e%2§8.
++sieged.kingdom.crown_transferred=§6 Couronne transférée à §e%1§8. Vous êtes désormais Noble.
++sieged.kingdom.tax_paid=§a §8Impôt payé : §e%1§8 émeraudes envoyées au royaume.
++sieged.kingdom.knight_recruited=§b §e1x %1§8 recruté ! (§e-%2 XP§8)
++sieged.kingdom.flag_granted=§6 Drapeau accordé à §d%1§8. Il reste sous votre royaume.
++sieged.kingdom.kingdom_left=§8 Vous avez quitté le royaume.
++sieged.kingdom.member_left=§c §e%1§8 a quitté le royaume.
++sieged.kingdom.troops_rallied_one=§6 §e1 §8troupe ralliée au drapeau.
++sieged.kingdom.troops_rallied_many=§6 §e%1 §8troupes ralliées au drapeau.
++sieged.kingdom.villagers_rallied_one=§6 §e1 §8villageois rallié au drapeau.
++sieged.kingdom.villagers_rallied_many=§6 §e%1 §8villageois ralliés au drapeau.
++sieged.kingdom.call_arms_one=§6 §e1 §8villageois appelé aux armes ! §7(%1) §c−%2 moral
++sieged.kingdom.call_arms_many=§6 §e%1 §8villageois appelés aux armes ! §7(%2) §c−%3 moral
++sieged.kingdom.tax_collected_one=§a §eImpôt : §a1 émeraude §8(%1 villageois, %2 % de moral)
++sieged.kingdom.tax_collected_many=§a §eImpôt : §a%1 émeraudes §8(%2 villageois, %3 % de moral)
++sieged.kingdom.tax_bank_collected=§a §e%1§8 émeraudes collectées dans la banque d'impôts.
++sieged.kingdom.tax_ready=§a §eImpôt prêt ! §8Ouvrez le drapeau de votre royaume pour le collecter.
++sieged.kingdom.diplo_accepted=§d §8%1 a accepté votre proposition d'alliance !
++sieged.kingdom.diplo_declined=§8Offre d'alliance de §e%1 §8refusée.
++sieged.kingdom.diplo_no_candidates=§8Aucun royaume éligible pour proposer une alliance.
++sieged.kingdom.diplo_proposed=§a §8Alliance proposée à §e%1§8.
++sieged.kingdom.diplo_incoming=§d §e%1 §8vous propose une alliance ! Ouvrez §dDiplomatie §8pour répondre.
++sieged.kingdom.diplo_trade_opened=§6 §e%1 §8a ouvert une route commerciale avec vous !
++sieged.kingdom.diplo_trade_failed=§c §8Impossible d'établir la route commerciale.
++sieged.kingdom.diplo_broken=§c §e%1 §8a rompu votre alliance.
++sieged.kingdom.diplo_alliance_world=§d §e%1 §8et §e%2 §8ont formé une alliance !
++sieged.kingdom.diplo_trade_world=§6 §8Une route commerciale a été établie entre §e%1 §8et §e%2§8 !
++sieged.kingdom.diplo_broken_world=§8 §8L'alliance entre §e%1 §8et §e%2 §8a pris fin.
++sieged.kingdom.disbanded=§8Votre royaume a été dissous.
++sieged.kingdom.disbanded_world=§8 §8Le royaume de %1 a été dissous.
++sieged.kingdom.castle_repaired=§b §eChâteau réparé ! §8Intégrité : §b%1%
++sieged.kingdom.upgraded=§6 §eAmélioration en %1 ! §8Nouveau rayon : §e%2 §8blocs.
++sieged.kingdom.upgraded_world=§6 §6Le territoire de §e%1§6 est devenu §l%2§r§6 !
++sieged.kingdom.enter_own=§6 §eBon retour dans votre %1.
++sieged.kingdom.enter_enemy=§c §8Territoire ennemi — %2 de §c%1§8.
++sieged.kingdom.enter_enemy_alert=§c §8L'ennemi §c%1 §8est entré dans votre %2 !
++sieged.kingdom.enter_friendly=§6 §8Vous entrez dans %2 de §e%1§8.
++sieged.kingdom.leave_territory=§8Vous quittez le territoire de §e%1§8.
++sieged.kingdom.pillager_reinforced=§c §8Des renforts de pillards sont arrivés à l'avant-poste !
++sieged.kingdom.nether_uneasy=§c §8Votre peuple s'inquiète de votre absence...
++sieged.kingdom.coup_started=§4 §cCoup d'État lancé ! Restez à moins de §e%1§c blocs du drapeau pendant §e60s§c.
++sieged.kingdom.coup_king_warned=§4 §c%1§c prépare un COUP D'ÉTAT contre votre royaume !
++sieged.kingdom.coup_foiled=§a §8Le coup d'État de §e%1§8 a été déjoué !
++sieged.kingdom.coup_success=§6 §lCoup d'État réussi ! §r§6Vous êtes désormais Roi de ce drapeau.
++sieged.kingdom.coup_overthrown=§c §lVous avez été renversé ! §r§c%1 est le nouveau Roi.
++sieged.kingdom.coup_world=§4 §e%1§4 a renversé §e%2§4 lors d'un coup d'État !
++sieged.kingdom.hud_integrity_label=§8Intégrité du château : 
++sieged.kingdom.hud_siege=  §c SIÈGE
++sieged.kingdom.hud_hostile_one=  §c1 hostile
++sieged.kingdom.hud_hostile_many=  §c%1 hostiles
++sieged.kingdom.must_siege_first=§c §8Vous devez d'abord assiéger ce château !\n§8Astuce : utilisez un §eCor §8pour l'assiéger.
++sieged.kingdom.barracks_enrolled_one=§a §e1 §8unité enrôlée à la caserne !
++sieged.kingdom.barracks_enrolled_many=§a §e%1 §8unités enrôlées à la caserne !
++sieged.kingdom.barracks_enrolled_skipped= §7(%1 ignorées)
++sieged.kingdom.barracks_removed=§c §e%1 §8%2 retiré(s) de la caserne.
++
++## banner_guard_script.js
++sieged.banner_guard.banner_rename_first=§c §8La bannière doit d'abord être renommée ! Utilisez une enclume pour la nommer.
++sieged.banner_guard.claim_success=§a §e%1 §8troupe(s) revendiquée(s) et apprivoisée(s) pour §6%2§8 !
++sieged.banner_guard.claim_blocked_suffix= §c(%1 déjà revendiquées par d'autres)
++sieged.banner_guard.troops_already_claimed=§c §8Ces troupes sont déjà revendiquées par quelqu'un d'autre !
++sieged.banner_guard.claim_no_troops=§7 §8Aucune troupe à revendiquer dans un rayon de §e%1 §8blocs.
++sieged.banner_guard.phalanx_need_warders=§c §8Il faut au moins §e%1 §8Gardiens pour former une phalange !
++sieged.banner_guard.phalanx_need_xp=§c §8Il faut §e%1 §8niveaux d'XP pour former une phalange ! §7(Vous en avez §e%2§7)
++sieged.banner_guard.phalanx_formed=§a §8Phalange formée ! §7(-%1 niveaux)
++sieged.banner_guard.turtle_need_warders=§c §8Il faut au moins §e%1 §8Gardiens pour former la Tortue !
++sieged.banner_guard.turtle_need_xp=§c §8Il faut §e%1 §8niveaux d'XP pour former la Tortue ! §7(Vous en avez §e%2§7)
++sieged.banner_guard.turtle_formed=§a §8Tortue formée ! §7(-%1 niveaux)
++sieged.banner_guard.falconer_need_xp=§c §8Il faut §e%1 §8niveaux d'XP pour former des fauconniers ! §7(Vous en avez §e%2§7)
++sieged.banner_guard.falconer_trained=§a §e%1 §8fauconnier(s) formé(s) ! §7(-%2 niveaux)
++sieged.banner_guard.march_no_troops=§c §8Aucune troupe à proximité pour marcher !
++sieged.banner_guard.march_started=§e§l EN AVANT, MARCHE !
++sieged.banner_guard.guard_already_claimed=§c §8Ce garde a déjà été revendiqué par un autre joueur.
++sieged.banner_guard.guard_tamed=§l§a Garde apprivoisé !
++sieged.banner_guard.guard_tame_hint=§7 Tenez une §aémeraude §7pour apprivoiser ce garde.
++sieged.banner_guard.guard_not_yours=§c §8Ce garde appartient à quelqu'un d'autre.
++sieged.banner_guard.faction_banner_needed=§c §8Il vous faut une bannière §6« %1 »§8 pour commander ce garde.
++sieged.banner_guard.chevalier_not_yours=§c §8Ce chevalier appartient à quelqu'un d'autre.
++sieged.banner_guard.chevalier_status_no_faction=§6 Chevalier §7— Commandé par un Garde-bannière
++sieged.banner_guard.chevalier_status_faction=§6 Chevalier §7— Commandé par un Garde-bannière §6[%1]
++sieged.banner_guard.chevalier_already_claimed=§c §8Ce chevalier a déjà été revendiqué par un autre joueur.
++sieged.banner_guard.chevalier_tamed=§l§a Chevalier apprivoisé ! §r§7 Utilisez une §6bannière nommée §7(accroupi + utiliser) pour lui assigner une faction.
++sieged.banner_guard.chevalier_tame_hint=§7 Tenez une §aémeraude §7pour apprivoiser ce chevalier.
++sieged.banner_guard.unit_not_yours=§c §8Cette unité appartient à quelqu'un d'autre.
++sieged.banner_guard.band_unit_removed=Compagnie %1 §7— unité retirée.
++sieged.banner_guard.band_unit_count=Compagnie %1 §7— §f%2 unité(s)
++sieged.banner_guard.commander_view_hint=§6 Vue Commandant §7— Sélectionnez §c[Quitter la vue commandant]§7 pour revenir
++sieged.banner_guard.commander_mode_toast= §6§lMode Commandant §8— §7Vos troupes attendent vos ordres.
++sieged.banner_guard.commander_exited=§a Retour de la Vue Commandant
++sieged.banner_guard.commander_timeout=§e La Vue Commandant a expiré.
++sieged.banner_guard.guard_fallen=§c Votre Garde-bannière est tombé !
++sieged.banner_guard.commander_timer_prefix=§6Vue Commandant
++sieged.banner_guard.commander_timer_suffix=  §e%1s
++sieged.banner_guard.selected_suffix= §7sélectionné(s)
++sieged.banner_guard.no_units_nearby=§c §8Aucune unité de ce type à proximité.
++sieged.banner_guard.placement_too_far=§c §8Trop loin ! La portée maximale de placement est de §e%1 §8blocs.
++sieged.banner_guard.units_positioned=§a §e%1 §8unité(s) positionnée(s) — en attente.
++sieged.banner_guard.placed_label=§a⊕ Placé
++sieged.banner_guard.repositioned_label=§7⟳ Repositionné
++sieged.banner_guard.point_progress= §f%1§e/§f%2
++sieged.banner_guard.armor_stripped=§a §8Armure retirée à §f%1§a troupe(s)
++sieged.banner_guard.cover_commander= §e§lProtégez le commandant ! §r§e Les Templiers vous encerclent pendant 10s.
++sieged.banner_guard.no_troops_type=§c §8Aucune troupe de ce type à proximité !
++sieged.banner_guard.follow_guard_only=§l§e LE GARDE-BANNIÈRE VOUS SUIT !
++sieged.banner_guard.follow_troops=§l§e SUIVEZ !
++sieged.banner_guard.horn_guard_untamed=§c §8Apprivoisez d'abord ce garde avant de lier votre cor.
++sieged.banner_guard.horn_linked=§a §8Cor lié à §6%1§a !
++sieged.banner_guard.unit_following=§a L'unité vous suit
++sieged.banner_guard.unit_holding=§6 L'unité tient la position
++sieged.banner_guard.horn_not_linked=§c §8Cor non lié. §8Accroupi + interagir avec un Garde-bannière pour le lier.
++sieged.banner_guard.horn_guard_range=§c §8Le garde lié n'est pas à moins de §e%1 §8blocs.
++sieged.banner_guard.move_blocked_illagers=§c §8Repositionnement impossible — des illageois sont à proximité.
++sieged.banner_guard.move_blocked_siege_flag=§c §8Repositionnement impossible — près d'un drapeau de siège ennemi.
++sieged.banner_guard.move_blocked_castle=§c §8Repositionnement impossible — près d'un château en siège.
++
++## quest_log.js / quest_master.js
++sieged.quest.map_received= §6§lCarte reçue §8— §7Ramassez la carte à vos pieds !
++sieged.quest.assigned=§6§l Quête confiée §8— §f%1 §8| %2
++sieged.quest.still_needed=§6Journal de quêtes §8— §7Encore requis : %1
++sieged.quest.complete_noble=§2§l Quête terminée §8— §7%1 §8| Bien joué !
++sieged.quest.not_complete=§7Journal de quêtes §8— §7Votre quête n'est pas encore terminée.
++sieged.quest.reward_claimed=§a§l Récompense réclamée ! §8— §7%1 §8| Journal de quêtes consommé.
++sieged.quest.complete_claim=§a§l Quête terminée ! §8— §7Tenez le Journal de quêtes et faites un clic droit pour réclamer !
++sieged.quest.progress=§6 Quête §8— §7%1 : §f%2§8/§f%3
++sieged.quest.run_voided=§c§l Tentative annulée §8— §7Vous avez subi des dégâts. Recommencez le combat pour réessayer.
++sieged.quest.damaged=§c§l Touché ! §8— §7Tentative sans faute annulée. Terrassez le Chevalier pour recommencer.
++sieged.quest.noble_no_quest=§6§l Noble du village §8— §7Je n'ai pas encore de nouvelle quête. Revenez dans §f%1§7.
++
++## ravager_boss.js
++sieged.ravager.kill_riders=§c Tuez les cavaliers pour blesser le Ravageur de guerre !
++
++## field_battle.js
++sieged.field_battle.fell= §7%1 §cest tombé sur le champ de bataille.
++
++## invasion_event.js (scout)
++sieged.invasion.scout_found_you=§c §l« Trouvé ! » §r§7Un éclaireur vous a repéré — tuez-le avant qu'il ne fasse son rapport !
++
++## items.js
++sieged.items.no_equippable=§c Aucun composant équipable trouvé.
++sieged.items.retrieved=§a %1 objet(s) récupéré(s).
++sieged.items.no_custom_gear=§7 Aucun équipement personnalisé à récupérer.
++
++item.sieged:royale_steel_helm=Heaume en acier royal
++item.sieged:royale_steel_chestplate=Plastron en acier royal
++item.sieged:royale_steel_leggings=Jambières en acier royal
++item.sieged:royale_steel_boots=Bottes en acier royal
++item.sieged:return_order_scroll=Parchemin d'ordre de retour
++
++## Hardened Steel Armor
++item.sieged:hardened_royale_steel_helm=Heaume en acier royal renforcé
++item.sieged:hardened_royale_steel_chestplate=Plastron en acier royal renforcé
++item.sieged:hardened_royale_steel_leggings=Jambières en acier royal renforcées
++item.sieged:hardened_royale_steel_boots=Bottes en acier royal renforcées
++item.sieged:hardened_steel_seafarer_helm=Heaume d'acier du Marin renforcé
++item.sieged:hardened_steel_seafarer_chestplate=Plastron d'acier du Marin renforcé
++item.sieged:hardened_steel_seafarer_leggings=Jambières d'acier du Marin renforcées
++item.sieged:hardened_steel_seafarers_sandals=Sandales d'acier du Marin renforcées
++item.sieged:hardened_steel_warlord_helm=Heaume d'acier du Seigneur de guerre renforcé
++item.sieged:hardened_steel_warlord_chestplate=Plastron d'acier du Seigneur de guerre renforcé
++item.sieged:hardened_steel_warlord_leggings=Jambières d'acier du Seigneur de guerre renforcées
++item.sieged:hardened_steel_warlord_boots=Bottes d'acier du Seigneur de guerre renforcées
++item.sieged:hardened_steel_repentence_helm=Heaume d'acier de la Repentance renforcé
++item.sieged:hardened_steel_repentance_chestplate=Plastron d'acier de la Repentance renforcé
++item.sieged:hardened_steel_repentance_leggings=Jambières d'acier de la Repentance renforcées
++item.sieged:hardened_steel_repentance_boots=Bottes d'acier de la Repentance renforcées
++item.sieged:hardened_steel_barren_garb=Tenue d'acier des Terres Arides renforcée
++item.sieged:hardened_steel_barren_chestplate=Plastron d'acier des Terres Arides renforcé
++item.sieged:hardened_steel_barren_leggings=Jambières d'acier des Terres Arides renforcées
++item.sieged:hardened_steel_barren_sandals=Sandales d'acier des Terres Arides renforcées
++item.sieged:hardened_tempered_steel_helm=Heaume en acier trempé renforcé
++item.sieged:hardened_tempered_steel_chestplate=Plastron en acier trempé renforcé
++item.sieged:hardened_tempered_steel_leggings=Jambières en acier trempé renforcées
++item.sieged:hardened_tempered_steel_boots=Bottes en acier trempé renforcées
++tile.sieged:the_golden_crossbow.name=§6§lMarque du Tyran
++tile.sieged:the_golden_horn.name=§6§lMarque du Ravageur
++tile.sieged:the_golden_shield.name=§6§lMarque du Déchu
++item.sieged:the_golden_crossbow=§6§lMarque du Tyran
++item.sieged:the_golden_horn=§6§lMarque du Ravageur
++item.sieged:the_golden_shield=§6§lMarque du Déchu
++item.sieged:the_golden_crossbow_trophy=§6§lMarque du Tyran
++item.sieged:the_golden_horn_trophy=§6§lMarque du Ravageur
++item.sieged:the_golden_shield_trophy=§6§lMarque du Déchu
++
++## war_declaration.js — libellés des formulaires (ajoutés pour la traduction)
++sieged.hud.war_scroll_form_title=Parchemin de guerre
++sieged.hud.war_form_accept=§2§l Accepter — Que la guerre commence
++sieged.hud.war_form_decline=§c Refuser
++sieged.hud.war_form_dropdown_label=§7Déclarer la guerre à :
++sieged.hud.war_form_reason_label=§7Indiquez le motif de votre guerre :
++sieged.hud.war_form_reason_placeholder=ex. : vol, trahison...
++sieged.hud.war_form_pending=§7(en attente...)
++sieged.hud.war_form_cancel=§7Annuler
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATR/texts/fr_FR.lang addon/SiegedTATR/texts/fr_FR.lang
+--- addon_orig/SiegedTATR/texts/fr_FR.lang	1970-01-01 00:00:00.000000000 +0000
++++ addon/SiegedTATR/texts/fr_FR.lang	2026-07-04 17:14:58.618413497 +0000
+@@ -0,0 +1,1024 @@
++﻿entity.sieged:questmaster.name=Noble du village
++action.interact.quest_master=Parler au Noble du village
++sieged:siege_items=Objets de Sieged
++sieged:shields=Boucliers
++sieged:crests=Blasons
++entity.sieged:executioner.name=Bourreau
++item.spawn_egg.entity.sieged:executioner.name=Invoquer un Bourreau
++entity.sieged:vanquisher.name=Vainqueur
++item.spawn_egg.entity.sieged:vanquisher.name=Invoquer un Vainqueur
++entity.sieged:trebuchet.name=Trébuchet
++item.spawn_egg.entity.sieged:trebuchet.name= §6Plan de trébuchet
++entity.sieged:warder.name=Gardien
++item.spawn_egg.entity.sieged:warder.name=Invoquer un Gardien
++entity.sieged:sentinel.name=Sentinelle
++item.spawn_egg.entity.sieged:sentinel.name=Invoquer une Sentinelle
++entity.sieged:boulder.name=Rocher
++item.sieged:trebuchet_spawn_egg=Plan de trébuchet
++entity.sieged:catapult.name=Catapulte
++item.spawn_egg.entity.sieged:catapult.name= §6Plan de catapulte
++item.sieged:firing_staff=Bâton de mise à feu
++item.sieged:lance=Lance
++item.sieged:longsword=Épée longue
++item.sieged:twoheadedaxe=Hache à deux têtes
++item.sieged:short_doubleheaded_axe=Hache double courte
++item.sieged:zweihander=Zweihander
++item.sieged:staff=Bâton
++item.sieged:morningstar=Étoile du matin
++item.sieged:pike=Pique
++item.sieged:halberd=Hallebarde
++item.sieged:heavy_hammer=Marteau lourd
++item.sieged:war_hammer=Marteau de guerre
++item.sieged:great_sword=Grande épée
++item.sieged:gladius=Gladius
++item.sieged:sabre=Sabre
++item.sieged:billhook=Serpe de guerre
++item.sieged:javelin=Javelot
++entity.sieged:thrown_javelin.name=Javelot lancé
++item.sieged:heavy_crossbow=Arbalète lourde
++item.sieged:heavy_crossbow_loaded=Arbalète lourde (chargée)
++item.sieged:heavy_crossbow_unusable=Arbalète lourde (vide)
++item.sieged:longbow=Arc long
++entity.sieged:battering_ram.name=Bélier
++item.spawn_egg.entity.sieged:battering_ram.name=§6Plan de bélier
++item.sieged:siege_legs=Supports de siège
++item.sieged:trebuchet_arm=Bras de trébuchet
++item.sieged:catapult_arm=Bras de catapulte
++entity.sieged:balista.name=Baliste
++item.spawn_egg.entity.sieged:balista.name=§6Baliste
++entity.sieged:falconer.name=Fauconnier
++item.spawn_egg.entity.sieged:falconer.name=Invoquer un Fauconnier
++item.sieged:crown_of_dominion=§5Couronne de Souveraineté
++entity.sieged:villager_general.name=Général villageois
++entity.sieged:trainee.name=Recrue
++action.hint.exit.sieged:balista=Rechargement
++action.hint.exit.sieged:battering_ram=Descendre
++entity.sieged:berserker.name=Berserker
++item.spawn_egg.entity.sieged:berserker.name=Invoquer un Berserker
++entity.sieged:siege_tower.name=Tour de siège
++item.spawn_egg.entity.sieged:siege_tower.name=§6Plan de tour de siège
++entity.sieged:eradicator.name=Éradicateur
++item.spawn_egg.entity.sieged:eradicator.name=Invoquer un Éradicateur
++tile.sieged:arrow_block.name=Bloc de flèches
++entity.sieged:shieldwall.name=Mur de boucliers
++entity.sieged:banner_guard.name=Garde-bannière
++item.spawn_egg.entity.sieged:banner_guard.name=Invoquer un Garde-bannière
++action.interact.banner_guard=Ouvrir le menu de commandement
++action.interact.sieged.hold_position=Tenir la position
++action.interact.sieged.follow_me=Suivez-moi
++entity.sieged:messenger_crow.name=Corbeau messager
++item.sieged:blank_schematic=Plan vierge
++item.sieged:scroll=Parchemin
++item.sieged:war_order_scroll=§uParchemin d'ordre de guerre
++action.hint.exit.sieged:siege_tower=Descendre
++action.hint.exit.sieged:shieldwall=
++tile.sieged:siege_stairs.name=Escalier de siège
++entity.sieged:war_ravager.name=Ravageur de guerre
++item.spawn_egg.entity.sieged:war_ravager.name=§4Invoquer un Ravageur de guerre
++item.sieged:target=cible
++item.sieged:war_horn=§uCor de guerre
++entity.sieged:siege_cart.name=Chariot de siège
++item.spawn_egg.entity.sieged:siege_cart.name=§6Chariot de siège
++action.hint.exit.sieged:siege_cart=Descendre
++action.interact.enter_cart=Monter dans le chariot
++entity.sieged:chevalier.name=Chevalier
++item.spawn_egg.entity.sieged:chevalier.name=Invoquer un Chevalier
++entity.sieged:villager_king.name=§6Le Monarque
++entity.sieged:villager_king_combat.name=§6Le Monarque
++item.spawn_egg.entity.sieged:villager_king.name=§6Invoquer le Monarque
++entity.sieged:brazier.name=Brasero
++entity.sieged:lancers.name=Lanciers
++item.spawn_egg.entity.sieged:lancers.name=Invoquer des Lanciers
++entity.sieged:illager_king.name=§cLe Tyran
++item.spawn_egg.entity.sieged:illager_king.name=§4Invoquer le Tyran
++entity.sieged:castle_flag.name=Drapeau de château
++item.spawn_egg.entity.sieged:castle_flag.name=Déployer un drapeau de château
++itemGroup.name.crests=Blasons
++itemGroup.name.siegedItems=Objets de Sieged
++itemGroup.name.siegeWeapons=Armes de siège
++sieged:siege_weapons=Armes de siège
++sieged:banner_flags=Bannières
++item.sieged:crest_of_fortitude=Blason de Vigueur
++item.sieged:crest_of_arms=Blason des Armes
++item.sieged:crest_of_morale=Blason du Moral
++item.sieged:crest_of_pursuit=Blason de Poursuite
++item.sieged:crest_of_empty=Blason vierge
++item.sieged:crest_of_architecture=Blason d'Architecture
++item.sieged:crest_of_wealth=Blason de Richesse
++item.sieged:crest_of_war=Blason de Guerre
++item.sieged:catapult_spawn_egg=§6Plan de catapulte
++item.sieged:balista_spawn_egg=§6Baliste
++item.sieged:siege_cart_spawn_egg=§6Chariot de siège
++item.sieged:siege_tower_spawn_egg=Plan de tour de siège
++item.sieged:battering_ram_spawn_egg=Plan de bélier
++action.hint.exit.sieged:commander_platform=Accroupissez-vous pour quitter le commandement
++entity.sieged:the_forsaken_knight.name=Le Chevalier Déchu
++item.spawn_egg.entity.sieged:the_forsaken_knight.name=§4Invoquer le Chevalier Déchu
++entity.sieged:ransacker.name=Saccageur
++item.spawn_egg.entity.sieged:ransacker.name=Invoquer un Saccageur
++action.interact.load_trebuchet=Charger un rocher
++entity.sieged:templar.name=Templier
++item.spawn_egg.entity.sieged:templar.name=Invoquer un Templier
++item.sieged:tempered_steel=Acier trempé
++item.sieged:warder_gear=équipement de gardien
++item.sieged:sieged_book=Registre
++item.sieged:forsaken_helm=Heaume du Déchu
++tile.sieged:forsaken_helm_block.name=Bloc de heaume du Déchu
++entity.sieged:cheiftain.name=Chef de guerre
++item.spawn_egg.entity.sieged:cheiftain.name=Invoquer un Chef de guerre
++tile.sieged:pile_o_rocks.name=Tas de rochers
++entity.sieged:siege_engineer.name=Ingénieur de siège
++item.spawn_egg.entity.sieged:siege_engineer.name=Invoquer un Ingénieur de siège
++item.sieged:rock=Roche lourde
++item.sieged:heated_iron=Fer chauffé
++item.sieged:tempered_steel_helm=Heaume en acier trempé
++item.sieged:tempered_steel_chestplate=Plastron en acier trempé
++item.sieged:tempered_steel_leggings=Jambières en acier trempé
++item.sieged:tempered_steel_boots=Bottes en acier trempé
++item.sieged:forsaken_chestplate=Plastron du Déchu
++item.sieged:the_crown_of_domination=§4Couronne de Domination
++item.sieged:forging_glove=Gant de forge
++entity.sieged:wooden_gate.name=Porte en bois
++item.spawn_egg.entity.sieged:wooden_gate.name=Invoquer une porte en bois
++action.hint.exit.sieged:the_forsaken_knight=§4Échappez à l'emprise du Chevalier !
++item.sieged:steel_repentence_helm=Heaume d'acier de la Repentance
++item.sieged:steel_repentance_chestplate=Plastron d'acier de la Repentance
++item.sieged:steel_repentance_leggings=Jambières d'acier de la Repentance
++item.myname:steel_repentance_boots=Bottes d'acier de la Repentance
++item.sieged:steel_barren_garb=Tenue d'acier des Terres Arides
++action.interact.repair=Réparer
++action.interact.wooden_gate=Ouvrir/Fermer la porte
++action.interact.wooden_gate_lock=Verrouiller/Déverrouiller la porte
++tile.sieged:woodengateblock.name=bloc de porte en bois
++tile.sieged:castle_gate.name=Porte de château
++item.sieged:steel_barren_chestplate=Plastron d'acier des Terres Arides
++item.sieged:steel_barren_leggings=Jambières d'acier des Terres Arides
++item.sieged:steel_barren_sandals=Sandales d'acier des Terres Arides
++item.sieged:steel_repentance_boots=Bottes d'acier de la Repentance
++item.sieged:steel_warlord_helm=Heaume d'acier du Seigneur de guerre
++item.sieged:steel_warlord_chestplate=Plastron d'acier du Seigneur de guerre
++item.sieged:steel_warlord_leggings=Jambières d'acier du Seigneur de guerre
++item.sieged:steel_warlord_boots=Bottes d'acier du Seigneur de guerre
++item.sieged:templar_gear=Équipement de Templier
++tile.sieged:forging_anvil.name=Enclume de forge
++tile.sieged:tempered_steel_block.name=Bloc d'acier trempé
++item.sieged:commanding_horn=Cor de commandement
++item.sieged:commanding_horn_gilded=Cor de commandement doré
++item.sieged:commanding_horn_diamond=Cor de commandement en diamant
++item.sieged:commanding_horn_emerald=Cor de commandement en émeraude
++item.sieged:commanding_horn_netherite=Cor de commandement en netherite
++item.sieged:heater_shield=Écu
++item.sieged:kite_shield=Bouclier en amande
++item.sieged:buckler_shield=Rondache
++item.sieged:tower_shield=Pavois
++item.sieged:round_shield=Bouclier rond
++item.sieged:large_round_shield=Grand bouclier rond
++
++entity.sieged:placed_tower_shield.name=Pavois posé
++item.sieged:crest_of_knowledge=Blason du Savoir
++item.sieged:flail=Fléau d'armes
++entity.sieged:vassal_ship.name=Navire vassal
++item.spawn_egg.entity.sieged:vassal_ship.name=Invoquer un Navire vassal
++action.hint.exit.sieged:vassal_ship= s'accroupir pour débarquer
++action.interact.board_ship=Monter à bord
++action.interact.open_container=Ouvrir la cale
++action.interact.claim_ship=Revendiquer le navire
++tile.sieged:arrow_slit_i.name=Meurtrière I
++tile.sieged:arrow_slit_t.name=Meurtrière T
++tile.sieged:arrow_barrel.name=Tonneau à flèches
++item.sieged:throwing_dagger=Dague de lancer
++entity.sieged:javalier.name=Javelinier
++item.spawn_egg.entity.sieged:javalier.name=Invoquer un Javelinier
++item.sieged:repeating_crossbow=Arbalète à répétition
++item.sieged:the_summoning_bell=La Cloche d'Invocation
++item.sieged:fleet_drums=Tambour de flotte
++item.sieged:surrender_flag=Drapeau de reddition
++tile.sieged:placed_wooden_pike.name=Pique en bois posée
++item.sieged:wooden_pike=Pique en bois
++entity.sieged:messenger.name=Messager
++item.spawn_egg.entity.sieged:messenger.name=Invoquer un Messager
++item.sieged:steel_seafarer_helm=Heaume d'acier du Marin
++item.sieged:steel_seafarer_chestplate=Plastron d'acier du Marin
++item.sieged:steel_seafarer_leggings=Jambières d'acier du Marin
++item.sieged:steel_seafarers_sandals=Sandales d'acier du Marin
++item.sieged:winter_gear=Équipement d'hiver
++item.sieged:desert_gear=Équipement du désert
++item.sieged:sea_gear=Équipement marin
++item.sieged:banner_flag=Bannière
++item.sieged:banner_flag_red=Bannière (rouge)
++item.sieged:banner_flag_green=Bannière (verte)
++item.sieged:banner_flag_blue=Bannière (bleue)
++item.sieged:banner_flag_purple=Bannière (violette)
++item.sieged:banner_flag_black=Bannière (noire)
++item.sieged:banner_flag_grey=Bannière (grise)
++entity.sieged:oracle.name=Oracle
++item.spawn_egg.entity.sieged:oracle.name=Invoquer un Oracle
++entity.sieged:wagoner.name=Charretier
++item.spawn_egg.entity.sieged:wagoner.name=Invoquer un Charretier
++entity.sieged:marker.name=Marqueur
++action.hint.exit.sieged:wagoner=voyage rapide...
++item.sieged:quest_log=Journal de quêtes
++entity.sieged:questmaster.name=Noble du village
++item.spawn_egg.entity.sieged:questmaster.name=Invoquer un Noble du village
++entity.sieged:illager.name=Illageois
++item.spawn_egg.entity.sieged:illager.name=Invoquer un Illageois
++
++## Script HUD strings
++sieged.hud.gate_destroyed=§cCette porte a été détruite.
++sieged.hud.gate_outside_open=§cCette porte ne peut être ouverte que de l'intérieur.
++sieged.hud.gate_outside_close=§cCette porte ne peut être fermée que de l'intérieur.
++sieged.hud.gate_locked=§cCette porte est verrouillée.
++sieged.hud.gate_lock_first=§eFermez la porte avant de la verrouiller.
++sieged.hud.cart_linked=§aChariot de siège lié ! Descendez pour le délier.
++sieged.hud.cart_not_yours=§cChariot déjà revendiqué.
++sieged.hud.cart_claimed=§aChariot de siège revendiqué pour %1 !
++sieged.hud.construction_progress=§7Construction : %1%2 §e%3§7/§e%4 §7(bûches ou planches)
++sieged.hud.construction_hint=§7Tenez des bûches ou des planches pour construire. §8Accroupi + clic droit pour pivoter.
++sieged.hud.construction_dismantled=§c%1 §7démantelé(e). Plan restitué.
++sieged.hud.construction_rotation=§7Rotation : §e%1°
++sieged.hud.construction_complete=§a§l%1 : construction terminée !
++sieged.hud.construction_building=§7Construction de %1... §e%2 §7matériaux encore nécessaires. §8(bûches ou planches)
++sieged.hud.arrow_barrel_full=§7Le tonneau à flèches est plein ! (%1/%2)
++sieged.hud.arrow_barrel_stored=§a§f%1§a flèche(s) rangée(s) ! §7Tonneau : §f%2§7/%3
++sieged.hud.arrow_barrel_status=§7Tonneau à flèches : %1%2§7/%3  §8(Accroupi + clic pour prendre)
++sieged.hud.arrow_barrel_empty=§cLe tonneau à flèches est vide !
++sieged.hud.arrow_barrel_took=§a§f%1§a flèche(s) prise(s) ! §7Tonneau : %2%3§7/%4
++sieged.hud.arrow_rain_have_marker=§7Vous avez déjà un Marqueur de pluie de flèches !
++sieged.hud.arrow_rain_received=§aMarqueur de pluie de flèches reçu ! Lancez-le pour appeler une volée de flèches !
++sieged.hud.arrow_rain_no_falconers=§cAucun fauconnier disponible ! Invoquez-en et revendiquez-les.
++sieged.hud.arrow_rain_success=§6 %1 fauconnier(s) font pleuvoir des flèches sur la cible !
++sieged.hud.arrow_rain_failed=§cLa pluie de flèches a échoué !
++sieged.hud.arrow_rain_cooldown=§cPluie de flèches en recharge : %1s
++sieged.hud.arrow_rain_no_ammo=§cMunitions insuffisantes ! (%1/%2 nécessaires)
++sieged.hud.arrow_rain_falconer_full=§7Le fauconnier a déjà toutes ses munitions (%1/%2)
++sieged.hud.arrow_rain_supplied=§aFlèche fournie ! §7Munitions du fauconnier : %1/%2
++
++sieged.hud.oracle_cooldown=§7L'Oracle rassemble sa vision... §e(%1s)
++sieged.hud.oracle_no_threats=§7L'Oracle ne voit aucune menace à proximité.
++sieged.hud.oracle_reveals_singular=§eL'Oracle révèle §f%1§e menace !
++sieged.hud.oracle_reveals_plural=§eL'Oracle révèle §f%1§e menaces !
++
++## brazier.js
++sieged.toast.brazier_arrows_lit= §6§lBrasero §8— §eVos flèches sont désormais enflammées !
++sieged.toast.brazier_locked= §c Le brasero §8est verrouillé. Ouvrez votre §eRegistre §8pour le débloquer.
++
++## wooden_pike.js
++sieged.hud.pike_already_max=§cCette formation de piques est déjà complète.
++sieged.hud.pike_not_enough=§cPas assez de piques en bois.
++
++## Siege Weapons HUD (catapult / trebuchet / balista)
++sieged.hud.catapult_claimed=§aCatapulte revendiquée pour %1 !
++sieged.hud.trebuchet_claimed=§aTrébuchet revendiqué pour %1 !
++sieged.hud.ballista_claimed=§aBaliste revendiquée pour %1 !
++sieged.hud.banner_rename_first=§cLa bannière doit d'abord être renommée ! Utilisez une enclume pour la nommer.
++sieged.hud.need_faction_banner=§cIl vous faut une bannière « %1 » dans votre inventaire !
++sieged.hud.trebuchet_flight_path=§e Trajectoire du rocher (5s)
++sieged.hud.ballista_already_full=§7La baliste est déjà pleine (%1/%2)
++sieged.hud.arrow_loaded=§aFlèche chargée ! §7Baliste : %1/%2
++
++## battering_ram.js HUD strings
++sieged.hud.ram_priming=§eArmement du bélier...
++sieged.hud.ram_ready=§aPrêt à tirer ! Utilisez à nouveau le Bâton de mise à feu pour TIRER !
++sieged.hud.ram_fired=§c§lBÉLIER DÉCLENCHÉ !
++sieged.hud.ram_idle=§7Bélier prêt. Utilisez le Bâton de mise à feu pour l'armer.
++sieged.hud.ram_steer_hint=§7Dirigez à §egauche/droite §7| §eBâton de mise à feu §7pour armer le bélier !
++sieged.hud.ram_claimed=§aBélier revendiqué pour %1 !
++sieged.hud.ram_banner_not_named=§cLa bannière doit d'abord être renommée ! Utilisez une enclume pour la nommer.
++
++## ravager_boss.js HUD strings
++sieged.hud.banner_already_burning=§cCette bannière brûle déjà !
++sieged.hud.banner_ignites=§6La bannière s'embrase de flammes sombres...
++sieged.hud.use_horn=§eUtilisez un cor pour déclencher le siège !
++sieged.hud.horn_echoes=§6Le cor résonne sur le champ de bataille...
++
++## victory_parade.js HUD strings
++sieged.hud.return_to_kingdom=§7Retournez dans votre royaume pour organiser le défilé de la victoire.
++sieged.hud.parade_form_title=§6§l Victoire !
++sieged.hud.parade_form_body=§7Votre peuple déborde de joie !\n\n§eVoulez-vous organiser un défilé de la victoire ?\n\n§8Vos unités et vos villageois célébreront\n§8la proclamation de votre triomphe.
++sieged.hud.parade_form_button_yes=§6§l Lancer le défilé !
++sieged.hud.parade_form_button_no=§7Ignorer
++sieged.hud.parade_title=§6§l DÉFILÉ DE LA VICTOIRE
++sieged.hud.parade_subtitle=§7Votre peuple célèbre votre triomphe !
++sieged.hud.parade_mid_title=§6§l VOTRE ROYAUME TIENT DEBOUT !
++sieged.hud.parade_mid_subtitle=§7Le peuple se réjouit en votre nom.
++sieged.hud.parade_end_title=§6§l LONGUE VIE AU VAINQUEUR !
++sieged.hud.parade_end_subtitle=§7La célébration s'achève.
++
++## furniture.js HUD strings
++sieged.hud.gate_horn_inside_only=§cVous devez être à l'intérieur pour lier un cor.
++sieged.hud.gate_horn_already_linked=§cCette porte est déjà liée à un autre cor.
++sieged.hud.gate_horn_linked=§aPorte liée ! Seul ce cor peut l'ouvrir.
++sieged.hud.castle_gate_inside_only=§cCette porte ne peut être manœuvrée que de l'intérieur.
++sieged.hud.castle_gate_needs_axe=§cNécessite une hache en diamant ou en netherite.
++sieged.hud.castle_gate_no_group=§cAucun groupe de porte trouvé.
++sieged.hud.castle_gate_demolished=§aPorte démolie (%1 blocs).
++sieged.hud.castle_gate_break_error=§cErreur de destruction de la porte — voir le journal de contenu.
++
++## sieged_book.js toast strings
++sieged.toast.research_already_busy=§c Recherche déjà en cours : §e%1§c. (%2 restant)
++sieged.toast.research_need_emeralds=§c Il faut §e%1 émeraudes §c(vous en avez §e%2§c).%3
++sieged.toast.research_need_xp=§c Il faut §e%1 niveaux d'XP §c(vous en avez §e%2§c).
++sieged.toast.research_need_castle=§c Il faut un(e) §e%1 §cou supérieur pour débloquer ceci.
++sieged.toast.research_need_engineer=§c Il faut un §e Ingénieur de siège §cdans votre colonie.
++sieged.toast.research_started=§6 Recherche : §e%1§8... §7(%2)%3
++sieged.toast.research_complete=§6 §8Recherche §e%1 §8terminée !
++sieged.toast.upgrade_locked=§c %1 §cest verrouillé. Ouvrez votre §eRegistre §cpour le débloquer.
++sieged.toast.tier_gate=§c %1 §cnécessite un(e) §e%2 §cou supérieur.
++sieged.toast.upgrades_reset=§6 Toutes les améliorations du Registre ont été réinitialisées.
++sieged.toast.upgrades_unlocked=§6 Toutes les améliorations du Registre ont été débloquées.
++sieged.toast.research_discount_suffix= §3(-25 % §8Savoir§8)
++
++## the_forsaken_knight.js HUD strings
++sieged.hud.fk_intro_stirs=§8Une présence corrompue s'agite non loin...
++sieged.hud.fk_intro_condemned=§7Un villageois... condamné. Déformé par une malédiction invisible.
++sieged.hud.fk_intro_guardian=§6Autrefois gardien... §4désormais simple destructeur.
++sieged.hud.fk_intro_title=§4§l LE CHEVALIER DÉCHU
++sieged.hud.fk_intro_subtitle=§7Celui qui fut abandonné... vous abandonnera.
++sieged.hud.fk_intro_rises=§c§lIl se relève...
++sieged.hud.fk_defeat_title=§6§l LE CHEVALIER DÉCHU TOMBE 
++sieged.hud.fk_defeat_subtitle=§7Il est brisé...
++sieged.toast.fk_point_cower=Vous tremblez sous sa présence écrasante...
++sieged.hud.fk_grab_escaped=§aVous avez échappé à son emprise !
++sieged.hud.fk_grab_partial=§eÉchappé de justesse — 1 cœur perdu.
++sieged.hud.fk_grab_failed=§cImpossible de s'échapper — 3 cœurs perdus !
++sieged.toast.fk_shield_crushed=Votre bouclier a été broyé par le Chevalier Déchu !
++sieged.toast.fk_slain=Vous avez terrassé le Chevalier Déchu.
++
++## villager_king.js
++sieged.toast.king_ravager_slain= §6§lQuête mise à jour §8— §7Le Ravageur de guerre a été terrassé !
++sieged.toast.king_enemy_of_realm= §4§lEnnemi du Royaume §8— §7Vous êtes désormais un ennemi des villageois.
++sieged.hud.king_monarch_provoked=§4§l Le Monarque a été provoqué ! Sa garde est enragée ! 
++sieged.toast.king_quest_accepted= §6§lQuête acceptée §8— §7Servez bien le Monarque.
++sieged.toast.king_map_received= §6§lCarte reçue §8— §7Ramassez la carte à vos pieds !
++sieged.hud.king_royal_guard_called=§6§l Le Monarque appelle sa Garde royale ! 
++sieged.hud.king_guard_called=§6 Le Monarque fait appel à sa garde ! 
++sieged.hud.king_monarch_fallen=§6§l §r§eLe Monarque est tombé ! §6Sa garde se bat avec une fureur renouvelée ! §6§l
++
++## ambush_controller.js
++sieged.toast.ambush_mesa= §4§lEmbuscade ! §r§c— §7Des pillards dévalent des falaises !
++sieged.toast.ambush_desert= §4§lEmbuscade ! §r§c— §7Des bandits surgissent des sables !
++sieged.toast.ambush_forest= §4§lEmbuscade ! §r§c— §7Des pillards émergent des arbres !
++
++## vassal_ship.js
++sieged.hud.fleet_no_ships=§c Aucun navire de flotte revendiqué sous votre bannière.
++sieged.hud.fleet_ashore=§6Flotte : §eTout le monde à terre ! §8(%1 %2 débarqués)
++sieged.hud.fleet_hold=§6Flotte : §cTenez la position ! §8(%1 %2)
++sieged.hud.fleet_advance=§6Flotte : §aEn avant ! §8(%1 %2)
++sieged.hud.fleet_ship_claimed=§aNavire revendiqué pour §6%1§a !
++sieged.hud.fleet_no_soldiers=§c Aucun soldat revendiqué à embarquer à proximité.
++sieged.hud.fleet_ships_full=§c Les navires sont pleins ou tous les soldats sont déjà à bord.
++sieged.hud.fleet_all_aboard=§6Flotte : §aTous à bord ! §8(%1 %2 embarqués)
++
++## wagoner.js
++sieged.toast.wagoner_location_unlocked=§aLieu débloqué : §e%2 de %1
++sieged.hud.wagoner_teleport_failed=§c[Charretier] Échec de la téléportation.
++sieged.hud.wagoner_arrived=§6[Charretier] §eArrivé à destination.
++sieged.hud.wagoner_arrived_troops=§6[Charretier] §eArrivé à destination. §8(%1 soldat transporté)
++sieged.hud.wagoner_arrived_troops_plural=§6[Charretier] §eArrivé à destination. §8(%1 soldats transportés)
++sieged.hud.wagoner_no_destinations_title=§6 Charretier
++sieged.hud.wagoner_no_destinations_body=§7Aucune destination de voyage rapide disponible pour le moment.\n\n§8Explorez le monde pour découvrir des châteaux.\n§8Les châteaux ennemis sont inaccessibles.
++sieged.hud.wagoner_no_destinations_close=§8Fermer
++sieged.hud.wagoner_menu_title=§6 Charretier — Voyage rapide
++sieged.hud.wagoner_menu_body=§7Choisissez une destination. Les châteaux ennemis sont exclus.\n§8Coût : §e%1 niveaux d'XP §8+ §a%2 émeraudes\n§8Vous avez : §e%3 niveaux §8/ §a%4 émeraudes
++sieged.hud.wagoner_menu_body_cooldown=§7Choisissez une destination. Les châteaux ennemis sont exclus.\n§8Coût : §e%1 niveaux d'XP §8+ §a%2 émeraudes\n§8Vous avez : §e%3 niveaux §8/ §a%4 émeraudes\n§cEn recharge — %5 restant\n 
++sieged.hud.wagoner_toggle_troops_on=§a[✓ Transporter les troupes] §8— %1 à proximité
++sieged.hud.wagoner_toggle_troops_off_none=§7[○ Voyage en solo]
++sieged.hud.wagoner_toggle_troops_off_nearby=§7[○ Voyage en solo] §8— %1 soldat à proximité
++sieged.hud.wagoner_toggle_troops_off_nearby_plural=§7[○ Voyage en solo] §8— %1 soldats à proximité
++sieged.hud.wagoner_cancel=§8Annuler
++sieged.hud.wagoner_cooldown=§c[Charretier] §eVous devez attendre §6%1s §eavant de voyager à nouveau.
++sieged.hud.wagoner_no_xp=§c[Charretier] §ePas assez d'XP. Nécessite §6%1 niveaux §e(vous en avez §6%2§e).
++sieged.hud.wagoner_no_emeralds=§c[Charretier] §ePas assez d'émeraudes. Nécessite §a%1 §e(vous en avez §a%2§e).
++
++## quest_master.js
++sieged.toast.qm_warning_1= §e§lPrudence §8— §7Le Noble n'apprécie guère l'agressivité.
++sieged.hud.qm_warning_1=§e§l Le Noble s'agite... frappez encore à vos risques et périls.
++sieged.toast.qm_warning_2= §c§lDernier avertissement §8— §7Encore un coup et vous serez un ennemi du royaume !
++sieged.hud.qm_warning_2=§c§l Le Noble lève la main — c'est votre dernier avertissement !
++sieged.toast.qm_enemy_of_realm= §4§lEnnemi du Royaume §8— §7Vous êtes désormais un ennemi des villageois.
++sieged.hud.qm_noble_attacked=§4§l Le Noble du village a été attaqué ! Sa garde est enragée !
++sieged.toast.qm_replacement_log=§6§l Noble du village §8— §7Voici un Journal de quêtes de remplacement.
++sieged.toast.qm_already_has_quest=§6§l Noble du village §8— §7Vous avez déjà une quête. Terminez-la d'abord !
++sieged.toast.qm_quest_assigned=§6§l Noble du village §8— §7Une quête vous a été confiée. Consultez votre Journal de quêtes !
++
++## illager_king.js
++sieged.hud.king_enraged_1=§e▲ Enragé I — Le Tyran gagne en puissance !
++sieged.hud.king_enraged_2=§6▲▲ Enragé II — Sa fureur ne connaît plus de limites !
++sieged.hud.king_enraged_max=§c▲▲▲ RAGE MAXIMALE — Le Tyran est déchaîné !
++sieged.hud.king_taunt=§4Le Tyran : §c%1
++sieged.hud.king_taunt_dim=§4Le Tyran : §7%1
++sieged.hud.king_kill_reset=§6[IllagerKing] §ePalier d'éliminations réinitialisé.
++sieged.hud.king_dark_presence=§c Une sombre présence s'agite... 
++sieged.hud.king_last_stand_title=§4§l— DERNIER REMPART —
++sieged.hud.king_last_stand_subtitle=§cLe Tyran appelle ses Chefs de guerre !
++sieged.hud.king_arrow_storm=§c TEMPÊTE DE FLÈCHES §e%1s
++sieged.hud.king_arrow_storm_end=§aLa tempête s'apaise...
++sieged.hud.king_boulder_barrage=§4 DÉLUGE DE ROCHERS §e%1s
++sieged.hud.king_boulder_barrage_end=§aLe déluge s'achève...
++sieged.hud.king_guard_break=§c GARDE DU ROI ! Tuez-les pour briser le bouclier !
++sieged.toast.king_chieftains_arrive= §4§lLes Chefs de guerre arrivent ! §r§8— §eTerrassez-les pour briser le bouclier !
++sieged.toast.king_guards_summoned= §c§lGardes du Roi invoqués §8— §eTuez-les pour blesser le Tyran !
++sieged.hud.king_recovers=§c Le Roi récupère !
++sieged.hud.king_enraged_ability=§c§l ENRAGÉ !
++sieged.hud.king_ground_slam=§4 FRAPPE SISMIQUE !
++sieged.hud.king_ravager_charges=§4 Un Ravageur charge !
++sieged.hud.king_arena_boundary=§c Limite de l'arène ! 
++## the_forsaken_knight.js — TROOP_LINES (tellraw taunts during Point ability)
++sieged.hud.fk_troop_taunt_1=§6Le Chevalier Déchu§r §7gronde : §f« Vos soldats se prosternent devant moi désormais... »
++sieged.hud.fk_troop_taunt_2=§6Le Chevalier Déchu§r §7rugit : §f« Vos alliés ont déjà prêté leurs lames ! »
++sieged.hud.fk_troop_taunt_3=§6Le Chevalier Déchu§r §7déclare : §f« Vos troupes s'agenouillent devant leur véritable seigneur ! »
++sieged.hud.fk_troop_taunt_4=§6Le Chevalier Déchu§r §7ordonne : §f« Rendez-vous — vos hommes ont fait le bon choix ! »
++sieged.hud.fk_troop_taunt_5=§6Le Chevalier Déchu§r §7raille : §f« Même votre propre garde vous abandonne ! »
++
++## illager_king_bound.js
++sieged.hud.king_lives=§4§lLe Roi Illageois est en vie ! Détruisez-les tous !
++sieged.hud.king_wont_be_over=§8...Ce n'est pas terminé.
++
++## illager_king.js
++sieged.toast.king_chieftains_arrive= §4§lLes Chefs de guerre arrivent ! §r§8— §eTerrassez-les pour briser le bouclier !
++sieged.toast.king_guards_summoned= §c§lGardes du Roi invoqués §8— §eTuez-les pour blesser le Tyran !
++
++## villager_king.js
++sieged.toast.monarch_enemy= §4§lEnnemi du Royaume §8— §7Vous êtes désormais un ennemi des villageois.
++sieged.hud.monarch_provoked=§4§l Le Monarque a été provoqué ! Sa garde est enragée !
++sieged.toast.monarch_quest_accepted= §6§lQuête acceptée §8— §7Servez bien le Monarque.
++sieged.hud.monarch_royal_guard=§6§l Le Monarque appelle sa Garde royale !
++sieged.hud.monarch_guard_call=§6 Le Monarque fait appel à sa garde !
++sieged.hud.monarch_fallen=§6§l §r§eLe Monarque est tombé ! §6Sa garde se bat avec une fureur renouvelée !
++sieged.toast.monarch_warning_1= §e§lPrudence §8— §7Le Monarque n'apprécie guère l'agressivité.
++sieged.hud.monarch_warning_1=§e§l Le Monarque s'agite... frappez encore à vos risques et périls.
++sieged.toast.monarch_warning_2= §c§lDernier avertissement §8— §7Encore un coup et la guerre commence !
++sieged.hud.monarch_warning_2=§c§l Le Monarque lève la main — c'est votre dernier avertissement !
++
++## ambush_controller.js
++sieged.toast.ambush_mesa= §4§lEmbuscade ! §r§c— §7Des pillards dévalent des falaises !
++sieged.toast.ambush_desert= §4§lEmbuscade ! §r§c— §7Des bandits surgissent des sables !
++sieged.toast.ambush_forest= §4§lEmbuscade ! §r§c— §7Des pillards émergent des arbres !
++
++## vassal_ship.js
++sieged.hud.ship_no_fleet=§c Aucun navire de flotte revendiqué sous votre bannière.
++sieged.hud.fleet_ashore_singular=§6Flotte : §eTout le monde à terre ! §8(%1 unité débarquée)
++sieged.hud.fleet_ashore_plural=§6Flotte : §eTout le monde à terre ! §8(%1 unités débarquées)
++sieged.hud.fleet_hold_singular=§6Flotte : §cTenez la position ! §8(%1 navire)
++sieged.hud.fleet_hold_plural=§6Flotte : §cTenez la position ! §8(%1 navires)
++sieged.hud.fleet_advance_singular=§6Flotte : §aEn avant ! §8(%1 navire)
++sieged.hud.fleet_advance_plural=§6Flotte : §aEn avant ! §8(%1 navires)
++sieged.hud.ship_claimed=§aNavire revendiqué pour §6%1§a !
++sieged.hud.ship_no_soldiers=§c Aucun soldat revendiqué à embarquer à proximité.
++sieged.hud.ship_full=§c Les navires sont pleins ou tous les soldats sont déjà à bord.
++sieged.hud.fleet_aboard_singular=§6Flotte : §aTous à bord ! §8(%1 soldat embarqué)
++sieged.hud.fleet_aboard_plural=§6Flotte : §aTous à bord ! §8(%1 soldats embarqués)
++
++## war_declaration.js
++sieged.hud.war_disabled=§c[Sieged] Les déclarations de guerre sont actuellement désactivées.
++sieged.hud.war_no_targets=§c Aucune cible valide à qui déclarer la guerre.
++sieged.hud.war_not_at_war=§cVous n'êtes en guerre avec personne en ligne.
++sieged.hud.war_declaration_subtitle=§4§l DÉCLARATION DE GUERRE\n§7Choisissez bien votre ennemi...
++sieged.hud.war_has_declared=§7a déclaré la guerre
++sieged.hud.war_vs=§e§lVS
++sieged.hud.war_prepare=§7préparez-vous à la guerre
++sieged.hud.war_begins=§4§l LA GUERRE COMMENCE
++sieged.hud.war_victory_title=§6§l VICTOIRE
++sieged.hud.war_defeated_title=§c§lDÉFAITE
++sieged.hud.war_peace_title=§a§lPAIX
++sieged.hud.war_peace_ended=§7La guerre avec %1 est terminée
++sieged.hud.war_propose_form_title=§a§lProposer la paix
++sieged.hud.war_propose_form_body=§7Choisissez un joueur à qui offrir la paix :
++sieged.hud.war_crow_summoned= §eLe parchemin a invoqué un corbeau messager !
++sieged.hud.war_declare_via_crow=§7Déclarez la guerre par l'intermédiaire du corbeau.
++sieged.hud.war_declined_self=§7Vous avez refusé la guerre de §c%1§7.
++sieged.hud.war_declined_broadcast=§7 §c%1 §7a refusé la guerre de §c%2§7.
++sieged.hud.war_active_self= §eGuerre en cours avec §c%1§e.
++sieged.hud.war_accepted_broadcast=§c §c%1 §ea accepté la guerre de §c%2§e.
++sieged.toast.war_scroll_received= §6§lParchemin de guerre §8— §ede §c%1
++sieged.toast.war_scroll_sent= §6§lParchemin envoyé §8— §eà §c%1
++sieged.hud.war_challenged_broadcast=§e §c%1 §ea défié §c%2 §een guerre.
++sieged.hud.war_victory_subtitle=§e%1 a été vaincu
++sieged.hud.war_defeated_subtitle=§7%1 a gagné la guerre
++sieged.hud.war_now_at_war_broadcast=§c §c%1 §eet §c%2 §esont désormais en guerre !
++sieged.hud.war_won_broadcast=§6 §e%1 §6a gagné la guerre contre §c%2§6 !
++sieged.hud.war_peace_broadcast=§a §a%1 §eet §a%2 §eont fait la paix.
++sieged.hud.war_peace_already_proposed=§ePaix déjà proposée à %1.
++sieged.hud.war_peace_sent=§aOffre de paix envoyée à §f%1§a.
++sieged.hud.war_peace_offers=§a%1 §7offre la §a§lPAIX§r§7. Déposez un parchemin près du corbeau pour accepter.
++sieged.hud.war_scroll_from_subtitle=§6§l DÉCLARATION DE GUERRE\n§7De : §c%1
++sieged.hud.war_scroll_form_body=§c%1 §evous a déclaré la guerre !\n\n§7Acceptez-vous cette déclaration de guerre ?
++sieged.toast.war_at_war_declarer= §4§lEn guerre §8— §eavec §c%1
++sieged.toast.war_at_war_target= §4§lEn guerre §8— §e§c%1 §evous a déclaré la guerre !
++
++## training_battle.js
++sieged.hud.training_already_in_session=§cVous êtes déjà en session d'entraînement !
++sieged.hud.training_form_body=§eChoisissez votre épreuve, guerrier.
++sieged.hud.training_elite_btn_available=§c§lÉpreuve d'élite — Garde-bannière\n§7§aDisponible
++sieged.hud.training_elite_btn_cooldown=§c§lÉpreuve d'élite — Garde-bannière\n§7§cRecharge : %1 min restantes
++sieged.hud.training_elite_on_cooldown=§cL'entraînement de Garde-bannière est en recharge ! §e%1 minutes restantes.
++sieged.hud.training_gauntlet_start_1=§6§l=== PARCOURS D'ENTRAÎNEMENT ===
++sieged.hud.training_gauntlet_start_2=§eSurvivez aux trois vagues pour gagner vos alliés !
++sieged.hud.training_wave_cleared=§aVague terminée ! Préparez-vous...
++sieged.hud.training_gauntlet_complete_1=§a§l=== PARCOURS TERMINÉ ===
++sieged.hud.training_gauntlet_complete_2=§eVous avez prouvé votre valeur !
++sieged.hud.training_elite_start_fail=§cImpossible de lancer l'épreuve.
++sieged.hud.training_elite_start_1=§c§l=== ÉPREUVE D'ÉLITE : PROTÉGEZ LE BLESSÉ ===
++sieged.hud.training_elite_start_2=§eUn soldat est grièvement blessé. Défendez-le au péril de votre vie !
++sieged.hud.training_wave_repelled=§aVague repoussée ! Tenez la ligne...
++sieged.hud.training_elite_complete_1=§c§l=== ÉPREUVE D'ÉLITE TERMINÉE ===
++sieged.hud.training_elite_complete_2=§6Vous avez protégé le blessé — le véritable devoir d'un Garde-bannière.
++sieged.hud.training_return=§cRevenez quand vous serez prêt, guerrier.
++sieged.hud.training_fallen=§cVous êtes tombé. Entraînement terminé.
++sieged.hud.training_warder_sentinel_joined=§aUn Gardien et une Sentinelle ont rejoint votre cause !
++sieged.hud.training_banner_guard_joined=§c§lUn Garde-bannière d'élite a rejoint votre armée !
++sieged.hud.training_banner_guard_cooldown_info=§6Vous pourrez entraîner un autre Garde-bannière dans 60 minutes.
++sieged.hud.training_cancelled=§eVotre session d'entraînement a été annulée.
++sieged.hud.training_interrupted=§cEntraînement interrompu.
++sieged.hud.training_fallen_soldier_lost=§cVous êtes tombé au combat. Le soldat blessé est perdu.
++sieged.hud.training_soldier_fallen=§c§lLe soldat blessé est tombé. Vous n'avez pas été assez rapide.
++sieged.hud.training_enemies_remaining=§eEnnemis restants : §c%1
++sieged.hud.training_allied_hp=§cPV de l'allié : §f%1 ❤  §8|  §eAttaquants : §c%2
++sieged.hud.training_wave_standard_1=§eVague 1 : §rUne recrue s'avance !
++sieged.hud.training_wave_standard_2=§6Vague 2 : §rDeux recrues chargent en même temps !
++sieged.hud.training_wave_standard_3=§cVague 3 — Vétéran : §rUn vétéran endurci s'avance !
++sieged.hud.training_wave_banner_1=§eVague d'épreuve 1 : §rDeux attaquants en approche !
++sieged.hud.training_wave_banner_2=§6Vague d'épreuve 2 : §rTrois attaquants chargent !
++sieged.hud.training_wave_banner_3=§cVague finale : §rLes soldats vétérans frappent !
++sieged.toast.training_gauntlet_start= §eParcours d'entraînement — §6Survivez aux vagues !
++sieged.toast.training_gauntlet_complete= §aParcours terminé — §eDes alliés rejoignent votre cause !
++sieged.toast.training_elite_start= §c§lÉpreuve d'élite — §eProtégez le soldat blessé !
++sieged.toast.training_elite_complete= §c§lÉpreuve d'élite terminée — §6Un Garde-bannière vous rejoint !
++
++## surrender.js
++sieged.hud.tribute_offline_delivered=§6[Tribut] §7Les paiements de tribut reçus pendant votre absence ont été déposés.
++sieged.hud.surrender_paper_dropped=§c[Reddition] §7Inventaire plein — le papier des conditions de reddition est tombé à vos pieds !
++sieged.hud.surrender_tyrant_block=§c[Reddition] On ne négocie pas avec les forces du Tyran. Battez-vous ou mourez !
++sieged.hud.surrender_no_threat=§c[Reddition] §7Aucune guerre active ni menace de pillards à négocier.\n§8La reddition n'est possible que pendant une guerre, un siège ou un raid.
++sieged.hud.surrender_target_offline=§c[Reddition] §e%1 §cn'est pas en ligne.
++sieged.hud.surrender_paper_received=\n§e§l[Reddition] §c%1§7 a hissé le drapeau blanc !\n§7Un papier de §fConditions de reddition §7a été ajouté à votre inventaire.\n§8Faites un clic droit dessus pour fixer vos exigences.
++sieged.hud.surrender_winner_target_offline=§c[Reddition] §e%1§c n'est pas en ligne — impossible de fixer les conditions maintenant.
++sieged.hud.surrender_dismissed_winner=§7Vous avez rejeté la demande de reddition. La guerre continue.
++sieged.hud.surrender_dismissed_loser=§c[Reddition] §e%1§c a rejeté votre offre. La guerre continue.
++sieged.hud.surrender_target_left=§c[Reddition] §e%1§c s'est déconnecté avant d'examiner les conditions.
++sieged.hud.surrender_terms_declined_loser=§e[Reddition] §7Conditions refusées. La guerre continue.
++sieged.hud.surrender_terms_declined_winner=§c[Reddition] §e%1§c a rejeté vos conditions. La guerre continue.
++sieged.hud.tribute_partial_pay=§c[Tribut] Vous n'aviez que §e%1§c sur §e%2 §e%3§c — paiement partiel effectué.
++sieged.hud.surrender_castle_forfeited=§4 §c%1§4 a cédé son royaume à §c%2§4 ! Capturez le drapeau !
++sieged.hud.surrender_world_broadcast=§e §c%1§e s'est rendu à §6%2§e !
++sieged.hud.surrender_world_broadcast_tribute=§e §c%1§e s'est rendu à §6%2§e ! §7— §e%3§7 paiement(s) de tribut de §e%4x %5§7 tous les §e%6§7 jour(s)
++sieged.hud.tribute_paid_full=§e §7Le tribut de §c%1§7 à §e%2§7 a été payé en totalité.
++sieged.hud.pillager_tribute_failed=§c[Reddition] Paiement incomplet — les pillards s'impatientent.
++sieged.hud.pillager_tribute_world=§4 §e%1§4 a payé un tribut au §cClan des Pillards§4 !
++sieged.hud.tribute_messenger_not_yours=§c[Tribut] Ce messager n'est pas là pour vous.
++sieged.hud.tribute_messenger_killed_world=§c §e%1§c a tué le messager du tribut ! La guerre avec §e%2§c reprend !
++sieged.hud.tribute_messenger_killed_self=§c§l[Tribut] Vous avez tué le messager — §e-%1 de moral§c ! La guerre reprend !
++sieged.hud.tribute_messenger_killed_winner=§c§l[Tribut] §e%1§c a tué votre messager ! La guerre reprend !
++sieged.hud.pillager_checklist_header=§4[Exigences des pillards] §7Objets qu'il vous reste à payer :
++sieged.hud.pillager_need_enough=§a✔ suffisant
++sieged.hud.pillager_need_more=§cencore %1 manquant(s)
++sieged.hud.pillager_use_flag_same=§8Utilisez à nouveau le §fDrapeau de reddition §8pour soumettre les MÊMES conditions.
++sieged.hud.pillager_use_flag=§8Utilisez à nouveau le §fDrapeau de reddition §8pour accepter les conditions.
++sieged.hud.pillager_pay_failed=§c[Tribut] Vous n'avez pu payer que §e%1§c / §e%2 §e%3§c.
++sieged.hud.surrender_offer_sent_title=§e§l OFFRE ENVOYÉE
++sieged.hud.surrender_offer_sent_subtitle=§7%1 §7a reçu votre requête. En attente de ses conditions.
++sieged.hud.surrender_defeat_title=§c§l REDDITION
++sieged.hud.surrender_defeat_subtitle=§7La guerre est finie. Honorez vos engagements.
++sieged.hud.surrender_victory_title=§6§l VICTOIRE
++sieged.hud.surrender_victory_subtitle=§7%1 s'est rendu !
++sieged.hud.tribute_paid_title=§4§l TRIBUT PAYÉ
++sieged.hud.tribute_paid_subtitle=§7Les pillards se retirent... pour l'instant.
++sieged.toast.tribute_offline_queued= §7§e%1§7 est hors ligne — objets mis en attente pour sa prochaine connexion.
++sieged.toast.tribute_partial= §c Tribut partiel — §c-%1 de moral !
++sieged.toast.tribute_partial_recipient= §c §e%1§c n'a payé que §e%2/%3x %4§c !
++sieged.toast.tribute_paid_payer= §6 §7Tribut payé à §e%1§7 : §6%2x %3
++sieged.toast.tribute_paid_recipient= §6 §7Tribut reçu de §e%1§7 : §6%2x %3
++sieged.toast.tribute_messenger_arrived= §6⚠ §eUn messager de §e%1§e est arrivé ! Payez §c%2x %3§e.
++sieged.toast.tribute_messenger_sent= §6⚠ §7Votre messager de tribut a été envoyé à §e%1§7.
++
++## items.js
++sieged.hud.crown_fallen=§c§l §6%1 §7est tombé ! La Couronne de Souveraineté est à prendre ! §c§l
++sieged.hud.mass_equip_armed_one=§a§f%1§a unité armée.
++sieged.hud.mass_equip_armed_many=§a§f%1§a unités armées.
++sieged.hud.mass_equip_weapon_countdown=§ePrenez l'arme en main... §f%1s
++sieged.hud.mass_equip_no_weapon=§cAucune arme en main — équipement annulé.
++sieged.hud.mass_equip_no_units=§cAucune unité Sieged trouvée dans un rayon de 32 blocs.
++sieged.hud.mass_equip_weapon_one=§a§f%1§a équipé sur §f%2§a unité.
++sieged.hud.mass_equip_weapon_many=§a§f%1§a équipé sur §f%2§a unités.
++sieged.hud.crown_domination_no_targets=§c Aucune cible valide à marquer à proximité.
++sieged.hud.crown_domination_marked=§cVous marquez §4%1 §cpour la mort !
++sieged.hud.crown_domination_cooldown=§cMarque de mort : §e%1s
++sieged.hud.crown_domination_mark_faded=§7 Votre marque s'est dissipée...
++sieged.hud.crown_domination_mark_consumed=§cMarque consumée ! §4+5 cœurs §cde dégâts !
++sieged.hud.war_horn_cooldown=§c Le Cor de guerre est en recharge ! Temps restant : §e%1
++sieged.hud.war_horn_no_troops=§e Aucune troupe apprivoisée à rallier à proximité !
++sieged.hud.war_horn_rallied_one=§6 §eLe Cor de guerre résonne ! §61 §etroupe ralliée !
++sieged.hud.war_horn_rallied_many=§6 §eLe Cor de guerre résonne ! §6%1 §etroupes ralliées !
++sieged.hud.war_scroll_upgrade_required=§c[Sieged] Ouvrez votre §eRegistre §cet débloquez §e%1 §cavant de promouvoir cette unité.
++sieged.hud.forge_tempered_steel=§aAcier trempé forgé !
++sieged.hud.forge_iron_ingot=§eLingot de fer — mauvais timing.
++sieged.hud.forge_iron_nugget=§cPépite de fer — timing raté !
++sieged.hud.forge_repair_cost=§cIl faut %1 lingots de fer pour réparer.
++sieged.hud.forge_anvil_repaired=§aEnclume de forge réparée.
++sieged.hud.forge_iron_cooled=§7Le fer a refroidi.
++sieged.hud.flail_momentum_max=§6Élan : §c3x §4MAX
++sieged.hud.flail_momentum=§6Élan : §6%1x
++sieged.hud.sabre_riposte_ready=§6Riposte prête...
++sieged.hud.sabre_riposte=§c§lRiposte !
++sieged.hud.summoning_bell_cooldown=§c La Cloche d'Invocation est en recharge ! Temps restant : §e%1
++sieged.hud.summoning_bell_rings=§5 §dLa Cloche d'Invocation sonne ! §54 Templiers §drépondent à votre appel !
++sieged.hud.forsaken_pact_no_targets=§c §4Aucun illageois à soumettre à proximité.
++sieged.hud.forsaken_pact_invoked_one=§4 §cLe Pacte du Déchu est invoqué ! §41 §cillageois plie sous votre volonté !
++sieged.hud.forsaken_pact_invoked_many=§4 §cLe Pacte du Déchu est invoqué ! §4%1 §cillageois plient sous votre volonté !
++sieged.hud.forsaken_pact_cooldown=§4Pacte du Déchu : §e%1s
++## castle-siege.js
++sieged.hud.crown_reset_success=§a[Couronne] Réinitialisée ! La couronne peut être réclamée à nouveau.
++sieged.hud.crown_reset_failed=§c[Couronne] Échec de la réinitialisation
++sieged.hud.crown_check_status=§e[Couronne] A été donnée : §6%1
++sieged.hud.crown_give_success=§a[Couronne] Couronne donnée à §e%1
++sieged.hud.siege_ship_wave_final=§4§lFLOTTE FINALE §r§7— §e%1 §7navires, §c%2 §7unités en approche !
++sieged.hud.siege_ship_wave=§c§lFlotte %1 §r§7— §e%2 §7navires, §c%3 §7unités en approche !
++sieged.hud.siege_ship_title=§b§lSIÈGE NAVAL
++sieged.hud.siege_difficulty_subtitle=§7Difficulté %1
++sieged.hud.siege_victory_title=§6§l VICTOIRE ! 
++sieged.hud.siege_ship_victory_subtitle=§7La flotte ennemie est vaincue !
++sieged.hud.siege_ship_rewards_header=§b§l━━━━━━ RÉCOMPENSES DU SIÈGE NAVAL ━━━━━━
++sieged.hud.siege_reward_emeralds=§e %1 émeraudes
++sieged.hud.siege_reward_gold=§6 %1 lingots d'or
++sieged.hud.siege_reward_diamonds=§b %1 diamants
++sieged.hud.siege_reward_netherite_scrap_one=§8 1 débris de netherite
++sieged.hud.siege_reward_netherite_scrap_many=§8 %1 débris de netherite
++sieged.hud.siege_reward_golden_apple=§6 1 pomme dorée enchantée
++sieged.hud.siege_ship_rewards_footer=§b§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.siege_ship_abandoned=§eLe siège naval a été abandonné.
++sieged.hud.siege_ship_status_final=§4FLOTTE FINALE §r§8| §e%1 §7navires §8· §c%2 §7unités
++sieged.hud.siege_ship_status=§cFlotte %1 §r§8| §e%2 §7navires §8· §c%3 §7unités
++sieged.hud.siege_flagship_incoming=§4§l LE NAVIRE AMIRAL APPROCHE !
++sieged.hud.siege_fleet_next=§e§lProchaine flotte en approche...
++sieged.hud.siege_already_active=§eLe siège a déjà commencé !
++sieged.hud.siege_already_conquered=§eCe château a déjà été conquis !
++sieged.hud.siege_no_water=§c Pas d'eau à proximité — les flottes ennemies ne peuvent pas approcher ce port !
++sieged.hud.siege_ship_already_active=§eUn siège naval est déjà en cours ici !
++sieged.hud.siege_harbor_taken=§eCe port a déjà été pris !
++sieged.hud.siege_crown_title=§6§lSIÈGE DE LA COURONNE
++sieged.hud.siege_castle_title=§c§lSIÈGE DE CHÂTEAU
++sieged.hud.siege_defenders_remaining=§cDéfenseurs restants : §e%1
++sieged.hud.siege_sink_ships=§b Coulez les navires ennemis ! §e%1 §brestants en mer
++sieged.hud.siege_wave_next=§e§lProchaine vague en approche...
++sieged.hud.siege_final_wave=§4§lVAGUE FINALE EN APPROCHE !
++sieged.hud.siege_defenders_attacking=§c§lLes défenseurs attaquent — Vague %1 !
++sieged.hud.siege_defenders_attacking_final=§c§lLes défenseurs attaquent — VAGUE FINALE !
++sieged.hud.siege_arrows_incoming=§c§l FLÈCHES EN APPROCHE ! 
++sieged.hud.siege_ships_spotted=§b Navires ennemis repérés en mer ! §e(%1)
++sieged.hud.siege_victory_pardoned=§a§lGracié §8— §7Votre victoire vous a racheté.
++sieged.hud.siege_victory_subtitle=§7Le château est tombé !
++sieged.hud.crown_claimed=§6§l §e%1 §6s'est emparé de la §lCouronne de Souveraineté§r§6 ! §l
++sieged.hud.siege_divider=§6§l━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.siege_crown_obtained=§e§lVous avez obtenu la Couronne de Souveraineté !
++sieged.hud.siege_crown_only=§7La seule couronne au monde...
++sieged.hud.siege_crown_claimed_other=§7La Couronne de Souveraineté a déjà été réclamée par un autre souverain.
++sieged.hud.siege_crown_no_reward=§cPas de récompenses — la couronne est le seul prix du Mauvais Présage V !
++sieged.hud.siege_rewards_header=§6§l━━━━━━━ RÉCOMPENSES DU SIÈGE ━━━━━━━
++sieged.hud.siege_reward_netherite_ingot_one=§8 1 lingot de netherite
++sieged.hud.siege_reward_netherite_ingot_many=§8 %1 lingots de netherite
++sieged.hud.siege_reward_exp=§d %1 niveaux d'expérience
++sieged.hud.siege_rewards_footer=§6§l━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.siege_abandoned=§eLe siège a été abandonné. Vous pourrez retenter votre chance.
++## invasion_event.js keys
++sieged.hud.invasion_ship_spotted=§b §lNavire ennemi repéré ! §r§7Un navire vassal approche par la mer !
++sieged.hud.invasion_declaration_header=§4§l━━━━━━━━ DÉCLARATION DE GUERRE ━━━━━━━━
++sieged.hud.invasion_declaration_line1=§7« Ta résistance s'arrête ici.
++sieged.hud.invasion_declaration_line2=§7 Mes armées raseront tout ce que tu as bâti. »
++sieged.hud.invasion_declaration_signature=§8                        — §cLe Tyran
++sieged.hud.invasion_declaration_days=§7Invasion imminente dans §e%1 §7jours (en jeu).
++sieged.hud.invasion_declaration_footer=§4§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_declared=§4 §cLe Tyran §7a déclaré la guerre à §c%1§7 !
++sieged.hud.invasion_no_castle=§c[Invasion] Les forces du Tyran ne trouvent pas votre château ! Placez un §4Drapeau de château §cà proximité pour ancrer l'invasion.
++sieged.hud.invasion_wave1_bar=§e§lVague 1 §8— §7Les éclaireurs avancent §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave2_bar=§6§lVague 2 §8— §7L'avant-garde arrive §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave3_bar=§c§lVague 3 §8— §7Force d'assaut déchaînée §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave4_bar=§4§lVague 4 §8— §cÉquipe de frappe d'élite §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_wave5_bar=§4§lVague 5 §8— §c§lEscouade de la mort §7— Forces venues du : §e%1§7 !
++sieged.hud.invasion_tyrant_title=§4§l  LE TYRAN  
++sieged.hud.invasion_tyrant_subtitle_intro=§7Il vient pour ce que vous avez bâti...
++sieged.hud.invasion_tyrant_subtitle_doom=§cAffronte ton destin, champion !
++sieged.hud.invasion_repelled=§a §lInvasion repoussée ! §r§7Les forces du Tyran sont brisées !
++sieged.hud.invasion_rewards_header=§a§l━━━━━━━ RÉCOMPENSES D'INVASION ━━━━━━━
++sieged.hud.invasion_rewards_emeralds=§e 20 émeraudes
++sieged.hud.invasion_rewards_diamonds=§b 8 diamants
++sieged.hud.invasion_rewards_netherite=§7 2 lingots de netherite
++sieged.hud.invasion_rewards_apple=§6 Pomme dorée enchantée
++sieged.hud.invasion_rewards_exp=§d 30 niveaux d'expérience
++sieged.hud.invasion_rewards_footer=§a§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_world_victory=§4§l §e%1 §6a repoussé l'invasion du Tyran ! §4§l
++sieged.hud.invasion_lost_header=§4§l━━━━━━━ INVASION PERDUE ━━━━━━━
++sieged.hud.invasion_lost_integrity=§7L'intégrité de votre château est tombée à zéro.
++sieged.hud.invasion_lost_occupied=§c§lLes forces du Tyran occupent désormais votre base.
++sieged.hud.invasion_lost_footer=§4§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_world_defeat=§4§l §4Le château de §e%1§4 est tombé aux mains du Tyran !
++sieged.hud.invasion_omen_divider=§8§l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
++sieged.hud.invasion_omen_line1=§7Une ombre menaçante s'agite à l'horizon...
++sieged.hud.invasion_omen_line2=§7§oDes rumeurs parlent d'un tyran redoutable dont le regard s'est tourné vers vous.
++sieged.hud.invasion_omen_line3=§7Le Tyran vous observe. Attendez-vous à recevoir une §4lettre§7 dans les §eprochains jours§7...
++sieged.hud.invasion_countdown_one=§c Invasion dans §e1 §cjour...
++sieged.hud.invasion_countdown_many=§c Invasion dans §e%1 §cjours...
++sieged.hud.invasion_spotted=§4 §lEnvahisseurs repérés ! §r§7Forces venues du §e%1§7 !
++sieged.hud.invasion_approach_hint=§4 §7Forces ennemies rassemblées au §e%1§7 ! Allez vers §e%2 §8(%3m)
++sieged.hud.invasion_closing_in=§c §7Les ennemis se rapprochent !
++sieged.hud.invasion_wave_cleared=§a§lVague %1 terminée ! §7Prochaine vague en approche...
++sieged.hud.invasion_all_waves_cleared=§4§l Vague 5 terminée ! §cLe Tyran approche...
++sieged.hud.invasion_scouts_stir=§c §lQuelque chose s'agite... §r§7Des éclaireurs ennemis fouillent votre royaume !
++sieged.hud.invasion_scouts_raid=§c §7Les éclaireurs illageois ont fait leur rapport ! Raid dans §e%1 §7jours !
++sieged.hud.invasion_scout_found_you=§c §l« Trouvé ! » §r§7Un éclaireur vous a repéré — tuez-le avant qu'il ne fasse son rapport !
++sieged.hud.invasion_scouts_revealed=§c §lÉclaireurs révélés ! §r§7Tuez-les avant la fin du temps imparti !
++sieged.hud.invasion_warchief_entered=§4 §lUn Chef de guerre illageois §r§4est entré dans la bataille !
++sieged.hud.invasion_raid_begins=§c §lLe raid commence ! §r§7Défendez votre royaume !
++sieged.hud.invasion_raid_wave=§c §lVague %1 §r§7— Pillards venus du §e%2§7 !
++sieged.hud.invasion_raid_repelled=§a §lRaid repoussé ! §r§7Votre royaume tient bon !
++sieged.hud.invasion_raid_sacked=§c §7Votre royaume a été saccagé par les pillards illageois !
++sieged.hud.invasion_raid_countdown_one=§c §7Raid illageois dans §e1 §cjour...
++sieged.hud.invasion_raid_countdown_many=§c §7Raid illageois dans §e%1 §cjours...
++sieged.hud.invasion_scouts_reported=§c §lLes éclaireurs ont fait leur rapport à leur chef de guerre ! §r§7Une lettre de raid arrive...
++sieged.hud.invasion_scouts_lurking=§c §7Éclaireurs tapis dans l'ombre ! §e%1 §7cachés — 
++sieged.hud.invasion_scouts_remaining=§c §7Éclaireurs ennemis ! §e%1 §7restants — 
++sieged.hud.invasion_scout_time_one=§c1 min
++sieged.hud.invasion_scout_time_many=§c%1 min
++sieged.hud.invasion_raid_cleared=§a§lRaid repoussé ! §7Belle défense !
++sieged.hud.invasion_raid_next_wave=§a§lVague %1 terminée ! §7Préparez-vous à la suite...
++sieged.hud.invasion_raiders_attack=§c §7Les forces illageoises attaquent depuis le §e%1§7 !
++sieged.hud.invasion_raid_incoming=§c §lDéfendez votre château ! §r§7Pillards en approche depuis le §e%1§7 !
++sieged.hud.invasion_raiders_closing=§c §7Les pillards se rapprochent !
++sieged.hud.invasion_scouts_eliminated=§a §lTous les éclaireurs éliminés ! §r§7Votre royaume est en sécurité... pour l'instant.
++
++## kingdom.js
++sieged.kingdom.crest_arms_reinforcements=§c §8Le §eBlason des Armes §8a convoqué les renforts quotidiens !
++sieged.kingdom.crest_war_siege_machine=§4 §8Le §cBlason de Guerre §8a livré une machine de siège !
++sieged.kingdom.crest_knowledge_xp=§3 §8Le §3Blason du Savoir §8vous accorde §3+3 niveaux d'XP §8grâce à vos érudits !
++sieged.kingdom.crest_arms_defenders=§c §8Le §eBlason des Armes §8a appelé des défenseurs à votre drapeau !
++sieged.kingdom.siege_initiated=§c Siège lancé sur §e%1§c. Restez dans un rayon de §e%2 §cblocs !
++sieged.kingdom.siege_initiated_world=§c §e%1 §ca lancé un siège sur le royaume de §e%2§c !
++sieged.kingdom.siege_besieging_you=§c §e%1 §cassiège votre drapeau ! Défendez-le !
++sieged.kingdom.siege_ended_owner=§a §8Le siège de votre drapeau est terminé.
++sieged.kingdom.siege_retreated=§a §8L'attaquant a battu en retraite. Votre drapeau est en sécurité.
++sieged.kingdom.siege_left=§c §8Vous avez quitté le siège — siège terminé.
++sieged.kingdom.siege_repelled=§a §8Siège repoussé ! Votre drapeau est en sécurité.
++sieged.kingdom.siege_failed=§c §8Siège échoué — le drapeau a été défendu.
++sieged.kingdom.siege_contested=§e⚔ Contesté
++sieged.kingdom.siege_hostile=§c §8Des forces hostiles assiègent votre drapeau !
++sieged.kingdom.siege_under_attack=§c §8Le royaume de §e%1§c est assiégé !
++sieged.kingdom.capture_pillager_world=§4 §c%1 §4est tombé aux mains des pillards !
++sieged.kingdom.capture_conquered_world=§4 §e%1 §4a conquis le royaume de §c%2§4 !
++sieged.kingdom.capture_seized_title=§6§l ROYAUME SAISI
++sieged.kingdom.capture_seized_subtitle=§8%1 est désormais à vous !
++sieged.kingdom.capture_conquered_title=§c§lROYAUME CONQUIS
++sieged.kingdom.capture_conquered_sub_pillager=§8Les pillards ont pris votre drapeau !
++sieged.kingdom.capture_conquered_sub_player=§8%1 s'est emparé de votre drapeau !
++sieged.kingdom.kingdom_fallen_toast=§c §8Votre royaume est tombé !
++sieged.kingdom.vassal_king_fell=§c §8Le château de votre roi est tombé. §eVotre colonie est désormais indépendante.
++sieged.kingdom.vassal_released_world=§4 §8Le royaume de §e%1§4 est tombé ! §8Toutes les colonies vassales ont été libérées.
++sieged.kingdom.collapse_pillagers_world=§4 §cLe royaume de %1 est tombé aux mains des pillards !
++sieged.kingdom.collapse_world=§8 §8Le royaume de %1 s'est effondré.
++sieged.kingdom.collapse_title=§c§lROYAUME DÉCHU
++sieged.kingdom.collapse_sub_morale=§8Votre peuple a perdu toute foi en votre règne.
++sieged.kingdom.collapse_sub_other=§8Votre royaume s'est effondré.
++sieged.kingdom.health_no_villagers=§c §8Aucun villageois ! Moral : §c%1%
++sieged.kingdom.trade_income_one_em=§6 §8Revenus commerciaux : §e+%1 §8émeraude (%2)
++sieged.kingdom.trade_income_many_em=§6 §8Revenus commerciaux : §e+%1 §8émeraudes (%2)
++sieged.kingdom.morale_daily_header=§a §8Moral quotidien : 
++sieged.kingdom.morale_daily_footer= §8(maintenant %1%)
++sieged.kingdom.morale_base=§e+10 §8base
++sieged.kingdom.morale_golem=§a+1 §8golems
++sieged.kingdom.morale_units=§a+1 §8unités
++sieged.kingdom.morale_animals=§a+1 §8animaux
++sieged.kingdom.morale_crops=§a+1 §8cultures
++sieged.kingdom.morale_crest=§a+%1 §8blason
++sieged.kingdom.morale_storm=§c%1 §8orage
++sieged.kingdom.morale_fire=§c%1 §8incendie
++sieged.kingdom.morale_atwar=§c%1 §8en guerre
++sieged.kingdom.morale_nether=§c%1 §8dans le Nether
++sieged.kingdom.morale_spiral=§c%1 §8spirale
++sieged.kingdom.desert_header=§c §8Moral bas — 
++sieged.kingdom.desert_villager_one=§e1 §cvillageois a fui
++sieged.kingdom.desert_villager_many=§e%1 §cvillageois ont fui
++sieged.kingdom.desert_troop_one=§e1 §ctroupe dissoute
++sieged.kingdom.desert_troop_many=§e%1 §ctroupes dissoutes
++sieged.kingdom.rebellion_world_one=§4 §c§lRÉBELLION §r§4— §4Les troupes de §e%1§4 se retournent ! §c1 unité a fait défection !
++sieged.kingdom.rebellion_world_many=§4 §c§lRÉBELLION §r§4— §4Les troupes de §e%1§4 se retournent ! §c%2 unités ont fait défection !
++sieged.kingdom.rebellion_toast_one=§4§l RÉBELLION ! §c1 troupe est passée à l'ennemi !
++sieged.kingdom.rebellion_toast_many=§4§l RÉBELLION ! §c%1 troupes sont passées à l'ennemi !
++sieged.kingdom.border_shown=§b §8Frontière du royaume affichée (rayon de %1 blocs).
++sieged.kingdom.border_hidden=§b §8Frontière du royaume masquée.
++sieged.kingdom.style_changed=§d §8Style du drapeau modifié.
++sieged.kingdom.crest_no_remove=§8 §8Ce drapeau n'a aucun blason à retirer.
++sieged.kingdom.crest_removed=§8 §8Blason retiré du drapeau.
++sieged.kingdom.crest_already_has=§c §8Ce drapeau porte déjà le §e%1§8. Utilisez un §eBlason vierge§8 pour le retirer d'abord.
++sieged.kingdom.crest_applied= §e%1 §8appliqué à votre drapeau !
++sieged.kingdom.flag_must_siege=§c §8Vous devez assiéger ce château pour capturer son drapeau !
++sieged.kingdom.already_member=§c §8Vous êtes déjà membre de §e%1§8. Quittez-le d'abord.
++sieged.kingdom.vassal_limit_claim=§c §8Votre §e%1§8 n'autorise que §e%2§8 drapeau(x) vassal(aux). Améliorez pour en avoir plus.
++sieged.kingdom.claimed_pillager_toast=§6 §eColonie revendiquée ! §8L'avant-poste de pillards est à vous.
++sieged.kingdom.claimed_abandoned_toast=§6 §eColonie revendiquée ! §8Le drapeau abandonné est à vous.
++sieged.kingdom.claimed_pillager_world=§6 §e%1 §6a revendiqué un avant-poste de pillards !
++sieged.kingdom.claimed_abandoned_world=§6 §e%1 §6a revendiqué un drapeau abandonné !
++sieged.kingdom.flag_now_owned=§cCe drapeau a désormais un propriétaire — vous ne pouvez pas le détruire.
++sieged.kingdom.flag_destroyed=§8 §8Drapeau détruit.
++sieged.kingdom.member_leave_to_found=§c §8Vous êtes membre de §e%1§8. Quittez-le avant d'en fonder un nouveau.
++sieged.kingdom.vassal_limit_spawn=§c §8Votre §e%1§8 a atteint la limite de vassaux (§e%2§8). Améliorez pour en revendiquer plus.
++sieged.kingdom.too_close_territory=§c §8Trop proche du territoire de §e%1§8. Les drapeaux doivent être espacés d'au moins %2 blocs.
++sieged.kingdom.too_close_other=§c §8Trop proche d'un autre drapeau. Les drapeaux doivent être espacés d'au moins %1 blocs.
++sieged.kingdom.settlement_founded=§6 §eColonie fondée ! §8Interagissez avec le drapeau pour gérer votre royaume.
++sieged.kingdom.barracks_locked=§c §8La caserne se débloque au niveau §eVille§8.
++sieged.kingdom.wagoner_summoned=§6 §eCharretier convoqué à votre château.
++sieged.kingdom.ft_enabled=§a §8Voyage rapide du Charretier §aactivé§8 pour votre château.
++sieged.kingdom.ft_disabled=§c §8Voyage rapide du Charretier §cdésactivé§8 pour votre château.
++sieged.kingdom.hud_enabled=§b §8ATH d'intégrité §aactivé§8.
++sieged.kingdom.hud_disabled=§b §8ATH d'intégrité §cdésactivé§8.
++sieged.kingdom.member_invited=§a §e%1 §8a rejoint le royaume en tant que §e%2§8.
++sieged.kingdom.member_removed=§c §e%1 §8retiré du royaume.
++sieged.kingdom.member_rank_set=§e §f%1 §8est désormais §e%2§8.
++sieged.kingdom.crown_transferred=§6 Couronne transférée à §e%1§8. Vous êtes désormais Noble.
++sieged.kingdom.tax_paid=§a §8Impôt payé : §e%1§8 émeraudes envoyées au royaume.
++sieged.kingdom.knight_recruited=§b §e1x %1§8 recruté ! (§e-%2 XP§8)
++sieged.kingdom.flag_granted=§6 Drapeau accordé à §d%1§8. Il reste sous votre royaume.
++sieged.kingdom.kingdom_left=§8 Vous avez quitté le royaume.
++sieged.kingdom.member_left=§c §e%1§8 a quitté le royaume.
++sieged.kingdom.troops_rallied_one=§6 §e1 §8troupe ralliée au drapeau.
++sieged.kingdom.troops_rallied_many=§6 §e%1 §8troupes ralliées au drapeau.
++sieged.kingdom.villagers_rallied_one=§6 §e1 §8villageois rallié au drapeau.
++sieged.kingdom.villagers_rallied_many=§6 §e%1 §8villageois ralliés au drapeau.
++sieged.kingdom.call_arms_one=§6 §e1 §8villageois appelé aux armes ! §7(%1) §c−%2 moral
++sieged.kingdom.call_arms_many=§6 §e%1 §8villageois appelés aux armes ! §7(%2) §c−%3 moral
++sieged.kingdom.tax_collected_one=§a §eImpôt : §a1 émeraude §8(%1 villageois, %2 % de moral)
++sieged.kingdom.tax_collected_many=§a §eImpôt : §a%1 émeraudes §8(%2 villageois, %3 % de moral)
++sieged.kingdom.tax_bank_collected=§a §e%1§8 émeraudes collectées dans la banque d'impôts.
++sieged.kingdom.tax_ready=§a §eImpôt prêt ! §8Ouvrez le drapeau de votre royaume pour le collecter.
++sieged.kingdom.diplo_accepted=§d §8%1 a accepté votre proposition d'alliance !
++sieged.kingdom.diplo_declined=§8Offre d'alliance de §e%1 §8refusée.
++sieged.kingdom.diplo_no_candidates=§8Aucun royaume éligible pour proposer une alliance.
++sieged.kingdom.diplo_proposed=§a §8Alliance proposée à §e%1§8.
++sieged.kingdom.diplo_incoming=§d §e%1 §8vous propose une alliance ! Ouvrez §dDiplomatie §8pour répondre.
++sieged.kingdom.diplo_trade_opened=§6 §e%1 §8a ouvert une route commerciale avec vous !
++sieged.kingdom.diplo_trade_failed=§c §8Impossible d'établir la route commerciale.
++sieged.kingdom.diplo_broken=§c §e%1 §8a rompu votre alliance.
++sieged.kingdom.diplo_alliance_world=§d §e%1 §8et §e%2 §8ont formé une alliance !
++sieged.kingdom.diplo_trade_world=§6 §8Une route commerciale a été établie entre §e%1 §8et §e%2§8 !
++sieged.kingdom.diplo_broken_world=§8 §8L'alliance entre §e%1 §8et §e%2 §8a pris fin.
++sieged.kingdom.disbanded=§8Votre royaume a été dissous.
++sieged.kingdom.disbanded_world=§8 §8Le royaume de %1 a été dissous.
++sieged.kingdom.castle_repaired=§b §eChâteau réparé ! §8Intégrité : §b%1%
++sieged.kingdom.upgraded=§6 §eAmélioration en %1 ! §8Nouveau rayon : §e%2 §8blocs.
++sieged.kingdom.upgraded_world=§6 §6Le territoire de §e%1§6 est devenu §l%2§r§6 !
++sieged.kingdom.enter_own=§6 §eBon retour dans votre %1.
++sieged.kingdom.enter_enemy=§c §8Territoire ennemi — %2 de §c%1§8.
++sieged.kingdom.enter_enemy_alert=§c §8L'ennemi §c%1 §8est entré dans votre %2 !
++sieged.kingdom.enter_friendly=§6 §8Vous entrez dans %2 de §e%1§8.
++sieged.kingdom.leave_territory=§8Vous quittez le territoire de §e%1§8.
++sieged.kingdom.pillager_reinforced=§c §8Des renforts de pillards sont arrivés à l'avant-poste !
++sieged.kingdom.nether_uneasy=§c §8Votre peuple s'inquiète de votre absence...
++sieged.kingdom.coup_started=§4 §cCoup d'État lancé ! Restez à moins de §e%1§c blocs du drapeau pendant §e60s§c.
++sieged.kingdom.coup_king_warned=§4 §c%1§c prépare un COUP D'ÉTAT contre votre royaume !
++sieged.kingdom.coup_foiled=§a §8Le coup d'État de §e%1§8 a été déjoué !
++sieged.kingdom.coup_success=§6 §lCoup d'État réussi ! §r§6Vous êtes désormais Roi de ce drapeau.
++sieged.kingdom.coup_overthrown=§c §lVous avez été renversé ! §r§c%1 est le nouveau Roi.
++sieged.kingdom.coup_world=§4 §e%1§4 a renversé §e%2§4 lors d'un coup d'État !
++sieged.kingdom.hud_integrity_label=§8Intégrité du château : 
++sieged.kingdom.hud_siege=  §c SIÈGE
++sieged.kingdom.hud_hostile_one=  §c1 hostile
++sieged.kingdom.hud_hostile_many=  §c%1 hostiles
++sieged.kingdom.must_siege_first=§c §8Vous devez d'abord assiéger ce château !\n§8Astuce : utilisez un §eCor §8pour l'assiéger.
++sieged.kingdom.barracks_enrolled_one=§a §e1 §8unité enrôlée à la caserne !
++sieged.kingdom.barracks_enrolled_many=§a §e%1 §8unités enrôlées à la caserne !
++sieged.kingdom.barracks_enrolled_skipped= §7(%1 ignorées)
++sieged.kingdom.barracks_removed=§c §e%1 §8%2 retiré(s) de la caserne.
++
++## banner_guard_script.js
++sieged.banner_guard.banner_rename_first=§c §8La bannière doit d'abord être renommée ! Utilisez une enclume pour la nommer.
++sieged.banner_guard.claim_success=§a §e%1 §8troupe(s) revendiquée(s) et apprivoisée(s) pour §6%2§8 !
++sieged.banner_guard.claim_blocked_suffix= §c(%1 déjà revendiquées par d'autres)
++sieged.banner_guard.troops_already_claimed=§c §8Ces troupes sont déjà revendiquées par quelqu'un d'autre !
++sieged.banner_guard.claim_no_troops=§7 §8Aucune troupe à revendiquer dans un rayon de §e%1 §8blocs.
++sieged.banner_guard.phalanx_need_warders=§c §8Il faut au moins §e%1 §8Gardiens pour former une phalange !
++sieged.banner_guard.phalanx_need_xp=§c §8Il faut §e%1 §8niveaux d'XP pour former une phalange ! §7(Vous en avez §e%2§7)
++sieged.banner_guard.phalanx_formed=§a §8Phalange formée ! §7(-%1 niveaux)
++sieged.banner_guard.turtle_need_warders=§c §8Il faut au moins §e%1 §8Gardiens pour former la Tortue !
++sieged.banner_guard.turtle_need_xp=§c §8Il faut §e%1 §8niveaux d'XP pour former la Tortue ! §7(Vous en avez §e%2§7)
++sieged.banner_guard.turtle_formed=§a §8Tortue formée ! §7(-%1 niveaux)
++sieged.banner_guard.falconer_need_xp=§c §8Il faut §e%1 §8niveaux d'XP pour former des fauconniers ! §7(Vous en avez §e%2§7)
++sieged.banner_guard.falconer_trained=§a §e%1 §8fauconnier(s) formé(s) ! §7(-%2 niveaux)
++sieged.banner_guard.march_no_troops=§c §8Aucune troupe à proximité pour marcher !
++sieged.banner_guard.march_started=§e§l EN AVANT, MARCHE !
++sieged.banner_guard.guard_already_claimed=§c §8Ce garde a déjà été revendiqué par un autre joueur.
++sieged.banner_guard.guard_tamed=§l§a Garde apprivoisé !
++sieged.banner_guard.guard_tame_hint=§7 Tenez une §aémeraude §7pour apprivoiser ce garde.
++sieged.banner_guard.guard_not_yours=§c §8Ce garde appartient à quelqu'un d'autre.
++sieged.banner_guard.faction_banner_needed=§c §8Il vous faut une bannière §6« %1 »§8 pour commander ce garde.
++sieged.banner_guard.chevalier_not_yours=§c §8Ce chevalier appartient à quelqu'un d'autre.
++sieged.banner_guard.chevalier_status_no_faction=§6 Chevalier §7— Commandé par un Garde-bannière
++sieged.banner_guard.chevalier_status_faction=§6 Chevalier §7— Commandé par un Garde-bannière §6[%1]
++sieged.banner_guard.chevalier_already_claimed=§c §8Ce chevalier a déjà été revendiqué par un autre joueur.
++sieged.banner_guard.chevalier_tamed=§l§a Chevalier apprivoisé ! §r§7 Utilisez une §6bannière nommée §7(accroupi + utiliser) pour lui assigner une faction.
++sieged.banner_guard.chevalier_tame_hint=§7 Tenez une §aémeraude §7pour apprivoiser ce chevalier.
++sieged.banner_guard.unit_not_yours=§c §8Cette unité appartient à quelqu'un d'autre.
++sieged.banner_guard.band_unit_removed=Compagnie %1 §7— unité retirée.
++sieged.banner_guard.band_unit_count=Compagnie %1 §7— §f%2 unité(s)
++sieged.banner_guard.commander_view_hint=§6 Vue Commandant §7— Sélectionnez §c[Quitter la vue commandant]§7 pour revenir
++sieged.banner_guard.commander_mode_toast= §6§lMode Commandant §8— §7Vos troupes attendent vos ordres.
++sieged.banner_guard.commander_exited=§a Retour de la Vue Commandant
++sieged.banner_guard.commander_timeout=§e La Vue Commandant a expiré.
++sieged.banner_guard.guard_fallen=§c Votre Garde-bannière est tombé !
++sieged.banner_guard.commander_timer_prefix=§6Vue Commandant
++sieged.banner_guard.commander_timer_suffix=  §e%1s
++sieged.banner_guard.selected_suffix= §7sélectionné(s)
++sieged.banner_guard.no_units_nearby=§c §8Aucune unité de ce type à proximité.
++sieged.banner_guard.placement_too_far=§c §8Trop loin ! La portée maximale de placement est de §e%1 §8blocs.
++sieged.banner_guard.units_positioned=§a §e%1 §8unité(s) positionnée(s) — en attente.
++sieged.banner_guard.placed_label=§a⊕ Placé
++sieged.banner_guard.repositioned_label=§7⟳ Repositionné
++sieged.banner_guard.point_progress= §f%1§e/§f%2
++sieged.banner_guard.armor_stripped=§a §8Armure retirée à §f%1§a troupe(s)
++sieged.banner_guard.cover_commander= §e§lProtégez le commandant ! §r§e Les Templiers vous encerclent pendant 10s.
++sieged.banner_guard.no_troops_type=§c §8Aucune troupe de ce type à proximité !
++sieged.banner_guard.follow_guard_only=§l§e LE GARDE-BANNIÈRE VOUS SUIT !
++sieged.banner_guard.follow_troops=§l§e SUIVEZ !
++sieged.banner_guard.horn_guard_untamed=§c §8Apprivoisez d'abord ce garde avant de lier votre cor.
++sieged.banner_guard.horn_linked=§a §8Cor lié à §6%1§a !
++sieged.banner_guard.unit_following=§a L'unité vous suit
++sieged.banner_guard.unit_holding=§6 L'unité tient la position
++sieged.banner_guard.horn_not_linked=§c §8Cor non lié. §8Accroupi + interagir avec un Garde-bannière pour le lier.
++sieged.banner_guard.horn_guard_range=§c §8Le garde lié n'est pas à moins de §e%1 §8blocs.
++sieged.banner_guard.move_blocked_illagers=§c §8Repositionnement impossible — des illageois sont à proximité.
++sieged.banner_guard.move_blocked_siege_flag=§c §8Repositionnement impossible — près d'un drapeau de siège ennemi.
++sieged.banner_guard.move_blocked_castle=§c §8Repositionnement impossible — près d'un château en siège.
++
++## quest_log.js / quest_master.js
++sieged.quest.map_received= §6§lCarte reçue §8— §7Ramassez la carte à vos pieds !
++sieged.quest.assigned=§6§l Quête confiée §8— §f%1 §8| %2
++sieged.quest.still_needed=§6Journal de quêtes §8— §7Encore requis : %1
++sieged.quest.complete_noble=§2§l Quête terminée §8— §7%1 §8| Bien joué !
++sieged.quest.not_complete=§7Journal de quêtes §8— §7Votre quête n'est pas encore terminée.
++sieged.quest.reward_claimed=§a§l Récompense réclamée ! §8— §7%1 §8| Journal de quêtes consommé.
++sieged.quest.complete_claim=§a§l Quête terminée ! §8— §7Tenez le Journal de quêtes et faites un clic droit pour réclamer !
++sieged.quest.progress=§6 Quête §8— §7%1 : §f%2§8/§f%3
++sieged.quest.run_voided=§c§l Tentative annulée §8— §7Vous avez subi des dégâts. Recommencez le combat pour réessayer.
++sieged.quest.damaged=§c§l Touché ! §8— §7Tentative sans faute annulée. Terrassez le Chevalier pour recommencer.
++sieged.quest.noble_no_quest=§6§l Noble du village §8— §7Je n'ai pas encore de nouvelle quête. Revenez dans §f%1§7.
++
++## ravager_boss.js
++sieged.ravager.kill_riders=§c Tuez les cavaliers pour blesser le Ravageur de guerre !
++
++## field_battle.js
++sieged.field_battle.fell= §7%1 §cest tombé sur le champ de bataille.
++
++## invasion_event.js (scout)
++sieged.invasion.scout_found_you=§c §l« Trouvé ! » §r§7Un éclaireur vous a repéré — tuez-le avant qu'il ne fasse son rapport !
++
++## items.js
++sieged.items.no_equippable=§c Aucun composant équipable trouvé.
++sieged.items.retrieved=§a %1 objet(s) récupéré(s).
++sieged.items.no_custom_gear=§7 Aucun équipement personnalisé à récupérer.
++
++item.sieged:royale_steel_helm=Heaume en acier royal
++item.sieged:royale_steel_chestplate=Plastron en acier royal
++item.sieged:royale_steel_leggings=Jambières en acier royal
++item.sieged:royale_steel_boots=Bottes en acier royal
++item.sieged:return_order_scroll=Parchemin d'ordre de retour
++
++## Hardened Steel Armor
++item.sieged:hardened_royale_steel_helm=Heaume en acier royal renforcé
++item.sieged:hardened_royale_steel_chestplate=Plastron en acier royal renforcé
++item.sieged:hardened_royale_steel_leggings=Jambières en acier royal renforcées
++item.sieged:hardened_royale_steel_boots=Bottes en acier royal renforcées
++item.sieged:hardened_steel_seafarer_helm=Heaume d'acier du Marin renforcé
++item.sieged:hardened_steel_seafarer_chestplate=Plastron d'acier du Marin renforcé
++item.sieged:hardened_steel_seafarer_leggings=Jambières d'acier du Marin renforcées
++item.sieged:hardened_steel_seafarers_sandals=Sandales d'acier du Marin renforcées
++item.sieged:hardened_steel_warlord_helm=Heaume d'acier du Seigneur de guerre renforcé
++item.sieged:hardened_steel_warlord_chestplate=Plastron d'acier du Seigneur de guerre renforcé
++item.sieged:hardened_steel_warlord_leggings=Jambières d'acier du Seigneur de guerre renforcées
++item.sieged:hardened_steel_warlord_boots=Bottes d'acier du Seigneur de guerre renforcées
++item.sieged:hardened_steel_repentence_helm=Heaume d'acier de la Repentance renforcé
++item.sieged:hardened_steel_repentance_chestplate=Plastron d'acier de la Repentance renforcé
++item.sieged:hardened_steel_repentance_leggings=Jambières d'acier de la Repentance renforcées
++item.sieged:hardened_steel_repentance_boots=Bottes d'acier de la Repentance renforcées
++item.sieged:hardened_steel_barren_garb=Tenue d'acier des Terres Arides renforcée
++item.sieged:hardened_steel_barren_chestplate=Plastron d'acier des Terres Arides renforcé
++item.sieged:hardened_steel_barren_leggings=Jambières d'acier des Terres Arides renforcées
++item.sieged:hardened_steel_barren_sandals=Sandales d'acier des Terres Arides renforcées
++item.sieged:hardened_tempered_steel_helm=Heaume en acier trempé renforcé
++item.sieged:hardened_tempered_steel_chestplate=Plastron en acier trempé renforcé
++item.sieged:hardened_tempered_steel_leggings=Jambières en acier trempé renforcées
++item.sieged:hardened_tempered_steel_boots=Bottes en acier trempé renforcées
++tile.sieged:the_golden_crossbow.name=§6§lMarque du Tyran
++tile.sieged:the_golden_horn.name=§6§lMarque du Ravageur
++tile.sieged:the_golden_shield.name=§6§lMarque du Déchu
++item.sieged:the_golden_crossbow=§6§lMarque du Tyran
++item.sieged:the_golden_horn=§6§lMarque du Ravageur
++item.sieged:the_golden_shield=§6§lMarque du Déchu
++item.sieged:the_golden_crossbow_trophy=§6§lMarque du Tyran
++item.sieged:the_golden_horn_trophy=§6§lMarque du Ravageur
++item.sieged:the_golden_shield_trophy=§6§lMarque du Déchu
++
++## war_declaration.js — libellés des formulaires (ajoutés pour la traduction)
++sieged.hud.war_scroll_form_title=Parchemin de guerre
++sieged.hud.war_form_accept=§2§l Accepter — Que la guerre commence
++sieged.hud.war_form_decline=§c Refuser
++sieged.hud.war_form_dropdown_label=§7Déclarer la guerre à :
++sieged.hud.war_form_reason_label=§7Indiquez le motif de votre guerre :
++sieged.hud.war_form_reason_placeholder=ex. : vol, trahison...
++sieged.hud.war_form_pending=§7(en attente...)
++sieged.hud.war_form_cancel=§7Annuler
+diff -ruN --strip-trailing-cr addon_orig/SiegedTATR/texts/languages.json addon/SiegedTATR/texts/languages.json
 --- addon_orig/SiegedTATR/texts/languages.json	2026-05-01 13:26:45.000000000 +0000
 +++ addon/SiegedTATR/texts/languages.json	2026-07-04 17:06:26.141974267 +0000
 @@ -1,6 +1,8 @@
@@ -4025,28 +6298,3 @@ diff -ruN --strip-trailing-cr addon_orig/SiegedTATB/scripts/war_targeting.js add
  	"pt_BR",
  	"zh_CN"
  ]
---- addon_orig/SiegedTATR/manifest.json	2026-07-02 01:41:31.000000000 +0000
-+++ addon/SiegedTATR/manifest.json	2026-07-04 19:36:13.082436022 +0000
-@@ -1,10 +1,10 @@
- {
- 	"format_version": 2,
- 	"header": {
--		"name": "Sieged TAT Resource",
--		"description": "Medieval survival addon RP Update V1.7",
-+		"name": "Sieged TAT Resource (FR)",
-+		"description": "Add-on médiéval de survie — RP — traduit en français (v1.7.7)",
- 		"uuid": "73fa7f0a-81c2-436c-a85b-7bc055ca299a",
--		"version": [1, 7, 1],
-+		"version": [1, 7, 7],
- 		"min_engine_version": [1, 26, 0]
- 	},
- 	"modules": [
-@@ -17,7 +17,7 @@
- 	"dependencies": [
- 		{
- 			"uuid": "a4f7aabf-caa9-4404-a28e-7c50e6fbb2dc",
--			"version": [1, 7, 1]
-+			"version": [1, 7, 7]
- 		}
- 	],
- 	"capabilities": ["pbr"],
