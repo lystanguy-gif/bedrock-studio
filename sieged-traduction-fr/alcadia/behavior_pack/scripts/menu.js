@@ -408,15 +408,32 @@ function giveMenuItem(player) {
   } catch (e) {}
 }
 
-// à la première connexion, on donne la montre et on rappelle la commande
+// à la première connexion, on donne le kit : montre Menu + livre du guide +
+// Registre de Sieged, et on rappelle la commande
+function giveBooks(p) {
+  try {
+    const livre = new ItemStack("minecraft:book", 1);
+    livre.nameTag = "§2Guide du serveur";
+    const inv = p.getComponent("minecraft:inventory");
+    if (inv && inv.container) { const left = inv.container.addItem(livre); if (left) p.dimension.spawnItem(left, p.location); }
+  } catch (e) {}
+  try {
+    // Le Registre de Sieged (si l'add-on Sieged est actif sur le monde)
+    const registre = new ItemStack("sieged:sieged_book", 1);
+    const inv = p.getComponent("minecraft:inventory");
+    if (inv && inv.container) { const left = inv.container.addItem(registre); if (left) p.dimension.spawnItem(left, p.location); }
+  } catch (e) {}
+}
+
 world.afterEvents.playerSpawn.subscribe((ev) => {
   try {
     if (!ev.initialSpawn || !ev.player) return;
     const p = ev.player;
-    p.sendMessage("§7Ouvre ton menu avec la montre §bMenu§7 de ton inventaire, ou avec §f/alcadia:menu§7.");
-    if (p.hasTag("alcadia_menu_given")) return;
-    giveMenuItem(p);
-    p.addTag("alcadia_menu_given");
+    p.sendMessage("§7Ouvre ton menu avec la montre §bMenu§7, le guide avec le §2livre§7, le Registre avec le §elivre de Sieged§7 — ou tape §f/alcadia:menu§7.");
+    if (!p.hasTag("alcadia_menu_given")) { giveMenuItem(p); p.addTag("alcadia_menu_given"); }
+    // Les livres ont leur propre marqueur : les joueurs d'avant cette version
+    // les reçoivent aussi à leur prochaine connexion.
+    if (!p.hasTag("alcadia_books_given")) { giveBooks(p); p.addTag("alcadia_books_given"); }
   } catch (e) {}
 });
 
