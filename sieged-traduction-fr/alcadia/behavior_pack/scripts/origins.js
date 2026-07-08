@@ -75,6 +75,28 @@ export function resetCharacter(player) {
   } catch (e) {}
 }
 
+// Relance la création de personnage chez un joueur (utilisé par le menu admin) :
+// efface l'ancien personnage puis rouvre le formulaire directement chez lui.
+export function relaunchCreation(target) {
+  resetCharacter(target);
+  try { target.sendMessage("§eUn administrateur relance la création de ton personnage."); } catch (e) {}
+  system.runTimeout(() => { try { startCreation(target); } catch (e) {} }, 10);
+}
+
+// Retire un joueur de sa civilisation (sans toucher au reste du personnage).
+// S'il en était le fondateur, la civilisation est libérée.
+export function removeFromNation(target) {
+  let na; try { na = target.getDynamicProperty(DP_NATION); } catch (e) {}
+  if (!na) return null;
+  const nations = loadNations();
+  const n = nations[na];
+  const wasFounder = !!(n && n.founderId === target.id);
+  if (wasFounder) { delete nations[na]; saveNations(nations); }
+  try { target.setDynamicProperty(DP_NATION, undefined); } catch (e) {}
+  try { target.sendMessage(wasFounder ? "§eUn administrateur t'a retiré des " + n.name + " ; la civilisation est libérée." : "§eUn administrateur t'a retiré de ta civilisation. Ouvre la montre pour en choisir une autre."); } catch (e) {}
+  return n ? n.name : String(na);
+}
+
 // ===================== création ===============================
 function startCreation(player) {
   const f = new ModalFormData().title("Création de ton personnage")
@@ -301,16 +323,40 @@ export function openCivAdmin(player) {
   form.show(player).then((res) => {
     if (res.canceled || res.selection >= ids.length) return;
     const id = ids[res.selection];
-    const n = nations[id];
-    new ActionFormData().title(n.name).body("Chef " + n.founderName + "\n§7Libérer rend la civilisation à nouveau disponible. Les membres actuels gardent leur appartenance jusqu'à ce qu'ils en changent.")
-      .button("§cLibérer cette civilisation").button("Retour")
-      .show(player).then((r2) => {
-        if (r2.canceled || r2.selection !== 0) { openCivAdmin(player); return; }
-        const cur = loadNations(); delete cur[id]; saveNations(cur);
-        player.sendMessage("§aCivilisation " + n.name + " libérée, elle peut de nouveau être fondée.");
-        openCivAdmin(player);
-      });
+    openOneCivAdmin(player, id);
   });
+}
+
+function openOneCivAdmin(player, id) {
+  const nations = loadNations();
+  const n = nations[id];
+  if (!n) { openCivAdmin(player); return; }
+  const members = world.getAllPlayers().filter((p) => { try { return p.getDynamicProperty(DP_NATION) === id; } catch (e) { return false; } });
+  new ActionFormData().title(n.name)
+    .body("Chef " + n.founderName + "\n§7Membres en ligne : " + (members.length ? members.map((m) => m.name).join(", ") : "aucun") + "\n\n§7« Supprimer » dissout la civilisation : elle redevient fondable et ses membres en ligne en sont retirés immédiatement.")
+    .button("§eRetirer un membre en ligne")
+    .button("§cSupprimer cette civilisation")
+    .button("Retour")
+    .show(player).then((r2) => {
+      if (r2.canceled || r2.selection === undefined || r2.selection === 2) { openCivAdmin(player); return; }
+      if (r2.selection === 0) {
+        if (!members.length) { player.sendMessage("§7Aucun membre de cette civilisation n'est en ligne. (Un joueur hors-ligne peut être retiré depuis Gérer un joueur quand il se connecte.)"); openOneCivAdmin(player, id); return; }
+        const f = new ActionFormData().title("Retirer un membre — " + n.name).body("Touche un joueur pour le retirer de la civilisation.");
+        for (const m of members) f.button(m.name + (n.founderId === m.id ? " §7(chef)" : ""));
+        f.button("Retour");
+        f.show(player).then((r3) => {
+          if (r3.canceled || r3.selection === undefined || r3.selection >= members.length) { openOneCivAdmin(player, id); return; }
+          const name = removeFromNation(members[r3.selection]);
+          player.sendMessage("§a" + members[r3.selection].name + " retiré des " + (name || n.name) + ".");
+          openOneCivAdmin(player, id);
+        });
+      } else {
+        for (const m of members) { try { m.setDynamicProperty(DP_NATION, undefined); m.sendMessage("§eTa civilisation (" + n.name + ") a été supprimée par un administrateur. Ouvre la montre pour en choisir une autre."); } catch (e) {} }
+        const cur = loadNations(); delete cur[id]; saveNations(cur);
+        player.sendMessage("§aCivilisation " + n.name + " supprimée : elle peut de nouveau être fondée.");
+        openCivAdmin(player);
+      }
+    });
 }
 
 // ===================== effets de gabarit ======================

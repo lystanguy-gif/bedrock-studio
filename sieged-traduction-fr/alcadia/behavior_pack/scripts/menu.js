@@ -4,8 +4,9 @@ import { isCreative, COIN_ID, getCoinId, setCoinId, container, countItem, remove
 import { openMyHouses, openPropertyAdmin, openPlayerHousesAdmin, propertiesCountOf } from "./merchant.js";
 import { openMyRoom } from "./inn.js";
 import { openMyGrade, describeGrade, resetGrade } from "./grades.js";
-import { describeCharacter, isCharacterCreated, resetCharacter, openMyNation, openCivAdmin, openNationSpawnsAdmin } from "./origins.js";
+import { describeCharacter, isCharacterCreated, resetCharacter, relaunchCreation, removeFromNation, openMyNation, openCivAdmin, openNationSpawnsAdmin } from "./origins.js";
 import { openTroupesShop } from "./troupes.js";
+import { openReglement, openSanctions } from "./reglement.js";
 
 // vrai pour les opérateurs (ceux qui ont les commandes) et les joueurs en créatif
 function isAdmin(player) {
@@ -128,6 +129,7 @@ function openMainMenu(player) {
   form.button("Ma chambre"); actions.push("room");
   form.button("Mon grade"); actions.push("grade");
   form.button("§2⚔ Troupes de siège"); actions.push("troops");
+  form.button("§f⚖ Règlement"); actions.push("rules");
   form.button("§2Guide du serveur"); actions.push("guide");
   if (admin) {
     form.button("§9Gérer un joueur"); actions.push("players");
@@ -148,6 +150,7 @@ function openMainMenu(player) {
     else if (a === "room") openMyRoom(player);
     else if (a === "grade") openMyGrade(player);
     else if (a === "troops") openTroupesShop(player);
+    else if (a === "rules") openReglement(player, isAdmin);
     else if (a === "guide") openGuideMenu(player);
     else if (a === "players") openPlayersAdmin(player);
     else if (a === "propadmin") openPropertyAdmin(player);
@@ -279,6 +282,10 @@ function openPlayerAdmin(viewer, target) {
     .button("Compte bancaire")
     .button("Grade")
     .button("Biens")
+    .button("§c⚔ Sanctions §7(avertir, prison, ban)")
+    .button("§6Vider son inventaire")
+    .button("§6Retirer de sa civilisation")
+    .button("§6Relancer la création du personnage")
     .button("§cRéinitialiser le personnage")
     .button("Retour")
     .show(viewer).then((res) => {
@@ -287,7 +294,43 @@ function openPlayerAdmin(viewer, target) {
       else if (res.selection === 1) openBankAdmin(viewer, target);
       else if (res.selection === 2) openGradeAdmin(viewer, target);
       else if (res.selection === 3) openPlayerHousesAdmin(viewer, target.id, target.name);
-      else if (res.selection === 4) confirmResetChar(viewer, target);
+      else if (res.selection === 4) openSanctions(viewer, target, () => openPlayerAdmin(viewer, target));
+      else if (res.selection === 5) confirmClearInventory(viewer, target);
+      else if (res.selection === 6) {
+        const civ = removeFromNation(target);
+        viewer.sendMessage(civ ? "§a" + target.name + " retiré des " + civ + "." : "§7" + target.name + " n'appartient à aucune civilisation.");
+        openPlayerAdmin(viewer, target);
+      }
+      else if (res.selection === 7) confirmRelaunchCreation(viewer, target);
+      else if (res.selection === 8) confirmResetChar(viewer, target);
+    });
+}
+
+// Vide l'inventaire du joueur via /clear exécuté PAR le joueur lui-même :
+// aucun besoin de taper son pseudo (caractères spéciaux sans problème).
+function confirmClearInventory(viewer, target) {
+  new ActionFormData().title("Vider l'inventaire de " + target.name)
+    .body("Tout l'inventaire de ce joueur (main, armure, sacoche) sera §cdéfinitivement supprimé§r. Confirmer ?")
+    .button("§cOui, tout vider").button("Annuler")
+    .show(viewer).then((res) => {
+      if (res.canceled || res.selection !== 0) { openPlayerAdmin(viewer, target); return; }
+      let ok = false;
+      try { target.runCommand("clear @s"); ok = true; } catch (e) {}
+      viewer.sendMessage(ok ? "§aInventaire de " + target.name + " vidé." : "§cImpossible de vider l'inventaire (joueur déconnecté ?).");
+      if (ok) { try { target.sendMessage("§eUn administrateur a vidé ton inventaire."); } catch (e) {} }
+      openPlayerAdmin(viewer, target);
+    });
+}
+
+function confirmRelaunchCreation(viewer, target) {
+  new ActionFormData().title("Relancer la création — " + target.name)
+    .body("Son personnage actuel (prénom, sexe, gabarit, civilisation) est effacé et le §eformulaire de création s'ouvre immédiatement§r chez lui. Confirmer ?")
+    .button("§6Oui, relancer la création").button("Annuler")
+    .show(viewer).then((res) => {
+      if (res.canceled || res.selection !== 0) { openPlayerAdmin(viewer, target); return; }
+      relaunchCreation(target);
+      viewer.sendMessage("§aCréation de personnage relancée chez " + target.name + ".");
+      openPlayerAdmin(viewer, target);
     });
 }
 function openInspect(viewer, target) {
