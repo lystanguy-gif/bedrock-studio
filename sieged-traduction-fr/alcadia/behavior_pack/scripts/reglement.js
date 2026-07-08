@@ -12,7 +12,7 @@
 // Coût : uniquement des événements + UNE vérification légère toutes les 5 s
 // (joueurs en ligne seulement : prison, bans, compte à rebours). Aucun scan
 // d'entités en continu.
-import { world, system } from "@minecraft/server";
+import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { isKingdomChief } from "./troupes.js";
 
@@ -54,6 +54,7 @@ const RULES = [
   { titre: "§67. Sanctions", texte: "§7Les avertissements ont des niveaux : §fléger§7 (1 pt), §6sérieux§7 (2 pts), §cgrave§7 (3 pts).\n\n§7Au-delà du seuil de points, bannissement temporaire automatique.\n\n§7Selon la faute, un admin peut aussi t'envoyer en §8prison RP§7 (cellule pour une durée donnée) ou te bannir directement.\n\n§7Les points s'effacent sur décision d'un admin." },
   { titre: "§d8. Représentants d'un royaume", texte: "§7Chaque roi peut nommer des §ereprésentants§7 (bouton 👑 de ce menu, visible par le roi).\n\n§7Quand le roi est hors-ligne mais qu'un représentant est en ligne, le royaume compte comme §edéfendu§7 : les attaques (en guerre déclarée) sont autorisées.\n\n§7Choisis des joueurs de confiance : ils portent la défense du royaume en ton absence." },
   { titre: "§c9. Nether et End interdits (règle automatisée)", texte: "§7Ce monde médiéval se joue dans le §emonde normal§7 : le §cNether§7 et §cl'End§7 sont interdits aux joueurs.\n\n§6Automatique : §7si tu y entres, un avertissement s'affiche avec un §ccompte à rebours§7. Ressors avant la fin : aucune sanction. Reste : avertissement grave, retour forcé au spawn et §cbannissement temporaire§7.\n\n§8Les administrateurs et le mode créatif ne sont pas concernés." },
+  { titre: "§c10. Enchantements interdits (règle automatisée)", texte: "§7Les combats de ce serveur se font à l'acier, pas à la magie : §cles enchantements sont interdits§7 sur les armes, outils, armures et livres.\n\n§6Automatique : §7la table d'enchantement est §cbloquée§7, et tout objet enchanté porté ou tenu est §cdésenchanté sur place§7 (les livres enchantés redeviennent des livres). L'objet n'est pas détruit, il perd seulement ses enchantements.\n\n§8Les administrateurs et le mode créatif ne sont pas concernés." },
 ];
 
 export function openReglement(player, isAdminFn) {
@@ -336,6 +337,55 @@ world.afterEvents.playerDimensionChange.subscribe((ev) => {
   startDimViolation(p, dimName);
 });
 
+// ── Règle 10 automatisée : enchantements interdits ───────────────────────────
+// 1) La table d'enchantement est bloquée (événement annulable).
+// 2) Tout objet enchanté TENU ou PORTÉ est désenchanté par la vérification
+//    périodique (les enchantements arrivent aussi par pêche, coffres,
+//    bibliothécaires : bloquer la table ne suffit pas). Les objets custom de
+//    Sieged ne sont jamais touchés (uniquement les objets minecraft:*).
+world.beforeEvents.playerInteractWithBlock.subscribe((ev) => {
+  try {
+    if (ev.block.typeId !== "minecraft:enchanting_table") return;
+    const p = ev.player;
+    if (!p || p.typeId !== "minecraft:player") return;
+    try { if (String(p.getGameMode()).toLowerCase() === "creative") return; } catch (e) {}
+    if (isOperator(p)) return;
+    ev.cancel = true;
+    system.run(() => {
+      try {
+        p.onScreenDisplay.setActionBar("§c⚠ Règle 10 : les enchantements sont interdits sur ce serveur.");
+        p.playSound("note.bass", { pitch: 0.6 });
+      } catch (e) {}
+    });
+  } catch (e) {}
+});
+
+const EQUIP_SLOTS = ["Mainhand", "Offhand", "Head", "Chest", "Legs", "Feet"];
+function stripEnchants(p) {
+  let eq;
+  try { eq = p.getComponent("minecraft:equippable"); } catch (e) { return; }
+  if (!eq) return;
+  for (const slot of EQUIP_SLOTS) {
+    try {
+      const it = eq.getEquipment(slot);
+      if (!it || !it.typeId.startsWith("minecraft:")) continue;
+      if (it.typeId === "minecraft:enchanted_book") {
+        eq.setEquipment(slot, new ItemStack("minecraft:book", it.amount));
+        p.sendMessage("§c⚠ Règle 10 : ton livre enchanté redevient un livre ordinaire.");
+        continue;
+      }
+      const en = it.getComponent("minecraft:enchantable");
+      if (!en) continue;
+      const list = en.getEnchantments();
+      if (!list || !list.length) continue;
+      en.removeAllEnchantments();
+      eq.setEquipment(slot, it);
+      p.onScreenDisplay.setActionBar("§c⚠ Règle 10 : enchantements retirés de " + it.typeId.replace("minecraft:", "").replace(/_/g, " ") + ".");
+      p.playSound("random.break", { volume: 0.4 });
+    } catch (e) {}
+  }
+}
+
 // Vérification légère toutes les 5 s : comptes à rebours, prison, bans.
 system.runInterval(() => {
   const now = Date.now();
@@ -388,6 +438,8 @@ system.runInterval(() => {
     // règle 9 : couvre aussi un joueur déjà dans le Nether/End sans avoir
     // changé de dimension (connexion sur place, pack fraîchement activé…)
     try { const dn = FORBIDDEN_DIMS[p.dimension.id]; if (dn) startDimViolation(p, dn); } catch (e) {}
+    // règle 10 : désenchante ce qui est tenu ou porté (hors créatif/admin)
+    try { if (String(p.getGameMode()).toLowerCase() !== "creative" && !isOperator(p)) stripEnchants(p); } catch (e) {}
     const j = jailInfo(p);
     if (j) {
       if (now >= j.until) { freePlayer(p); continue; }
