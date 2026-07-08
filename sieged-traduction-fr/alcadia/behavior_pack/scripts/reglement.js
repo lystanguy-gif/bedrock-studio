@@ -30,7 +30,7 @@ function loadObj(dp) {
 }
 function saveObj(dp, o) { try { world.setDynamicProperty(dp, JSON.stringify(o)); } catch (e) {} }
 
-const DEFAULT_CFG = { countdown: 60, banHours: 24, warnLimit: 4, radius: 48 };
+const DEFAULT_CFG = { countdown: 60, dimCountdown: 10, banHours: 24, warnLimit: 4, radius: 48 };
 export function getCfg() { return Object.assign({}, DEFAULT_CFG, loadObj(DP_CFG)); }
 function saveCfg(c) { saveObj(DP_CFG, c); }
 
@@ -315,10 +315,10 @@ function startDimViolation(p, dimName) {
   if (isOperator(p)) return;
   if (dimViolations.has(p.id)) return;
   const cfg = getCfg();
-  dimViolations.set(p.id, { until: Date.now() + cfg.countdown * 1000, name: p.name });
+  dimViolations.set(p.id, { until: Date.now() + cfg.dimCountdown * 1000, name: p.name });
   try { p.onScreenDisplay.setTitle("§c⚠ INTERDIT", { fadeInDuration: 5, stayDuration: 60, fadeOutDuration: 10, subtitle: "§f" + dimName + " est interdit sur ce serveur" }); } catch (e) {}
   try {
-    p.sendMessage("§c⚠ Règle 9 : §e" + dimName + "§c est interdit aux joueurs.\n§eRessors avant " + cfg.countdown + " secondes§c : aucune sanction. Sinon : avertissement grave, retour au spawn et bannissement temporaire.");
+    p.sendMessage("§c⚠ Règle 9 : §e" + dimName + "§c est interdit aux joueurs.\n§eRessors avant " + cfg.dimCountdown + " secondes§c : aucune sanction. Sinon : avertissement grave, retour au spawn et bannissement temporaire.");
     p.playSound("note.bass", { pitch: 0.6 });
   } catch (e) {}
 }
@@ -424,6 +424,7 @@ function openRulesAdmin(player, isAdminFn) {
   new ActionFormData().title("§9⚙ Administration du règlement")
     .body(
       "§7Compte à rebours règle 4 : §f" + cfg.countdown + " s\n" +
+      "§7Compte à rebours règle 9 (Nether/End) : §f" + cfg.dimCountdown + " s\n" +
       "§7Zone interdite : §fterritoire réel du royaume§7 (20→96 blocs selon son niveau)\n" +
       "§7Rayon de secours (drapeau introuvable) : §f" + cfg.radius + " blocs\n" +
       "§7Durée du ban auto : §f" + cfg.banHours + " h\n" +
@@ -450,6 +451,7 @@ function openRulesAdmin(player, isAdminFn) {
       } else if (res.selection === 2) {
         const f = new ModalFormData().title("Durées et seuils")
           .textField("Compte à rebours de la règle 4 (secondes)", String(cfg.countdown), { defaultValue: String(cfg.countdown) })
+          .textField("Compte à rebours de la règle 9 Nether/End (secondes)", String(cfg.dimCountdown), { defaultValue: String(cfg.dimCountdown) })
           .textField("Rayon de secours en blocs (utilisé seulement si le drapeau est introuvable)", String(cfg.radius), { defaultValue: String(cfg.radius) })
           .textField("Durée du bannissement automatique (heures)", String(cfg.banHours), { defaultValue: String(cfg.banHours) })
           .textField("Seuil d'avertissements avant ban (points)", String(cfg.warnLimit), { defaultValue: String(cfg.warnLimit) });
@@ -458,9 +460,10 @@ function openRulesAdmin(player, isAdminFn) {
           const nums = r.formValues.map((v) => parseInt(String(v || "").trim(), 10));
           const nc = getCfg();
           if (Number.isFinite(nums[0]) && nums[0] >= 10) nc.countdown = nums[0];
-          if (Number.isFinite(nums[1]) && nums[1] >= 8) nc.radius = nums[1];
-          if (Number.isFinite(nums[2]) && nums[2] >= 1) nc.banHours = nums[2];
-          if (Number.isFinite(nums[3]) && nums[3] >= 1) nc.warnLimit = nums[3];
+          if (Number.isFinite(nums[1]) && nums[1] >= 5) nc.dimCountdown = nums[1];
+          if (Number.isFinite(nums[2]) && nums[2] >= 8) nc.radius = nums[2];
+          if (Number.isFinite(nums[3]) && nums[3] >= 1) nc.banHours = nums[3];
+          if (Number.isFinite(nums[4]) && nums[4] >= 1) nc.warnLimit = nums[4];
           saveCfg(nc);
           player.sendMessage("§aRéglages du règlement enregistrés.");
           openRulesAdmin(player, isAdminFn);
