@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bedrock Studio — Nous bâtissons des mondes</title>
+<meta name="description" content="Bedrock Studio crée votre nom, votre identité et un site internet spectaculaire, animé en 3D. Faites défiler : la pagode se désagrège, le monde change.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0:#08090c; --bg1:#0d1018; --bg2:#121620; --bg3:#181d28;
+  --border:#1e2535; --border2:#252d3d;
+  --gold:#c8a55a; --gold2:#e8c878; --golddim:#7a6030;
+  --blue:#4a9ece; --red:#c0392b;
+  --text:#ccc8be; --muted:#6a7080; --light:#e8e4dc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg0);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:16px;
+  overflow-x:hidden;
+}
+::selection{background:var(--gold);color:#0a0c12}
+
+/* ── LOADER ── */
+#loader{
+  position:fixed;inset:0;z-index:100;background:var(--bg0);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  transition:opacity .8s ease, visibility .8s;
+}
+#loader.done{opacity:0;visibility:hidden}
+#loader .l-logo{font-family:'Cinzel Decorative',serif;font-size:22px;color:var(--gold);letter-spacing:6px;text-shadow:0 0 40px rgba(200,165,90,.5)}
+#loader .l-bar{width:180px;height:1px;background:var(--border);position:relative;overflow:hidden}
+#loader .l-bar::after{content:'';position:absolute;inset:0;background:var(--gold);transform-origin:left;animation:load 1.4s ease forwards}
+@keyframes load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+/* ── CANVAS 3D FIXE (pagode) ── */
+#scene3d{
+  position:fixed;inset:0;width:100%;height:100vh;z-index:0;
+  transition:opacity .4s linear;
+}
+
+/* ── HEADER ── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;gap:24px;
+  padding:18px 32px;
+  background:linear-gradient(180deg,rgba(8,9,12,.85),transparent);
+}
+.logo{font-family:'Cinzel Decorative',serif;font-size:17px;color:var(--gold);letter-spacing:4px;text-shadow:0 0 30px rgba(200,165,90,.5);text-decoration:none}
+.logo span{color:var(--blue);font-size:11px;display:block;letter-spacing:7px;font-family:'Cinzel',serif;text-shadow:none}
+nav{margin-left:auto;display:flex;gap:26px}
+nav a{
+  color:var(--muted);text-decoration:none;font-family:'Cinzel',serif;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;transition:color .2s;
+}
+nav a:hover{color:var(--gold)}
+@media(max-width:640px){nav{display:none}}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:10}
+
+/* Hero : superposé au canvas */
+#hero{
+  height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:0 24px;pointer-events:none;
+}
+#hero h1{
+  font-family:'Cinzel Decorative',serif;font-weight:900;
+  font-size:clamp(30px,6vw,68px);color:var(--light);
+  letter-spacing:4px;line-height:1.15;
+  text-shadow:0 0 60px rgba(0,0,0,.9), 0 0 120px rgba(200,165,90,.25);
+}
+#hero h1 em{font-style:normal;color:var(--gold)}
+#hero p{
+  margin-top:20px;font-size:clamp(15px,2vw,21px);font-weight:400;
+  letter-spacing:2px;color:var(--text);max-width:640px;
+  text-shadow:0 2px 20px rgba(0,0,0,.9);
+}
+#hero .scroll-hint{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:4px;color:var(--muted);
+  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.scroll-hint::after{
+  content:'';width:1px;height:44px;background:linear-gradient(var(--gold),transparent);
+  animation:drip 1.8s ease infinite;
+}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* Zone de scroll pendant laquelle la pagode se désagrège */
+#dislocation{height:220vh;pointer-events:none}
+#dislocation .msg{
+  position:sticky;top:0;height:100vh;
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:0 24px;
+  opacity:0;transition:opacity .3s linear;
+}
+#dislocation .msg h2{
+  font-family:'Cinzel',serif;font-size:clamp(22px,4vw,44px);
+  color:var(--gold2);letter-spacing:6px;font-weight:600;
+  text-shadow:0 0 60px rgba(0,0,0,.9);
+}
+#dislocation .msg h2 small{display:block;font-size:.45em;color:var(--text);letter-spacing:4px;margin-top:14px;font-family:'Rajdhani',sans-serif;font-weight:400}
+
+/* Contenu après la dislocation */
+.panel{background:linear-gradient(180deg,transparent,var(--bg0) 12%,var(--bg0))}
+.wrap{max-width:1100px;margin:0 auto;padding:110px 28px}
+.kicker{font-family:'Cinzel',serif;font-size:11px;letter-spacing:5px;color:var(--blue);text-transform:uppercase}
+h2.title{font-family:'Cinzel Decorative',serif;font-size:clamp(26px,4vw,44px);color:var(--light);letter-spacing:3px;margin:14px 0 12px}
+.lead{color:var(--muted);font-size:18px;max-width:640px;letter-spacing:.5px}
+
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ── PROMESSES ── */
+.claims{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2px;margin-top:48px;background:var(--border)}
+.claim{background:var(--bg1);padding:34px 28px;transition:background .3s}
+.claim:hover{background:var(--bg2)}
+.claim .num{font-family:'Cinzel',serif;color:var(--golddim);font-size:12px;letter-spacing:3px}
+.claim h3{font-family:'Cinzel',serif;color:var(--gold);font-size:18px;letter-spacing:2px;margin:12px 0 10px}
+.claim p{color:var(--muted);font-size:15px;line-height:1.55}
+
+/* ── RÉALISATIONS (faux sites) ── */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;margin-top:52px;perspective:1200px}
+.card{
+  background:var(--bg1);border:1px solid var(--border);
+  transform-style:preserve-3d;transition:transform .18s ease-out, border-color .3s, box-shadow .3s;
+  cursor:pointer;position:relative;overflow:hidden;
+}
+.card:hover{border-color:var(--golddim);box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 40px rgba(200,165,90,.07)}
+.card .glare{
+  position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(400px circle at var(--gx,50%) var(--gy,50%),rgba(232,200,120,.14),transparent 60%);
+}
+.card:hover .glare{opacity:1}
+.browser{border-bottom:1px solid var(--border);padding:9px 12px;display:flex;align-items:center;gap:6px;background:var(--bg2)}
+.browser i{width:9px;height:9px;border-radius:50%;background:var(--border2)}
+.browser i:first-child{background:#5a3030}
+.browser .url{margin-left:8px;font-size:11px;color:var(--muted);letter-spacing:1px;border:1px solid var(--border);padding:2px 10px;border-radius:10px}
+.shot{height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden}
+.shot .t{font-family:'Cinzel Decorative',serif;letter-spacing:3px;font-size:20px;z-index:1}
+.shot .s{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:.75;z-index:1}
+.shot-ryokan{background:linear-gradient(160deg,#120c0a,#2a130e 60%,#3d1c10);color:#e8c878}
+.shot-ryokan::before{content:'鳥居';position:absolute;font-size:120px;opacity:.08;color:#e8c878}
+.shot-forge{background:linear-gradient(160deg,#0a0c12,#131a26 60%,#1a2740);color:#9cc4e4}
+.shot-forge::before{content:'⚒';position:absolute;font-size:120px;opacity:.08}
+.shot-lks{background:linear-gradient(160deg,#101418,#1c2a2e 60%,#2e4448);color:#cfe8dd}
+.shot-lks::before{content:'◐';position:absolute;font-size:120px;opacity:.08}
+.card-body{padding:18px 20px 22px}
+.card-body h3{font-family:'Cinzel',serif;color:var(--light);letter-spacing:2px;font-size:16px}
+.card-body p{color:var(--muted);font-size:14px;margin-top:6px;line-height:1.5}
+.tag{display:inline-block;margin-top:12px;margin-right:6px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border:1px solid var(--golddim);padding:3px 9px}
+
+/* ── SECTION KATANA ── */
+#lame{background:var(--bg0)}
+#lame .stage{
+  position:relative;max-width:1100px;margin:40px auto 0;
+  border:1px solid var(--border);background:var(--bg1);
+  height:520px;overflow:hidden;
+}
+#katanaCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;z-index:4;transition:opacity .6s ease .5s}
+.stage.cut #katanaCanvas{opacity:0}
+.stage-hint{
+  position:absolute;bottom:20px;left:0;right:0;text-align:center;z-index:5;
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--muted);
+  text-transform:uppercase;pointer-events:none;transition:opacity .4s;
+}
+/* Le site démo caché derrière la "coupe" */
+.demo-site{
+  position:absolute;inset:0;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(700px circle at 50% 30%,#3d1c10,#160b07 70%);
+  text-align:center;padding:24px;
+}
+.demo-site .ds-k{font-size:12px;letter-spacing:6px;color:#c47a4a;text-transform:uppercase}
+.demo-site h3{font-family:'Cinzel Decorative',serif;font-size:clamp(26px,4vw,48px);color:#e8c878;letter-spacing:4px}
+.demo-site p{color:#c9a98e;max-width:520px;font-size:16px;letter-spacing:1px}
+.demo-site .ds-btn{
+  margin-top:10px;border:1px solid #c47a4a;color:#e8c878;padding:10px 26px;
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  background:none;cursor:pointer;transition:all .3s;
+}
+.demo-site .ds-btn:hover{background:#c47a4a22}
+/* Les deux volets qui recouvrent le site démo, tranchés par le katana */
+.cover{position:absolute;inset:0;z-index:3;pointer-events:none}
+.cover .half{
+  position:absolute;inset:0;background:linear-gradient(160deg,#0d1018,#121620);
+  transition:transform 1s cubic-bezier(.6,0,.2,1), opacity 1s;
+}
+.cover .half.top{clip-path:polygon(0 0,100% 0,100% 32%,0 78%)}
+.cover .half.bottom{clip-path:polygon(0 78%,100% 32%,100% 100%,0 100%)}
+.cover .slash-line{
+  position:absolute;left:-10%;right:-10%;top:55%;height:2px;
+  background:linear-gradient(90deg,transparent,#fff,var(--gold2),#fff,transparent);
+  transform:rotate(-14deg) scaleX(0);transform-origin:left center;
+  box-shadow:0 0 24px rgba(232,200,120,.9),0 0 60px rgba(232,200,120,.5);
+  opacity:0;
+}
+.stage.cut .slash-line{animation:slash .38s ease-out forwards}
+@keyframes slash{0%{opacity:1;transform:rotate(-14deg) scaleX(0)}80%{opacity:1;transform:rotate(-14deg) scaleX(1)}100%{opacity:0;transform:rotate(-14deg) scaleX(1)}}
+.stage.cut .half.top{transform:translate(-3%,-105%) rotate(-2deg);transition-delay:.28s}
+.stage.cut .half.bottom{transform:translate(3%,105%) rotate(2deg);transition-delay:.28s}
+.stage.cut #katanaCanvas{pointer-events:none}
+.stage.cut .stage-hint{opacity:0}
+.replay{
+  position:absolute;top:14px;right:14px;z-index:6;
+  background:none;border:1px solid var(--border2);color:var(--muted);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  padding:7px 14px;cursor:pointer;opacity:0;pointer-events:none;transition:all .4s;
+}
+.stage.cut .replay{opacity:1;pointer-events:auto;transition-delay:1.2s}
+.replay:hover{color:var(--gold);border-color:var(--golddim)}
+
+/* ── CONTACT ── */
+#contact .wrap{text-align:center;padding-bottom:140px}
+#contact .lead{margin:0 auto}
+.cta{
+  display:inline-block;margin-top:38px;
+  background:linear-gradient(135deg,var(--golddim),#5a4020);
+  border:1px solid var(--gold);color:var(--gold2);
+  padding:16px 44px;font-family:'Cinzel',serif;font-size:13px;
+  letter-spacing:4px;text-transform:uppercase;text-decoration:none;transition:all .25s;
+}
+.cta:hover{background:var(--gold);color:#0a0c12;box-shadow:0 0 40px rgba(200,165,90,.4)}
+footer{border-top:1px solid var(--border);padding:26px;text-align:center;font-size:12px;color:var(--muted);letter-spacing:2px;position:relative;z-index:10;background:var(--bg0)}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="l-logo">BEDROCK</div><div class="l-bar"></div></div>
+
+<canvas id="scene3d"></canvas>
+
+<header>
+  <a class="logo" href="#">BEDROCK<span>STUDIO</span></a>
+  <nav>
+    <a href="#promesses">L'agence</a>
+    <a href="#realisations">Réalisations</a>
+    <a href="#lame">Démo</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<section id="hero">
+  <h1>Nous bâtissons<br><em>des mondes</em></h1>
+  <p>Vous créez. Nous, on vous crée un nom, une identité — et un site que personne n'oublie.</p>
+  <div class="scroll-hint">Faites défiler</div>
+</section>
+
+<!-- Pendant ce scroll, la pagode 3D se désagrège cube par cube -->
+<section id="dislocation">
+  <div class="msg" id="dislocMsg">
+    <h2>CHAQUE MONDE PEUT ÊTRE DÉFAIT…<small>…et rebâti à votre image.</small></h2>
+  </div>
+</section>
+
+<div class="panel">
+
+  <section id="promesses">
+    <div class="wrap reveal">
+      <div class="kicker">L'agence</div>
+      <h2 class="title">On ne livre pas des pages.<br>On forge des identités.</h2>
+      <p class="lead">Un site Bedrock n'est pas une brochure : c'est une expérience. La 3D, le mouvement et le récit sont au service d'une seule chose — qu'on se souvienne de vous.</p>
+      <div class="claims">
+        <div class="claim">
+          <div class="num">I</div>
+          <h3>Un nom, une identité</h3>
+          <p>Nom de marque, logotype, univers visuel complet. Vous arrivez avec une idée, vous repartez avec une signature.</p>
+        </div>
+        <div class="claim">
+          <div class="num">II</div>
+          <h3>Des sites vivants</h3>
+          <p>Scènes 3D temps réel, animations au défilement, interactions qui racontent votre histoire. Comme la pagode que vous venez de désagréger.</p>
+        </div>
+        <div class="claim">
+          <div class="num">III</div>
+          <h3>La meilleure communication</h3>
+          <p>Phrases d'accroche, ton, réseaux : un message clair porté par une mise en scène spectaculaire.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="realisations">
+    <div class="wrap reveal">
+      <div class="kicker">Réalisations &amp; démonstrations</div>
+      <h2 class="title">Explorez nos mondes</h2>
+      <p class="lead">Des sites de démonstration créés par le studio pour montrer ce qui est possible. Survolez : chaque carte réagit en 3D.</p>
+      <div class="cards">
+        <div class="card" data-tilt>
+          <div class="glare"></div>
+          <div class="browser"><i></i><i></i><i></i><span class="url">ryokan-izumi.demo</span></div>
+          <div class="shot shot-ryokan"><div class="t">RYOKAN IZUMI</div><div class="s">Maison d'hôtes japonaise</div></div>
+          <div class="card-body">
+            <h3>Ryokan Izumi</h3>
+            <p>Un temple qui s'assemble à l'écran, pièce par pièce, pendant que le visiteur découvre les chambres.</p>
+            <span class="tag">3D temps réel</span><span class="tag">Réservation</span>
+          </div>
+        </div>
+        <div class="card" data-tilt>
+          <div class="glare"></div>
+          <div class="browser"><i></i><i></i><i></i><span class="url">atelier-forge.demo</span></div>
+          <div class="shot shot-forge"><div class="t">ATELIER FORGE</div><div class="s">Coutellerie d'art</div></div>
+          <div class="card-body">
+            <h3>Atelier Forge</h3>
+            <p>Une lame forgée sous vos yeux : chaque section du site est révélée d'un coup de marteau. Essayez la démo du sabre plus bas.</p>
+            <span class="tag">Interaction</span><span class="tag">E-commerce</span>
+          </div>
+        </div>
+        <div class="card" data-tilt>
+          <div class="glare"></div>
+          <div class="browser"><i></i><i></i><i></i><span class="url">lksartpeintures.com</span></div>
+          <div class="shot shot-lks"><div class="t">LKS ART</div><div class="s">Léa Kalck — Artiste peintre</div></div>
+          <div class="card-body">
+            <h3>LKS ART — site réel</h3>
+            <p>Galerie en ligne et espace privé de gestion pour l'artiste peintre Léa Kalck. Un site livré, en production.</p>
+            <span class="tag">Site livré</span><span class="tag">Galerie</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="lame">
+    <div class="wrap reveal">
+      <div class="kicker">Démonstration interactive</div>
+      <h2 class="title">Cliquez sur le sabre</h2>
+      <p class="lead">Un exemple d'interaction signature : le katana tranche l'écran, et le site apparaît derrière la coupe.</p>
+      <div class="stage" id="stage">
+        <div class="demo-site">
+          <div class="ds-k">Coutellerie d'art — Édition limitée</div>
+          <h3>ATELIER FORGE</h3>
+          <p>Chaque lame est forgée, polie et signée à la main. Douze exemplaires par an. Pas un de plus.</p>
+          <button class="ds-btn" type="button">Découvrir la collection</button>
+        </div>
+        <div class="cover" id="cover">
+          <div class="half top"></div>
+          <div class="half bottom"></div>
+          <div class="slash-line"></div>
+        </div>
+        <canvas id="katanaCanvas"></canvas>
+        <div class="stage-hint">Cliquez sur le katana pour trancher</div>
+        <button class="replay" id="replay" type="button">↺ Rejouer</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap reveal">
+      <div class="kicker">Contact</div>
+      <h2 class="title">Et si on bâtissait le vôtre&nbsp;?</h2>
+      <p class="lead">Racontez-nous votre projet. On revient vers vous avec un nom, une accroche et une première scène.</p>
+      <a class="cta" href="mailto:lystanguy@gmail.com?subject=Projet%20Bedrock%20Studio">Lancer un projet</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>BEDROCK STUDIO — Nous bâtissons des mondes. © 2026</footer>
+
+<script src="./three.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   SCÈNE 1 — La pagode de voxels qui se désagrège au scroll
+   ═══════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('scene3d');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x08090c, 0.016);
+
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 300);
+
+  scene.add(new THREE.AmbientLight(0x25304a, 1.6));
+  const sun = new THREE.DirectionalLight(0xe8c878, 1.2);
+  sun.position.set(18, 40, 22);
+  scene.add(sun);
+  const lantern = new THREE.PointLight(0xc8a55a, 2.2, 60);
+  lantern.position.set(0, 12, 0);
+  scene.add(lantern);
+
+  /* ---- Construction de la pagode, cube par cube ---- */
+  const STONE=0x2a2f3a, WALL=0x141821, RED=0x7e2d24, GOLD=0xc8a55a, GOLD2=0xe8c878;
+  const voxels = [];
+  const seen = new Set();
+  function box(x,y,z,c){
+    const k = x+'_'+y+'_'+z;
+    if (seen.has(k)) return;
+    seen.add(k);
+    voxels.push({x,y,z,c});
+  }
+  // Socle de pierre
+  for (let x=-7;x<=7;x++) for (let z=-7;z<=7;z++){
+    box(x,1,z,STONE);
+    if (Math.abs(x)===7 || Math.abs(z)===7) box(x,0,z,STONE);
+  }
+  // Murs creux d'un étage
+  function walls(s, y0, h){
+    for (let y=y0;y<y0+h;y++)
+      for (let x=-s;x<=s;x++) for (let z=-s;z<=s;z++)
+        if (Math.abs(x)===s || Math.abs(z)===s){
+          const corner = Math.abs(x)===s && Math.abs(z)===s;
+          box(x,y,z, corner ? RED : WALL);
+        }
+  }
+  // Toit en dalles décroissantes + coins relevés (silhouette asiatique)
+  function roof(y0, s){
+    for (let i=0;i<3;i++){
+      const s2 = s - i;
+      for (let x=-s2;x<=s2;x++) for (let z=-s2;z<=s2;z++)
+        box(x, y0+i, z, i===2 ? GOLD2 : GOLD);
+    }
+    for (const sx of [-1,1]) for (const sz of [-1,1])
+      box(sx*(s+1), y0+1, sz*(s+1), GOLD2);
+  }
+  walls(4, 2, 5);  roof(7, 6);
+  walls(3, 10, 4); roof(14, 5);
+  walls(2, 18, 3); roof(21, 4);
+  box(0,24,0,GOLD2); box(0,25,0,GOLD2); box(0,26,0,GOLD);
+
+  const COUNT = voxels.length;
+  const geo = new THREE.BoxGeometry(0.94, 0.94, 0.94);
+  const mat = new THREE.MeshStandardMaterial({roughness:0.55, metalness:0.25});
+  const mesh = new THREE.InstancedMesh(geo, mat, COUNT);
+
+  const group = new THREE.Group();
+  group.add(mesh);
+  scene.add(group);
+
+  // Données par cube : position d'origine + trajectoire d'explosion
+  const dummy = new THREE.Object3D();
+  const color = new THREE.Color();
+  const base = new Float32Array(COUNT*3);
+  const dir  = new Float32Array(COUNT*3);
+  const spin = new Float32Array(COUNT*3);
+  const dist = new Float32Array(COUNT);
+  const CENTER_Y = 12;
+  let seed = 42;
+  const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+
+  for (let i=0;i<COUNT;i++){
+    const v = voxels[i];
+    base[i*3]=v.x; base[i*3+1]=v.y; base[i*3+2]=v.z;
+    const d = new THREE.Vector3(v.x, v.y-CENTER_Y, v.z).normalize();
+    d.x += (rnd()-0.5)*1.2; d.y += (rnd()-0.2)*1.2; d.z += (rnd()-0.5)*1.2;
+    d.normalize();
+    dir[i*3]=d.x; dir[i*3+1]=d.y; dir[i*3+2]=d.z;
+    dist[i] = 14 + rnd()*30;
+    spin[i*3]=(rnd()-0.5)*8; spin[i*3+1]=(rnd()-0.5)*8; spin[i*3+2]=(rnd()-0.5)*8;
+    const j = 0.9 + rnd()*0.2;
+    color.setHex(v.c).multiplyScalar(j);
+    mesh.setColorAt(i, color);
+  }
+  mesh.instanceColor.needsUpdate = true;
+
+  /* ---- Braises flottantes ---- */
+  const N_EMBER = 160;
+  const epos = new Float32Array(N_EMBER*3);
+  for (let i=0;i<N_EMBER;i++){
+    epos[i*3]   = (rnd()-0.5)*70;
+    epos[i*3+1] = rnd()*40;
+    epos[i*3+2] = (rnd()-0.5)*70;
+  }
+  const egeo = new THREE.BufferGeometry();
+  egeo.setAttribute('position', new THREE.BufferAttribute(epos, 3));
+  const embers = new THREE.Points(egeo, new THREE.PointsMaterial({
+    color:0xe8c878, size:0.35, transparent:true, opacity:0.7,
+    blending:THREE.AdditiveBlending, depthWrite:false
+  }));
+  scene.add(embers);
+
+  /* ---- Scroll → progression de la dislocation ---- */
+  let progress = 0;
+  const dislocMsg = document.getElementById('dislocMsg');
+  const hero = document.getElementById('hero');
+  const easeInOut = t => t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+
+  function onScroll(){
+    const vh = window.innerHeight;
+    const y = window.scrollY;
+    progress = Math.min(Math.max((y - vh*0.15) / (vh*1.7), 0), 1);
+    hero.style.opacity = String(Math.max(1 - y/(vh*0.55), 0));
+    const m = progress<0.15 ? 0 : progress>0.9 ? (1-progress)/0.1 : Math.min((progress-0.15)/0.25,1);
+    dislocMsg.style.opacity = String(Math.max(m,0));
+    canvas.style.opacity = String(progress>0.85 ? Math.max(1-(progress-0.85)/0.15,0) : 1);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+
+  function resize(){
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const q = new THREE.Quaternion();
+  const e = new THREE.Euler();
+  let t0 = performance.now();
+
+  function animate(now){
+    requestAnimationFrame(animate);
+    const t = (now - t0)/1000;
+    const p = easeInOut(progress);
+
+    group.rotation.y = t*0.12 + p*1.2;
+    group.position.y = Math.sin(t*0.7)*0.25;
+
+    for (let i=0;i<COUNT;i++){
+      const px = base[i*3]   + dir[i*3]  *dist[i]*p;
+      const py = base[i*3+1] + dir[i*3+1]*dist[i]*p;
+      const pz = base[i*3+2] + dir[i*3+2]*dist[i]*p;
+      dummy.position.set(px, py, pz);
+      if (p > 0.001){
+        e.set(spin[i*3]*p, spin[i*3+1]*p, spin[i*3+2]*p);
+        q.setFromEuler(e);
+        dummy.quaternion.copy(q);
+      } else {
+        dummy.quaternion.set(0,0,0,1);
+      }
+      const s = Math.max(1 - p*1.05, 0.001);
+      dummy.scale.set(s,s,s);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+
+    // La caméra plonge à travers le nuage de cubes
+    camera.position.set(
+      Math.sin(t*0.1)*3,
+      15 + p*4,
+      34 - p*26
+    );
+    camera.lookAt(0, CENTER_Y + p*2, 0);
+
+    // Braises qui montent
+    const arr = egeo.attributes.position.array;
+    for (let i=0;i<N_EMBER;i++){
+      arr[i*3+1] += 0.02 + (i%5)*0.004;
+      if (arr[i*3+1] > 42) arr[i*3+1] = -2;
+    }
+    egeo.attributes.position.needsUpdate = true;
+
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(animate);
+  onScroll();
+
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('done'), 900);
+  });
+  // Filet de sécurité si 'load' a déjà eu lieu
+  setTimeout(() => document.getElementById('loader').classList.add('done'), 2600);
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   SCÈNE 2 — Le katana qui tranche l'écran
+   ═══════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('katanaCanvas');
+  const stage = document.getElementById('stage');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+  camera.position.set(0, 0, 9);
+
+  scene.add(new THREE.AmbientLight(0x606a80, 2.2));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4);
+  key.position.set(4, 6, 8);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0x9cc4e4, 1.2);
+  fill.position.set(-3, -2, 6);
+  scene.add(fill);
+  const rim = new THREE.PointLight(0xc8a55a, 2.5, 30);
+  rim.position.set(-4, 2, 4);
+  scene.add(rim);
+
+  // Katana procédural : lame, garde, poignée
+  const katana = new THREE.Group();
+  const blade = new THREE.Mesh(
+    new THREE.BoxGeometry(0.13, 4.4, 0.03),
+    new THREE.MeshStandardMaterial({color:0xd8dde8, metalness:0.55, roughness:0.25})
+  );
+  blade.position.y = 2.6;
+  const edge = new THREE.Mesh(
+    new THREE.BoxGeometry(0.04, 4.4, 0.035),
+    new THREE.MeshStandardMaterial({color:0xffffff, metalness:1, roughness:0.05})
+  );
+  edge.position.set(0.075, 2.6, 0);
+  const tsuba = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.34, 0.34, 0.07, 24),
+    new THREE.MeshStandardMaterial({color:0xc8a55a, metalness:0.8, roughness:0.3})
+  );
+  tsuba.position.y = 0.36;
+  const grip = new THREE.Mesh(
+    new THREE.BoxGeometry(0.16, 1.15, 0.11),
+    new THREE.MeshStandardMaterial({color:0x2a1616, roughness:0.8})
+  );
+  grip.position.y = -0.28;
+  for (let i=0;i<5;i++){
+    const wrap = new THREE.Mesh(
+      new THREE.BoxGeometry(0.18, 0.06, 0.13),
+      new THREE.MeshStandardMaterial({color:0x7e2d24, roughness:0.7})
+    );
+    wrap.position.y = -0.72 + i*0.22;
+    katana.add(wrap);
+  }
+  katana.add(blade, edge, tsuba, grip);
+  katana.rotation.z = -0.5;
+  scene.add(katana);
+
+  // Traînée lumineuse du coup de sabre
+  const trail = new THREE.Mesh(
+    new THREE.RingGeometry(3.2, 4.6, 48, 1, 0, Math.PI*0.9),
+    new THREE.MeshBasicMaterial({
+      color:0xe8c878, transparent:true, opacity:0,
+      side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false
+    })
+  );
+  trail.position.z = -0.3;
+  scene.add(trail);
+
+  function resize(){
+    const r = stage.getBoundingClientRect();
+    if (r.width === 0) return;
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width/r.height;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let slashing = false, slashStart = 0;
+  let visible = false;
+  const io = new IntersectionObserver(en => { visible = en[0].isIntersecting; }, {threshold:0.05});
+  io.observe(stage);
+
+  function slash(){
+    if (slashing || stage.classList.contains('cut')) return;
+    slashing = true;
+    slashStart = performance.now();
+    setTimeout(() => stage.classList.add('cut'), 200);
+  }
+  canvas.addEventListener('click', slash);
+  document.getElementById('replay').addEventListener('click', ev => {
+    ev.stopPropagation();
+    stage.classList.remove('cut');
+    slashing = false;
+    katana.rotation.z = -0.5;
+  });
+
+  function animate(now){
+    requestAnimationFrame(animate);
+    if (!visible) return;
+    const t = now/1000;
+
+    if (slashing){
+      const k = Math.min((now - slashStart)/380, 1);
+      const ease = 1 - Math.pow(1-k, 3);
+      katana.rotation.z = -0.5 + ease * -3.6;
+      trail.rotation.z = katana.rotation.z + 1.4;
+      trail.material.opacity = k<0.7 ? k*1.1 : (1-k)*2.5;
+      if (k >= 1){ trail.material.opacity = 0; }
+    } else {
+      katana.rotation.z = -0.5 + Math.sin(t*0.9)*0.08;
+      katana.rotation.y = Math.sin(t*0.6)*0.35;
+      katana.position.y = Math.sin(t*1.1)*0.18 - 0.6;
+      trail.material.opacity = 0;
+    }
+    rim.intensity = 2.5 + Math.sin(t*3)*0.6;
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(animate);
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   Cartes inclinables en 3D + apparitions au scroll
+   ═══════════════════════════════════════════════════════════ */
+(function(){
+  const fine = window.matchMedia('(pointer:fine)').matches;
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    if (!fine) return;
+    card.addEventListener('mousemove', ev => {
+      const r = card.getBoundingClientRect();
+      const x = (ev.clientX - r.left)/r.width - 0.5;
+      const y = (ev.clientY - r.top)/r.height - 0.5;
+      card.style.transform = `rotateY(${x*10}deg) rotateX(${-y*8}deg) translateZ(6px)`;
+      card.style.setProperty('--gx', ((x+0.5)*100)+'%');
+      card.style.setProperty('--gy', ((y+0.5)*100)+'%');
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('in'); });
+  }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>

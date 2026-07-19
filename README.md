@@ -9,6 +9,12 @@ Réalisation : Tanguy Lys. Périmètre livré : **Phase 1 (le socle)**.
 > Le fichier `bedrock_studio.html` présent dans ce dépôt appartient à un autre
 > projet ; il n'a aucun lien avec le site LKS ART décrit ici.
 
+> Le dossier `agence/` contient la vitrine **Bedrock Studio — l'agence** :
+> une page d'accueil de démonstration avec animations 3D (pagode de voxels qui
+> se désagrège au défilement, katana interactif qui « tranche » l'écran pour
+> révéler un site démo). Page autonome : ouvrir `agence/index.html`, aucun
+> build nécessaire (three.js est fourni en local dans le dossier).
+
 ---
 
 ## Ce qui est livré
