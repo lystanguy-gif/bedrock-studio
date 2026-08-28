@@ -14,8 +14,8 @@ window.LKS_CONFIG = {
 
   // --- Supabase ---
   // Projet Supabase > Project Settings > API
-  SUPABASE_URL: "https://VOTRE-PROJET.supabase.co",
-  SUPABASE_ANON_KEY: "VOTRE_CLE_ANON",
+  SUPABASE_URL: "https://rfaaauzypyweqjcdcgye.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_un80kRmY2P1GruFUooGgNg_RD-3pqKv",
 
   // Nom du bucket de stockage des images (public)
   STORAGE_BUCKET: "paintings",

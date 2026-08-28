@@ -27,6 +27,28 @@
       : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
   }
 
+  /* Filet de sécurité : si Supabase est injoignable (projet en pause sur l'offre
+     gratuite, coupure réseau), le site réaffiche les œuvres de contenu-initial.json
+     plutôt qu'une galerie vide. Lecture seule, uniquement en cas d'erreur — une
+     galerie réellement vide reste vide. */
+  function fallbackPaintings() {
+    return fetch('contenu-initial.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        return (d.paintings || []).map(function (p, i) {
+          return {
+            id: 'fallback-' + i, sort_order: (p.sort_order != null ? p.sort_order : i),
+            title: p.title, category: p.category, description: p.description || '',
+            dimensions: p.dimensions || '', medium: p.medium || 'Huile sur toile',
+            price: (p.price == null ? null : p.price), sold: !!p.sold,
+            availability: p.availability || (p.price == null ? 'request' : 'sale'),
+            image_url: p.image_file || p.image_url, created_at: new Date().toISOString()
+          };
+        });
+      })
+      .catch(function () { return []; });
+  }
+
   /* réduit une image choisie en une vignette base64 (mode démo, sans stockage) */
   function downscaleToDataURL(file, maxW, quality) {
     return new Promise(function (resolve, reject) {
@@ -74,7 +96,8 @@
       paintings: {
         list: function () {
           return sb.from('paintings').select('*').order('sort_order', { ascending: true })
-            .then(function (r) { return r.error ? [] : (r.data || []); });
+            .then(function (r) { return r.error ? fallbackPaintings() : (r.data || []); })
+            .catch(function () { return fallbackPaintings(); });
         },
         insert: function (rec) { return sb.from('paintings').insert(rec); },
         update: function (id, patch) { return sb.from('paintings').update(patch).eq('id', id); },
