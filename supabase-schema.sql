@@ -25,6 +25,21 @@ create table if not exists public.paintings (
   availability text not null default 'sale'  -- 'sale' | 'request' | 'exhibition'
 );
 
+-- 1 bis. Mise a niveau d'une table existante.
+-- "create table if not exists" ne touche pas une table deja creee : si elle
+-- date d'une version anterieure du schema, les colonnes ajoutees depuis
+-- manquent, et l'API repond "Could not find the 'availability' column of
+-- 'paintings' in the schema cache". Ces ALTER rattrapent le retard.
+alter table public.paintings add column if not exists sort_order   int not null default 0;
+alter table public.paintings add column if not exists description  text default '';
+alter table public.paintings add column if not exists category     text not null default 'paysages';
+alter table public.paintings add column if not exists dimensions   text default '';
+alter table public.paintings add column if not exists medium       text default 'Huile sur toile';
+alter table public.paintings add column if not exists price        numeric;
+alter table public.paintings add column if not exists image_url    text;
+alter table public.paintings add column if not exists sold         boolean not null default false;
+alter table public.paintings add column if not exists availability text not null default 'sale';
+
 -- 2. Activer la securite au niveau des lignes
 alter table public.paintings enable row level security;
 
@@ -151,3 +166,6 @@ grant select on public.paintings, public.annonces, public.presse, public.site_co
 
 grant insert, update, delete on public.paintings, public.annonces, public.presse, public.site_content
   to authenticated;
+
+-- 10. Demande a l'API de relire le schema (evite d'attendre le cache).
+notify pgrst, 'reload schema';
