@@ -3,6 +3,12 @@
 -- Ce script est "idempotent" : on peut le relancer sans erreur, il remet
 -- simplement les tables et les regles d'acces dans l'etat attendu.
 
+-- 0. Droits d'acces sur le schema public.
+-- Les policies RLS decrivent QUI a le droit de faire QUOI, mais Postgres exige
+-- en plus un GRANT sur la table elle-meme. Sans ces lignes, l'API renvoie
+-- "permission denied for table paintings" meme connecte. Les GRANT sont places
+-- en fin de fichier (apres la creation des tables) : voir section 9.
+
 -- 1. Table des oeuvres
 create table if not exists public.paintings (
   id          uuid primary key default gen_random_uuid(),
@@ -133,3 +139,15 @@ drop policy if exists "Lecture publique du contenu" on public.site_content;
 create policy "Lecture publique du contenu" on public.site_content for select using (true);
 drop policy if exists "Ecriture contenu connectes" on public.site_content;
 create policy "Ecriture contenu connectes" on public.site_content for all to authenticated using (true) with check (true);
+
+-- 9. Droits d'acces (GRANT) sur les tables du schema public.
+-- A executer APRES la creation des tables ci-dessus.
+-- Les visiteurs anonymes ne peuvent que lire ; seul un utilisateur connecte
+-- (Lea) peut ecrire. Les policies RLS restent la deuxieme barriere.
+grant usage on schema public to anon, authenticated;
+
+grant select on public.paintings, public.annonces, public.presse, public.site_content
+  to anon, authenticated;
+
+grant insert, update, delete on public.paintings, public.annonces, public.presse, public.site_content
+  to authenticated;
