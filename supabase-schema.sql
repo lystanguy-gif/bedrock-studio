@@ -1,5 +1,7 @@
 -- LKS ART — Schema Supabase
 -- A executer dans l'editeur SQL du projet Supabase.
+-- Ce script est "idempotent" : on peut le relancer sans erreur, il remet
+-- simplement les tables et les regles d'acces dans l'etat attendu.
 
 -- 1. Table des oeuvres
 create table if not exists public.paintings (
@@ -21,18 +23,21 @@ create table if not exists public.paintings (
 alter table public.paintings enable row level security;
 
 -- 3. Lecture publique (les visiteurs voient la galerie)
+drop policy if exists "Lecture publique des oeuvres" on public.paintings;
 create policy "Lecture publique des oeuvres"
   on public.paintings
   for select
   using (true);
 
 -- 4. Ecriture reservee aux utilisateurs connectes (Lea uniquement)
+drop policy if exists "Ajout reserve aux connectes" on public.paintings;
 create policy "Ajout reserve aux connectes"
   on public.paintings
   for insert
   to authenticated
   with check (true);
 
+drop policy if exists "Modification reservee aux connectes" on public.paintings;
 create policy "Modification reservee aux connectes"
   on public.paintings
   for update
@@ -40,6 +45,7 @@ create policy "Modification reservee aux connectes"
   using (true)
   with check (true);
 
+drop policy if exists "Suppression reservee aux connectes" on public.paintings;
 create policy "Suppression reservee aux connectes"
   on public.paintings
   for delete
@@ -53,25 +59,32 @@ insert into storage.buckets (id, name, public)
 values ('paintings', 'paintings', true)
 on conflict (id) do update set public = true;
 
--- Lecture publique des images
+-- Regles d'acces aux images.
+-- Remarque : si ces quatre blocs renvoient une erreur du type
+-- "must be owner of table objects", ce n'est pas bloquant : le bucket est
+-- public, donc l'affichage fonctionne. Les droits d'envoi peuvent alors etre
+-- ajoutes depuis l'interface Supabase (Storage > paintings > Policies).
+drop policy if exists "Lecture publique des images" on storage.objects;
 create policy "Lecture publique des images"
   on storage.objects
   for select
   using ( bucket_id = 'paintings' );
 
--- Upload, mise a jour et suppression reserves aux connectes
+drop policy if exists "Upload images reserve aux connectes" on storage.objects;
 create policy "Upload images reserve aux connectes"
   on storage.objects
   for insert
   to authenticated
   with check ( bucket_id = 'paintings' );
 
+drop policy if exists "Maj images reservee aux connectes" on storage.objects;
 create policy "Maj images reservee aux connectes"
   on storage.objects
   for update
   to authenticated
   using ( bucket_id = 'paintings' );
 
+drop policy if exists "Suppression images reservee aux connectes" on storage.objects;
 create policy "Suppression images reservee aux connectes"
   on storage.objects
   for delete
@@ -86,7 +99,9 @@ create table if not exists public.annonces (
   body        text default ''
 );
 alter table public.annonces enable row level security;
+drop policy if exists "Lecture publique annonces" on public.annonces;
 create policy "Lecture publique annonces" on public.annonces for select using (true);
+drop policy if exists "Ecriture annonces connectes" on public.annonces;
 create policy "Ecriture annonces connectes" on public.annonces for all to authenticated using (true) with check (true);
 
 -- 7. Optionnel, table presse et medias
@@ -98,7 +113,9 @@ create table if not exists public.presse (
   url         text default ''
 );
 alter table public.presse enable row level security;
+drop policy if exists "Lecture publique presse" on public.presse;
 create policy "Lecture publique presse" on public.presse for select using (true);
+drop policy if exists "Ecriture presse connectes" on public.presse;
 create policy "Ecriture presse connectes" on public.presse for all to authenticated using (true) with check (true);
 
 -- 8. Contenu personnalisable du site (textes et images modifiables par Lea)
@@ -112,5 +129,7 @@ create table if not exists public.site_content (
   updated_at  timestamptz not null default now()
 );
 alter table public.site_content enable row level security;
+drop policy if exists "Lecture publique du contenu" on public.site_content;
 create policy "Lecture publique du contenu" on public.site_content for select using (true);
+drop policy if exists "Ecriture contenu connectes" on public.site_content;
 create policy "Ecriture contenu connectes" on public.site_content for all to authenticated using (true) with check (true);
