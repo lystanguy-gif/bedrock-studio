@@ -37,7 +37,7 @@ window.LKS_CONFIG = {
   // Repli optionnel : ancien endpoint HTTP (Formspree, Edge Function...).
   // Utilise uniquement si EmailJS n'est pas configure. Laisser vide sinon.
   CONTACT_FORM_ENDPOINT: "",
-  CONTACT_EMAIL: "lks.kalck.artpeinture@gmail.com",
+  CONTACT_EMAIL: "lksartpeintures@gmail.com",
 
   // Telephone : laisser vide pour ne PAS l'afficher. Des qu'on met un numero
   // ici (ou depuis l'espace prive de Lea), une ligne "Telephone" apparait.
