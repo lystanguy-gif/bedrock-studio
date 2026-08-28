@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=26">
+<link rel="stylesheet" href="assets/styles.css?v=27">
 </head>
 <body class="admin-body">
 
@@ -54,7 +54,10 @@
     <!-- PANNEAU ŒUVRES -->
     <section class="admin-panel active" id="panel-oeuvres">
       <div class="admin-panel__head">
-        <h2>Mes peintures</h2>
+        <div class="admin-panel__title">
+          <h2>Mes peintures</h2>
+          <button type="button" class="help-dot" data-help="oeuvres" title="Aide sur cette rubrique" aria-label="Aide sur la rubrique Mes peintures">?</button>
+        </div>
         <button class="btn btn-gold" id="addPainting">＋ Ajouter une peinture</button>
       </div>
       <div class="adm-list" id="paintingsList"></div>
@@ -64,7 +67,10 @@
     <!-- PANNEAU ANNONCES -->
     <section class="admin-panel" id="panel-annonces">
       <div class="admin-panel__head">
-        <h2>Mes annonces</h2>
+        <div class="admin-panel__title">
+          <h2>Mes annonces</h2>
+          <button type="button" class="help-dot" data-help="annonces" title="Aide sur cette rubrique" aria-label="Aide sur la rubrique Mes annonces">?</button>
+        </div>
         <button class="btn btn-gold" id="addAnnonce">＋ Ajouter une annonce</button>
       </div>
       <div class="adm-list" id="annoncesList"></div>
@@ -74,7 +80,10 @@
     <!-- PANNEAU PRESSE -->
     <section class="admin-panel" id="panel-presse">
       <div class="admin-panel__head">
-        <h2>Presse &amp; médias</h2>
+        <div class="admin-panel__title">
+          <h2>Presse &amp; médias</h2>
+          <button type="button" class="help-dot" data-help="presse" title="Aide sur cette rubrique" aria-label="Aide sur la rubrique Presse et médias">?</button>
+        </div>
         <button class="btn btn-gold" id="addPresse">＋ Ajouter une parution</button>
       </div>
       <div class="adm-list" id="presseList"></div>
@@ -84,7 +93,10 @@
     <!-- PANNEAU MON SITE (textes & photos de personnalisation) -->
     <section class="admin-panel" id="panel-site">
       <div class="admin-panel__head">
-        <h2>Mon site</h2>
+        <div class="admin-panel__title">
+          <h2>Mon site</h2>
+          <button type="button" class="help-dot" data-help="site" title="Aide sur cette rubrique" aria-label="Aide sur la rubrique Mon site">?</button>
+        </div>
       </div>
       <p style="color:var(--muted); margin:-8px 0 26px; max-width:640px">
         Modifiez ici les textes et les photos de votre site. Cliquez sur « Mettre à jour le site » :
@@ -149,6 +161,14 @@
           <b>tout de suite</b> sur votre site, pour tous les visiteurs. Un peu comme publier sur Facebook.</p>
         <div class="tip">Vous n'avez jamais besoin d'aller ailleurs que sur votre site. Tout se fait ici.</div>
 
+        <h3>Une aide sur chaque page, sans revenir ici</h3>
+        <p>À côté du titre de chaque rubrique (<b>Mes peintures</b>, <b>Mes annonces</b>,
+          <b>Presse &amp; médias</b>, <b>Mon site</b>), vous trouverez une petite pastille dorée
+          <b>?</b>. Cliquez dessus&nbsp;: l'explication de <i>cette rubrique-là</i> s'affiche
+          aussitôt, sans quitter votre travail en cours. Fermez-la, et vous reprenez où vous en étiez.</p>
+        <div class="tip">Vous n'avez donc pas besoin de revenir dans ce guide à chaque fois.
+          Il reste là si vous voulez tout relire tranquillement.</div>
+
         <h3>2. Se connecter et se déconnecter</h3>
         <p>Vous arrivez sur votre espace avec votre <b>adresse e-mail</b> et votre <b>mot de passe</b>.
           Quand vous avez fini, surtout sur un ordinateur partagé, cliquez sur <b>Se déconnecter</b>
@@ -167,7 +187,8 @@
 
         <h3>4. Le prix (3 possibilités)</h3>
         <ul>
-          <li><b>Un prix affiché</b> : vous écrivez le montant en euros. Un bouton d'achat PayPal apparaît sur la fiche.</li>
+          <li><b>Un prix affiché</b> : vous écrivez le montant en euros. Le visiteur voit le prix et vous
+            contacte pour l'acquérir (le paiement en ligne sera proposé plus tard).</li>
           <li><b>Prix sur demande</b> : cochez la case « Prix sur demande (à négocier) ». Aucun montant
             n'est affiché, et le visiteur peut vous écrire pour le connaître.</li>
           <li><b>Vendue</b> : cliquez sur <b>Marquer vendue</b>. Un petit badge « Vendu » s'affiche sur la toile.</li>
@@ -197,7 +218,7 @@
         <ul>
           <li>la <b>photo d'accueil</b> (la grande image en haut) et votre <b>portrait</b> ;</li>
           <li>l'<b>accroche</b> d'accueil, votre <b>texte de présentation</b> (votre bio) ;</li>
-          <li>vos <b>coordonnées</b> : e-mail affiché, horaires, lien Facebook.</li>
+          <li>vos <b>coordonnées</b> : e-mail affiché, disponibilité, lien Facebook.</li>
         </ul>
         <p>Quand tout vous convient, cliquez sur <b>Mettre à jour le site</b>. Le bouton
           <b>Voir le résultat</b> ouvre votre site dans un nouvel onglet pour vérifier.</p>
@@ -318,11 +339,109 @@
   </div>
 </div>
 
+<!-- ====================== MODALE AIDE CONTEXTUELLE ====================== -->
+<div class="modal" id="helpModal">
+  <div class="modal__box">
+    <button class="modal__x" id="closeHelp" aria-label="Fermer l'aide">✕</button>
+    <h3 id="helpTitle">Aide</h3>
+    <div class="guide-doc" id="helpBody"></div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" id="helpFull">Lire le guide complet</button>
+      <button type="button" class="btn btn-gold" id="helpOk">J'ai compris</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/config.js?v=26"></script>
-<script src="assets/store.js?v=26"></script>
-<script src="assets/admin.js?v=15"></script>
+<script src="assets/config.js?v=27"></script>
+<script src="assets/store.js?v=27"></script>
+<script src="assets/admin.js?v=27"></script>
+
+<!-- Aide contextuelle : chaque rubrique a sa pastille « ? » qui ouvre
+     l'extrait du guide correspondant, sans quitter la page en cours. -->
+<script>
+(function () {
+  var HELP = {
+    oeuvres: {
+      title: 'Mes peintures',
+      html: '<p class="lead">Cette rubrique contient toutes vos toiles. C\'est ici que vous en ajoutez, que vous les modifiez et que vous indiquez celles qui sont vendues.</p>'
+          + '<h4>Ajouter une toile</h4>'
+          + '<ol><li>Cliquez sur <b>＋ Ajouter une peinture</b>.</li>'
+          + '<li>Cliquez sur la zone photo et choisissez l\'image sur votre téléphone ou votre ordinateur.</li>'
+          + '<li>Indiquez le <b>titre</b>, la <b>catégorie</b> (Paysages, Marines ou Imaginaire) et les <b>dimensions</b>.</li>'
+          + '<li>Cliquez sur <b>Enregistrer</b> : la toile apparaît aussitôt sur votre site.</li></ol>'
+          + '<div class="tip">Conseil photo : photographiez la toile bien de face, avec une bonne lumière, sans le mur ni d\'objets autour.</div>'
+          + '<h4>Le prix</h4>'
+          + '<ul><li><b>Un prix affiché</b> : écrivez le montant en euros.</li>'
+          + '<li><b>Prix sur demande</b> : laissez le prix vide. Aucun montant ne s\'affiche et le visiteur vous écrit pour le connaître.</li>'
+          + '<li><b>Vendue</b> : cliquez sur <b>Marquer vendue</b>, un badge « Vendu » apparaît sur la toile.</li></ul>'
+          + '<h4>Modifier, réordonner, supprimer</h4>'
+          + '<ul><li><b>Modifier</b> : bouton <b>Modifier</b> sur la ligne de la toile, puis <b>Enregistrer</b>.</li>'
+          + '<li><b>Changer l\'ordre</b> : les flèches <b>▲</b> et <b>▼</b> à gauche de chaque toile.</li>'
+          + '<li><b>Supprimer</b> : bouton <b>Supprimer</b> puis confirmation. Attention, c\'est définitif.</li></ul>'
+    },
+    annonces: {
+      title: 'Mes annonces',
+      html: '<p class="lead">Vos actualités : une exposition, un atelier, une nouveauté. Elles s\'affichent dans la rubrique « Annonces &amp; événements » de votre site.</p>'
+          + '<h4>Publier une annonce</h4>'
+          + '<ol><li>Cliquez sur <b>＋ Ajouter une annonce</b>.</li>'
+          + '<li>Écrivez un <b>titre</b> court (par exemple « Exposition à Gap ») et un petit <b>texte</b> : les dates, le lieu, l\'adresse.</li>'
+          + '<li>Cliquez sur <b>Enregistrer</b>.</li></ol>'
+          + '<div class="tip">Pensez à supprimer une annonce quand l\'événement est passé, pour que votre site reste à jour.</div>'
+    },
+    presse: {
+      title: 'Presse &amp; médias',
+      html: '<p class="lead">Les articles de journaux, les passages en radio ou les publications qui parlent de votre travail.</p>'
+          + '<h4>Ajouter une parution</h4>'
+          + '<ol><li>Cliquez sur <b>＋ Ajouter une parution</b>.</li>'
+          + '<li><b>Média</b> : le nom du journal, de la radio ou du site.</li>'
+          + '<li><b>Titre</b> : le titre de l\'article ou de l\'émission.</li>'
+          + '<li><b>Lien</b> : facultatif. Si l\'article est en ligne, collez son adresse.</li></ol>'
+          + '<div class="tip">Pour un passage radio sans lien, indiquez simplement le nom de la radio et la date.</div>'
+    },
+    site: {
+      title: 'Mon site',
+      html: '<p class="lead">C\'est ici que vous personnalisez votre site vous-même : les grandes photos, vos textes et vos coordonnées.</p>'
+          + '<h4>Ce que vous pouvez changer</h4>'
+          + '<ul><li>La <b>photo d\'accueil</b> (la grande image tout en haut) et votre <b>portrait</b>.</li>'
+          + '<li>L\'<b>accroche</b> d\'accueil et votre <b>texte de présentation</b>.</li>'
+          + '<li>Vos <b>coordonnées</b> : e-mail affiché, disponibilité, lien Facebook.</li></ul>'
+          + '<h4>Enregistrer vos changements</h4>'
+          + '<p>Quand tout vous convient, cliquez sur <b>Mettre à jour le site</b>. Vos visiteurs voient les changements aussitôt. Le bouton <b>Voir le résultat</b> ouvre votre site dans un nouvel onglet pour vérifier.</p>'
+          + '<div class="tip">N\'ayez pas peur d\'essayer : rien n\'est cassable, tout se corrige.</div>'
+    }
+  };
+
+  function $(id) { return document.getElementById(id); }
+  var modal = $('helpModal');
+  if (!modal) return;
+
+  function open(key) {
+    var h = HELP[key];
+    if (!h) return;
+    $('helpTitle').innerHTML = h.title;
+    $('helpBody').innerHTML = h.html;
+    modal.classList.add('open');
+  }
+  function close() { modal.classList.remove('open'); }
+
+  document.querySelectorAll('.help-dot').forEach(function (b) {
+    b.addEventListener('click', function () { open(b.dataset.help); });
+  });
+  $('closeHelp').addEventListener('click', close);
+  $('helpOk').addEventListener('click', close);
+  $('helpFull').addEventListener('click', function () {
+    close();
+    var tab = document.querySelector('.admin-tabs [data-tab="guide"]');
+    if (tab) tab.click();
+  });
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+})();
+</script>
 </body>
 </html>

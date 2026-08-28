@@ -483,3 +483,25 @@ h2.title{
   .hero__kicker,.hero h1,.hero__sub,.hero__cta,.hero__scroll{opacity:1; transform:none}
   .reveal{opacity:1; transform:none}
 }
+
+/* =====================================================================
+   AIDE CONTEXTUELLE — pastille « ? » a cote du titre de chaque rubrique
+   Ouvre l'extrait du guide correspondant a la rubrique affichee, pour
+   eviter d'avoir a retourner dans l'onglet Guide.
+   ===================================================================== */
+.admin-panel__title{display:flex; align-items:center; gap:12px}
+.help-dot{
+  width:27px; height:27px; flex:0 0 27px; border-radius:50%;
+  border:1px solid var(--gold); background:rgba(201,162,94,.10);
+  color:var(--gold); font-family:var(--body); font-size:.88rem; font-weight:700;
+  line-height:1; display:inline-flex; align-items:center; justify-content:center;
+  cursor:pointer; padding:0;
+  transition:background .25s, color .25s, transform .25s, box-shadow .25s;
+}
+.help-dot:hover, .help-dot:focus-visible{
+  background:var(--gold); color:var(--ink); transform:scale(1.09);
+  box-shadow:0 0 0 4px rgba(201,162,94,.15); outline:none;
+}
+/* Le contenu de l'aide reprend la mise en forme du guide */
+#helpBody h4{margin-top:22px}
+#helpBody > *:first-child{margin-top:0}
