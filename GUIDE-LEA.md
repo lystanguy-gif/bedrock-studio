@@ -6,8 +6,8 @@ se fait tout seul. 🌿
 
 ## Se connecter
 
-1. Allez sur **votre-site.fr/admin.html** (le lien « Espace privé de Léa » se
-   trouve aussi tout en bas du site).
+1. Allez sur **lksartpeintures.com/admin.html** (le lien « Espace privé de Léa »
+   se trouve aussi tout en bas du site).
 2. Entrez votre **e-mail** et votre **mot de passe**, puis « Se connecter ».
 
 ## Ajouter une peinture
