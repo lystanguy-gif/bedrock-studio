@@ -1,2 +1,8 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+# Pages privees : espace de gestion de Lea et outil de mise en place.
+Disallow: /admin.html
+Disallow: /outils-import.html
+
+Sitemap: https://lksartpeintures.com/sitemap.xml
