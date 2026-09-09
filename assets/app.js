@@ -465,8 +465,22 @@
     }
     var btn = $('contactSubmit');
     var ok = function () { showToast('Message envoyé. Léa vous répondra bientôt.'); f.reset(); };
-    var fail = function () { showToast("L'envoi a échoué. Réessayez ou écrivez directement par e-mail.", true); };
     var done = function () { btn.disabled = false; btn.textContent = 'Envoyer le message'; };
+
+    /* Ouvre la messagerie du visiteur avec son message deja saisi. */
+    function ouvrirMessagerie() {
+      var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
+      var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
+      window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lksartpeintures@gmail.com') +
+        '?subject=' + subject + '&body=' + body;
+    }
+
+    /* Si le service d'envoi est indisponible, on ne perd pas le message du
+       visiteur : sa messagerie s'ouvre avec le texte deja rempli. */
+    var fail = function () {
+      showToast("L'envoi automatique est indisponible. Votre messagerie s'ouvre avec votre message.", true);
+      setTimeout(ouvrirMessagerie, 1200);
+    };
 
     // Variables envoyées au modèle. On fournit plusieurs alias pour rester
     // compatible quel que soit le nommage du modèle EmailJS.
@@ -505,11 +519,8 @@
     }
 
     // 3) Dernier repli : ouverture de la messagerie du visiteur.
-    var subject = encodeURIComponent('Message depuis le site LKS ART, ' + f.n.value);
-    var body = encodeURIComponent(f.m.value + '\n\n' + f.n.value + ' (' + f.e.value + ')');
-    window.location.href = 'mailto:' + (CFG.CONTACT_EMAIL || 'lksartpeintures@gmail.com') +
-      '?subject=' + subject + '&body=' + body;
     showToast('Votre messagerie va s\'ouvrir pour finaliser l\'envoi.');
+    ouvrirMessagerie();
   });
 
   /* ---------- réglages issus de config.js ---------- */
