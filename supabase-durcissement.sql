@@ -1,7 +1,12 @@
 -- LKS ART — Durcissement des droits d'ecriture
 -- ---------------------------------------------------------------------------
--- A EXECUTER APRES avoir desactive l'inscription libre dans Supabase
--- (Authentication > Sign In / Providers > Email > "Allow new users to sign up").
+-- ETAT : APPLIQUE le 19 septembre 2026 (migrations restreindre_ecriture_a_l_artiste
+-- et restreindre_stockage_a_l_artiste). Conserve ici pour pouvoir etre rejoue si
+-- la base est recreee, ou si l'UID de Lea change.
+--
+-- Il reste recommande de desactiver aussi l'inscription libre dans Supabase
+-- (Authentication > Sign In / Providers > Email > "Allow new users to sign up"),
+-- mais ce n'est plus la seule barriere : l'ecriture est desormais nominative.
 --
 -- Probleme corrige
 -- Les policies actuelles autorisent l'ecriture a TOUT utilisateur connecte

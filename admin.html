@@ -5,10 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Espace privé · LKS ART</title>
+<script>
+// Bascule vers HTTPS si la page a ete ouverte en clair. Le mot de passe de
+// Lea est saisi ici : la connexion doit etre chiffree. Protection de repli
+// tant que l'option "Enforce HTTPS" de GitHub Pages n'est pas activee.
+if (location.protocol === 'http:' && location.hostname.indexOf('localhost') === -1
+    && location.hostname !== '127.0.0.1') {
+  location.replace('https://' + location.host + location.pathname + location.search + location.hash);
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=32">
+<link rel="stylesheet" href="assets/styles.css?v=33">
 </head>
 <body class="admin-body">
 
@@ -355,9 +364,9 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/config.js?v=32"></script>
-<script src="assets/store.js?v=32"></script>
-<script src="assets/admin.js?v=32"></script>
+<script src="assets/config.js?v=33"></script>
+<script src="assets/store.js?v=33"></script>
+<script src="assets/admin.js?v=33"></script>
 
 <!-- Aide contextuelle : chaque rubrique a sa pastille « ? » qui ouvre
      l'extrait du guide correspondant, sans quitter la page en cours. -->
