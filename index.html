@@ -42,7 +42,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=31">
+<link rel="stylesheet" href="assets/styles.css?v=32">
 </head>
 <body>
 
@@ -170,6 +170,7 @@
         <div class="field"><label for="e">Adresse e-mail</label><input id="e" name="e" type="email" required></div>
         <div class="field"><label for="m">Votre message</label><textarea id="m" name="m" required></textarea></div>
         <button type="submit" class="btn btn-gold" id="contactSubmit">Envoyer le message</button>
+        <p class="form-privacy">Votre nom, votre adresse e-mail et votre message sont utilisés uniquement pour vous répondre, et ne sont jamais transmis à des tiers à des fins commerciales. Vous pouvez demander leur suppression à tout moment. <button type="button" class="link-inline" id="openLegalForm">En savoir plus</button></p>
       </form>
       <aside class="contact__aside reveal">
         <div class="line"><div class="k">E-mail</div><div class="v"><a id="contactEmail" href="mailto:lksartpeintures@gmail.com">lksartpeintures@gmail.com</a></div></div>
@@ -198,7 +199,7 @@
         </div>
         <div class="col"><h4>Acquérir</h4>
           <a href="#galerie">Œuvres disponibles</a><a href="#contact">Commande sur mesure</a>
-          <a href="#contact">Paiement PayPal</a>
+          <a href="#contact">Acquérir une œuvre</a>
         </div>
         <div class="col"><h4>Espace</h4>
           <a href="admin.html">Espace privé de Léa</a>
@@ -235,24 +236,12 @@
         <div class="lb__price" id="lbPrice"></div>
         <div class="lb__pricesub" id="lbPriceSub">Œuvre originale · pièce unique</div>
         <div class="lb__soldtag" id="lbSold" style="display:none">Œuvre vendue</div>
-        <button class="paypal" id="lbBuy"><span class="pp">Pay<i>Pal</i></span></button>
+        <button class="paypal" id="lbBuy" style="display:none"><span class="pp">Pay<i>Pal</i></span></button>
         <button class="btn btn-gold btn-block" id="lbAsk" style="display:none">Demander le prix</button>
         <div id="lbPaypalSdk"></div>
         <p class="lb__note" id="lbNote">Le paiement en ligne sécurisé sera bientôt disponible.</p>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- PURCHASE DEMO MODAL -->
-<div class="modal" id="buyModal">
-  <div class="modal__box small">
-    <button class="modal__x" data-close-buy>✕</button>
-    <h3>Acquisition</h3>
-    <p id="buyWork" style="color:var(--cream)"></p>
-    <div class="pp-amount" id="buyPrice"></div>
-    <p>Vous seriez maintenant redirigé vers le paiement sécurisé <b style="color:#fff">PayPal</b>.</p>
-    <p class="ph">Intégration à activer avec l'identifiant PayPal Business de Léa (renseigner <code>PAYPAL_CLIENT_ID</code> dans <code>assets/config.js</code>).</p>
   </div>
 </div>
 
@@ -274,7 +263,8 @@
     <p>Léa Kalck.</p>
 
     <h4>3. Hébergement</h4>
-    <p>Le site est hébergé par <b style="color:var(--cream)">GitHub Pages</b> (GitHub, Inc.), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis. <span class="ph">[À mettre à jour si l'hébergeur change lors de la mise en ligne définitive.]</span></p>
+    <p>Le site est hébergé par <b style="color:var(--cream)">GitHub, Inc.</b> (service GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis. Support : <a href="https://support.github.com" target="_blank" rel="noopener">support.github.com</a>.</p>
+    <p>Les données de la galerie (œuvres, textes, images) sont hébergées par <b style="color:var(--cream)">Supabase</b>, sur des serveurs situés dans l'Union européenne (Irlande).</p>
 
     <h4>4. Propriété intellectuelle</h4>
     <p>L'ensemble des œuvres, images, textes et éléments graphiques présents sur ce site est la propriété exclusive de Léa Kalck et reste protégé par le droit d'auteur. Toute reproduction, représentation, modification ou diffusion, totale ou partielle, par quelque procédé que ce soit, sans autorisation écrite préalable, est strictement interdite et constitue une contrefaçon (art. L.122-4 et L.335-2 du Code de la propriété intellectuelle).</p>
@@ -283,21 +273,32 @@
     <p>Les visuels des œuvres sont diffusés en définition réduite, marqués d'une signature discrète, et leur enregistrement direct est désactivé. Ces mesures sont dissuasives : elles ne sauraient autoriser un quelconque usage des images sans l'accord écrit de l'artiste.</p>
 
     <h4>6. Données personnelles (RGPD)</h4>
-    <p>Les informations transmises via le formulaire de contact (nom, e-mail, message) servent uniquement à répondre à votre demande. Elles ne sont jamais cédées ni vendues à des tiers et sont conservées le temps nécessaire au traitement de votre demande. Conformément au Règlement général sur la protection des données (RGPD) et à la loi « Informatique et Libertés », vous disposez d'un droit d'accès, de rectification, d'opposition et de suppression de vos données, en écrivant à lksartpeintures@gmail.com. Vous pouvez également introduire une réclamation auprès de la CNIL (www.cnil.fr).</p>
+    <p><b style="color:var(--cream)">Responsable du traitement.</b> Léa Kalck, joignable à lksartpeintures@gmail.com.</p>
+    <p><b style="color:var(--cream)">Ce que nous collectons et pourquoi.</b></p>
+    <ul>
+      <li><b>Formulaire de contact</b> — nom, adresse e-mail et message, tous trois obligatoires pour pouvoir vous répondre. Finalité : traiter votre demande et y répondre. Base légale : votre démarche volontaire, qui relève de mesures précontractuelles ou de l'intérêt légitime de l'artiste à répondre à ses correspondants (art. 6.1.b et 6.1.f du RGPD). Conservation : le temps de l'échange, puis jusqu'à trois ans après le dernier contact ; les messages débouchant sur une vente sont conservés le temps des obligations comptables.</li>
+      <li><b>Consultation du site</b> — l'hébergeur et le fournisseur de la galerie enregistrent des journaux techniques (adresse IP, date, pages consultées) nécessaires au fonctionnement et à la sécurité du service.</li>
+    </ul>
+    <p>Aucune newsletter, aucun profilage, aucune décision automatisée, aucune revente ni cession de données à des tiers.</p>
+    <p><b style="color:var(--cream)">Qui traite vos données pour notre compte.</b> GitHub, Inc. (hébergement du site, États-Unis) ; Supabase (base de données et images, Union européenne) ; EmailJS (acheminement du message du formulaire) et Google (boîte Gmail de réception). Les transferts vers les États-Unis sont encadrés par les clauses contractuelles types de la Commission européenne et, le cas échéant, par le cadre de protection des données UE–États-Unis.</p>
+    <p><b style="color:var(--cream)">Vos droits.</b> Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité. Écrivez à lksartpeintures@gmail.com ; une réponse vous sera apportée dans un délai d'un mois. Si cette réponse ne vous satisfait pas, vous pouvez saisir la CNIL, 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, ou déposer une plainte sur <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.</p>
 
-    <h4>7. Cookies</h4>
-    <p>Ce site n'utilise aucun cookie de suivi publicitaire ni de mesure d'audience. Seules les données techniques strictement nécessaires à l'affichage de la galerie sont utilisées. Aucun consentement préalable n'est donc requis.</p>
+    <h4>7. Traceurs et stockage local</h4>
+    <p>Ce site <b style="color:var(--cream)">ne dépose aucun cookie</b> : ni publicité, ni mesure d'audience, ni réseau social. Aucun consentement n'est donc requis à ce titre.</p>
+    <p>Un espace de stockage local est utilisé uniquement dans l'espace privé de l'artiste, pour maintenir sa session ouverte après connexion. Ce dispositif est strictement nécessaire au service qu'elle demande et ne concerne pas les visiteurs.</p>
+    <p>L'affichage des pages appelle des ressources hébergées par des tiers : les polices de caractères (Google Fonts), les bibliothèques techniques (jsDelivr) et les images des œuvres (Supabase). Ces appels transmettent votre adresse IP aux prestataires concernés, sans dépôt de traceur.</p>
 
     <h4>8. Conditions générales de vente</h4>
     <p><b style="color:var(--cream)">Produits.</b> Chaque œuvre proposée est une pièce unique, peinte à l'huile par Léa Kalck. Les photographies sont les plus fidèles possibles ; de légères variations de couleur peuvent exister selon les écrans.</p>
     <p><b style="color:var(--cream)">Prix.</b> Les prix sont indiqués en euros, toutes taxes comprises, hors frais de livraison. Certaines œuvres sont proposées « prix sur demande » : leur tarif est alors communiqué directement par l'artiste.</p>
     <p><b style="color:var(--cream)">Commande et paiement.</b> Pour acquérir une œuvre, contactez directement l'artiste via le formulaire de contact ou par e-mail. Le prix, le mode de règlement et les modalités de remise sont alors convenus directement avec elle. Le paiement en ligne sécurisé sera proposé prochainement.</p>
     <p><b style="color:var(--cream)">Livraison et remise.</b> Les modalités d'emballage, d'expédition ou de remise en main propre, ainsi que les éventuels frais, sont convenues directement avec l'artiste avant tout règlement.</p>
-    <p><b style="color:var(--cream)">Droit de rétractation.</b> Conformément aux articles L.221-18 et suivants du Code de la consommation, vous disposez d'un délai de quatorze (14) jours à compter de la réception de l'œuvre pour exercer votre droit de rétractation, sans avoir à motiver votre décision. Les frais de retour sont à la charge de l'acheteur et l'œuvre doit être renvoyée dans son état et son emballage d'origine. Les œuvres réalisées sur mesure ou personnalisées en sont exclues (art. L.221-28, 3°).</p>
-    <p><b style="color:var(--cream)">Médiation de la consommation.</b> Conformément à l'article L.612-1 du Code de la consommation, en cas de litige non résolu à l'amiable, le consommateur peut recourir gratuitement à un médiateur de la consommation : <span class="ph">[nom et coordonnées du médiateur à désigner]</span>.</p>
-    <p><b style="color:var(--cream)">Droit applicable.</b> Les présentes conditions sont soumises au droit français. En cas de litige, une solution amiable sera recherchée en priorité.</p>
+    <p><b style="color:var(--cream)">Droit de rétractation.</b> Lorsque la vente est conclue à distance avec un consommateur, celui-ci dispose, conformément aux articles L.221-18 et suivants du Code de la consommation, d'un délai de quatorze (14) jours à compter de la réception de l'œuvre pour se rétracter, sans avoir à se justifier ni à payer de pénalité. Il suffit d'en informer l'artiste par une déclaration dénuée d'ambiguïté (e-mail suffisant) ; un formulaire type peut être fourni sur demande. L'œuvre doit être renvoyée dans les quatorze jours suivant cette information, correctement protégée pour le transport ; les frais de retour sont à la charge de l'acheteur. Le remboursement intervient au plus tard quatorze jours après récupération de l'œuvre. La responsabilité de l'acheteur n'est engagée qu'en cas de dépréciation résultant de manipulations autres que celles nécessaires pour vérifier l'œuvre. Le caractère unique d'une œuvre ne prive pas l'acheteur de ce droit ; seules les œuvres <b>confectionnées selon ses spécifications ou nettement personnalisées</b> en sont exclues (art. L.221-28, 3°).</p>
+    <p><b style="color:var(--cream)">Garanties.</b> L'acheteur bénéficie de la garantie légale de conformité (art. L.217-3 et suivants du Code de la consommation) et de la garantie des vices cachés (art. 1641 et suivants du Code civil).</p>
+    <p><b style="color:var(--cream)">Réclamations et médiation.</b> Toute réclamation peut être adressée à lksartpeintures@gmail.com ; une solution amiable sera recherchée en priorité. Lorsque la vente est conclue par un professionnel avec un consommateur, celui-ci peut, en cas de litige non résolu, recourir gratuitement à un médiateur de la consommation (art. L.612-1 du Code de la consommation). Les coordonnées du médiateur compétent sont communiquées sur demande à l'adresse ci-dessus.</p>
+    <p><b style="color:var(--cream)">Droit applicable.</b> Les présentes conditions sont soumises au droit français.</p>
 
-    <p style="margin-top:22px; font-size:.82rem; color:var(--muted-2)">Document à finaliser avec les informations légales définitives de Léa avant la mise en ligne publique. Dernière mise à jour : 2026.</p>
+    <p style="margin-top:22px; font-size:.82rem; color:var(--muted-2)">Dernière mise à jour : septembre 2026.</p>
   </div>
 </div>
 
@@ -306,8 +307,8 @@
 <!-- Supabase JS (CDN), service e-mail, puis configuration et logique du site -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="assets/config.js?v=31"></script>
-<script src="assets/store.js?v=31"></script>
-<script src="assets/app.js?v=31"></script>
+<script src="assets/config.js?v=32"></script>
+<script src="assets/store.js?v=32"></script>
+<script src="assets/app.js?v=32"></script>
 </body>
 </html>

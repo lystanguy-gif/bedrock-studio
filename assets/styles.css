@@ -505,3 +505,13 @@ h2.title{
 /* Le contenu de l'aide reprend la mise en forme du guide */
 #helpBody h4{margin-top:22px}
 #helpBody > *:first-child{margin-top:0}
+
+/* Mention RGPD courte sous le formulaire de contact */
+.form-privacy{
+  margin:14px 0 0; font-size:.78rem; line-height:1.6; color:var(--muted-2);
+}
+.link-inline{
+  background:none; border:0; padding:0; font:inherit; color:var(--gold);
+  text-decoration:underline; cursor:pointer;
+}
+.link-inline:hover, .link-inline:focus-visible{ color:var(--gold-bright); }

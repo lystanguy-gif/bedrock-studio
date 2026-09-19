@@ -391,16 +391,9 @@
     if (e.key === 'ArrowRight') stepLB(1);
   });
 
-  /* achat — démonstration (modal) */
-  var buyModal = $('buyModal');
-  $('lbBuy').addEventListener('click', function () {
-    var w = WORKS[curIndex]; if (!w) return;
-    $('buyWork').textContent = '« ' + w.title + ' », ' + w.medium + (w.dimensions ? ', ' + w.dimensions : '');
-    $('buyPrice').textContent = formatPrice(w.price) || '';
-    buyModal.classList.add('open');
-  });
-  document.querySelector('[data-close-buy]').addEventListener('click', function () { buyModal.classList.remove('open'); });
-  buyModal.addEventListener('click', function (e) { if (e.target === buyModal) buyModal.classList.remove('open'); });
+  /* Le bouton de paiement n'est affiche que si PAYPAL_CLIENT_ID est renseigne
+     (voir setupPurchase). Tant que la vente en ligne n'est pas active, aucun
+     parcours d'achat n'est propose au visiteur : on l'oriente vers le contact. */
 
   /* « Demander le prix » : pré-remplit le message de contact et y conduit */
   $('lbAsk').addEventListener('click', function () {
@@ -561,10 +554,13 @@
   /* ---------- modale mentions légales ---------- */
   var legal = $('legalModal');
   $('openLegal').addEventListener('click', function () { legal.classList.add('open'); });
+  // Lien « En savoir plus » de la mention RGPD placee sous le formulaire.
+  var openLegalForm = $('openLegalForm');
+  if (openLegalForm) openLegalForm.addEventListener('click', function () { legal.classList.add('open'); });
   document.querySelector('[data-close-legal]').addEventListener('click', function () { legal.classList.remove('open'); });
   legal.addEventListener('click', function (e) { if (e.target === legal) legal.classList.remove('open'); });
   addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { legal.classList.remove('open'); buyModal.classList.remove('open'); }
+    if (e.key === 'Escape') { legal.classList.remove('open'); }
   });
 
   /* ---------- navigation (scroll, menu mobile, ancres) ---------- */
